@@ -4,6 +4,9 @@ import { getCollection } from "@/lib/db/mongodb";
 export async function GET() {
   try {
     const collection = await getCollection("cvs");
+    if (!collection) {
+      return NextResponse.json({ cvs: [] });
+    }
     const cvs = await collection.find({}).sort({ createdAt: -1 }).limit(100).toArray();
     return NextResponse.json({ cvs });
   } catch (error) {
@@ -22,6 +25,9 @@ export async function DELETE(request: NextRequest) {
     }
 
     const collection = await getCollection("cvs");
+    if (!collection) {
+      return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
+    }
     await collection.deleteOne({ id });
 
     return NextResponse.json({ success: true });
