@@ -25,7 +25,7 @@ export function UploadDropzone({ onFilesAdded }: UploadDropzoneProps) {
     const files = Array.from(e.dataTransfer.files).filter(
       (file) => file.type === "application/pdf" || 
                 file.name.endsWith(".docx") ||
-                file.name.endsWith(".doc")
+                file.name.endsWith(".txt")
     );
     if (files.length > 0) {
       onFilesAdded(files);
@@ -67,12 +67,12 @@ export function UploadDropzone({ onFilesAdded }: UploadDropzoneProps) {
         <div className="flex gap-2 mt-2">
           <Badge variant="secondary" className="text-[9px] px-2 py-0.5">PDF</Badge>
           <Badge variant="secondary" className="text-[9px] px-2 py-0.5">DOCX</Badge>
-          <Badge variant="secondary" className="text-[9px] px-2 py-0.5">DOC</Badge>
+          <Badge variant="secondary" className="text-[9px] px-2 py-0.5">TXT</Badge>
         </div>
         <input
           type="file"
           className="hidden"
-          accept=".pdf,.doc,.docx"
+          accept=".pdf,.docx,.txt"
           multiple
           onChange={handleFileInput}
           data-testid="input-file-upload"
