@@ -70,12 +70,12 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
   };
 
   const templateStyles = {
-    "modern-dark": { headerBg: "#1a1a2e", accent: "#d4af37", headerText: "#ffffff", bodyBg: "#ffffff", borderBottom: "none" },
-    "classic-light": { headerBg: "#f5f5f5", accent: "#2c3e50", headerText: "#1a1a1a", bodyBg: "#ffffff", borderBottom: "1px solid #e0e0e0" },
-    "executive": { headerBg: "#0a192f", accent: "#64ffda", headerText: "#ffffff", bodyBg: "#f8f9fa", borderBottom: "none" },
-    "minimal": { headerBg: "#ffffff", accent: "#000000", headerText: "#1a1a1a", bodyBg: "#ffffff", borderBottom: "2px solid #000000" },
-    "creative": { headerBg: "#667eea", accent: "#f093fb", headerText: "#ffffff", bodyBg: "#fafafa", borderBottom: "none" },
-    "professional": { headerBg: "#2d3436", accent: "#74b9ff", headerText: "#ffffff", bodyBg: "#ffffff", borderBottom: "none" },
+    "modern-dark": { headerBg: "#1a1a2e", accent: "#d4af37", headerText: "#ffffff", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "none" },
+    "classic-light": { headerBg: "#f5f5f5", accent: "#2c3e50", headerText: "#1a1a1a", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "1px solid #e0e0e0" },
+    "executive": { headerBg: "#0a192f", accent: "#64ffda", headerText: "#ffffff", bodyBg: "#f8f9fa", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "none" },
+    "minimal": { headerBg: "#ffffff", accent: "#000000", headerText: "#1a1a1a", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "2px solid #000000" },
+    "creative": { headerBg: "#667eea", accent: "#9b59b6", headerText: "#ffffff", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "none" },
+    "professional": { headerBg: "#2d3436", accent: "#74b9ff", headerText: "#ffffff", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "none" },
   };
 
   const style = templateStyles[template] || templateStyles["modern-dark"];
@@ -130,13 +130,13 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
         </Box>
       </Box>
 
-      <Box sx={{ p: 3 }}>
+      <Box sx={{ p: 3, color: style.bodyText }}>
         {cv.summary && (
           <Box sx={{ mb: 3 }}>
             <Typography variant="h6" sx={{ color: style.accent, mb: 1, fontFamily: "'Cormorant Garamond', serif" }}>
               Summary
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
               <EditableField value={cv.summary} onChange={(v) => updateField("summary", v)} multiline />
             </Typography>
           </Box>
@@ -149,14 +149,14 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
             </Typography>
             {cv.experience.map((exp, index) => (
               <Box key={exp.id} sx={{ mb: 2 }}>
-                <Typography variant="subtitle1" fontWeight={600}>
+                <Typography variant="subtitle1" fontWeight={600} sx={{ color: style.bodyText }}>
                   {exp.role}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
                   {exp.company} {exp.duration && `| ${exp.duration}`}
                 </Typography>
                 {exp.description && (
-                  <Typography variant="body2" sx={{ mt: 0.5 }}>
+                  <Typography variant="body2" sx={{ mt: 0.5, color: style.bodyText }}>
                     {exp.description}
                   </Typography>
                 )}
@@ -173,10 +173,10 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
             </Typography>
             {cv.education.map((edu) => (
               <Box key={edu.id} sx={{ mb: 1 }}>
-                <Typography variant="subtitle2" fontWeight={600}>
+                <Typography variant="subtitle2" fontWeight={600} sx={{ color: style.bodyText }}>
                   {edu.degree}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
                   {edu.institution} {edu.year && `(${edu.year})`}
                 </Typography>
               </Box>
@@ -195,7 +195,7 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
                   key={index}
                   label={skill}
                   size="small"
-                  sx={{ bgcolor: style.accent, color: style.headerBg }}
+                  sx={{ bgcolor: style.accent, color: "#ffffff" }}
                 />
               ))}
             </Box>

@@ -586,6 +586,8 @@ function CVPreview({ cv, template, onUpdateCV }) {
             accent: "#d4af37",
             headerText: "#ffffff",
             bodyBg: "#ffffff",
+            bodyText: "#1a1a1a",
+            bodyTextSecondary: "#4a4a4a",
             borderBottom: "none"
         },
         "classic-light": {
@@ -593,6 +595,8 @@ function CVPreview({ cv, template, onUpdateCV }) {
             accent: "#2c3e50",
             headerText: "#1a1a1a",
             bodyBg: "#ffffff",
+            bodyText: "#1a1a1a",
+            bodyTextSecondary: "#4a4a4a",
             borderBottom: "1px solid #e0e0e0"
         },
         "executive": {
@@ -600,6 +604,8 @@ function CVPreview({ cv, template, onUpdateCV }) {
             accent: "#64ffda",
             headerText: "#ffffff",
             bodyBg: "#f8f9fa",
+            bodyText: "#1a1a1a",
+            bodyTextSecondary: "#4a4a4a",
             borderBottom: "none"
         },
         "minimal": {
@@ -607,13 +613,17 @@ function CVPreview({ cv, template, onUpdateCV }) {
             accent: "#000000",
             headerText: "#1a1a1a",
             bodyBg: "#ffffff",
+            bodyText: "#1a1a1a",
+            bodyTextSecondary: "#4a4a4a",
             borderBottom: "2px solid #000000"
         },
         "creative": {
             headerBg: "#667eea",
-            accent: "#f093fb",
+            accent: "#9b59b6",
             headerText: "#ffffff",
-            bodyBg: "#fafafa",
+            bodyBg: "#ffffff",
+            bodyText: "#1a1a1a",
+            bodyTextSecondary: "#4a4a4a",
             borderBottom: "none"
         },
         "professional": {
@@ -621,6 +631,8 @@ function CVPreview({ cv, template, onUpdateCV }) {
             accent: "#74b9ff",
             headerText: "#ffffff",
             bodyBg: "#ffffff",
+            bodyText: "#1a1a1a",
+            bodyTextSecondary: "#4a4a4a",
             borderBottom: "none"
         }
     };
@@ -870,7 +882,8 @@ function CVPreview({ cv, template, onUpdateCV }) {
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
                 sx: {
-                    p: 3
+                    p: 3,
+                    color: style.bodyText
                 },
                 children: [
                     cv.summary && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -893,7 +906,9 @@ function CVPreview({ cv, template, onUpdateCV }) {
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
                                 variant: "body2",
-                                color: "text.secondary",
+                                sx: {
+                                    color: style.bodyTextSecondary
+                                },
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(EditableField, {
                                     value: cv.summary,
                                     onChange: (v)=>updateField("summary", v),
@@ -940,6 +955,9 @@ function CVPreview({ cv, template, onUpdateCV }) {
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
                                             variant: "subtitle1",
                                             fontWeight: 600,
+                                            sx: {
+                                                color: style.bodyText
+                                            },
                                             children: exp.role
                                         }, void 0, false, {
                                             fileName: "[project]/components/CVPreview.tsx",
@@ -948,7 +966,9 @@ function CVPreview({ cv, template, onUpdateCV }) {
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
                                             variant: "body2",
-                                            color: "text.secondary",
+                                            sx: {
+                                                color: style.bodyTextSecondary
+                                            },
                                             children: [
                                                 exp.company,
                                                 " ",
@@ -962,7 +982,8 @@ function CVPreview({ cv, template, onUpdateCV }) {
                                         exp.description && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
                                             variant: "body2",
                                             sx: {
-                                                mt: 0.5
+                                                mt: 0.5,
+                                                color: style.bodyText
                                             },
                                             children: exp.description
                                         }, void 0, false, {
@@ -1017,6 +1038,9 @@ function CVPreview({ cv, template, onUpdateCV }) {
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
                                             variant: "subtitle2",
                                             fontWeight: 600,
+                                            sx: {
+                                                color: style.bodyText
+                                            },
                                             children: edu.degree
                                         }, void 0, false, {
                                             fileName: "[project]/components/CVPreview.tsx",
@@ -1025,7 +1049,9 @@ function CVPreview({ cv, template, onUpdateCV }) {
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
                                             variant: "body2",
-                                            color: "text.secondary",
+                                            sx: {
+                                                color: style.bodyTextSecondary
+                                            },
                                             children: [
                                                 edu.institution,
                                                 " ",
@@ -1074,7 +1100,7 @@ function CVPreview({ cv, template, onUpdateCV }) {
                                         size: "small",
                                         sx: {
                                             bgcolor: style.accent,
-                                            color: style.headerBg
+                                            color: "#ffffff"
                                         }
                                     }, index, false, {
                                         fileName: "[project]/components/CVPreview.tsx",
