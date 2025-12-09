@@ -2135,14 +2135,15 @@ function Home() {
         for (const file of doneFiles){
             const cv = parsedCVs.get(file.id);
             if (cv) {
-                await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$export$2f$exportCV$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["exportToPDF"])(cv, `${cv.name || file.name}-cv.pdf`);
+                await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$export$2f$exportCV$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["exportToPDF"])(cv, `${cv.name || file.name}-cv.pdf`, template);
             }
         }
         showSnackbar(`Exported ${doneFiles.length} CV(s) as PDF`, "success");
         setExportMenuAnchor(null);
     }, [
         files,
-        parsedCVs
+        parsedCVs,
+        template
     ]);
     const handleExportDOCX = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useCallback"])(async ()=>{
         const doneFiles = files.filter((f)=>f.status === "done");
@@ -2153,14 +2154,15 @@ function Home() {
         for (const file of doneFiles){
             const cv = parsedCVs.get(file.id);
             if (cv) {
-                await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$export$2f$exportCV$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["exportToDOCX"])(cv, `${cv.name || file.name}-cv.docx`);
+                await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$export$2f$exportCV$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["exportToDOCX"])(cv, `${cv.name || file.name}-cv.docx`, template);
             }
         }
         showSnackbar(`Exported ${doneFiles.length} CV(s) as DOCX`, "success");
         setExportMenuAnchor(null);
     }, [
         files,
-        parsedCVs
+        parsedCVs,
+        template
     ]);
     const handleExportJSON = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useCallback"])(()=>{
         const doneFiles = files.filter((f)=>f.status === "done");

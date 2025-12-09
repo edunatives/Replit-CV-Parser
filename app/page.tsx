@@ -173,12 +173,12 @@ export default function Home() {
     for (const file of doneFiles) {
       const cv = parsedCVs.get(file.id);
       if (cv) {
-        await exportToPDF(cv, `${cv.name || file.name}-cv.pdf`);
+        await exportToPDF(cv, `${cv.name || file.name}-cv.pdf`, template);
       }
     }
     showSnackbar(`Exported ${doneFiles.length} CV(s) as PDF`, "success");
     setExportMenuAnchor(null);
-  }, [files, parsedCVs]);
+  }, [files, parsedCVs, template]);
 
   const handleExportDOCX = useCallback(async () => {
     const doneFiles = files.filter((f) => f.status === "done");
@@ -189,12 +189,12 @@ export default function Home() {
     for (const file of doneFiles) {
       const cv = parsedCVs.get(file.id);
       if (cv) {
-        await exportToDOCX(cv, `${cv.name || file.name}-cv.docx`);
+        await exportToDOCX(cv, `${cv.name || file.name}-cv.docx`, template);
       }
     }
     showSnackbar(`Exported ${doneFiles.length} CV(s) as DOCX`, "success");
     setExportMenuAnchor(null);
-  }, [files, parsedCVs]);
+  }, [files, parsedCVs, template]);
 
   const handleExportJSON = useCallback(() => {
     const doneFiles = files.filter((f) => f.status === "done");

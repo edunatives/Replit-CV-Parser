@@ -2215,7 +2215,7 @@ function Home() {
             for (const file of doneFiles){
                 const cv = parsedCVs.get(file.id);
                 if (cv) {
-                    await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$export$2f$exportCV$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["exportToPDF"])(cv, `${cv.name || file.name}-cv.pdf`);
+                    await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$export$2f$exportCV$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["exportToPDF"])(cv, `${cv.name || file.name}-cv.pdf`, template);
                 }
             }
             showSnackbar(`Exported ${doneFiles.length} CV(s) as PDF`, "success");
@@ -2223,7 +2223,8 @@ function Home() {
         }
     }["Home.useCallback[handleExportPDF]"], [
         files,
-        parsedCVs
+        parsedCVs,
+        template
     ]);
     const handleExportDOCX = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "Home.useCallback[handleExportDOCX]": async ()=>{
@@ -2237,7 +2238,7 @@ function Home() {
             for (const file of doneFiles){
                 const cv = parsedCVs.get(file.id);
                 if (cv) {
-                    await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$export$2f$exportCV$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["exportToDOCX"])(cv, `${cv.name || file.name}-cv.docx`);
+                    await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$export$2f$exportCV$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["exportToDOCX"])(cv, `${cv.name || file.name}-cv.docx`, template);
                 }
             }
             showSnackbar(`Exported ${doneFiles.length} CV(s) as DOCX`, "success");
@@ -2245,7 +2246,8 @@ function Home() {
         }
     }["Home.useCallback[handleExportDOCX]"], [
         files,
-        parsedCVs
+        parsedCVs,
+        template
     ]);
     const handleExportJSON = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "Home.useCallback[handleExportJSON]": ()=>{
