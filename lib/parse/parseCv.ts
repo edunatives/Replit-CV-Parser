@@ -1,9 +1,31 @@
 import type { ParsedCV } from "@/types/cv";
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const pdfParse = require("pdf-parse");
-// eslint-disable-next-line @typescript-eslint/no-require-imports  
-const mammoth = require("mammoth");
+async function parsePdfBuffer(buffer: Buffer): Promise<{ text: string; numpages: number }> {
+  const pdfModule = await import("pdf-parse");
+  let pdfParse: ((buffer: Buffer, options?: object) => Promise<{ text: string; numpages: number }>) | undefined;
+  
+  if (typeof pdfModule === "function") {
+    pdfParse = pdfModule as typeof pdfParse;
+  } else if (typeof pdfModule.default === "function") {
+    pdfParse = pdfModule.default;
+  } else if (pdfModule.default && typeof pdfModule.default.default === "function") {
+    pdfParse = pdfModule.default.default;
+  }
+  
+  if (!pdfParse || typeof pdfParse !== "function") {
+    console.error("pdf-parse module structure:", JSON.stringify(Object.keys(pdfModule)));
+    throw new Error(`pdf-parse module not callable. Keys: ${Object.keys(pdfModule).join(", ")}`);
+  }
+  
+  return pdfParse(buffer, { max: 0 });
+}
+
+async function parseDocxBuffer(buffer: Buffer): Promise<string> {
+  const mammothModule = await import("mammoth");
+  const mammoth = mammothModule.default ?? mammothModule;
+  const result = await mammoth.extractRawText({ buffer });
+  return result.value;
+}
 
 function extractEmail(text: string): string {
   const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
@@ -508,7 +530,7 @@ export async function parseCV(buffer: Buffer, fileName: string, fileId: string):
   try {
     if (extension === "pdf") {
       console.log(`Parsing PDF file: ${fileName}, buffer size: ${buffer.length}`);
-      const data = await pdfParse(buffer, { max: 0 });
+      const data = await parsePdfBuffer(buffer);
       text = data.text;
       
       text = text
@@ -521,8 +543,7 @@ export async function parseCV(buffer: Buffer, fileName: string, fileId: string):
       console.log(`PDF parsed successfully, extracted ${text.length} characters, ${data.numpages} pages`);
     } else if (extension === "docx" || extension === "doc") {
       console.log(`Parsing Word file: ${fileName}, buffer size: ${buffer.length}`);
-      const result = await mammoth.extractRawText({ buffer });
-      text = result.value;
+      text = await parseDocxBuffer(buffer);
       console.log(`Word file parsed successfully, extracted ${text.length} characters`);
     } else {
       console.log(`Parsing text file: ${fileName}`);

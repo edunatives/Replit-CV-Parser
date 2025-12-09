@@ -41,12 +41,16 @@ const mod = __turbopack_context__.x("next/dist/server/app-render/after-task-asyn
 
 module.exports = mod;
 }),
-"[externals]/pdf-parse [external] (pdf-parse, cjs)", ((__turbopack_context__, module, exports) => {
+"[externals]/pdf-parse [external] (pdf-parse, esm_import)", ((__turbopack_context__) => {
+"use strict";
 
-const mod = __turbopack_context__.x("pdf-parse", () => require("pdf-parse"));
+return __turbopack_context__.a(async (__turbopack_handle_async_dependencies__, __turbopack_async_result__) => { try {
 
-module.exports = mod;
-}),
+const mod = await __turbopack_context__.y("pdf-parse");
+
+__turbopack_context__.n(mod);
+__turbopack_async_result__();
+} catch(e) { __turbopack_async_result__(e); } }, true);}),
 "[externals]/mammoth [external] (mammoth, cjs)", ((__turbopack_context__, module, exports) => {
 
 const mod = __turbopack_context__.x("mammoth", () => require("mammoth"));
@@ -56,14 +60,20 @@ module.exports = mod;
 "[project]/lib/parse/parseCv.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
+return __turbopack_context__.a(async (__turbopack_handle_async_dependencies__, __turbopack_async_result__) => { try {
+
 __turbopack_context__.s([
     "parseCV",
     ()=>parseCV
 ]);
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const pdfParse = __turbopack_context__.r("[externals]/pdf-parse [external] (pdf-parse, cjs)");
-// eslint-disable-next-line @typescript-eslint/no-require-imports  
-const mammoth = __turbopack_context__.r("[externals]/mammoth [external] (mammoth, cjs)");
+var __TURBOPACK__imported__module__$5b$externals$5d2f$pdf$2d$parse__$5b$external$5d$__$28$pdf$2d$parse$2c$__esm_import$29$__ = __turbopack_context__.i("[externals]/pdf-parse [external] (pdf-parse, esm_import)");
+var __TURBOPACK__imported__module__$5b$externals$5d2f$mammoth__$5b$external$5d$__$28$mammoth$2c$__cjs$29$__ = __turbopack_context__.i("[externals]/mammoth [external] (mammoth, cjs)");
+var __turbopack_async_dependencies__ = __turbopack_handle_async_dependencies__([
+    __TURBOPACK__imported__module__$5b$externals$5d2f$pdf$2d$parse__$5b$external$5d$__$28$pdf$2d$parse$2c$__esm_import$29$__
+]);
+[__TURBOPACK__imported__module__$5b$externals$5d2f$pdf$2d$parse__$5b$external$5d$__$28$pdf$2d$parse$2c$__esm_import$29$__] = __turbopack_async_dependencies__.then ? (await __turbopack_async_dependencies__)() : __turbopack_async_dependencies__;
+;
+;
 function extractEmail(text) {
     const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
     const matches = text.match(emailRegex);
@@ -658,7 +668,7 @@ async function parseCV(buffer, fileName, fileId) {
     try {
         if (extension === "pdf") {
             console.log(`Parsing PDF file: ${fileName}, buffer size: ${buffer.length}`);
-            const data = await pdfParse(buffer, {
+            const data = await (0, __TURBOPACK__imported__module__$5b$externals$5d2f$pdf$2d$parse__$5b$external$5d$__$28$pdf$2d$parse$2c$__esm_import$29$__["default"])(buffer, {
                 max: 0
             });
             text = data.text;
@@ -666,7 +676,7 @@ async function parseCV(buffer, fileName, fileId) {
             console.log(`PDF parsed successfully, extracted ${text.length} characters, ${data.numpages} pages`);
         } else if (extension === "docx" || extension === "doc") {
             console.log(`Parsing Word file: ${fileName}, buffer size: ${buffer.length}`);
-            const result = await mammoth.extractRawText({
+            const result = await __TURBOPACK__imported__module__$5b$externals$5d2f$mammoth__$5b$external$5d$__$28$mammoth$2c$__cjs$29$__["default"].extractRawText({
                 buffer
             });
             text = result.value;
@@ -703,7 +713,8 @@ async function parseCV(buffer, fileName, fileId) {
         rawText: text
     };
 }
-}),
+__turbopack_async_result__();
+} catch(e) { __turbopack_async_result__(e); } }, false);}),
 "[externals]/mongodb [external] (mongodb, cjs)", ((__turbopack_context__, module, exports) => {
 
 const mod = __turbopack_context__.x("mongodb", () => require("mongodb"));
@@ -766,6 +777,8 @@ async function getCollection(collectionName) {
 "[project]/app/api/parse/route.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
+return __turbopack_context__.a(async (__turbopack_handle_async_dependencies__, __turbopack_async_result__) => { try {
+
 __turbopack_context__.s([
     "POST",
     ()=>POST,
@@ -775,6 +788,10 @@ __turbopack_context__.s([
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/server.js [app-route] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$parse$2f$parseCv$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/parse/parseCv.ts [app-route] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$db$2f$mongodb$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/db/mongodb.ts [app-route] (ecmascript)");
+var __turbopack_async_dependencies__ = __turbopack_handle_async_dependencies__([
+    __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$parse$2f$parseCv$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__
+]);
+[__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$parse$2f$parseCv$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__] = __turbopack_async_dependencies__.then ? (await __turbopack_async_dependencies__)() : __turbopack_async_dependencies__;
 ;
 ;
 ;
@@ -839,7 +856,8 @@ async function POST(request) {
         });
     }
 }
-}),
+__turbopack_async_result__();
+} catch(e) { __turbopack_async_result__(e); } }, false);}),
 ];
 
-//# sourceMappingURL=%5Broot-of-the-server%5D__f23fc052._.js.map
+//# sourceMappingURL=%5Broot-of-the-server%5D__3ef53d3a._.js.map
