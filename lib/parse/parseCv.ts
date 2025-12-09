@@ -1,5 +1,10 @@
 import type { ParsedCV } from "@/types/cv";
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const pdfParse = require("pdf-parse");
+// eslint-disable-next-line @typescript-eslint/no-require-imports  
+const mammoth = require("mammoth");
+
 function extractEmail(text: string): string {
   const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
   const matches = text.match(emailRegex);
@@ -219,12 +224,9 @@ export async function parseCV(buffer: Buffer, fileName: string, fileId: string):
   
   try {
     if (extension === "pdf") {
-      const pdfParseModule = await import("pdf-parse");
-      const pdfParse = pdfParseModule.default || pdfParseModule;
       const data = await pdfParse(buffer);
       text = data.text;
     } else if (extension === "docx" || extension === "doc") {
-      const mammoth = await import("mammoth");
       const result = await mammoth.extractRawText({ buffer });
       text = result.value;
     } else {
