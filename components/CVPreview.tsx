@@ -2,6 +2,8 @@
 
 import { Box, Typography, Paper, Chip, Divider, TextField, IconButton } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
@@ -17,7 +19,17 @@ interface CVPreviewProps {
   onUpdateCV: (cv: ParsedCV) => void;
 }
 
-function EditableField({ value, onChange, multiline = false }: { value: string; onChange: (v: string) => void; multiline?: boolean }) {
+function EditableField({ 
+  value, 
+  onChange, 
+  multiline = false,
+  placeholder = "(click to edit)"
+}: { 
+  value: string; 
+  onChange: (v: string) => void; 
+  multiline?: boolean;
+  placeholder?: string;
+}) {
   const [editing, setEditing] = useState(false);
   const [tempValue, setTempValue] = useState(value);
 
@@ -36,6 +48,10 @@ function EditableField({ value, onChange, multiline = false }: { value: string; 
             onChange(tempValue);
             setEditing(false);
           }
+          if (e.key === "Escape") {
+            setTempValue(value);
+            setEditing(false);
+          }
         }}
         multiline={multiline}
         rows={multiline ? 3 : 1}
@@ -48,7 +64,10 @@ function EditableField({ value, onChange, multiline = false }: { value: string; 
 
   return (
     <Box
-      onClick={() => setEditing(true)}
+      onClick={() => {
+        setTempValue(value);
+        setEditing(true);
+      }}
       sx={{
         cursor: "pointer",
         "&:hover": { bgcolor: "action.hover", borderRadius: 1 },
@@ -56,17 +75,175 @@ function EditableField({ value, onChange, multiline = false }: { value: string; 
         display: "inline-flex",
         alignItems: "center",
         gap: 0.5,
+        minWidth: 50,
       }}
     >
-      <span>{value || "(click to edit)"}</span>
+      <span>{value || placeholder}</span>
       <EditIcon sx={{ fontSize: 14, opacity: 0.5 }} />
     </Box>
   );
 }
 
+function EditableContactField({ 
+  icon: Icon, 
+  value, 
+  onChange,
+  placeholder,
+  headerText
+}: { 
+  icon: React.ElementType;
+  value: string; 
+  onChange: (v: string) => void;
+  placeholder: string;
+  headerText: string;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [tempValue, setTempValue] = useState(value);
+
+  if (editing) {
+    return (
+      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+        <Icon fontSize="small" />
+        <TextField
+          size="small"
+          value={tempValue}
+          onChange={(e) => setTempValue(e.target.value)}
+          onBlur={() => {
+            onChange(tempValue);
+            setEditing(false);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              onChange(tempValue);
+              setEditing(false);
+            }
+            if (e.key === "Escape") {
+              setTempValue(value);
+              setEditing(false);
+            }
+          }}
+          autoFocus
+          sx={{ 
+            "& .MuiInputBase-input": { 
+              color: headerText,
+              py: 0.5,
+              px: 1,
+              fontSize: "0.875rem"
+            },
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderColor: "rgba(255,255,255,0.3)"
+            }
+          }}
+        />
+      </Box>
+    );
+  }
+
+  return (
+    <Box 
+      onClick={() => {
+        setTempValue(value);
+        setEditing(true);
+      }}
+      sx={{ 
+        display: "flex", 
+        alignItems: "center", 
+        gap: 0.5,
+        cursor: "pointer",
+        "&:hover": { opacity: 0.7 },
+        p: 0.5,
+        borderRadius: 1,
+      }}
+    >
+      <Icon fontSize="small" />
+      <Typography variant="body2">{value || placeholder}</Typography>
+      <EditIcon sx={{ fontSize: 12, opacity: 0.5 }} />
+    </Box>
+  );
+}
+
 export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
-  const updateField = (field: keyof ParsedCV, value: string) => {
+  const updateField = (field: keyof ParsedCV, value: string | string[]) => {
     onUpdateCV({ ...cv, [field]: value });
+  };
+
+  const updateExperience = (index: number, field: string, value: string) => {
+    const newExperience = [...cv.experience];
+    newExperience[index] = { ...newExperience[index], [field]: value };
+    onUpdateCV({ ...cv, experience: newExperience });
+  };
+
+  const deleteExperience = (index: number) => {
+    const newExperience = cv.experience.filter((_, i) => i !== index);
+    onUpdateCV({ ...cv, experience: newExperience });
+  };
+
+  const addExperience = () => {
+    const newExp = {
+      id: `exp-new-${Date.now()}`,
+      role: "New Role",
+      company: "Company Name",
+      duration: "",
+      description: ""
+    };
+    onUpdateCV({ ...cv, experience: [...cv.experience, newExp] });
+  };
+
+  const updateEducation = (index: number, field: string, value: string) => {
+    const newEducation = [...cv.education];
+    newEducation[index] = { ...newEducation[index], [field]: value };
+    onUpdateCV({ ...cv, education: newEducation });
+  };
+
+  const deleteEducation = (index: number) => {
+    const newEducation = cv.education.filter((_, i) => i !== index);
+    onUpdateCV({ ...cv, education: newEducation });
+  };
+
+  const addEducation = () => {
+    const newEdu = {
+      id: `edu-new-${Date.now()}`,
+      degree: "Degree",
+      institution: "Institution",
+      year: ""
+    };
+    onUpdateCV({ ...cv, education: [...cv.education, newEdu] });
+  };
+
+  const updateSkill = (index: number, value: string) => {
+    const newSkills = [...cv.skills];
+    newSkills[index] = value;
+    onUpdateCV({ ...cv, skills: newSkills });
+  };
+
+  const deleteSkill = (index: number) => {
+    const newSkills = cv.skills.filter((_, i) => i !== index);
+    onUpdateCV({ ...cv, skills: newSkills });
+  };
+
+  const addSkill = () => {
+    onUpdateCV({ ...cv, skills: [...cv.skills, "New Skill"] });
+  };
+
+  const updateCertification = (index: number, field: string, value: string) => {
+    const newCerts = [...(cv.certifications || [])];
+    newCerts[index] = { ...newCerts[index], [field]: value };
+    onUpdateCV({ ...cv, certifications: newCerts });
+  };
+
+  const deleteCertification = (index: number) => {
+    const newCerts = (cv.certifications || []).filter((_, i) => i !== index);
+    onUpdateCV({ ...cv, certifications: newCerts });
+  };
+
+  const addCertification = () => {
+    const newCert = {
+      id: `cert-new-${Date.now()}`,
+      name: "Certification Name",
+      issuer: "",
+      year: ""
+    };
+    onUpdateCV({ ...cv, certifications: [...(cv.certifications || []), newCert] });
   };
 
   const templateStyles = {
@@ -84,143 +261,388 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
     <Paper elevation={2} sx={{ overflow: "hidden", bgcolor: style.bodyBg }} data-testid="cv-preview">
       <Box sx={{ bgcolor: style.headerBg, p: 3, color: style.headerText, borderBottom: style.borderBottom }}>
         <Typography variant="h4" component="h2" sx={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 600 }}>
-          <EditableField value={cv.name} onChange={(v) => updateField("name", v)} />
+          <EditableField value={cv.name} onChange={(v) => updateField("name", v)} placeholder="Your Name" />
         </Typography>
         <Typography variant="h6" sx={{ color: style.accent, mt: 0.5 }}>
-          <EditableField value={cv.title} onChange={(v) => updateField("title", v)} />
+          <EditableField value={cv.title} onChange={(v) => updateField("title", v)} placeholder="Your Title" />
         </Typography>
         
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mt: 2 }}>
-          {cv.email && (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <EmailIcon fontSize="small" />
-              <Typography variant="body2">{cv.email}</Typography>
-            </Box>
-          )}
-          {cv.phone && (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <PhoneIcon fontSize="small" />
-              <Typography variant="body2">{cv.phone}</Typography>
-            </Box>
-          )}
-          {cv.location && (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <LocationOnIcon fontSize="small" />
-              <Typography variant="body2">{cv.location}</Typography>
-            </Box>
-          )}
-          {cv.linkedin && (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <LinkedInIcon fontSize="small" />
-              <Typography variant="body2">{cv.linkedin}</Typography>
-            </Box>
-          )}
-          {cv.github && (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <GitHubIcon fontSize="small" />
-              <Typography variant="body2">{cv.github}</Typography>
-            </Box>
-          )}
-          {cv.website && (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <LinkIcon fontSize="small" />
-              <Typography variant="body2">{cv.website}</Typography>
-            </Box>
-          )}
+          <EditableContactField
+            icon={EmailIcon}
+            value={cv.email}
+            onChange={(v) => updateField("email", v)}
+            placeholder="email@example.com"
+            headerText={style.headerText}
+          />
+          <EditableContactField
+            icon={PhoneIcon}
+            value={cv.phone}
+            onChange={(v) => updateField("phone", v)}
+            placeholder="+1 234 567 890"
+            headerText={style.headerText}
+          />
+          <EditableContactField
+            icon={LocationOnIcon}
+            value={cv.location}
+            onChange={(v) => updateField("location", v)}
+            placeholder="City, Country"
+            headerText={style.headerText}
+          />
+          <EditableContactField
+            icon={LinkedInIcon}
+            value={cv.linkedin}
+            onChange={(v) => updateField("linkedin", v)}
+            placeholder="linkedin.com/in/..."
+            headerText={style.headerText}
+          />
+          <EditableContactField
+            icon={GitHubIcon}
+            value={cv.github}
+            onChange={(v) => updateField("github", v)}
+            placeholder="github.com/..."
+            headerText={style.headerText}
+          />
+          <EditableContactField
+            icon={LinkIcon}
+            value={cv.website}
+            onChange={(v) => updateField("website", v)}
+            placeholder="yourwebsite.com"
+            headerText={style.headerText}
+          />
         </Box>
       </Box>
 
       <Box sx={{ p: 3, color: style.bodyText }}>
-        {cv.summary && (
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="h6" sx={{ color: style.accent, mb: 1, fontFamily: "'Cormorant Garamond', serif" }}>
-              Summary
-            </Typography>
-            <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
-              <EditableField value={cv.summary} onChange={(v) => updateField("summary", v)} multiline />
-            </Typography>
-          </Box>
-        )}
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" sx={{ color: style.accent, mb: 1, fontFamily: "'Cormorant Garamond', serif" }}>
+            Summary
+          </Typography>
+          <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
+            <EditableField 
+              value={cv.summary} 
+              onChange={(v) => updateField("summary", v)} 
+              multiline 
+              placeholder="Write a professional summary..."
+            />
+          </Typography>
+        </Box>
 
-        {cv.experience.length > 0 && (
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="h6" sx={{ color: style.accent, mb: 1, fontFamily: "'Cormorant Garamond', serif" }}>
+        <Box sx={{ mb: 3 }}>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
+            <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Cormorant Garamond', serif" }}>
               Experience
             </Typography>
-            {cv.experience.map((exp, index) => (
-              <Box key={exp.id} sx={{ mb: 2 }}>
-                <Typography variant="subtitle1" fontWeight={600} sx={{ color: style.bodyText }}>
-                  {exp.role}
-                </Typography>
-                <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
-                  {exp.company} {exp.duration && `| ${exp.duration}`}
-                </Typography>
-                {exp.description && (
-                  <Typography variant="body2" sx={{ mt: 0.5, color: style.bodyText }}>
-                    {exp.description}
-                  </Typography>
-                )}
-                {index < cv.experience.length - 1 && <Divider sx={{ mt: 2 }} />}
-              </Box>
-            ))}
+            <IconButton size="small" onClick={addExperience} sx={{ color: style.accent }} data-testid="button-add-experience">
+              <AddIcon fontSize="small" />
+            </IconButton>
           </Box>
-        )}
+          {cv.experience.map((exp, index) => (
+            <Box key={exp.id} sx={{ mb: 2, position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
+              <IconButton 
+                className="delete-btn"
+                size="small" 
+                onClick={() => deleteExperience(index)}
+                sx={{ position: "absolute", right: 0, top: 0, visibility: "hidden", color: "error.main" }}
+                data-testid={`button-delete-experience-${index}`}
+              >
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+              <Typography variant="subtitle1" fontWeight={600} sx={{ color: style.bodyText }}>
+                <EditableField 
+                  value={exp.role} 
+                  onChange={(v) => updateExperience(index, "role", v)} 
+                  placeholder="Job Title"
+                />
+              </Typography>
+              <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap" }}>
+                <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
+                  <EditableField 
+                    value={exp.company} 
+                    onChange={(v) => updateExperience(index, "company", v)} 
+                    placeholder="Company Name"
+                  />
+                </Typography>
+                <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>|</Typography>
+                <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
+                  <EditableField 
+                    value={exp.duration} 
+                    onChange={(v) => updateExperience(index, "duration", v)} 
+                    placeholder="Duration"
+                  />
+                </Typography>
+              </Box>
+              <Typography variant="body2" sx={{ mt: 0.5, color: style.bodyText }}>
+                <EditableField 
+                  value={exp.description} 
+                  onChange={(v) => updateExperience(index, "description", v)} 
+                  multiline
+                  placeholder="Describe your responsibilities and achievements..."
+                />
+              </Typography>
+              {index < cv.experience.length - 1 && <Divider sx={{ mt: 2 }} />}
+            </Box>
+          ))}
+          {cv.experience.length === 0 && (
+            <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
+              Click + to add experience
+            </Typography>
+          )}
+        </Box>
 
-        {cv.education.length > 0 && (
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="h6" sx={{ color: style.accent, mb: 1, fontFamily: "'Cormorant Garamond', serif" }}>
+        <Box sx={{ mb: 3 }}>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
+            <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Cormorant Garamond', serif" }}>
               Education
             </Typography>
-            {cv.education.map((edu) => (
-              <Box key={edu.id} sx={{ mb: 1 }}>
-                <Typography variant="subtitle2" fontWeight={600} sx={{ color: style.bodyText }}>
-                  {edu.degree}
-                </Typography>
-                <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
-                  {edu.institution} {edu.year && `(${edu.year})`}
-                </Typography>
-              </Box>
-            ))}
+            <IconButton size="small" onClick={addEducation} sx={{ color: style.accent }} data-testid="button-add-education">
+              <AddIcon fontSize="small" />
+            </IconButton>
           </Box>
-        )}
+          {cv.education.map((edu, index) => (
+            <Box key={edu.id} sx={{ mb: 1, position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
+              <IconButton 
+                className="delete-btn"
+                size="small" 
+                onClick={() => deleteEducation(index)}
+                sx={{ position: "absolute", right: 0, top: 0, visibility: "hidden", color: "error.main" }}
+                data-testid={`button-delete-education-${index}`}
+              >
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+              <Typography variant="subtitle2" fontWeight={600} sx={{ color: style.bodyText }}>
+                <EditableField 
+                  value={edu.degree} 
+                  onChange={(v) => updateEducation(index, "degree", v)} 
+                  placeholder="Degree"
+                />
+              </Typography>
+              <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap" }}>
+                <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
+                  <EditableField 
+                    value={edu.institution} 
+                    onChange={(v) => updateEducation(index, "institution", v)} 
+                    placeholder="Institution"
+                  />
+                </Typography>
+                <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>(</Typography>
+                <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
+                  <EditableField 
+                    value={edu.year} 
+                    onChange={(v) => updateEducation(index, "year", v)} 
+                    placeholder="Year"
+                  />
+                </Typography>
+                <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>)</Typography>
+              </Box>
+            </Box>
+          ))}
+          {cv.education.length === 0 && (
+            <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
+              Click + to add education
+            </Typography>
+          )}
+        </Box>
 
-        {cv.skills.length > 0 && (
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="h6" sx={{ color: style.accent, mb: 1, fontFamily: "'Cormorant Garamond', serif" }}>
+        <Box sx={{ mb: 3 }}>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
+            <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Cormorant Garamond', serif" }}>
               Skills
             </Typography>
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-              {cv.skills.map((skill, index) => (
-                <Chip
-                  key={index}
-                  label={skill}
-                  size="small"
-                  sx={{ bgcolor: style.accent, color: "#ffffff" }}
-                />
-              ))}
-            </Box>
+            <IconButton size="small" onClick={addSkill} sx={{ color: style.accent }} data-testid="button-add-skill">
+              <AddIcon fontSize="small" />
+            </IconButton>
           </Box>
-        )}
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+            {cv.skills.map((skill, index) => (
+              <EditableSkillChip
+                key={index}
+                skill={skill}
+                accentColor={style.accent}
+                onUpdate={(v) => updateSkill(index, v)}
+                onDelete={() => deleteSkill(index)}
+                testId={`skill-${index}`}
+              />
+            ))}
+          </Box>
+          {cv.skills.length === 0 && (
+            <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
+              Click + to add skills
+            </Typography>
+          )}
+        </Box>
 
-        {cv.certifications && cv.certifications.length > 0 && (
-          <Box>
-            <Typography variant="h6" sx={{ color: style.accent, mb: 1, fontFamily: "'Cormorant Garamond', serif" }}>
+        <Box>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
+            <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Cormorant Garamond', serif" }}>
               Certifications
             </Typography>
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-              {cv.certifications.map((cert) => (
-                <Chip
-                  key={cert.id}
-                  label={cert.issuer ? `${cert.name} - ${cert.issuer}` : cert.name}
-                  size="small"
-                  variant="outlined"
-                  sx={{ borderColor: style.accent, color: style.bodyText }}
-                />
-              ))}
-            </Box>
+            <IconButton size="small" onClick={addCertification} sx={{ color: style.accent }} data-testid="button-add-certification">
+              <AddIcon fontSize="small" />
+            </IconButton>
           </Box>
-        )}
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+            {(cv.certifications || []).map((cert, index) => (
+              <EditableCertChip
+                key={cert.id}
+                cert={cert}
+                accentColor={style.accent}
+                bodyText={style.bodyText}
+                onUpdateName={(v) => updateCertification(index, "name", v)}
+                onUpdateIssuer={(v) => updateCertification(index, "issuer", v)}
+                onDelete={() => deleteCertification(index)}
+                testId={`cert-${index}`}
+              />
+            ))}
+          </Box>
+          {(!cv.certifications || cv.certifications.length === 0) && (
+            <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
+              Click + to add certifications
+            </Typography>
+          )}
+        </Box>
       </Box>
     </Paper>
+  );
+}
+
+function EditableSkillChip({ 
+  skill, 
+  accentColor, 
+  onUpdate, 
+  onDelete,
+  testId
+}: { 
+  skill: string; 
+  accentColor: string; 
+  onUpdate: (v: string) => void; 
+  onDelete: () => void;
+  testId: string;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [tempValue, setTempValue] = useState(skill);
+
+  if (editing) {
+    return (
+      <TextField
+        size="small"
+        value={tempValue}
+        onChange={(e) => setTempValue(e.target.value)}
+        onBlur={() => {
+          if (tempValue.trim()) {
+            onUpdate(tempValue);
+          }
+          setEditing(false);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            if (tempValue.trim()) {
+              onUpdate(tempValue);
+            }
+            setEditing(false);
+          }
+          if (e.key === "Escape") {
+            setTempValue(skill);
+            setEditing(false);
+          }
+        }}
+        autoFocus
+        sx={{ width: 120 }}
+      />
+    );
+  }
+
+  return (
+    <Chip
+      label={skill}
+      size="small"
+      onClick={() => {
+        setTempValue(skill);
+        setEditing(true);
+      }}
+      onDelete={onDelete}
+      sx={{ bgcolor: accentColor, color: "#ffffff", cursor: "pointer" }}
+      data-testid={testId}
+    />
+  );
+}
+
+function EditableCertChip({ 
+  cert, 
+  accentColor, 
+  bodyText,
+  onUpdateName, 
+  onUpdateIssuer,
+  onDelete,
+  testId
+}: { 
+  cert: { name: string; issuer: string };
+  accentColor: string; 
+  bodyText: string;
+  onUpdateName: (v: string) => void; 
+  onUpdateIssuer: (v: string) => void;
+  onDelete: () => void;
+  testId: string;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [tempName, setTempName] = useState(cert.name);
+  const [tempIssuer, setTempIssuer] = useState(cert.issuer);
+
+  if (editing) {
+    return (
+      <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
+        <TextField
+          size="small"
+          value={tempName}
+          onChange={(e) => setTempName(e.target.value)}
+          placeholder="Cert name"
+          sx={{ width: 120 }}
+        />
+        <TextField
+          size="small"
+          value={tempIssuer}
+          onChange={(e) => setTempIssuer(e.target.value)}
+          placeholder="Issuer"
+          sx={{ width: 100 }}
+          onBlur={() => {
+            if (tempName.trim()) {
+              onUpdateName(tempName);
+              onUpdateIssuer(tempIssuer);
+            }
+            setEditing(false);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              if (tempName.trim()) {
+                onUpdateName(tempName);
+                onUpdateIssuer(tempIssuer);
+              }
+              setEditing(false);
+            }
+            if (e.key === "Escape") {
+              setTempName(cert.name);
+              setTempIssuer(cert.issuer);
+              setEditing(false);
+            }
+          }}
+        />
+      </Box>
+    );
+  }
+
+  return (
+    <Chip
+      label={cert.issuer ? `${cert.name} - ${cert.issuer}` : cert.name}
+      size="small"
+      variant="outlined"
+      onClick={() => {
+        setTempName(cert.name);
+        setTempIssuer(cert.issuer);
+        setEditing(true);
+      }}
+      onDelete={onDelete}
+      sx={{ borderColor: accentColor, color: bodyText, cursor: "pointer" }}
+      data-testid={testId}
+    />
   );
 }
