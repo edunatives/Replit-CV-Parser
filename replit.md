@@ -32,7 +32,8 @@ Preferred communication style: Simple, everyday language.
 - CV parsing implemented in `/lib/parse/parseCv.ts` using:
   - `mammoth` for DOCX parsing
   - `pdf-parse` for PDF text extraction
-  - Regex-based pattern matching for extracting emails, phones, LinkedIn profiles
+  - **AI-powered extraction** using OpenAI GPT-4o-mini for intelligent parsing
+  - Regex-based fallback for emails, phones, LinkedIn profiles
 
 **API Endpoints**:
 - `POST /api/parse` - Single file parsing

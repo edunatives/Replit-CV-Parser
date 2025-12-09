@@ -1,9 +1,94 @@
 import type { ParsedCV } from "@/types/cv";
+import OpenAI from "openai";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const pdfParse = require("pdf-parse");
 // eslint-disable-next-line @typescript-eslint/no-require-imports  
 const mammoth = require("mammoth");
+
+function getOpenAIClient(): OpenAI | null {
+  const apiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
+  const baseURL = process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
+  
+  if (!apiKey || !baseURL) {
+    return null;
+  }
+  
+  return new OpenAI({ apiKey, baseURL });
+}
+
+interface AIExtractedData {
+  name: string;
+  title: string;
+  email: string;
+  phone: string;
+  location: string;
+  website: string;
+  linkedin: string;
+  github: string;
+  summary: string;
+  experience: Array<{
+    role: string;
+    company: string;
+    duration: string;
+    description: string;
+  }>;
+  education: Array<{
+    degree: string;
+    institution: string;
+    year: string;
+  }>;
+  skills: string[];
+}
+
+async function extractWithAI(text: string): Promise<AIExtractedData | null> {
+  const openai = getOpenAIClient();
+  if (!openai) {
+    console.log("OpenAI credentials not available, using regex fallback");
+    return null;
+  }
+  
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: `You are a CV/resume parser. Extract structured information from the CV text provided. Return a valid JSON object with these fields:
+- name: Full name of the candidate
+- title: Current or most recent job title
+- email: Email address
+- phone: Phone number
+- location: City/State or location
+- website: Personal website (not LinkedIn or GitHub)
+- linkedin: LinkedIn profile URL or username
+- github: GitHub profile URL or username
+- summary: Brief professional summary (2-3 sentences max)
+- experience: Array of up to 5 most recent jobs with {role, company, duration, description}
+- education: Array of educational qualifications with {degree, institution, year}
+- skills: Array of technical and professional skills (up to 15)
+
+If a field cannot be found, use an empty string or empty array. Return ONLY valid JSON, no markdown.`
+        },
+        {
+          role: "user",
+          content: text.slice(0, 8000)
+        }
+      ],
+      temperature: 0.1,
+      max_tokens: 2000,
+    });
+
+    const content = response.choices[0]?.message?.content;
+    if (!content) return null;
+
+    const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+    return JSON.parse(cleaned) as AIExtractedData;
+  } catch (error) {
+    console.error("AI extraction failed:", error);
+    return null;
+  }
+}
 
 function extractEmail(text: string): string {
   const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
@@ -237,24 +322,60 @@ export async function parseCV(buffer: Buffer, fileName: string, fileId: string):
     text = buffer.toString("utf-8");
   }
   
-  const cv: ParsedCV = {
-    id: fileId,
-    name: extractName(text),
-    title: extractTitle(text),
-    email: extractEmail(text),
-    phone: extractPhone(text),
-    location: extractLocation(text),
-    website: extractWebsite(text),
-    linkedin: extractLinkedIn(text),
-    github: extractGithub(text),
-    summary: extractSummary(text),
-    experience: extractExperience(text, fileId),
-    education: extractEducation(text, fileId),
-    skills: extractSkills(text),
-    originalFilename: fileName,
-    uploadedAt: new Date(),
-    rawText: text,
-  };
+  const aiData = await extractWithAI(text);
+  
+  let cv: ParsedCV;
+  
+  if (aiData) {
+    cv = {
+      id: fileId,
+      name: aiData.name || extractName(text),
+      title: aiData.title || extractTitle(text),
+      email: aiData.email || extractEmail(text),
+      phone: aiData.phone || extractPhone(text),
+      location: aiData.location || extractLocation(text),
+      website: aiData.website || extractWebsite(text),
+      linkedin: aiData.linkedin || extractLinkedIn(text),
+      github: aiData.github || extractGithub(text),
+      summary: aiData.summary || extractSummary(text),
+      experience: aiData.experience?.map((exp, i) => ({
+        id: `exp-${fileId}-${i}`,
+        role: exp.role,
+        company: exp.company,
+        duration: exp.duration,
+        description: exp.description,
+      })) || extractExperience(text, fileId),
+      education: aiData.education?.map((edu, i) => ({
+        id: `edu-${fileId}-${i}`,
+        degree: edu.degree,
+        institution: edu.institution,
+        year: edu.year,
+      })) || extractEducation(text, fileId),
+      skills: aiData.skills || extractSkills(text),
+      originalFilename: fileName,
+      uploadedAt: new Date(),
+      rawText: text,
+    };
+  } else {
+    cv = {
+      id: fileId,
+      name: extractName(text),
+      title: extractTitle(text),
+      email: extractEmail(text),
+      phone: extractPhone(text),
+      location: extractLocation(text),
+      website: extractWebsite(text),
+      linkedin: extractLinkedIn(text),
+      github: extractGithub(text),
+      summary: extractSummary(text),
+      experience: extractExperience(text, fileId),
+      education: extractEducation(text, fileId),
+      skills: extractSkills(text),
+      originalFilename: fileName,
+      uploadedAt: new Date(),
+      rawText: text,
+    };
+  }
   
   return { cv, rawText: text };
 }
