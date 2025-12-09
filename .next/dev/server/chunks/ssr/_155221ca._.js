@@ -552,34 +552,53 @@ function CVPreview({ cv, template, onUpdateCV }) {
     const templateStyles = {
         "modern-dark": {
             headerBg: "#1a1a2e",
-            accent: "#d4af37"
+            accent: "#d4af37",
+            headerText: "#ffffff",
+            bodyBg: "#ffffff",
+            borderBottom: "none"
         },
         "classic-light": {
             headerBg: "#f5f5f5",
-            accent: "#2c3e50"
+            accent: "#2c3e50",
+            headerText: "#1a1a1a",
+            bodyBg: "#ffffff",
+            borderBottom: "1px solid #e0e0e0"
         },
         "executive": {
             headerBg: "#0a192f",
-            accent: "#64ffda"
+            accent: "#64ffda",
+            headerText: "#ffffff",
+            bodyBg: "#f8f9fa",
+            borderBottom: "none"
         },
         "minimal": {
             headerBg: "#ffffff",
-            accent: "#000000"
+            accent: "#000000",
+            headerText: "#1a1a1a",
+            bodyBg: "#ffffff",
+            borderBottom: "2px solid #000000"
         },
         "creative": {
             headerBg: "#667eea",
-            accent: "#f093fb"
+            accent: "#f093fb",
+            headerText: "#ffffff",
+            bodyBg: "#fafafa",
+            borderBottom: "none"
         },
         "professional": {
             headerBg: "#2d3436",
-            accent: "#74b9ff"
+            accent: "#74b9ff",
+            headerText: "#ffffff",
+            bodyBg: "#ffffff",
+            borderBottom: "none"
         }
     };
     const style = templateStyles[template] || templateStyles["modern-dark"];
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Paper$2f$Paper$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Paper$3e$__["Paper"], {
         elevation: 2,
         sx: {
-            overflow: "hidden"
+            overflow: "hidden",
+            bgcolor: style.bodyBg
         },
         "data-testid": "cv-preview",
         children: [
@@ -587,7 +606,8 @@ function CVPreview({ cv, template, onUpdateCV }) {
                 sx: {
                     bgcolor: style.headerBg,
                     p: 3,
-                    color: "white"
+                    color: style.headerText,
+                    borderBottom: style.borderBottom
                 },
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {

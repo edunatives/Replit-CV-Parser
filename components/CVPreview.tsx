@@ -70,19 +70,19 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
   };
 
   const templateStyles = {
-    "modern-dark": { headerBg: "#1a1a2e", accent: "#d4af37" },
-    "classic-light": { headerBg: "#f5f5f5", accent: "#2c3e50" },
-    "executive": { headerBg: "#0a192f", accent: "#64ffda" },
-    "minimal": { headerBg: "#ffffff", accent: "#000000" },
-    "creative": { headerBg: "#667eea", accent: "#f093fb" },
-    "professional": { headerBg: "#2d3436", accent: "#74b9ff" },
+    "modern-dark": { headerBg: "#1a1a2e", accent: "#d4af37", headerText: "#ffffff", bodyBg: "#ffffff", borderBottom: "none" },
+    "classic-light": { headerBg: "#f5f5f5", accent: "#2c3e50", headerText: "#1a1a1a", bodyBg: "#ffffff", borderBottom: "1px solid #e0e0e0" },
+    "executive": { headerBg: "#0a192f", accent: "#64ffda", headerText: "#ffffff", bodyBg: "#f8f9fa", borderBottom: "none" },
+    "minimal": { headerBg: "#ffffff", accent: "#000000", headerText: "#1a1a1a", bodyBg: "#ffffff", borderBottom: "2px solid #000000" },
+    "creative": { headerBg: "#667eea", accent: "#f093fb", headerText: "#ffffff", bodyBg: "#fafafa", borderBottom: "none" },
+    "professional": { headerBg: "#2d3436", accent: "#74b9ff", headerText: "#ffffff", bodyBg: "#ffffff", borderBottom: "none" },
   };
 
   const style = templateStyles[template] || templateStyles["modern-dark"];
 
   return (
-    <Paper elevation={2} sx={{ overflow: "hidden" }} data-testid="cv-preview">
-      <Box sx={{ bgcolor: style.headerBg, p: 3, color: "white" }}>
+    <Paper elevation={2} sx={{ overflow: "hidden", bgcolor: style.bodyBg }} data-testid="cv-preview">
+      <Box sx={{ bgcolor: style.headerBg, p: 3, color: style.headerText, borderBottom: style.borderBottom }}>
         <Typography variant="h4" component="h2" sx={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 600 }}>
           <EditableField value={cv.name} onChange={(v) => updateField("name", v)} />
         </Typography>
