@@ -379,16 +379,22 @@ export async function parseCV(buffer: Buffer, fileName: string, fileId: string):
   
   try {
     if (extension === "pdf") {
+      console.log(`Parsing PDF file: ${fileName}, buffer size: ${buffer.length}`);
       const data = await pdfParse(buffer);
       text = data.text;
+      console.log(`PDF parsed successfully, extracted ${text.length} characters`);
     } else if (extension === "docx" || extension === "doc") {
+      console.log(`Parsing Word file: ${fileName}, buffer size: ${buffer.length}`);
       const result = await mammoth.extractRawText({ buffer });
       text = result.value;
+      console.log(`Word file parsed successfully, extracted ${text.length} characters`);
     } else {
+      console.log(`Parsing text file: ${fileName}`);
       text = buffer.toString("utf-8");
     }
   } catch (error) {
-    console.error("Error parsing file:", error);
+    console.error(`Error parsing ${extension} file (${fileName}):`, error);
+    console.error("Error details:", error instanceof Error ? error.message : String(error));
     text = buffer.toString("utf-8");
   }
   
