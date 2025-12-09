@@ -12,9 +12,9 @@ import {
   LinearProgress,
   Alert,
   Snackbar,
-  Grid,
   Divider,
 } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
@@ -201,7 +201,7 @@ export default function Home() {
         )}
 
         <Grid container spacing={3}>
-          <Grid item xs={12} md={4} lg={3}>
+          <Grid size={{ xs: 12, md: 4, lg: 3 }}>
             <Paper sx={{ p: 2, mb: 2 }}>
               <Typography variant="h6" gutterBottom sx={{ fontFamily: "'Cormorant Garamond', serif" }}>
                 Upload Files
@@ -263,7 +263,7 @@ export default function Home() {
             </Box>
           </Grid>
 
-          <Grid item xs={12} md={8} lg={9}>
+          <Grid size={{ xs: 12, md: 8, lg: 9 }}>
             <Paper sx={{ p: 2, mb: 2 }}>
               <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2, mb: 2 }}>
                 <Tabs value={activeTab} onChange={(_, v) => setActiveTab(v)}>
