@@ -13,6 +13,13 @@ export interface Education {
   year: string;
 }
 
+export interface Certification {
+  id: string;
+  name: string;
+  issuer: string;
+  year: string;
+}
+
 export interface ParsedCV {
   id: string;
   name: string;
@@ -26,6 +33,7 @@ export interface ParsedCV {
   summary: string;
   experience: Experience[];
   education: Education[];
+  certifications: Certification[];
   skills: string[];
   originalFilename?: string;
   mimeType?: string;

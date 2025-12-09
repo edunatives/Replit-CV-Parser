@@ -38,6 +38,11 @@ interface AIExtractedData {
     institution: string;
     year: string;
   }>;
+  certifications: Array<{
+    name: string;
+    issuer: string;
+    year: string;
+  }>;
   skills: string[];
 }
 
@@ -54,29 +59,30 @@ async function extractWithAI(text: string): Promise<AIExtractedData | null> {
       messages: [
         {
           role: "system",
-          content: `You are a CV/resume parser. Extract structured information from the CV text provided. Return a valid JSON object with these fields:
+          content: `You are an expert CV/resume parser. Extract ALL structured information from the CV text provided. Be thorough and extract every detail. Return a valid JSON object with these fields:
 - name: Full name of the candidate
-- title: Current or most recent job title
+- title: Current or most recent job title/position
 - email: Email address
-- phone: Phone number
-- location: City/State or location
-- website: Personal website (not LinkedIn or GitHub)
+- phone: Phone number (include country code if present)
+- location: City, Country or full location
+- website: Personal website URL (not LinkedIn or GitHub)
 - linkedin: LinkedIn profile URL or username
 - github: GitHub profile URL or username
-- summary: Brief professional summary (2-3 sentences max)
-- experience: Array of up to 5 most recent jobs with {role, company, duration, description}
-- education: Array of educational qualifications with {degree, institution, year}
-- skills: Array of technical and professional skills (up to 15)
+- summary: Professional summary or profile section (keep the full text, up to 500 characters)
+- experience: Array of ALL jobs/positions found with {role, company, duration, description}. Extract EVERY job listed, not just recent ones. Include full job descriptions.
+- education: Array of ALL educational qualifications with {degree, institution, year}
+- certifications: Array of ALL certifications, licenses, and professional credentials with {name, issuer, year}. Include certifications like TOGAF, ITIL, PMP, AWS, COBIT, CISA, etc.
+- skills: Array of ALL technical and professional skills mentioned (extract all, not limited)
 
-If a field cannot be found, use an empty string or empty array. Return ONLY valid JSON, no markdown.`
+IMPORTANT: Extract EVERYTHING. Do not limit or truncate any arrays. If a field cannot be found, use an empty string or empty array. Return ONLY valid JSON, no markdown.`
         },
         {
           role: "user",
-          content: text.slice(0, 8000)
+          content: text.slice(0, 20000)
         }
       ],
       temperature: 0.1,
-      max_tokens: 2000,
+      max_tokens: 4000,
     });
 
     const content = response.choices[0]?.message?.content;
@@ -281,10 +287,10 @@ function extractSkills(text: string): string[] {
     const skillsList = sectionText
       .split(/[,\n•|·]/)
       .map(s => s.trim())
-      .filter(s => s.length > 1 && s.length < 30 && !/^\d+$/.test(s));
+      .filter(s => s.length > 1 && s.length < 50 && !/^\d+$/.test(s));
     
     if (skillsList.length > 0) {
-      return skillsList.slice(0, 15);
+      return skillsList;
     }
   }
   
@@ -293,13 +299,77 @@ function extractSkills(text: string): string[] {
     "React", "Vue", "Angular", "Node.js", "Express", "Django", "Flask", "Spring",
     "AWS", "Azure", "GCP", "Docker", "Kubernetes", "Git", "Linux", "SQL", "MongoDB",
     "Machine Learning", "Data Science", "Agile", "Scrum", "REST", "GraphQL",
+    "ITSM", "ITIL", "Enterprise Architecture", "Business Architecture", "TOGAF",
   ];
   
   const foundSkills = commonSkills.filter(skill => 
     new RegExp(`\\b${skill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(text)
   );
   
-  return foundSkills.slice(0, 12);
+  return foundSkills;
+}
+
+function extractCertifications(text: string, fileId: string): ParsedCV["certifications"] {
+  const certSection = text.match(
+    /(?:certifications?|certificates?|credentials?|licenses?|professional\s*qualifications?):?\s*\n([\s\S]*?)(?=\n\s*(?:experience|education|skills|projects|languages|references|work|employment|$))/i
+  );
+  
+  const certifications: ParsedCV["certifications"] = [];
+  
+  if (certSection) {
+    const sectionText = certSection[1];
+    const lines = sectionText.split("\n").filter(l => l.trim().length > 3);
+    
+    for (let i = 0; i < lines.length && certifications.length < 20; i++) {
+      const line = lines[i].trim();
+      if (line.length > 5 && line.length < 150) {
+        const yearMatch = line.match(/(\d{4})/);
+        certifications.push({
+          id: `cert-${fileId}-${i}`,
+          name: line.replace(/\d{4}/, "").trim(),
+          issuer: "",
+          year: yearMatch ? yearMatch[1] : "",
+        });
+      }
+    }
+  }
+  
+  const certPatterns = [
+    /\b(TOGAF[\s\d.]*(?:Certified)?)\b/gi,
+    /\b(IT4IT[\s\d.]*(?:Certified)?)\b/gi,
+    /\b(ITIL[\s\d.v]*(?:Foundation|Practitioner|Expert)?)\b/gi,
+    /\b(PMP|Project Management Professional)\b/gi,
+    /\b(COBIT[\s\d.]*(?:Foundation)?)\b/gi,
+    /\b(CISA|Certified Information Systems Auditor)\b/gi,
+    /\b(CGEIT)\b/gi,
+    /\b(AWS[\s\w-]*(?:Certified|Architect|Developer)?)\b/gi,
+    /\b(Azure[\s\w-]*(?:Certified)?)\b/gi,
+    /\b(Lean[\s\w]*(?:Six Sigma)?)\b/gi,
+    /\b(Kaizen[\s\w]*(?:Certified)?)\b/gi,
+    /\b(Scrum[\s\w]*(?:Master|Owner)?)\b/gi,
+  ];
+  
+  for (const pattern of certPatterns) {
+    const matches = text.match(pattern);
+    if (matches) {
+      for (const match of matches) {
+        const exists = certifications.some(c => 
+          c.name.toLowerCase().includes(match.toLowerCase()) || 
+          match.toLowerCase().includes(c.name.toLowerCase())
+        );
+        if (!exists) {
+          certifications.push({
+            id: `cert-${fileId}-${certifications.length}`,
+            name: match.trim(),
+            issuer: "",
+            year: "",
+          });
+        }
+      }
+    }
+  }
+  
+  return certifications;
 }
 
 export async function parseCV(buffer: Buffer, fileName: string, fileId: string): Promise<{ cv: ParsedCV; rawText: string }> {
@@ -351,6 +421,12 @@ export async function parseCV(buffer: Buffer, fileName: string, fileId: string):
         institution: edu.institution,
         year: edu.year,
       })) || extractEducation(text, fileId),
+      certifications: aiData.certifications?.map((cert, i) => ({
+        id: `cert-${fileId}-${i}`,
+        name: cert.name,
+        issuer: cert.issuer,
+        year: cert.year,
+      })) || extractCertifications(text, fileId),
       skills: aiData.skills || extractSkills(text),
       originalFilename: fileName,
       uploadedAt: new Date(),
@@ -370,6 +446,7 @@ export async function parseCV(buffer: Buffer, fileName: string, fileId: string):
       summary: extractSummary(text),
       experience: extractExperience(text, fileId),
       education: extractEducation(text, fileId),
+      certifications: extractCertifications(text, fileId),
       skills: extractSkills(text),
       originalFilename: fileName,
       uploadedAt: new Date(),

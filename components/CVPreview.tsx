@@ -185,7 +185,7 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
         )}
 
         {cv.skills.length > 0 && (
-          <Box>
+          <Box sx={{ mb: 3 }}>
             <Typography variant="h6" sx={{ color: style.accent, mb: 1, fontFamily: "'Cormorant Garamond', serif" }}>
               Skills
             </Typography>
@@ -196,6 +196,25 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
                   label={skill}
                   size="small"
                   sx={{ bgcolor: style.accent, color: "#ffffff" }}
+                />
+              ))}
+            </Box>
+          </Box>
+        )}
+
+        {cv.certifications && cv.certifications.length > 0 && (
+          <Box>
+            <Typography variant="h6" sx={{ color: style.accent, mb: 1, fontFamily: "'Cormorant Garamond', serif" }}>
+              Certifications
+            </Typography>
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+              {cv.certifications.map((cert) => (
+                <Chip
+                  key={cert.id}
+                  label={cert.issuer ? `${cert.name} - ${cert.issuer}` : cert.name}
+                  size="small"
+                  variant="outlined"
+                  sx={{ borderColor: style.accent, color: style.bodyText }}
                 />
               ))}
             </Box>
