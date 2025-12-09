@@ -42,11 +42,13 @@ export async function POST(request: NextRequest) {
     cv.mimeType = file.type;
     cv.size = file.size;
 
-    try {
-      const collection = await getCollection("cvs");
-      await collection.insertOne({ ...cv, createdAt: new Date() });
-    } catch (dbError) {
-      console.log("MongoDB not available, continuing without persistence:", dbError);
+    const collection = await getCollection("cvs");
+    if (collection) {
+      try {
+        await collection.insertOne({ ...cv, createdAt: new Date() });
+      } catch (dbError) {
+        console.log("Failed to save to MongoDB:", dbError);
+      }
     }
 
     return NextResponse.json({ cv, rawText });
