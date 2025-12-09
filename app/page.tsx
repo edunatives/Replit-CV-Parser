@@ -13,11 +13,19 @@ import {
   Alert,
   Snackbar,
   Divider,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import DescriptionIcon from "@mui/icons-material/Description";
+import DataObjectIcon from "@mui/icons-material/DataObject";
+import { exportToPDF, exportToDOCX, exportToJSON } from "@/lib/export/exportCV";
 import { Header } from "@/components/Header";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { FileList } from "@/components/FileList";
@@ -40,6 +48,7 @@ export default function Home() {
     message: "",
     severity: "info",
   });
+  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
 
   const fileDataRef = useRef<Map<string, File>>(new Map());
 
@@ -154,27 +163,51 @@ export default function Home() {
     showSnackbar("All files cleared", "info");
   }, []);
 
-  const handleExportAll = useCallback(() => {
+  const handleExportPDF = useCallback(async () => {
     const doneFiles = files.filter((f) => f.status === "done");
     if (doneFiles.length === 0) {
       showSnackbar("No parsed CVs to export", "info");
       return;
     }
+    for (const file of doneFiles) {
+      const cv = parsedCVs.get(file.id);
+      if (cv) {
+        await exportToPDF(cv, `${cv.name || file.name}-cv.pdf`);
+      }
+    }
+    showSnackbar(`Exported ${doneFiles.length} CV(s) as PDF`, "success");
+    setExportMenuAnchor(null);
+  }, [files, parsedCVs]);
 
+  const handleExportDOCX = useCallback(async () => {
+    const doneFiles = files.filter((f) => f.status === "done");
+    if (doneFiles.length === 0) {
+      showSnackbar("No parsed CVs to export", "info");
+      return;
+    }
+    for (const file of doneFiles) {
+      const cv = parsedCVs.get(file.id);
+      if (cv) {
+        await exportToDOCX(cv, `${cv.name || file.name}-cv.docx`);
+      }
+    }
+    showSnackbar(`Exported ${doneFiles.length} CV(s) as DOCX`, "success");
+    setExportMenuAnchor(null);
+  }, [files, parsedCVs]);
+
+  const handleExportJSON = useCallback(() => {
+    const doneFiles = files.filter((f) => f.status === "done");
+    if (doneFiles.length === 0) {
+      showSnackbar("No parsed CVs to export", "info");
+      return;
+    }
     const exportData = doneFiles.map((f) => ({
       fileName: f.name,
       cv: parsedCVs.get(f.id),
     }));
-
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `parsed-cvs-${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-
-    showSnackbar(`Exported ${doneFiles.length} CV${doneFiles.length > 1 ? "s" : ""}`, "success");
+    exportToJSON(exportData, `parsed-cvs-${Date.now()}.json`);
+    showSnackbar(`Exported ${doneFiles.length} CV(s) as JSON`, "success");
+    setExportMenuAnchor(null);
   }, [files, parsedCVs]);
 
   const handleUpdateCV = useCallback((cv: ParsedCV) => {
@@ -242,13 +275,31 @@ export default function Home() {
               <Button
                 variant="outlined"
                 startIcon={<FileDownloadIcon />}
-                onClick={handleExportAll}
+                onClick={(e) => setExportMenuAnchor(e.currentTarget)}
                 disabled={doneCount === 0}
                 fullWidth
-                data-testid="button-export-all"
+                data-testid="button-export-menu"
               >
                 Export ({doneCount})
               </Button>
+              <Menu
+                anchorEl={exportMenuAnchor}
+                open={Boolean(exportMenuAnchor)}
+                onClose={() => setExportMenuAnchor(null)}
+              >
+                <MenuItem onClick={handleExportPDF} data-testid="menu-export-pdf">
+                  <ListItemIcon><PictureAsPdfIcon fontSize="small" /></ListItemIcon>
+                  <ListItemText>Export as PDF</ListItemText>
+                </MenuItem>
+                <MenuItem onClick={handleExportDOCX} data-testid="menu-export-docx">
+                  <ListItemIcon><DescriptionIcon fontSize="small" /></ListItemIcon>
+                  <ListItemText>Export as Word</ListItemText>
+                </MenuItem>
+                <MenuItem onClick={handleExportJSON} data-testid="menu-export-json">
+                  <ListItemIcon><DataObjectIcon fontSize="small" /></ListItemIcon>
+                  <ListItemText>Export as JSON</ListItemText>
+                </MenuItem>
+              </Menu>
               <Button
                 variant="outlined"
                 color="error"
