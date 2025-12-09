@@ -214,3 +214,73 @@ export function exportToJSON(cvs: Array<{ fileName: string; cv: ParsedCV | undef
   a.click();
   URL.revokeObjectURL(url);
 }
+
+export function exportToTXT(cv: ParsedCV, filename: string): void {
+  const lines: string[] = [];
+
+  lines.push(cv.name || "Name");
+  if (cv.title) lines.push(cv.title);
+  lines.push("");
+
+  const contactParts: string[] = [];
+  if (cv.email) contactParts.push(cv.email);
+  if (cv.phone) contactParts.push(cv.phone);
+  if (cv.location) contactParts.push(cv.location);
+  if (contactParts.length > 0) lines.push(contactParts.join(" | "));
+
+  const linkParts: string[] = [];
+  if (cv.linkedin) linkParts.push(cv.linkedin);
+  if (cv.github) linkParts.push(cv.github);
+  if (cv.website) linkParts.push(cv.website);
+  if (linkParts.length > 0) lines.push(linkParts.join(" | "));
+
+  if (cv.summary) {
+    lines.push("");
+    lines.push("=== SUMMARY ===");
+    lines.push(cv.summary);
+  }
+
+  if (cv.experience && cv.experience.length > 0) {
+    lines.push("");
+    lines.push("=== EXPERIENCE ===");
+    for (const exp of cv.experience) {
+      lines.push(`${exp.role} at ${exp.company}`);
+      if (exp.duration) lines.push(exp.duration);
+      if (exp.description) lines.push(exp.description);
+      lines.push("");
+    }
+  }
+
+  if (cv.education && cv.education.length > 0) {
+    lines.push("");
+    lines.push("=== EDUCATION ===");
+    for (const edu of cv.education) {
+      lines.push(edu.degree);
+      lines.push(`${edu.institution}${edu.year ? ` (${edu.year})` : ""}`);
+      lines.push("");
+    }
+  }
+
+  if (cv.certifications && cv.certifications.length > 0) {
+    lines.push("");
+    lines.push("=== CERTIFICATIONS ===");
+    for (const cert of cv.certifications) {
+      const certText = cert.issuer ? `${cert.name} - ${cert.issuer}` : cert.name;
+      lines.push(`- ${certText}${cert.year ? ` (${cert.year})` : ""}`);
+    }
+  }
+
+  if (cv.skills && cv.skills.length > 0) {
+    lines.push("");
+    lines.push("=== SKILLS ===");
+    lines.push(cv.skills.join(", "));
+  }
+
+  const blob = new Blob([lines.join("\n")], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}

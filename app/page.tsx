@@ -25,7 +25,8 @@ import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DescriptionIcon from "@mui/icons-material/Description";
 import DataObjectIcon from "@mui/icons-material/DataObject";
-import { exportToPDF, exportToDOCX, exportToJSON } from "@/lib/export/exportCV";
+import { exportToPDF, exportToDOCX, exportToJSON, exportToTXT } from "@/lib/export/exportCV";
+import TextSnippetIcon from "@mui/icons-material/TextSnippet";
 import { Header } from "@/components/Header";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { FileList } from "@/components/FileList";
@@ -210,6 +211,22 @@ export default function Home() {
     setExportMenuAnchor(null);
   }, [files, parsedCVs]);
 
+  const handleExportTXT = useCallback(() => {
+    const doneFiles = files.filter((f) => f.status === "done");
+    if (doneFiles.length === 0) {
+      showSnackbar("No parsed CVs to export", "info");
+      return;
+    }
+    for (const file of doneFiles) {
+      const cv = parsedCVs.get(file.id);
+      if (cv) {
+        exportToTXT(cv, `${cv.name || file.name}-cv.txt`);
+      }
+    }
+    showSnackbar(`Exported ${doneFiles.length} CV(s) as Text`, "success");
+    setExportMenuAnchor(null);
+  }, [files, parsedCVs]);
+
   const handleUpdateCV = useCallback((cv: ParsedCV) => {
     setParsedCVs((prev) => new Map(prev).set(cv.id, cv));
   }, []);
@@ -294,6 +311,10 @@ export default function Home() {
                 <MenuItem onClick={handleExportDOCX} data-testid="menu-export-docx">
                   <ListItemIcon><DescriptionIcon fontSize="small" /></ListItemIcon>
                   <ListItemText>Export as Word</ListItemText>
+                </MenuItem>
+                <MenuItem onClick={handleExportTXT} data-testid="menu-export-txt">
+                  <ListItemIcon><TextSnippetIcon fontSize="small" /></ListItemIcon>
+                  <ListItemText>Export as Text</ListItemText>
                 </MenuItem>
                 <MenuItem onClick={handleExportJSON} data-testid="menu-export-json">
                   <ListItemIcon><DataObjectIcon fontSize="small" /></ListItemIcon>
