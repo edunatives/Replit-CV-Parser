@@ -1,0 +1,2168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Intelligence Parser - Batch & Edit</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://unpkg.com/compromise"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Source+Sans+3:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0b;
+            --bg-secondary: #141416;
+            --bg-card: #1a1a1e;
+            --bg-input: #0d0d0f;
+            --accent: #c9a227;
+            --accent-light: #e8c547;
+            --accent-dim: rgba(201, 162, 39, 0.15);
+            --success: #34d399;
+            --warning: #fbbf24;
+            --error: #f87171;
+            --text-primary: #f5f5f5;
+            --text-secondary: #a0a0a5;
+            --text-body: #909095;
+            --text-muted: #606065;
+            --border: rgba(201, 162, 39, 0.2);
+            --border-light: rgba(255, 255, 255, 0.06);
+            --font-body: 11px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Source Sans 3', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            font-size: var(--font-body);
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .header h1 span { color: var(--accent); }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 11px;
+            letter-spacing: 0.05em;
+        }
+
+        .badge {
+            display: inline-block;
+            background: var(--accent-dim);
+            color: var(--accent);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 6px;
+        }
+
+        /* Config Bar */
+        .config-bar {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .config-bar label {
+            color: var(--text-muted);
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .config-bar select, .config-bar input {
+            background: var(--bg-input);
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            padding: 6px 10px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 11px;
+            min-width: 140px;
+        }
+
+        .config-bar select:focus, .config-bar input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .config-group { display: flex; flex-direction: column; }
+
+        .status-indicator {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--text-muted);
+        }
+
+        .status-dot.ready { background: var(--success); }
+
+        /* Template Thumbs */
+        .template-bar {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            padding: 8px 0;
+        }
+
+        .template-bar-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-right: 8px;
+        }
+
+        .template-thumb {
+            width: 40px;
+            height: 28px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .template-thumb:hover { transform: scale(1.05); }
+        .template-thumb.active {
+            border-color: var(--accent);
+            box-shadow: 0 0 6px rgba(201, 162, 39, 0.4);
+        }
+
+        .thumb-modern-dark { background: #1a1a1e; }
+        .thumb-classic-light { background: #fff; border-color: #ddd; }
+        .thumb-executive { background: linear-gradient(135deg, #1a1a2e, #16213e); }
+        .thumb-minimal { background: #fafafa; }
+        .thumb-creative { background: #fff; border-color: #ff6b6b; }
+        .thumb-professional { background: linear-gradient(135deg, #00529b, #0077b6); }
+
+        /* Main Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 16px;
+            min-height: calc(100vh - 200px);
+        }
+
+        @media (max-width: 1000px) {
+            .main-layout { grid-template-columns: 1fr; }
+        }
+
+        /* Sidebar - File List */
+        .sidebar {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 180px);
+        }
+
+        .sidebar-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-title {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .file-count {
+            background: var(--accent-dim);
+            color: var(--accent);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+        }
+
+        .upload-area {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .upload-dropzone {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .upload-dropzone:hover { border-color: var(--accent); }
+        .upload-dropzone.dragover {
+            border-color: var(--accent-light);
+            background: var(--accent-dim);
+        }
+
+        .upload-dropzone h4 {
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .upload-dropzone p {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .upload-dropzone .formats {
+            margin-top: 8px;
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .format-badge {
+            background: var(--bg-primary);
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 8px;
+            color: var(--text-muted);
+        }
+
+        input[type="file"] { display: none; }
+
+        /* File List */
+        .file-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 4px;
+        }
+
+        .file-item:hover { background: var(--bg-secondary); }
+        .file-item.active {
+            background: var(--accent-dim);
+            border-left: 3px solid var(--accent);
+        }
+
+        .file-item.processing {
+            opacity: 0.6;
+        }
+
+        .file-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--bg-primary);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .file-info { flex: 1; min-width: 0; }
+
+        .file-name {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-meta {
+            font-size: 9px;
+            color: var(--text-muted);
+            display: flex;
+            gap: 8px;
+        }
+
+        .file-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .file-status.pending { background: var(--text-muted); }
+        .file-status.processing {
+            background: var(--warning);
+            animation: pulse 1s infinite;
+        }
+        .file-status.done { background: var(--success); }
+        .file-status.error { background: var(--error); }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .file-remove {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+
+        .file-item:hover .file-remove { opacity: 1; }
+        .file-remove:hover { color: var(--error); }
+
+        /* Sidebar Actions */
+        .sidebar-actions {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            flex: 1;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border: none;
+        }
+
+        .btn-primary:hover { background: var(--accent-light); }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-light);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Main Content */
+        .main-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 180px);
+        }
+
+        .content-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .content-tabs {
+            display: flex;
+            gap: 4px;
+        }
+
+        .content-tab {
+            padding: 6px 14px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .content-tab:hover { color: var(--text-secondary); }
+        .content-tab.active {
+            background: var(--bg-primary);
+            color: var(--accent);
+        }
+
+        .content-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .content-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 40px;
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            stroke: var(--border);
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state p {
+            font-size: 11px;
+        }
+
+        /* Editable CV Output */
+        .cv-output {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .cv-section {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .cv-section:last-child { border-bottom: none; }
+
+        .cv-section-label {
+            background: var(--bg-primary);
+            padding: 12px 14px;
+            color: var(--accent);
+            font-size: 9px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            border-right: 1px solid var(--border-light);
+        }
+
+        .cv-section-content {
+            padding: 12px 14px;
+            font-size: 11px;
+            color: var(--text-body);
+        }
+
+        /* Editable Fields */
+        .editable {
+            position: relative;
+            cursor: text;
+            padding: 2px 4px;
+            margin: -2px -4px;
+            border-radius: 3px;
+            transition: all 0.2s ease;
+            min-height: 1.4em;
+        }
+
+        .editable:hover {
+            background: rgba(201, 162, 39, 0.1);
+        }
+
+        .editable:focus {
+            outline: none;
+            background: var(--bg-input);
+            box-shadow: 0 0 0 2px var(--accent);
+        }
+
+        .editable.editing {
+            background: var(--bg-input);
+        }
+
+        .editable[data-placeholder]:empty::before {
+            content: attr(data-placeholder);
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .edit-indicator {
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            color: var(--accent);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .editable:hover .edit-indicator { opacity: 0.5; }
+        .editable:focus .edit-indicator { opacity: 1; }
+
+        /* Editable Name & Title */
+        .cv-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .cv-title {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        /* Contact Grid */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 6px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+        }
+
+        .contact-label {
+            color: var(--text-muted);
+            font-size: 9px;
+            min-width: 50px;
+        }
+
+        /* Experience Entries */
+        .experience-entry {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .experience-entry:last-child { border-bottom: none; padding-bottom: 0; }
+        .experience-entry:first-child { padding-top: 0; }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 2px;
+        }
+
+        .entry-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .entry-delete {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+
+        .experience-entry:hover .entry-delete {
+            opacity: 1;
+        }
+
+        .entry-delete:hover {
+            background: rgba(248, 113, 113, 0.2);
+            color: var(--error);
+        }
+
+        .entry-role {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .entry-date {
+            font-size: 10px;
+            color: var(--accent);
+            white-space: nowrap;
+        }
+
+        .entry-company {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .entry-description {
+            font-size: 11px;
+            color: var(--text-body);
+            line-height: 1.5;
+        }
+
+        /* Tags */
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tag {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-light);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: var(--text-body);
+            cursor: text;
+        }
+
+        .tag.editable:hover {
+            border-color: var(--accent);
+        }
+
+        .tag-add {
+            background: transparent;
+            border: 1px dashed var(--border);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .tag-add:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .tag-remove {
+            margin-left: 6px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .tag-remove:hover { color: var(--error); }
+
+        /* Certificates Grid */
+        .cert-category {
+            margin-bottom: 10px;
+        }
+
+        .cert-category:last-child { margin-bottom: 0; }
+
+        .cert-category-title {
+            font-size: 9px;
+            font-weight: 500;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 6px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .cert-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .cert-tag {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-light);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            color: var(--text-body);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .cert-tag .year {
+            margin-left: 4px;
+            color: var(--accent);
+            font-size: 8px;
+        }
+
+        .cert-tag .tag-remove {
+            margin-left: 4px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .cert-tag:hover .tag-remove {
+            opacity: 1;
+        }
+
+        .empty-hint {
+            color: var(--text-muted);
+            font-style: italic;
+            font-size: 10px;
+        }
+
+        /* JSON View */
+        .json-view {
+            background: var(--bg-primary);
+            border-radius: 8px;
+            padding: 16px;
+            max-height: 100%;
+            overflow: auto;
+        }
+
+        .json-view pre {
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 10px;
+            color: var(--text-body);
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .json-key { color: var(--accent); }
+        .json-string { color: var(--success); }
+        .json-number { color: var(--warning); }
+
+        /* Progress Bar */
+        .progress-bar {
+            height: 3px;
+            background: var(--bg-primary);
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        /* Batch Progress */
+        .batch-progress {
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .batch-progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .batch-progress-text {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .batch-progress-count {
+            font-size: 10px;
+            color: var(--accent);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast.success { border-left: 3px solid var(--success); }
+        .toast.error { border-left: 3px solid var(--error); }
+        .toast.info { border-left: 3px solid var(--accent); }
+
+        .toast-message {
+            font-size: 11px;
+            color: var(--text-primary);
+        }
+
+        /* Template Styles */
+        .cv-output.template-modern-dark { background: var(--bg-secondary); }
+        
+        .cv-output.template-classic-light { background: #fff; }
+        .cv-output.template-classic-light .cv-section-label { background: #f8f8f8; color: #2c3e50; }
+        .cv-output.template-classic-light .cv-section-content { color: #444; }
+        .cv-output.template-classic-light .cv-name { color: #1a1a1a; }
+        .cv-output.template-classic-light .cv-title { color: #666; }
+        .cv-output.template-classic-light .tag { background: #f0f0f0; border-color: #ddd; color: #444; }
+        .cv-output.template-classic-light .entry-role { color: #2c3e50; }
+        .cv-output.template-classic-light .entry-date { color: #8b4513; }
+        .cv-output.template-classic-light .contact-label { color: #888; }
+
+        .cv-output.template-executive { background: linear-gradient(135deg, #1a1a2e, #16213e); }
+        .cv-output.template-executive .cv-section-label { background: rgba(0,0,0,0.2); color: #d4af37; border-right-color: rgba(212,175,55,0.2); }
+        .cv-output.template-executive .cv-section-content { color: #c0c0c0; }
+        .cv-output.template-executive .cv-section { border-bottom-color: rgba(212,175,55,0.2); }
+        .cv-output.template-executive .cv-name { color: #fff; }
+        .cv-output.template-executive .cv-title { color: #d4af37; }
+        .cv-output.template-executive .entry-role { color: #fff; }
+        .cv-output.template-executive .entry-date { color: #d4af37; }
+        .cv-output.template-executive .entry-company { color: #888; }
+        .cv-output.template-executive .tag { background: rgba(212,175,55,0.15); border-color: rgba(212,175,55,0.3); color: #d4af37; }
+        .cv-output.template-executive .contact-label { color: #d4af37; }
+
+        .cv-output.template-minimal { background: #fafafa; }
+        .cv-output.template-minimal .cv-section-label { background: transparent; color: #999; border-right: none; }
+        .cv-output.template-minimal .cv-section-content { color: #333; }
+        .cv-output.template-minimal .cv-section { border-bottom-color: #eee; }
+        .cv-output.template-minimal .cv-name { color: #111; font-weight: 300; font-size: 28px; }
+        .cv-output.template-minimal .cv-title { color: #666; }
+        .cv-output.template-minimal .entry-role { color: #111; }
+        .cv-output.template-minimal .entry-date { color: #999; }
+        .cv-output.template-minimal .tag { background: transparent; border-color: #ddd; color: #555; border-radius: 0; }
+
+        .cv-output.template-creative { background: #fff; box-shadow: 0 0 0 3px #ff6b6b; }
+        .cv-output.template-creative .cv-section:first-child { background: linear-gradient(135deg, #ff6b6b, #feca57); }
+        .cv-output.template-creative .cv-section:first-child .cv-section-label { background: transparent; color: rgba(255,255,255,0.9); }
+        .cv-output.template-creative .cv-section:first-child .cv-section-content { background: transparent; }
+        .cv-output.template-creative .cv-section:first-child .cv-name { color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+        .cv-output.template-creative .cv-section:first-child .cv-title { color: rgba(255,255,255,0.9); }
+        .cv-output.template-creative .cv-section-label { background: #fff5f5; color: #ff6b6b; border-right-color: #ffe0e0; }
+        .cv-output.template-creative .cv-section { border-bottom-color: #ffe0e0; }
+        .cv-output.template-creative .cv-section-content { color: #444; }
+        .cv-output.template-creative .cv-name { color: #333; }
+        .cv-output.template-creative .cv-title { color: #ff6b6b; }
+        .cv-output.template-creative .entry-role { color: #333; }
+        .cv-output.template-creative .entry-date { color: #ff6b6b; }
+        .cv-output.template-creative .tag { background: linear-gradient(135deg, #ff6b6b, #feca57); color: #fff; border: none; }
+
+        .cv-output.template-professional { background: #fff; }
+        .cv-output.template-professional .cv-section:first-child { background: linear-gradient(135deg, #00529b, #0077b6); }
+        .cv-output.template-professional .cv-section:first-child .cv-section-label { background: transparent; color: rgba(255,255,255,0.8); border-right-color: rgba(255,255,255,0.2); }
+        .cv-output.template-professional .cv-section:first-child .cv-section-content { background: transparent; }
+        .cv-output.template-professional .cv-section:first-child .cv-name { color: #fff; }
+        .cv-output.template-professional .cv-section:first-child .cv-title { color: rgba(255,255,255,0.9); }
+        .cv-output.template-professional .cv-section:first-child .contact-item { color: rgba(255,255,255,0.9); }
+        .cv-output.template-professional .cv-section:first-child .contact-label { color: rgba(255,255,255,0.7); }
+        .cv-output.template-professional .cv-section-label { background: #f8fafc; color: #00529b; }
+        .cv-output.template-professional .cv-section-content { color: #444; }
+        .cv-output.template-professional .cv-name { color: #1a1a1a; }
+        .cv-output.template-professional .cv-title { color: #0077b6; }
+        .cv-output.template-professional .entry-role { color: #00529b; }
+        .cv-output.template-professional .entry-date { color: #0077b6; }
+        .cv-output.template-professional .tag { background: #e8f4fc; border-color: #b8d8eb; color: #00529b; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .cv-section { grid-template-columns: 1fr; }
+            .cv-section-label { border-right: none; border-bottom: 1px solid var(--border-light); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>CV <span>Intelligence</span> Parser</h1>
+            <p>Batch Upload • Inline Edit • Multi-Template Export</p>
+            <span class="badge">EduNatives Technology</span>
+        </header>
+
+        <!-- Config Bar -->
+        <div class="config-bar">
+            <div class="config-group">
+                <label>LLM Provider</label>
+                <select id="llmProvider">
+                    <option value="local">Local NLP Only</option>
+                    <option value="anthropic">Anthropic Claude</option>
+                    <option value="openai">OpenAI GPT</option>
+                    <option value="groq">Groq</option>
+                </select>
+            </div>
+            <div class="config-group">
+                <label>API Key</label>
+                <input type="password" id="apiKey" placeholder="Optional...">
+            </div>
+            <div class="config-group">
+                <label>Model</label>
+                <select id="modelSelect">
+                    <option value="nlp-only">NLP Only</option>
+                </select>
+            </div>
+            <div class="template-bar">
+                <span class="template-bar-label">Template:</span>
+                <div class="template-thumb thumb-modern-dark active" data-template="modern-dark" title="Modern Dark"></div>
+                <div class="template-thumb thumb-classic-light" data-template="classic-light" title="Classic Light"></div>
+                <div class="template-thumb thumb-executive" data-template="executive" title="Executive"></div>
+                <div class="template-thumb thumb-minimal" data-template="minimal" title="Minimal"></div>
+                <div class="template-thumb thumb-creative" data-template="creative" title="Creative"></div>
+                <div class="template-thumb thumb-professional" data-template="professional" title="Professional"></div>
+            </div>
+            <div class="status-indicator">
+                <span class="status-dot" id="apiStatus"></span>
+                <span id="apiStatusText">NLP Ready</span>
+            </div>
+        </div>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Sidebar - File List -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <span class="sidebar-title">CV Files</span>
+                    <span class="file-count" id="fileCount">0</span>
+                </div>
+
+                <div class="upload-area">
+                    <div class="upload-dropzone" id="uploadDropzone">
+                        <h4>Drop CVs Here</h4>
+                        <p>or click to browse</p>
+                        <div class="formats">
+                            <span class="format-badge">PDF</span>
+                            <span class="format-badge">DOCX</span>
+                            <span class="format-badge">TXT</span>
+                        </div>
+                    </div>
+                    <input type="file" id="fileInput" accept=".pdf,.docx,.txt" multiple>
+                </div>
+
+                <div class="file-list" id="fileList">
+                    <!-- Files will be listed here -->
+                </div>
+
+                <div class="sidebar-actions">
+                    <button class="btn btn-primary" id="processAllBtn" disabled>Process All</button>
+                    <button class="btn btn-secondary" id="exportAllBtn" disabled>Export All</button>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <div class="content-header">
+                    <div class="content-tabs">
+                        <button class="content-tab active" data-tab="edit">Edit View</button>
+                        <button class="content-tab" data-tab="preview">Preview</button>
+                        <button class="content-tab" data-tab="json">JSON</button>
+                    </div>
+                    <div class="content-actions">
+                        <button class="btn btn-secondary" id="reprocessBtn" style="display:none;">Reprocess</button>
+                        <button class="btn btn-primary" id="exportCurrentBtn" style="display:none;">Export</button>
+                    </div>
+                </div>
+
+                <div class="content-body" id="contentBody">
+                    <div class="empty-state" id="emptyState">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10 9 9 9 8 9"/>
+                        </svg>
+                        <h3>No CV Selected</h3>
+                        <p>Upload CVs and select one to view and edit</p>
+                    </div>
+
+                    <div id="editView" style="display:none;"></div>
+                    <div id="previewView" style="display:none;"></div>
+                    <div id="jsonView" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // Initialize PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // ============================================
+        // STATE MANAGEMENT
+        // ============================================
+        const state = {
+            files: [], // Array of { id, file, name, status, data, rawText }
+            activeFileId: null,
+            currentTemplate: 'modern-dark',
+            currentTab: 'edit'
+        };
+
+        // ============================================
+        // DOM ELEMENTS
+        // ============================================
+        const dom = {
+            uploadDropzone: document.getElementById('uploadDropzone'),
+            fileInput: document.getElementById('fileInput'),
+            fileList: document.getElementById('fileList'),
+            fileCount: document.getElementById('fileCount'),
+            processAllBtn: document.getElementById('processAllBtn'),
+            exportAllBtn: document.getElementById('exportAllBtn'),
+            contentBody: document.getElementById('contentBody'),
+            emptyState: document.getElementById('emptyState'),
+            editView: document.getElementById('editView'),
+            previewView: document.getElementById('previewView'),
+            jsonView: document.getElementById('jsonView'),
+            reprocessBtn: document.getElementById('reprocessBtn'),
+            exportCurrentBtn: document.getElementById('exportCurrentBtn'),
+            llmProvider: document.getElementById('llmProvider'),
+            apiKey: document.getElementById('apiKey'),
+            modelSelect: document.getElementById('modelSelect'),
+            apiStatus: document.getElementById('apiStatus'),
+            apiStatusText: document.getElementById('apiStatusText'),
+            toastContainer: document.getElementById('toastContainer')
+        };
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+        function generateId() {
+            return 'cv_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function esc(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span class="toast-message">${message}</span>`;
+            dom.toastContainer.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        // ============================================
+        // FILE MANAGEMENT
+        // ============================================
+        function addFiles(fileList) {
+            for (const file of fileList) {
+                const ext = file.name.split('.').pop().toLowerCase();
+                if (!['pdf', 'docx', 'txt'].includes(ext)) {
+                    showToast(`Skipped: ${file.name} (unsupported format)`, 'error');
+                    continue;
+                }
+
+                const fileEntry = {
+                    id: generateId(),
+                    file: file,
+                    name: file.name,
+                    size: file.size,
+                    status: 'pending', // pending, processing, done, error
+                    data: null,
+                    rawText: ''
+                };
+
+                state.files.push(fileEntry);
+            }
+
+            renderFileList();
+            updateButtons();
+
+            if (state.files.length === 1) {
+                selectFile(state.files[0].id);
+            }
+        }
+
+        function removeFile(id) {
+            state.files = state.files.filter(f => f.id !== id);
+            if (state.activeFileId === id) {
+                state.activeFileId = state.files.length > 0 ? state.files[0].id : null;
+            }
+            renderFileList();
+            renderContent();
+            updateButtons();
+        }
+
+        function selectFile(id) {
+            state.activeFileId = id;
+            renderFileList();
+            renderContent();
+            updateButtons();
+        }
+
+        function getActiveFile() {
+            return state.files.find(f => f.id === state.activeFileId);
+        }
+
+        function updateButtons() {
+            const hasPending = state.files.some(f => f.status === 'pending');
+            const hasDone = state.files.some(f => f.status === 'done');
+            const activeFile = getActiveFile();
+
+            dom.processAllBtn.disabled = !hasPending;
+            dom.exportAllBtn.disabled = !hasDone;
+            dom.fileCount.textContent = state.files.length;
+
+            dom.reprocessBtn.style.display = activeFile ? 'block' : 'none';
+            dom.exportCurrentBtn.style.display = activeFile?.status === 'done' ? 'block' : 'none';
+        }
+
+        // ============================================
+        // RENDERING
+        // ============================================
+        function renderFileList() {
+            if (state.files.length === 0) {
+                dom.fileList.innerHTML = '<div class="empty-state" style="padding:20px;"><p>No files uploaded</p></div>';
+                return;
+            }
+
+            dom.fileList.innerHTML = state.files.map(f => `
+                <div class="file-item ${f.id === state.activeFileId ? 'active' : ''} ${f.status === 'processing' ? 'processing' : ''}" 
+                     data-id="${f.id}" onclick="selectFile('${f.id}')">
+                    <div class="file-icon">${f.name.split('.').pop().toUpperCase()}</div>
+                    <div class="file-info">
+                        <div class="file-name">${esc(f.name)}</div>
+                        <div class="file-meta">
+                            <span>${formatFileSize(f.size)}</span>
+                            <span>${f.status === 'done' ? (f.data?.name || 'Parsed') : f.status}</span>
+                        </div>
+                    </div>
+                    <div class="file-status ${f.status}"></div>
+                    <button class="file-remove" onclick="event.stopPropagation(); removeFile('${f.id}')">✕</button>
+                </div>
+            `).join('');
+        }
+
+        function renderContent() {
+            const file = getActiveFile();
+
+            if (!file) {
+                dom.emptyState.style.display = 'flex';
+                dom.editView.style.display = 'none';
+                dom.previewView.style.display = 'none';
+                dom.jsonView.style.display = 'none';
+                return;
+            }
+
+            dom.emptyState.style.display = 'none';
+
+            if (file.status === 'pending') {
+                dom.editView.innerHTML = `
+                    <div class="empty-state">
+                        <h3>Ready to Process</h3>
+                        <p>Click "Process All" or select this file and click "Reprocess"</p>
+                    </div>
+                `;
+                dom.editView.style.display = 'block';
+                dom.previewView.style.display = 'none';
+                dom.jsonView.style.display = 'none';
+                return;
+            }
+
+            if (file.status === 'processing') {
+                dom.editView.innerHTML = `
+                    <div class="empty-state">
+                        <div class="spinner" style="width:32px;height:32px;border:2px solid var(--border-light);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:16px;"></div>
+                        <h3>Processing...</h3>
+                        <p>Extracting and analyzing CV content</p>
+                    </div>
+                `;
+                dom.editView.style.display = 'block';
+                return;
+            }
+
+            if (file.status === 'error') {
+                dom.editView.innerHTML = `
+                    <div class="empty-state">
+                        <h3 style="color:var(--error);">Processing Failed</h3>
+                        <p>There was an error processing this file</p>
+                    </div>
+                `;
+                dom.editView.style.display = 'block';
+                return;
+            }
+
+            // Show content based on current tab
+            showTab(state.currentTab);
+        }
+
+        function showTab(tab) {
+            state.currentTab = tab;
+
+            // Update tab buttons
+            document.querySelectorAll('.content-tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.tab === tab);
+            });
+
+            const file = getActiveFile();
+            if (!file || file.status !== 'done') return;
+
+            dom.editView.style.display = tab === 'edit' ? 'block' : 'none';
+            dom.previewView.style.display = tab === 'preview' ? 'block' : 'none';
+            dom.jsonView.style.display = tab === 'json' ? 'block' : 'none';
+
+            if (tab === 'edit') {
+                renderEditView(file);
+            } else if (tab === 'preview') {
+                renderPreviewView(file);
+            } else if (tab === 'json') {
+                renderJsonView(file);
+            }
+        }
+
+        function renderEditView(file) {
+            const data = file.data;
+            
+            dom.editView.innerHTML = `
+                <div class="cv-output template-${state.currentTemplate}">
+                    <div class="cv-section">
+                        <div class="cv-section-label">Name</div>
+                        <div class="cv-section-content">
+                            <div class="cv-name editable" contenteditable="true" data-field="name" data-placeholder="Enter name...">${esc(data.name)}</div>
+                            <div class="cv-title editable" contenteditable="true" data-field="title" data-placeholder="Enter title...">${esc(data.title)}</div>
+                        </div>
+                    </div>
+
+                    <div class="cv-section">
+                        <div class="cv-section-label">Contact</div>
+                        <div class="cv-section-content">
+                            <div class="contact-grid">
+                                <div class="contact-item">
+                                    <span class="contact-label">Email:</span>
+                                    <span class="editable" contenteditable="true" data-field="contact.email" data-placeholder="email@example.com">${esc(data.contact?.email)}</span>
+                                </div>
+                                <div class="contact-item">
+                                    <span class="contact-label">Phone:</span>
+                                    <span class="editable" contenteditable="true" data-field="contact.phone" data-placeholder="+1234567890">${esc(data.contact?.phone)}</span>
+                                </div>
+                                <div class="contact-item">
+                                    <span class="contact-label">LinkedIn:</span>
+                                    <span class="editable" contenteditable="true" data-field="contact.linkedin" data-placeholder="linkedin.com/in/...">${esc(data.contact?.linkedin)}</span>
+                                </div>
+                                <div class="contact-item">
+                                    <span class="contact-label">Location:</span>
+                                    <span class="editable" contenteditable="true" data-field="contact.location" data-placeholder="City, Country">${esc(data.contact?.location)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cv-section">
+                        <div class="cv-section-label">Summary</div>
+                        <div class="cv-section-content">
+                            <div class="editable" contenteditable="true" data-field="summary" data-placeholder="Professional summary...">${esc(data.summary)}</div>
+                        </div>
+                    </div>
+
+                    <div class="cv-section">
+                        <div class="cv-section-label">Strengths</div>
+                        <div class="cv-section-content">
+                            <div class="tag-container" id="strengthsContainer">
+                                ${(data.strengths || []).map((s, i) => `
+                                    <span class="tag">
+                                        <span class="editable" contenteditable="true" data-field="strengths.${i}">${esc(s)}</span>
+                                        <span class="tag-remove" onclick="removeArrayItem('strengths', ${i})">×</span>
+                                    </span>
+                                `).join('')}
+                                <span class="tag-add" onclick="addArrayItem('strengths')">+ Add</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cv-section">
+                        <div class="cv-section-label">Skills</div>
+                        <div class="cv-section-content">
+                            <div class="tag-container" id="skillsContainer">
+                                ${(data.skills || []).map((s, i) => `
+                                    <span class="tag">
+                                        <span class="editable" contenteditable="true" data-field="skills.${i}">${esc(s)}</span>
+                                        <span class="tag-remove" onclick="removeArrayItem('skills', ${i})">×</span>
+                                    </span>
+                                `).join('')}
+                                <span class="tag-add" onclick="addArrayItem('skills')">+ Add</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cv-section">
+                        <div class="cv-section-label">Experience</div>
+                        <div class="cv-section-content">
+                            ${(data.experience || []).map((exp, i) => `
+                                <div class="experience-entry" data-index="${i}">
+                                    <div class="entry-header">
+                                        <span class="entry-role editable" contenteditable="true" data-field="experience.${i}.role">${esc(exp.role)}</span>
+                                        <div class="entry-actions">
+                                            <span class="entry-date editable" contenteditable="true" data-field="experience.${i}.dates">${esc(exp.startDate)}${exp.endDate ? ' – ' + esc(exp.endDate) : ''}</span>
+                                            <button class="entry-delete" onclick="removeExperience(${i})" title="Delete">×</button>
+                                        </div>
+                                    </div>
+                                    <div class="entry-company editable" contenteditable="true" data-field="experience.${i}.company">${esc(exp.company)}</div>
+                                    <div class="entry-description editable" contenteditable="true" data-field="experience.${i}.description">${esc(exp.description)}</div>
+                                </div>
+                            `).join('')}
+                            <button class="tag-add" style="margin-top:8px;" onclick="addExperience()">+ Add Experience</button>
+                        </div>
+                    </div>
+
+                    <div class="cv-section">
+                        <div class="cv-section-label">Education</div>
+                        <div class="cv-section-content">
+                            ${(data.education || []).map((edu, i) => `
+                                <div class="experience-entry" data-index="${i}">
+                                    <div class="entry-header">
+                                        <span class="entry-role editable" contenteditable="true" data-field="education.${i}.degree">${esc(edu.degree)}</span>
+                                        <div class="entry-actions">
+                                            <span class="entry-date editable" contenteditable="true" data-field="education.${i}.year">${esc(edu.year)}</span>
+                                            <button class="entry-delete" onclick="removeEducation(${i})" title="Delete">×</button>
+                                        </div>
+                                    </div>
+                                    <div class="entry-company editable" contenteditable="true" data-field="education.${i}.institution">${esc(edu.institution)}</div>
+                                </div>
+                            `).join('')}
+                            <button class="tag-add" style="margin-top:8px;" onclick="addEducation()">+ Add Education</button>
+                        </div>
+                    </div>
+
+                    <div class="cv-section">
+                        <div class="cv-section-label">Certificates</div>
+                        <div class="cv-section-content">
+                            ${renderCertificatesGroupedEditable(data.certificates || [])}
+                            <button class="tag-add" style="margin-top:8px;" onclick="addCertificate()">+ Add Certificate</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Attach edit handlers
+            attachEditHandlers();
+        }
+
+        function renderPreviewView(file) {
+            dom.previewView.innerHTML = `<div class="cv-output template-${state.currentTemplate}">${generatePreviewHTML(file.data)}</div>`;
+        }
+
+        function generatePreviewHTML(data) {
+            return `
+                <div class="cv-section">
+                    <div class="cv-section-label">Name</div>
+                    <div class="cv-section-content">
+                        <div class="cv-name">${esc(data.name)}</div>
+                        <div class="cv-title">${esc(data.title)}</div>
+                    </div>
+                </div>
+                <div class="cv-section">
+                    <div class="cv-section-label">Contact</div>
+                    <div class="cv-section-content">
+                        <div class="contact-grid">
+                            ${data.contact?.email ? `<div class="contact-item"><span class="contact-label">Email:</span>${esc(data.contact.email)}</div>` : ''}
+                            ${data.contact?.phone ? `<div class="contact-item"><span class="contact-label">Phone:</span>${esc(data.contact.phone)}</div>` : ''}
+                            ${data.contact?.linkedin ? `<div class="contact-item"><span class="contact-label">LinkedIn:</span>${esc(data.contact.linkedin)}</div>` : ''}
+                            ${data.contact?.location ? `<div class="contact-item"><span class="contact-label">Location:</span>${esc(data.contact.location)}</div>` : ''}
+                        </div>
+                    </div>
+                </div>
+                ${data.summary ? `<div class="cv-section"><div class="cv-section-label">Summary</div><div class="cv-section-content">${esc(data.summary)}</div></div>` : ''}
+                ${data.strengths?.length ? `<div class="cv-section"><div class="cv-section-label">Strengths</div><div class="cv-section-content"><div class="tag-container">${data.strengths.map(s => `<span class="tag">${esc(s)}</span>`).join('')}</div></div></div>` : ''}
+                ${data.skills?.length ? `<div class="cv-section"><div class="cv-section-label">Skills</div><div class="cv-section-content"><div class="tag-container">${data.skills.map(s => `<span class="tag">${esc(s)}</span>`).join('')}</div></div></div>` : ''}
+                ${data.experience?.length ? `<div class="cv-section"><div class="cv-section-label">Experience</div><div class="cv-section-content">${data.experience.map(exp => `
+                    <div class="experience-entry">
+                        <div class="entry-header"><span class="entry-role">${esc(exp.role)}</span><span class="entry-date">${esc(exp.startDate)} – ${esc(exp.endDate)}</span></div>
+                        <div class="entry-company">${esc(exp.company)}</div>
+                        <div class="entry-description">${esc(exp.description)}</div>
+                    </div>
+                `).join('')}</div></div>` : ''}
+                ${data.education?.length ? `<div class="cv-section"><div class="cv-section-label">Education</div><div class="cv-section-content">${data.education.map(edu => `
+                    <div class="experience-entry">
+                        <div class="entry-header"><span class="entry-role">${esc(edu.degree)}</span><span class="entry-date">${esc(edu.year)}</span></div>
+                        <div class="entry-company">${esc(edu.institution)}</div>
+                    </div>
+                `).join('')}</div></div>` : ''}
+                ${data.certificates?.length ? `<div class="cv-section"><div class="cv-section-label">Certificates</div><div class="cv-section-content">${renderCertificatesGrouped(data.certificates)}</div></div>` : ''}
+            `;
+        }
+
+        function renderJsonView(file) {
+            const json = JSON.stringify(file.data, null, 2);
+            const highlighted = json
+                .replace(/"([^"]+)":/g, '<span class="json-key">"$1"</span>:')
+                .replace(/: "([^"]*)"([,\n])/g, ': <span class="json-string">"$1"</span>$2')
+                .replace(/: (\d+)([,\n])/g, ': <span class="json-number">$1</span>$2');
+
+            dom.jsonView.innerHTML = `<div class="json-view"><pre>${highlighted}</pre></div>`;
+        }
+
+        function renderCertificatesGrouped(certificates) {
+            const categories = {
+                'Enterprise Architecture': /togaf|archimate|ea\b|enterprise\s*architect/i,
+                'IT Governance': /cobit|cgeit|crisc|cisa|itil|iso\s*2[07]|governance/i,
+                'Project Management': /pmp|prince|agile|scrum|project/i,
+                'Cloud & Infrastructure': /aws|azure|gcp|cloud|docker|kubernetes|devops/i,
+                'Security': /cissp|cism|security|siem|iso\s*27/i,
+                'Vendor Certifications': /microsoft|cisco|oracle|ibm|hp|bmc|sap|vmware|mcse|ccna|ccnp/i,
+                'Frameworks & Standards': /tmforum|etom|frameworx|six\s*sigma|lean/i,
+                'Leadership & Strategy': /strategy|leadership|balanced\s*scorecard|bsc|kpi|executive/i
+            };
+
+            const grouped = {};
+            const ungrouped = [];
+
+            for (const cert of certificates) {
+                let matched = false;
+                for (const [category, pattern] of Object.entries(categories)) {
+                    if (pattern.test(cert.name) || pattern.test(cert.issuer || '')) {
+                        if (!grouped[category]) grouped[category] = [];
+                        grouped[category].push(cert);
+                        matched = true;
+                        break;
+                    }
+                }
+                if (!matched) ungrouped.push(cert);
+            }
+
+            if (ungrouped.length > 0) grouped['Other'] = ungrouped;
+
+            let html = '';
+            for (const [category, certs] of Object.entries(grouped)) {
+                if (certs.length === 0) continue;
+                html += `
+                    <div class="cert-category">
+                        <div class="cert-category-title">${esc(category)}</div>
+                        <div class="cert-tags">
+                            ${certs.map(cert => `<span class="cert-tag">${esc(cert.name)}${cert.year ? `<span class="year">${esc(cert.year)}</span>` : ''}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            return html;
+        }
+
+        // ============================================
+        // INLINE EDITING
+        // ============================================
+        function attachEditHandlers() {
+            document.querySelectorAll('.editable').forEach(el => {
+                el.addEventListener('blur', handleFieldEdit);
+                el.addEventListener('keydown', e => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        el.blur();
+                    }
+                });
+            });
+        }
+
+        function handleFieldEdit(e) {
+            const field = e.target.dataset.field;
+            const value = e.target.textContent.trim();
+            const file = getActiveFile();
+
+            if (!file || !field) return;
+
+            // Parse field path (e.g., "contact.email" or "experience.0.role")
+            const parts = field.split('.');
+            let obj = file.data;
+
+            for (let i = 0; i < parts.length - 1; i++) {
+                const key = isNaN(parts[i]) ? parts[i] : parseInt(parts[i]);
+                if (!obj[key]) obj[key] = {};
+                obj = obj[key];
+            }
+
+            const lastKey = isNaN(parts[parts.length - 1]) ? parts[parts.length - 1] : parseInt(parts[parts.length - 1]);
+            obj[lastKey] = value;
+
+            showToast('Field updated', 'success');
+        }
+
+        function removeArrayItem(arrayName, index) {
+            const file = getActiveFile();
+            if (!file) return;
+
+            file.data[arrayName].splice(index, 1);
+            renderEditView(file);
+            showToast('Item removed', 'info');
+        }
+
+        function addArrayItem(arrayName) {
+            const file = getActiveFile();
+            if (!file) return;
+
+            if (!file.data[arrayName]) file.data[arrayName] = [];
+            file.data[arrayName].push('New item');
+            renderEditView(file);
+            showToast('Item added', 'success');
+        }
+
+        function addExperience() {
+            const file = getActiveFile();
+            if (!file) return;
+
+            if (!file.data.experience) file.data.experience = [];
+            file.data.experience.push({
+                role: 'New Position',
+                company: 'Company Name',
+                startDate: '2024',
+                endDate: 'Present',
+                description: 'Description of responsibilities...'
+            });
+            renderEditView(file);
+            showToast('Experience added', 'success');
+        }
+
+        function addEducation() {
+            const file = getActiveFile();
+            if (!file) return;
+
+            if (!file.data.education) file.data.education = [];
+            file.data.education.push({
+                degree: 'Degree Name',
+                institution: 'Institution Name',
+                year: '2024'
+            });
+            renderEditView(file);
+            showToast('Education added', 'success');
+        }
+
+        function addCertificate() {
+            const file = getActiveFile();
+            if (!file) return;
+
+            if (!file.data.certificates) file.data.certificates = [];
+            file.data.certificates.push({
+                name: 'New Certificate',
+                issuer: '',
+                year: ''
+            });
+            renderEditView(file);
+            showToast('Certificate added', 'success');
+        }
+
+        function removeExperience(index) {
+            const file = getActiveFile();
+            if (!file || !file.data.experience) return;
+
+            file.data.experience.splice(index, 1);
+            renderEditView(file);
+            showToast('Experience removed', 'info');
+        }
+
+        function removeEducation(index) {
+            const file = getActiveFile();
+            if (!file || !file.data.education) return;
+
+            file.data.education.splice(index, 1);
+            renderEditView(file);
+            showToast('Education removed', 'info');
+        }
+
+        function removeCertificate(index) {
+            const file = getActiveFile();
+            if (!file || !file.data.certificates) return;
+
+            file.data.certificates.splice(index, 1);
+            renderEditView(file);
+            showToast('Certificate removed', 'info');
+        }
+
+        // Editable version of certificates grouped renderer
+        function renderCertificatesGroupedEditable(certificates) {
+            if (!certificates || certificates.length === 0) {
+                return '<div class="empty-hint">No certificates added</div>';
+            }
+
+            const categories = {
+                'Enterprise Architecture': /togaf|archimate|ea\b|enterprise\s*architect/i,
+                'IT Governance': /cobit|cgeit|crisc|cisa|itil|iso\s*2[07]|governance/i,
+                'Project Management': /pmp|prince|agile|scrum|project/i,
+                'Cloud & Infrastructure': /aws|azure|gcp|cloud|docker|kubernetes|devops/i,
+                'Security': /cissp|cism|security|siem|iso\s*27/i,
+                'Vendor Certifications': /microsoft|cisco|oracle|ibm|hp|bmc|sap|vmware|mcse|ccna|ccnp/i,
+                'Frameworks & Standards': /tmforum|etom|frameworx|six\s*sigma|lean/i,
+                'Leadership & Strategy': /strategy|leadership|balanced\s*scorecard|bsc|kpi|executive/i
+            };
+
+            // Store original indices for delete functionality
+            const grouped = {};
+            const ungrouped = [];
+
+            certificates.forEach((cert, originalIndex) => {
+                let matched = false;
+                for (const [category, pattern] of Object.entries(categories)) {
+                    if (pattern.test(cert.name) || pattern.test(cert.issuer || '')) {
+                        if (!grouped[category]) grouped[category] = [];
+                        grouped[category].push({ ...cert, _index: originalIndex });
+                        matched = true;
+                        break;
+                    }
+                }
+                if (!matched) ungrouped.push({ ...cert, _index: originalIndex });
+            });
+
+            if (ungrouped.length > 0) grouped['Other'] = ungrouped;
+
+            let html = '';
+            for (const [category, certs] of Object.entries(grouped)) {
+                if (certs.length === 0) continue;
+                html += `
+                    <div class="cert-category">
+                        <div class="cert-category-title">${esc(category)}</div>
+                        <div class="cert-tags">
+                            ${certs.map(cert => `
+                                <span class="cert-tag">
+                                    <span class="editable" contenteditable="true" data-field="certificates.${cert._index}.name">${esc(cert.name)}</span>
+                                    ${cert.year ? `<span class="year">${esc(cert.year)}</span>` : ''}
+                                    <span class="tag-remove" onclick="removeCertificate(${cert._index})">×</span>
+                                </span>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            return html;
+        }
+
+        // ============================================
+        // PROCESSING
+        // ============================================
+        async function processFile(fileEntry) {
+            fileEntry.status = 'processing';
+            renderFileList();
+            renderContent();
+
+            try {
+                // Extract text
+                const text = await extractText(fileEntry.file);
+                fileEntry.rawText = text;
+
+                // Parse
+                const nlpData = performNLPAnalysis(text);
+                const sections = classifySections(text);
+
+                // Use LLM or NLP extraction
+                if (dom.llmProvider.value !== 'local' && dom.apiKey.value.trim()) {
+                    fileEntry.data = await llmExtraction(text, nlpData, sections);
+                } else {
+                    fileEntry.data = enhancedNLPExtraction(text, nlpData, sections);
+                }
+
+                fileEntry.status = 'done';
+                showToast(`Processed: ${fileEntry.name}`, 'success');
+            } catch (error) {
+                console.error('Processing error:', error);
+                fileEntry.status = 'error';
+                showToast(`Error: ${fileEntry.name}`, 'error');
+            }
+
+            renderFileList();
+            renderContent();
+            updateButtons();
+        }
+
+        async function processAllFiles() {
+            const pending = state.files.filter(f => f.status === 'pending');
+            
+            for (const file of pending) {
+                await processFile(file);
+            }
+
+            showToast(`Processed ${pending.length} files`, 'success');
+        }
+
+        // ============================================
+        // TEXT EXTRACTION (same as before)
+        // ============================================
+        async function extractText(file) {
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (ext === 'pdf') return await extractPdfText(file);
+            if (ext === 'docx') return await extractDocxText(file);
+            if (ext === 'txt') return await file.text();
+            throw new Error('Unsupported format');
+        }
+
+        async function extractPdfText(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let text = '';
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+                let lastY = null, lineText = '';
+                for (const item of content.items) {
+                    if (lastY !== null && Math.abs(item.transform[5] - lastY) > 8) {
+                        text += lineText.trim() + '\n';
+                        lineText = '';
+                    }
+                    lineText += item.str + ' ';
+                    lastY = item.transform[5];
+                }
+                text += lineText.trim() + '\n\n';
+            }
+            return text.trim();
+        }
+
+        async function extractDocxText(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const result = await mammoth.extractRawText({ arrayBuffer });
+            return result.value;
+        }
+
+        // ============================================
+        // NLP ANALYSIS (same as before, condensed)
+        // ============================================
+        function performNLPAnalysis(text) {
+            if (typeof nlp === 'undefined') return performRegexNLPFallback(text);
+            const doc = nlp(text);
+            return {
+                people: doc.people().out('array'),
+                organizations: doc.organizations().out('array'),
+                places: doc.places().out('array'),
+                dates: doc.dates().out('array'),
+                emails: text.match(/[\w._%+-]+@[\w.-]+\.[a-zA-Z]{2,}/g) || [],
+                phones: text.match(/(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3,4}[-.\s]?\d{3,4}/g) || [],
+                urls: text.match(/(?:https?:\/\/)?(?:www\.)?[\w-]+\.[\w.-]+(?:\/[\w-./?%&=]*)?/gi) || [],
+                acronyms: text.match(/\b[A-Z]{2,6}\b/g) || []
+            };
+        }
+
+        function performRegexNLPFallback(text) {
+            return {
+                people: text.match(/^[A-Z][a-z]+\s+[A-Z][a-z]+/gm)?.slice(0, 5) || [],
+                organizations: text.match(/\b(?:Inc|Corp|Ltd|LLC|Oracle|Microsoft|IBM|Huawei|Cisco)\b[^,\n]*/gi)?.slice(0, 20) || [],
+                places: [...new Set(text.match(/\b(?:Dubai|Kuwait|Egypt|Cairo|Riyadh|UAE|Saudi|Qatar|London|UK|USA)\b/gi) || [])],
+                dates: text.match(/\b(?:19|20)\d{2}\b/g) || [],
+                emails: text.match(/[\w._%+-]+@[\w.-]+\.[a-zA-Z]{2,}/g) || [],
+                phones: text.match(/(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3,4}[-.\s]?\d{3,4}/g) || [],
+                urls: text.match(/(?:https?:\/\/)?(?:www\.)?[\w-]+\.[\w.-]+/gi) || [],
+                acronyms: text.match(/\b[A-Z]{2,6}\b/g) || []
+            };
+        }
+
+        function classifySections(text) {
+            const patterns = {
+                summary: /(?:executive\s+)?summary|profile|objective|about\s*me/i,
+                strengths: /(?:areas?\s+of\s+)?strength|core\s+competenc/i,
+                skills: /skills?|technologies|technical\s+skills/i,
+                experience: /experience|work\s*history|employment|career\s*path/i,
+                education: /education|academic|qualifications/i,
+                certificates: /certifications?|certificates?|professional\s+training/i
+            };
+
+            const lines = text.split('\n');
+            const sections = {};
+            let currentSection = 'header';
+            let currentContent = [];
+
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (!trimmed) continue;
+                let foundSection = null;
+                for (const [section, pattern] of Object.entries(patterns)) {
+                    if (pattern.test(trimmed) && trimmed.length < 80) {
+                        foundSection = section;
+                        break;
+                    }
+                }
+                if (foundSection) {
+                    if (currentContent.length > 0) sections[currentSection] = currentContent.join('\n');
+                    currentSection = foundSection;
+                    currentContent = [];
+                } else {
+                    currentContent.push(trimmed);
+                }
+            }
+            if (currentContent.length > 0) sections[currentSection] = currentContent.join('\n');
+            return sections;
+        }
+
+        // ============================================
+        // ENHANCED NLP EXTRACTION (condensed)
+        // ============================================
+        function enhancedNLPExtraction(text, nlpData, sections) {
+            return {
+                name: extractName(text, nlpData),
+                title: extractTitle(text),
+                contact: {
+                    email: nlpData.emails[0] || '',
+                    phone: nlpData.phones[0] || '',
+                    linkedin: (text.match(/linkedin\.com\/in\/[\w-]+/i) || [''])[0],
+                    location: nlpData.places[0] || ''
+                },
+                summary: sections.summary?.slice(0, 2000) || '',
+                strengths: extractStrengths(text, sections),
+                skills: extractSkills(text, sections, nlpData),
+                experience: extractExperience(text, sections),
+                education: extractEducation(text, sections),
+                certificates: extractCertificates(text, sections)
+            };
+        }
+
+        function extractName(text, nlpData) {
+            if (nlpData.people?.length > 0) return nlpData.people[0];
+            const lines = text.split('\n').filter(l => l.trim());
+            for (const line of lines.slice(0, 5)) {
+                const clean = line.trim();
+                if (clean.length > 3 && clean.length < 50 && !clean.includes('@') && !clean.match(/^\d/)) {
+                    const words = clean.split(/\s+/);
+                    if (words.length >= 2 && words.length <= 4 && words.every(w => /^[A-Z]/.test(w))) return clean;
+                }
+            }
+            return 'Name Not Detected';
+        }
+
+        function extractTitle(text) {
+            const keywords = ['consultant', 'architect', 'engineer', 'developer', 'manager', 'director', 'analyst'];
+            const lines = text.split('\n').slice(0, 10);
+            for (const line of lines) {
+                if (keywords.some(k => line.toLowerCase().includes(k)) && line.length < 100) {
+                    return line.trim().replace(/[|•·].*$/, '').trim();
+                }
+            }
+            return '';
+        }
+
+        function extractStrengths(text, sections) {
+            if (sections.strengths) {
+                return sections.strengths.split(/[•·▪►⮚\n]/).map(s => s.trim()).filter(s => s.length > 5 && s.length < 200).slice(0, 20);
+            }
+            return [];
+        }
+
+        function extractSkills(text, sections, nlpData) {
+            const skills = new Set();
+            if (sections.skills) {
+                sections.skills.split(/[•·▪►,\n]/).map(s => s.trim()).filter(s => s.length > 1 && s.length < 50).forEach(s => skills.add(s));
+            }
+            ['TOGAF', 'ITIL', 'COBIT', 'AWS', 'Azure', 'Docker', 'Python', 'Java', 'SQL'].forEach(s => { if (text.includes(s)) skills.add(s); });
+            return [...skills].slice(0, 30);
+        }
+
+        function extractExperience(text, sections) {
+            const experiences = [];
+            const expText = sections.experience || '';
+            if (!expText) return experiences;
+
+            const blocks = expText.split(/(?=\b(?:19|20)\d{2}\s*[-–—])/i);
+            for (const block of blocks) {
+                if (block.trim().length < 30) continue;
+                const lines = block.split('\n').filter(l => l.trim());
+                const dateMatch = block.match(/(\b(?:19|20)\d{2})\s*[-–—]\s*((?:19|20)?\d{0,4}|Present|Current)/i);
+                experiences.push({
+                    role: lines[0]?.replace(/\d{4}.*$/, '').trim() || 'Position',
+                    company: lines[1]?.trim() || '',
+                    startDate: dateMatch?.[1] || '',
+                    endDate: dateMatch?.[2] || '',
+                    description: lines.slice(2).join(' ').slice(0, 500)
+                });
+            }
+            return experiences.slice(0, 15);
+        }
+
+        function extractEducation(text, sections) {
+            const education = [];
+            const eduText = sections.education || '';
+            if (!eduText) return education;
+
+            const blocks = eduText.split(/\n{2,}/);
+            for (const block of blocks) {
+                if (block.trim().length < 10) continue;
+                const yearMatch = block.match(/\b(19|20)\d{2}\b/);
+                const lines = block.split('\n').filter(l => l.trim());
+                education.push({
+                    degree: lines[0]?.trim() || '',
+                    institution: lines[1]?.trim() || '',
+                    year: yearMatch?.[0] || ''
+                });
+            }
+            return education.slice(0, 5);
+        }
+
+        function extractCertificates(text, sections) {
+            const certificates = [];
+            const certText = sections.certificates || '';
+            const items = certText.split(/[•·▪►\n]/).filter(s => s.trim().length > 5);
+
+            for (const item of items) {
+                const yearMatch = item.match(/\b(19|20)\d{2}\b/);
+                const clean = item.replace(/\b(19|20)\d{2}\b/g, '').trim();
+                if (clean.length > 3) {
+                    certificates.push({ name: clean, issuer: '', year: yearMatch?.[0] || '' });
+                }
+            }
+            return certificates.slice(0, 30);
+        }
+
+        // ============================================
+        // LLM EXTRACTION (condensed)
+        // ============================================
+        async function llmExtraction(text, nlpData, sections) {
+            const provider = dom.llmProvider.value;
+            const key = dom.apiKey.value.trim();
+            const model = dom.modelSelect.value;
+
+            const prompt = `Parse this CV and return JSON with: name, title, contact{email,phone,linkedin,location}, summary, strengths[], skills[], experience[{role,company,startDate,endDate,description}], education[{degree,institution,year}], certificates[{name,issuer,year}].
+
+CV TEXT:
+${text.slice(0, 8000)}
+
+Return ONLY valid JSON.`;
+
+            try {
+                let response;
+                if (provider === 'anthropic') {
+                    const res = await fetch('https://api.anthropic.com/v1/messages', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+                        body: JSON.stringify({ model, max_tokens: 4096, messages: [{ role: 'user', content: prompt }] })
+                    });
+                    const data = await res.json();
+                    response = data.content[0].text;
+                } else if (provider === 'openai') {
+                    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+                        body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }], max_tokens: 4096 })
+                    });
+                    const data = await res.json();
+                    response = data.choices[0].message.content;
+                } else if (provider === 'groq') {
+                    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+                        body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }], max_tokens: 4096 })
+                    });
+                    const data = await res.json();
+                    response = data.choices[0].message.content;
+                }
+
+                const cleaned = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+                const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+                return JSON.parse(jsonMatch ? jsonMatch[0] : cleaned);
+            } catch (error) {
+                console.error('LLM error:', error);
+                return enhancedNLPExtraction(text, nlpData, sections);
+            }
+        }
+
+        // ============================================
+        // EXPORT
+        // ============================================
+        function exportCurrentFile() {
+            try {
+                const file = getActiveFile();
+                if (!file) {
+                    showToast('No file selected', 'error');
+                    return;
+                }
+                if (!file.data) {
+                    showToast('File not processed yet', 'error');
+                    return;
+                }
+
+                const jsonData = JSON.stringify(file.data, null, 2);
+                const blob = new Blob([jsonData], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                // Sanitize filename
+                const safeName = (file.data.name || 'cv').replace(/[^a-z0-9]/gi, '_').substring(0, 50);
+                a.download = `${safeName}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showToast('Exported successfully', 'success');
+            } catch (error) {
+                console.error('Export error:', error);
+                showToast('Export failed: ' + error.message, 'error');
+            }
+        }
+
+        function exportAllFiles() {
+            try {
+                const doneFiles = state.files.filter(f => f.status === 'done' && f.data);
+                
+                if (doneFiles.length === 0) {
+                    showToast('No processed files to export', 'error');
+                    return;
+                }
+
+                const allData = doneFiles.map(f => ({
+                    filename: f.name,
+                    data: f.data
+                }));
+                
+                const jsonData = JSON.stringify(allData, null, 2);
+                const blob = new Blob([jsonData], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `cv-batch-export-${new Date().toISOString().slice(0,10)}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showToast(`Exported ${doneFiles.length} files`, 'success');
+            } catch (error) {
+                console.error('Export error:', error);
+                showToast('Export failed: ' + error.message, 'error');
+            }
+        }
+
+        // ============================================
+        // EVENT HANDLERS
+        // ============================================
+        dom.uploadDropzone.addEventListener('click', () => dom.fileInput.click());
+        dom.uploadDropzone.addEventListener('dragover', e => { e.preventDefault(); dom.uploadDropzone.classList.add('dragover'); });
+        dom.uploadDropzone.addEventListener('dragleave', () => dom.uploadDropzone.classList.remove('dragover'));
+        dom.uploadDropzone.addEventListener('drop', e => {
+            e.preventDefault();
+            dom.uploadDropzone.classList.remove('dragover');
+            addFiles(e.dataTransfer.files);
+        });
+        dom.fileInput.addEventListener('change', e => addFiles(e.target.files));
+
+        dom.processAllBtn.addEventListener('click', processAllFiles);
+        dom.exportAllBtn.addEventListener('click', exportAllFiles);
+        dom.exportCurrentBtn.addEventListener('click', exportCurrentFile);
+        dom.reprocessBtn.addEventListener('click', () => {
+            const file = getActiveFile();
+            if (file) {
+                file.status = 'pending';
+                processFile(file);
+            }
+        });
+
+        document.querySelectorAll('.content-tab').forEach(tab => {
+            tab.addEventListener('click', () => showTab(tab.dataset.tab));
+        });
+
+        document.querySelectorAll('.template-thumb').forEach(thumb => {
+            thumb.addEventListener('click', () => {
+                state.currentTemplate = thumb.dataset.template;
+                document.querySelectorAll('.template-thumb').forEach(t => t.classList.remove('active'));
+                thumb.classList.add('active');
+                renderContent();
+            });
+        });
+
+        // Provider change
+        const providerModels = {
+            local: [{ value: 'nlp-only', label: 'NLP Only' }],
+            anthropic: [{ value: 'claude-sonnet-4-20250514', label: 'Claude Sonnet 4' }, { value: 'claude-3-haiku-20240307', label: 'Claude 3 Haiku' }],
+            openai: [{ value: 'gpt-4o-mini', label: 'GPT-4o Mini' }, { value: 'gpt-4o', label: 'GPT-4o' }],
+            groq: [{ value: 'llama-3.1-70b-versatile', label: 'Llama 3.1 70B' }]
+        };
+
+        dom.llmProvider.addEventListener('change', () => {
+            const models = providerModels[dom.llmProvider.value];
+            dom.modelSelect.innerHTML = models.map(m => `<option value="${m.value}">${m.label}</option>`).join('');
+            updateApiStatus();
+        });
+
+        function updateApiStatus() {
+            const isLocal = dom.llmProvider.value === 'local';
+            const hasKey = dom.apiKey.value.trim().length > 0;
+            dom.apiStatus.className = 'status-dot' + (isLocal || hasKey ? ' ready' : '');
+            dom.apiStatusText.textContent = isLocal ? 'NLP Ready' : (hasKey ? 'API Ready' : 'API Key Required');
+        }
+
+        dom.apiKey.addEventListener('input', updateApiStatus);
+
+        // Initialize
+        updateApiStatus();
+        renderFileList();
+    </script>
+</body>
+</html>
