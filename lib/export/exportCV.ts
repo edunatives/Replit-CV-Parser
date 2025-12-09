@@ -1,22 +1,116 @@
 import { jsPDF } from "jspdf";
-import { Document, Packer, Paragraph, TextRun, HeadingLevel } from "docx";
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle } from "docx";
 import { saveAs } from "file-saver";
-import type { ParsedCV } from "@/types/cv";
+import type { ParsedCV, TemplateType } from "@/types/cv";
 
-export async function exportToPDF(cv: ParsedCV, filename: string): Promise<void> {
+interface TemplateStyle {
+  headerBg: string;
+  accent: string;
+  headerText: string;
+  bodyBg: string;
+  bodyText: string;
+  bodyTextSecondary: string;
+}
+
+const templateStyles: Record<TemplateType, TemplateStyle> = {
+  "modern-dark": { headerBg: "#1a1a2e", accent: "#d4af37", headerText: "#ffffff", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a" },
+  "classic-light": { headerBg: "#f5f5f5", accent: "#2c3e50", headerText: "#1a1a1a", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a" },
+  "executive": { headerBg: "#0a192f", accent: "#64ffda", headerText: "#ffffff", bodyBg: "#f8f9fa", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a" },
+  "minimal": { headerBg: "#ffffff", accent: "#000000", headerText: "#1a1a1a", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a" },
+  "creative": { headerBg: "#667eea", accent: "#9b59b6", headerText: "#ffffff", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a" },
+  "professional": { headerBg: "#2d3436", accent: "#74b9ff", headerText: "#ffffff", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a" },
+};
+
+function hexToRgb(hex: string): { r: number; g: number; b: number } {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result
+    ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) }
+    : { r: 0, g: 0, b: 0 };
+}
+
+export async function exportToPDF(cv: ParsedCV, filename: string, template: TemplateType = "modern-dark"): Promise<void> {
+  const style = templateStyles[template];
   const doc = new jsPDF();
-  let y = 20;
-  const lineHeight = 7;
-  const marginLeft = 20;
   const pageWidth = doc.internal.pageSize.getWidth();
-  const maxWidth = pageWidth - marginLeft * 2;
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const marginLeft = 20;
+  const marginRight = 20;
+  const maxWidth = pageWidth - marginLeft - marginRight;
+  const lineHeight = 6;
+  let y = 0;
 
-  const addText = (text: string, size: number = 10, bold: boolean = false) => {
+  const headerBg = hexToRgb(style.headerBg);
+  const headerText = hexToRgb(style.headerText);
+  const accent = hexToRgb(style.accent);
+  const bodyText = hexToRgb(style.bodyText);
+  const bodyTextSecondary = hexToRgb(style.bodyTextSecondary);
+
+  doc.setFillColor(headerBg.r, headerBg.g, headerBg.b);
+  doc.rect(0, 0, pageWidth, 55, "F");
+
+  y = 18;
+  doc.setTextColor(headerText.r, headerText.g, headerText.b);
+  doc.setFontSize(22);
+  doc.setFont("helvetica", "bold");
+  doc.text(cv.name || "Name", marginLeft, y);
+
+  if (cv.title) {
+    y += 10;
+    doc.setTextColor(accent.r, accent.g, accent.b);
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "normal");
+    doc.text(cv.title, marginLeft, y);
+  }
+
+  y += 10;
+  doc.setTextColor(headerText.r, headerText.g, headerText.b);
+  doc.setFontSize(9);
+  const contactParts: string[] = [];
+  if (cv.email) contactParts.push(cv.email);
+  if (cv.phone) contactParts.push(cv.phone);
+  if (cv.location) contactParts.push(cv.location);
+  if (contactParts.length > 0) {
+    doc.text(contactParts.join("  |  "), marginLeft, y);
+    y += 6;
+  }
+
+  const linkParts: string[] = [];
+  if (cv.linkedin) linkParts.push(cv.linkedin);
+  if (cv.github) linkParts.push(cv.github);
+  if (cv.website) linkParts.push(cv.website);
+  if (linkParts.length > 0) {
+    doc.text(linkParts.join("  |  "), marginLeft, y);
+  }
+
+  y = 65;
+
+  const addSection = (title: string) => {
+    if (y > pageHeight - 30) {
+      doc.addPage();
+      y = 20;
+    }
+    y += 8;
+    doc.setTextColor(accent.r, accent.g, accent.b);
+    doc.setFontSize(13);
+    doc.setFont("helvetica", "bold");
+    doc.text(title, marginLeft, y);
+    doc.setDrawColor(accent.r, accent.g, accent.b);
+    doc.setLineWidth(0.5);
+    doc.line(marginLeft, y + 2, marginLeft + 40, y + 2);
+    y += 8;
+  };
+
+  const addText = (text: string, size: number = 10, bold: boolean = false, secondary: boolean = false) => {
+    if (secondary) {
+      doc.setTextColor(bodyTextSecondary.r, bodyTextSecondary.g, bodyTextSecondary.b);
+    } else {
+      doc.setTextColor(bodyText.r, bodyText.g, bodyText.b);
+    }
     doc.setFontSize(size);
     doc.setFont("helvetica", bold ? "bold" : "normal");
     const lines = doc.splitTextToSize(text, maxWidth);
     for (const line of lines) {
-      if (y > 280) {
+      if (y > pageHeight - 15) {
         doc.addPage();
         y = 20;
       }
@@ -25,53 +119,30 @@ export async function exportToPDF(cv: ParsedCV, filename: string): Promise<void>
     }
   };
 
-  const addSection = (title: string) => {
-    y += 5;
-    addText(title, 14, true);
-    y += 2;
-  };
-
-  addText(cv.name || "Name", 18, true);
-  if (cv.title) addText(cv.title, 12);
-  y += 3;
-
-  const contactParts: string[] = [];
-  if (cv.email) contactParts.push(cv.email);
-  if (cv.phone) contactParts.push(cv.phone);
-  if (cv.location) contactParts.push(cv.location);
-  if (contactParts.length > 0) {
-    addText(contactParts.join(" | "), 10);
-  }
-
-  const linkParts: string[] = [];
-  if (cv.linkedin) linkParts.push(cv.linkedin);
-  if (cv.github) linkParts.push(cv.github);
-  if (cv.website) linkParts.push(cv.website);
-  if (linkParts.length > 0) {
-    addText(linkParts.join(" | "), 9);
-  }
-
   if (cv.summary) {
     addSection("Summary");
-    addText(cv.summary);
+    addText(cv.summary, 10, false, true);
   }
 
   if (cv.experience && cv.experience.length > 0) {
     addSection("Experience");
     for (const exp of cv.experience) {
-      addText(`${exp.role} at ${exp.company}`, 11, true);
-      if (exp.duration) addText(exp.duration, 9);
-      if (exp.description) addText(exp.description);
-      y += 3;
+      addText(exp.role, 11, true);
+      addText(`${exp.company}${exp.duration ? ` | ${exp.duration}` : ""}`, 9, false, true);
+      if (exp.description) {
+        y += 2;
+        addText(exp.description, 10);
+      }
+      y += 4;
     }
   }
 
   if (cv.education && cv.education.length > 0) {
     addSection("Education");
     for (const edu of cv.education) {
-      addText(`${edu.degree}`, 11, true);
-      addText(`${edu.institution}${edu.year ? ` (${edu.year})` : ""}`, 10);
-      y += 2;
+      addText(edu.degree, 11, true);
+      addText(`${edu.institution}${edu.year ? ` (${edu.year})` : ""}`, 9, false, true);
+      y += 3;
     }
   }
 
@@ -79,34 +150,89 @@ export async function exportToPDF(cv: ParsedCV, filename: string): Promise<void>
     addSection("Certifications");
     for (const cert of cv.certifications) {
       const certText = cert.issuer ? `${cert.name} - ${cert.issuer}` : cert.name;
-      addText(`• ${certText}${cert.year ? ` (${cert.year})` : ""}`);
+      doc.setFillColor(accent.r, accent.g, accent.b);
+      doc.circle(marginLeft + 2, y - 2, 1.5, "F");
+      doc.setTextColor(bodyText.r, bodyText.g, bodyText.b);
+      doc.setFontSize(10);
+      doc.text(`${certText}${cert.year ? ` (${cert.year})` : ""}`, marginLeft + 8, y);
+      y += lineHeight;
     }
   }
 
   if (cv.skills && cv.skills.length > 0) {
     addSection("Skills");
-    addText(cv.skills.join(", "));
+    let skillX = marginLeft;
+    const skillY = y;
+    const chipPadding = 4;
+    const chipHeight = 7;
+    const chipSpacing = 3;
+    let currentY = skillY;
+
+    for (const skill of cv.skills) {
+      const textWidth = doc.getTextWidth(skill);
+      const chipWidth = textWidth + chipPadding * 2;
+
+      if (skillX + chipWidth > pageWidth - marginRight) {
+        skillX = marginLeft;
+        currentY += chipHeight + chipSpacing;
+      }
+
+      if (currentY > pageHeight - 15) {
+        doc.addPage();
+        currentY = 20;
+        skillX = marginLeft;
+      }
+
+      doc.setFillColor(accent.r, accent.g, accent.b);
+      doc.roundedRect(skillX, currentY - 5, chipWidth, chipHeight, 2, 2, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(8);
+      doc.text(skill, skillX + chipPadding, currentY);
+
+      skillX += chipWidth + chipSpacing;
+    }
+    y = currentY + chipHeight + 5;
   }
 
   doc.save(filename);
 }
 
-export async function exportToDOCX(cv: ParsedCV, filename: string): Promise<void> {
+export async function exportToDOCX(cv: ParsedCV, filename: string, template: TemplateType = "modern-dark"): Promise<void> {
+  const style = templateStyles[template];
   const children: Paragraph[] = [];
+
+  const accentHex = style.accent.replace("#", "");
+  const bodyTextHex = style.bodyText.replace("#", "");
+  const bodyTextSecondaryHex = style.bodyTextSecondary.replace("#", "");
 
   children.push(
     new Paragraph({
-      text: cv.name || "Name",
-      heading: HeadingLevel.TITLE,
+      children: [
+        new TextRun({
+          text: cv.name || "Name",
+          bold: true,
+          size: 48,
+          color: accentHex,
+        }),
+      ],
       spacing: { after: 100 },
+      border: {
+        bottom: { style: BorderStyle.SINGLE, size: 12, color: accentHex },
+      },
     })
   );
 
   if (cv.title) {
     children.push(
       new Paragraph({
-        text: cv.title,
-        heading: HeadingLevel.HEADING_2,
+        children: [
+          new TextRun({
+            text: cv.title,
+            size: 28,
+            color: bodyTextSecondaryHex,
+            italics: true,
+          }),
+        ],
         spacing: { after: 200 },
       })
     );
@@ -117,7 +243,12 @@ export async function exportToDOCX(cv: ParsedCV, filename: string): Promise<void
   if (cv.phone) contactParts.push(cv.phone);
   if (cv.location) contactParts.push(cv.location);
   if (contactParts.length > 0) {
-    children.push(new Paragraph({ text: contactParts.join(" | "), spacing: { after: 100 } }));
+    children.push(
+      new Paragraph({
+        children: [new TextRun({ text: contactParts.join("  |  "), size: 20, color: bodyTextHex })],
+        spacing: { after: 100 },
+      })
+    );
   }
 
   const linkParts: string[] = [];
@@ -125,50 +256,94 @@ export async function exportToDOCX(cv: ParsedCV, filename: string): Promise<void
   if (cv.github) linkParts.push(cv.github);
   if (cv.website) linkParts.push(cv.website);
   if (linkParts.length > 0) {
-    children.push(new Paragraph({ text: linkParts.join(" | "), spacing: { after: 200 } }));
+    children.push(
+      new Paragraph({
+        children: [new TextRun({ text: linkParts.join("  |  "), size: 18, color: bodyTextSecondaryHex })],
+        spacing: { after: 300 },
+      })
+    );
   }
 
-  if (cv.summary) {
+  const addSectionHeader = (title: string) => {
     children.push(
-      new Paragraph({ text: "Summary", heading: HeadingLevel.HEADING_1, spacing: { before: 300, after: 100 } })
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: title.toUpperCase(),
+            bold: true,
+            size: 26,
+            color: accentHex,
+          }),
+        ],
+        spacing: { before: 400, after: 150 },
+        border: {
+          bottom: { style: BorderStyle.SINGLE, size: 6, color: accentHex },
+        },
+      })
     );
-    children.push(new Paragraph({ text: cv.summary, spacing: { after: 200 } }));
+  };
+
+  if (cv.summary) {
+    addSectionHeader("Summary");
+    children.push(
+      new Paragraph({
+        children: [new TextRun({ text: cv.summary, size: 22, color: bodyTextSecondaryHex })],
+        spacing: { after: 200 },
+      })
+    );
   }
 
   if (cv.experience && cv.experience.length > 0) {
-    children.push(
-      new Paragraph({ text: "Experience", heading: HeadingLevel.HEADING_1, spacing: { before: 300, after: 100 } })
-    );
+    addSectionHeader("Experience");
     for (const exp of cv.experience) {
       children.push(
         new Paragraph({
-          children: [new TextRun({ text: `${exp.role} at ${exp.company}`, bold: true })],
+          children: [new TextRun({ text: exp.role, bold: true, size: 24, color: bodyTextHex })],
           spacing: { before: 150 },
         })
       );
-      if (exp.duration) {
-        children.push(new Paragraph({ text: exp.duration, spacing: { after: 50 } }));
-      }
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: `${exp.company}${exp.duration ? ` | ${exp.duration}` : ""}`,
+              size: 20,
+              color: bodyTextSecondaryHex,
+              italics: true,
+            }),
+          ],
+          spacing: { after: 50 },
+        })
+      );
       if (exp.description) {
-        children.push(new Paragraph({ text: exp.description, spacing: { after: 100 } }));
+        children.push(
+          new Paragraph({
+            children: [new TextRun({ text: exp.description, size: 22, color: bodyTextHex })],
+            spacing: { after: 150 },
+          })
+        );
       }
     }
   }
 
   if (cv.education && cv.education.length > 0) {
-    children.push(
-      new Paragraph({ text: "Education", heading: HeadingLevel.HEADING_1, spacing: { before: 300, after: 100 } })
-    );
+    addSectionHeader("Education");
     for (const edu of cv.education) {
       children.push(
         new Paragraph({
-          children: [new TextRun({ text: edu.degree, bold: true })],
+          children: [new TextRun({ text: edu.degree, bold: true, size: 24, color: bodyTextHex })],
           spacing: { before: 100 },
         })
       );
       children.push(
         new Paragraph({
-          text: `${edu.institution}${edu.year ? ` (${edu.year})` : ""}`,
+          children: [
+            new TextRun({
+              text: `${edu.institution}${edu.year ? ` (${edu.year})` : ""}`,
+              size: 20,
+              color: bodyTextSecondaryHex,
+            }),
+          ],
           spacing: { after: 100 },
         })
       );
@@ -176,14 +351,19 @@ export async function exportToDOCX(cv: ParsedCV, filename: string): Promise<void
   }
 
   if (cv.certifications && cv.certifications.length > 0) {
-    children.push(
-      new Paragraph({ text: "Certifications", heading: HeadingLevel.HEADING_1, spacing: { before: 300, after: 100 } })
-    );
+    addSectionHeader("Certifications");
     for (const cert of cv.certifications) {
       const certText = cert.issuer ? `${cert.name} - ${cert.issuer}` : cert.name;
       children.push(
         new Paragraph({
-          text: `• ${certText}${cert.year ? ` (${cert.year})` : ""}`,
+          children: [
+            new TextRun({ text: "\u2022 ", size: 22, color: accentHex }),
+            new TextRun({
+              text: `${certText}${cert.year ? ` (${cert.year})` : ""}`,
+              size: 22,
+              color: bodyTextHex,
+            }),
+          ],
           spacing: { after: 50 },
         })
       );
@@ -191,17 +371,30 @@ export async function exportToDOCX(cv: ParsedCV, filename: string): Promise<void
   }
 
   if (cv.skills && cv.skills.length > 0) {
+    addSectionHeader("Skills");
     children.push(
-      new Paragraph({ text: "Skills", heading: HeadingLevel.HEADING_1, spacing: { before: 300, after: 100 } })
+      new Paragraph({
+        children: cv.skills.map((skill, i) => [
+          new TextRun({
+            text: skill,
+            size: 22,
+            color: accentHex,
+            bold: true,
+          }),
+          ...(i < cv.skills.length - 1
+            ? [new TextRun({ text: "  •  ", size: 22, color: bodyTextSecondaryHex })]
+            : []),
+        ]).flat(),
+        spacing: { after: 200 },
+      })
     );
-    children.push(new Paragraph({ text: cv.skills.join(", "), spacing: { after: 200 } }));
   }
 
-  const doc = new Document({
+  const docx = new Document({
     sections: [{ children }],
   });
 
-  const blob = await Packer.toBlob(doc);
+  const blob = await Packer.toBlob(docx);
   saveAs(blob, filename);
 }
 

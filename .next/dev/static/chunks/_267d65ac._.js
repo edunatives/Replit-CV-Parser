@@ -18,19 +18,142 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$file$2d$save
 ;
 ;
 ;
-async function exportToPDF(cv, filename) {
+const templateStyles = {
+    "modern-dark": {
+        headerBg: "#1a1a2e",
+        accent: "#d4af37",
+        headerText: "#ffffff",
+        bodyBg: "#ffffff",
+        bodyText: "#1a1a1a",
+        bodyTextSecondary: "#4a4a4a"
+    },
+    "classic-light": {
+        headerBg: "#f5f5f5",
+        accent: "#2c3e50",
+        headerText: "#1a1a1a",
+        bodyBg: "#ffffff",
+        bodyText: "#1a1a1a",
+        bodyTextSecondary: "#4a4a4a"
+    },
+    "executive": {
+        headerBg: "#0a192f",
+        accent: "#64ffda",
+        headerText: "#ffffff",
+        bodyBg: "#f8f9fa",
+        bodyText: "#1a1a1a",
+        bodyTextSecondary: "#4a4a4a"
+    },
+    "minimal": {
+        headerBg: "#ffffff",
+        accent: "#000000",
+        headerText: "#1a1a1a",
+        bodyBg: "#ffffff",
+        bodyText: "#1a1a1a",
+        bodyTextSecondary: "#4a4a4a"
+    },
+    "creative": {
+        headerBg: "#667eea",
+        accent: "#9b59b6",
+        headerText: "#ffffff",
+        bodyBg: "#ffffff",
+        bodyText: "#1a1a1a",
+        bodyTextSecondary: "#4a4a4a"
+    },
+    "professional": {
+        headerBg: "#2d3436",
+        accent: "#74b9ff",
+        headerText: "#ffffff",
+        bodyBg: "#ffffff",
+        bodyText: "#1a1a1a",
+        bodyTextSecondary: "#4a4a4a"
+    }
+};
+function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : {
+        r: 0,
+        g: 0,
+        b: 0
+    };
+}
+async function exportToPDF(cv, filename, template = "modern-dark") {
+    const style = templateStyles[template];
     const doc = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jspdf$2f$dist$2f$jspdf$2e$es$2e$min$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsPDF"]();
-    let y = 20;
-    const lineHeight = 7;
-    const marginLeft = 20;
     const pageWidth = doc.internal.pageSize.getWidth();
-    const maxWidth = pageWidth - marginLeft * 2;
-    const addText = (text, size = 10, bold = false)=>{
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const marginLeft = 20;
+    const marginRight = 20;
+    const maxWidth = pageWidth - marginLeft - marginRight;
+    const lineHeight = 6;
+    let y = 0;
+    const headerBg = hexToRgb(style.headerBg);
+    const headerText = hexToRgb(style.headerText);
+    const accent = hexToRgb(style.accent);
+    const bodyText = hexToRgb(style.bodyText);
+    const bodyTextSecondary = hexToRgb(style.bodyTextSecondary);
+    doc.setFillColor(headerBg.r, headerBg.g, headerBg.b);
+    doc.rect(0, 0, pageWidth, 55, "F");
+    y = 18;
+    doc.setTextColor(headerText.r, headerText.g, headerText.b);
+    doc.setFontSize(22);
+    doc.setFont("helvetica", "bold");
+    doc.text(cv.name || "Name", marginLeft, y);
+    if (cv.title) {
+        y += 10;
+        doc.setTextColor(accent.r, accent.g, accent.b);
+        doc.setFontSize(14);
+        doc.setFont("helvetica", "normal");
+        doc.text(cv.title, marginLeft, y);
+    }
+    y += 10;
+    doc.setTextColor(headerText.r, headerText.g, headerText.b);
+    doc.setFontSize(9);
+    const contactParts = [];
+    if (cv.email) contactParts.push(cv.email);
+    if (cv.phone) contactParts.push(cv.phone);
+    if (cv.location) contactParts.push(cv.location);
+    if (contactParts.length > 0) {
+        doc.text(contactParts.join("  |  "), marginLeft, y);
+        y += 6;
+    }
+    const linkParts = [];
+    if (cv.linkedin) linkParts.push(cv.linkedin);
+    if (cv.github) linkParts.push(cv.github);
+    if (cv.website) linkParts.push(cv.website);
+    if (linkParts.length > 0) {
+        doc.text(linkParts.join("  |  "), marginLeft, y);
+    }
+    y = 65;
+    const addSection = (title)=>{
+        if (y > pageHeight - 30) {
+            doc.addPage();
+            y = 20;
+        }
+        y += 8;
+        doc.setTextColor(accent.r, accent.g, accent.b);
+        doc.setFontSize(13);
+        doc.setFont("helvetica", "bold");
+        doc.text(title, marginLeft, y);
+        doc.setDrawColor(accent.r, accent.g, accent.b);
+        doc.setLineWidth(0.5);
+        doc.line(marginLeft, y + 2, marginLeft + 40, y + 2);
+        y += 8;
+    };
+    const addText = (text, size = 10, bold = false, secondary = false)=>{
+        if (secondary) {
+            doc.setTextColor(bodyTextSecondary.r, bodyTextSecondary.g, bodyTextSecondary.b);
+        } else {
+            doc.setTextColor(bodyText.r, bodyText.g, bodyText.b);
+        }
         doc.setFontSize(size);
         doc.setFont("helvetica", bold ? "bold" : "normal");
         const lines = doc.splitTextToSize(text, maxWidth);
         for (const line of lines){
-            if (y > 280) {
+            if (y > pageHeight - 15) {
                 doc.addPage();
                 y = 20;
             }
@@ -38,75 +161,109 @@ async function exportToPDF(cv, filename) {
             y += lineHeight;
         }
     };
-    const addSection = (title)=>{
-        y += 5;
-        addText(title, 14, true);
-        y += 2;
-    };
-    addText(cv.name || "Name", 18, true);
-    if (cv.title) addText(cv.title, 12);
-    y += 3;
-    const contactParts = [];
-    if (cv.email) contactParts.push(cv.email);
-    if (cv.phone) contactParts.push(cv.phone);
-    if (cv.location) contactParts.push(cv.location);
-    if (contactParts.length > 0) {
-        addText(contactParts.join(" | "), 10);
-    }
-    const linkParts = [];
-    if (cv.linkedin) linkParts.push(cv.linkedin);
-    if (cv.github) linkParts.push(cv.github);
-    if (cv.website) linkParts.push(cv.website);
-    if (linkParts.length > 0) {
-        addText(linkParts.join(" | "), 9);
-    }
     if (cv.summary) {
         addSection("Summary");
-        addText(cv.summary);
+        addText(cv.summary, 10, false, true);
     }
     if (cv.experience && cv.experience.length > 0) {
         addSection("Experience");
         for (const exp of cv.experience){
-            addText(`${exp.role} at ${exp.company}`, 11, true);
-            if (exp.duration) addText(exp.duration, 9);
-            if (exp.description) addText(exp.description);
-            y += 3;
+            addText(exp.role, 11, true);
+            addText(`${exp.company}${exp.duration ? ` | ${exp.duration}` : ""}`, 9, false, true);
+            if (exp.description) {
+                y += 2;
+                addText(exp.description, 10);
+            }
+            y += 4;
         }
     }
     if (cv.education && cv.education.length > 0) {
         addSection("Education");
         for (const edu of cv.education){
-            addText(`${edu.degree}`, 11, true);
-            addText(`${edu.institution}${edu.year ? ` (${edu.year})` : ""}`, 10);
-            y += 2;
+            addText(edu.degree, 11, true);
+            addText(`${edu.institution}${edu.year ? ` (${edu.year})` : ""}`, 9, false, true);
+            y += 3;
         }
     }
     if (cv.certifications && cv.certifications.length > 0) {
         addSection("Certifications");
         for (const cert of cv.certifications){
             const certText = cert.issuer ? `${cert.name} - ${cert.issuer}` : cert.name;
-            addText(`• ${certText}${cert.year ? ` (${cert.year})` : ""}`);
+            doc.setFillColor(accent.r, accent.g, accent.b);
+            doc.circle(marginLeft + 2, y - 2, 1.5, "F");
+            doc.setTextColor(bodyText.r, bodyText.g, bodyText.b);
+            doc.setFontSize(10);
+            doc.text(`${certText}${cert.year ? ` (${cert.year})` : ""}`, marginLeft + 8, y);
+            y += lineHeight;
         }
     }
     if (cv.skills && cv.skills.length > 0) {
         addSection("Skills");
-        addText(cv.skills.join(", "));
+        let skillX = marginLeft;
+        const skillY = y;
+        const chipPadding = 4;
+        const chipHeight = 7;
+        const chipSpacing = 3;
+        let currentY = skillY;
+        for (const skill of cv.skills){
+            const textWidth = doc.getTextWidth(skill);
+            const chipWidth = textWidth + chipPadding * 2;
+            if (skillX + chipWidth > pageWidth - marginRight) {
+                skillX = marginLeft;
+                currentY += chipHeight + chipSpacing;
+            }
+            if (currentY > pageHeight - 15) {
+                doc.addPage();
+                currentY = 20;
+                skillX = marginLeft;
+            }
+            doc.setFillColor(accent.r, accent.g, accent.b);
+            doc.roundedRect(skillX, currentY - 5, chipWidth, chipHeight, 2, 2, "F");
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(8);
+            doc.text(skill, skillX + chipPadding, currentY);
+            skillX += chipWidth + chipSpacing;
+        }
+        y = currentY + chipHeight + 5;
     }
     doc.save(filename);
 }
-async function exportToDOCX(cv, filename) {
+async function exportToDOCX(cv, filename, template = "modern-dark") {
+    const style = templateStyles[template];
     const children = [];
+    const accentHex = style.accent.replace("#", "");
+    const bodyTextHex = style.bodyText.replace("#", "");
+    const bodyTextSecondaryHex = style.bodyTextSecondary.replace("#", "");
     children.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Paragraph"]({
-        text: cv.name || "Name",
-        heading: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["HeadingLevel"].TITLE,
+        children: [
+            new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TextRun"]({
+                text: cv.name || "Name",
+                bold: true,
+                size: 48,
+                color: accentHex
+            })
+        ],
         spacing: {
             after: 100
+        },
+        border: {
+            bottom: {
+                style: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["BorderStyle"].SINGLE,
+                size: 12,
+                color: accentHex
+            }
         }
     }));
     if (cv.title) {
         children.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Paragraph"]({
-            text: cv.title,
-            heading: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["HeadingLevel"].HEADING_2,
+            children: [
+                new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TextRun"]({
+                    text: cv.title,
+                    size: 28,
+                    color: bodyTextSecondaryHex,
+                    italics: true
+                })
+            ],
             spacing: {
                 after: 200
             }
@@ -118,7 +275,13 @@ async function exportToDOCX(cv, filename) {
     if (cv.location) contactParts.push(cv.location);
     if (contactParts.length > 0) {
         children.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Paragraph"]({
-            text: contactParts.join(" | "),
+            children: [
+                new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TextRun"]({
+                    text: contactParts.join("  |  "),
+                    size: 20,
+                    color: bodyTextHex
+                })
+            ],
             spacing: {
                 after: 100
             }
@@ -130,82 +293,111 @@ async function exportToDOCX(cv, filename) {
     if (cv.website) linkParts.push(cv.website);
     if (linkParts.length > 0) {
         children.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Paragraph"]({
-            text: linkParts.join(" | "),
+            children: [
+                new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TextRun"]({
+                    text: linkParts.join("  |  "),
+                    size: 18,
+                    color: bodyTextSecondaryHex
+                })
+            ],
             spacing: {
-                after: 200
+                after: 300
             }
         }));
     }
-    if (cv.summary) {
+    const addSectionHeader = (title)=>{
         children.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Paragraph"]({
-            text: "Summary",
-            heading: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["HeadingLevel"].HEADING_1,
+            children: [
+                new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TextRun"]({
+                    text: title.toUpperCase(),
+                    bold: true,
+                    size: 26,
+                    color: accentHex
+                })
+            ],
             spacing: {
-                before: 300,
-                after: 100
+                before: 400,
+                after: 150
+            },
+            border: {
+                bottom: {
+                    style: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["BorderStyle"].SINGLE,
+                    size: 6,
+                    color: accentHex
+                }
             }
         }));
+    };
+    if (cv.summary) {
+        addSectionHeader("Summary");
         children.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Paragraph"]({
-            text: cv.summary,
+            children: [
+                new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TextRun"]({
+                    text: cv.summary,
+                    size: 22,
+                    color: bodyTextSecondaryHex
+                })
+            ],
             spacing: {
                 after: 200
             }
         }));
     }
     if (cv.experience && cv.experience.length > 0) {
-        children.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Paragraph"]({
-            text: "Experience",
-            heading: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["HeadingLevel"].HEADING_1,
-            spacing: {
-                before: 300,
-                after: 100
-            }
-        }));
+        addSectionHeader("Experience");
         for (const exp of cv.experience){
             children.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Paragraph"]({
                 children: [
                     new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TextRun"]({
-                        text: `${exp.role} at ${exp.company}`,
-                        bold: true
+                        text: exp.role,
+                        bold: true,
+                        size: 24,
+                        color: bodyTextHex
                     })
                 ],
                 spacing: {
                     before: 150
                 }
             }));
-            if (exp.duration) {
-                children.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Paragraph"]({
-                    text: exp.duration,
-                    spacing: {
-                        after: 50
-                    }
-                }));
-            }
+            children.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Paragraph"]({
+                children: [
+                    new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TextRun"]({
+                        text: `${exp.company}${exp.duration ? ` | ${exp.duration}` : ""}`,
+                        size: 20,
+                        color: bodyTextSecondaryHex,
+                        italics: true
+                    })
+                ],
+                spacing: {
+                    after: 50
+                }
+            }));
             if (exp.description) {
                 children.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Paragraph"]({
-                    text: exp.description,
+                    children: [
+                        new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TextRun"]({
+                            text: exp.description,
+                            size: 22,
+                            color: bodyTextHex
+                        })
+                    ],
                     spacing: {
-                        after: 100
+                        after: 150
                     }
                 }));
             }
         }
     }
     if (cv.education && cv.education.length > 0) {
-        children.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Paragraph"]({
-            text: "Education",
-            heading: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["HeadingLevel"].HEADING_1,
-            spacing: {
-                before: 300,
-                after: 100
-            }
-        }));
+        addSectionHeader("Education");
         for (const edu of cv.education){
             children.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Paragraph"]({
                 children: [
                     new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TextRun"]({
                         text: edu.degree,
-                        bold: true
+                        bold: true,
+                        size: 24,
+                        color: bodyTextHex
                     })
                 ],
                 spacing: {
@@ -213,7 +405,13 @@ async function exportToDOCX(cv, filename) {
                 }
             }));
             children.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Paragraph"]({
-                text: `${edu.institution}${edu.year ? ` (${edu.year})` : ""}`,
+                children: [
+                    new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TextRun"]({
+                        text: `${edu.institution}${edu.year ? ` (${edu.year})` : ""}`,
+                        size: 20,
+                        color: bodyTextSecondaryHex
+                    })
+                ],
                 spacing: {
                     after: 100
                 }
@@ -221,18 +419,22 @@ async function exportToDOCX(cv, filename) {
         }
     }
     if (cv.certifications && cv.certifications.length > 0) {
-        children.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Paragraph"]({
-            text: "Certifications",
-            heading: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["HeadingLevel"].HEADING_1,
-            spacing: {
-                before: 300,
-                after: 100
-            }
-        }));
+        addSectionHeader("Certifications");
         for (const cert of cv.certifications){
             const certText = cert.issuer ? `${cert.name} - ${cert.issuer}` : cert.name;
             children.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Paragraph"]({
-                text: `• ${certText}${cert.year ? ` (${cert.year})` : ""}`,
+                children: [
+                    new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TextRun"]({
+                        text: "\u2022 ",
+                        size: 22,
+                        color: accentHex
+                    }),
+                    new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TextRun"]({
+                        text: `${certText}${cert.year ? ` (${cert.year})` : ""}`,
+                        size: 22,
+                        color: bodyTextHex
+                    })
+                ],
                 spacing: {
                     after: 50
                 }
@@ -240,29 +442,36 @@ async function exportToDOCX(cv, filename) {
         }
     }
     if (cv.skills && cv.skills.length > 0) {
+        addSectionHeader("Skills");
         children.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Paragraph"]({
-            text: "Skills",
-            heading: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["HeadingLevel"].HEADING_1,
-            spacing: {
-                before: 300,
-                after: 100
-            }
-        }));
-        children.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Paragraph"]({
-            text: cv.skills.join(", "),
+            children: cv.skills.map((skill, i)=>[
+                    new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TextRun"]({
+                        text: skill,
+                        size: 22,
+                        color: accentHex,
+                        bold: true
+                    }),
+                    ...i < cv.skills.length - 1 ? [
+                        new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TextRun"]({
+                            text: "  •  ",
+                            size: 22,
+                            color: bodyTextSecondaryHex
+                        })
+                    ] : []
+                ]).flat(),
             spacing: {
                 after: 200
             }
         }));
     }
-    const doc = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Document"]({
+    const docx = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Document"]({
         sections: [
             {
                 children
             }
         ]
     });
-    const blob = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Packer"].toBlob(doc);
+    const blob = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Packer"].toBlob(docx);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$file$2d$saver$2f$dist$2f$FileSaver$2e$min$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["saveAs"])(blob, filename);
 }
 function exportToJSON(cvs, filename) {
