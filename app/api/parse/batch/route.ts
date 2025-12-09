@@ -62,7 +62,9 @@ export async function POST(request: NextRequest) {
 
         try {
           const collection = await getCollection("cvs");
-          await collection.insertOne({ ...cv, createdAt: new Date() });
+          if (collection) {
+            await collection.insertOne({ ...cv, createdAt: new Date() });
+          }
         } catch (dbError) {
           console.log("MongoDB not available, continuing without persistence");
         }
