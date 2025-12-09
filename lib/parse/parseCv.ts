@@ -59,30 +59,38 @@ async function extractWithAI(text: string): Promise<AIExtractedData | null> {
       messages: [
         {
           role: "system",
-          content: `You are an expert CV/resume parser. Extract ALL structured information from the CV text provided. Be thorough and extract every detail. Return a valid JSON object with these fields:
-- name: Full name of the candidate
+          content: `You are an expert CV/resume parser. The text may come from a PDF and might have unusual formatting, missing spaces, or jumbled sections due to PDF text extraction. Be thorough and intelligent about parsing.
+
+Extract ALL structured information and return a valid JSON object with these fields:
+- name: Full name of the candidate (usually at the top)
 - title: Current or most recent job title/position
-- email: Email address
-- phone: Phone number (include country code if present)
+- email: Email address (look for @ symbol)
+- phone: Phone number (include country code if present, look for patterns like +XX, (XXX), etc.)
 - location: City, Country or full location
 - website: Personal website URL (not LinkedIn or GitHub)
 - linkedin: LinkedIn profile URL or username
 - github: GitHub profile URL or username
-- summary: Professional summary or profile section (keep the full text, up to 500 characters)
-- experience: Array of ALL jobs/positions found with {role, company, duration, description}. Extract EVERY job listed, not just recent ones. Include full job descriptions.
-- education: Array of ALL educational qualifications with {degree, institution, year}
-- certifications: Array of ALL certifications, licenses, and professional credentials with {name, issuer, year}. Include certifications like TOGAF, ITIL, PMP, AWS, COBIT, CISA, etc.
-- skills: Array of ALL technical and professional skills mentioned (extract all, not limited)
+- summary: Professional summary, profile, or objective section (keep full text, up to 1000 characters)
+- experience: Array of ALL jobs/positions found with {role, company, duration, description}. Extract EVERY job listed, not just recent ones. Include bullet points as description. Duration should be in format like "Jan 2020 - Present" or "2018 - 2022".
+- education: Array of ALL educational qualifications with {degree, institution, year}. Include degrees, diplomas, courses.
+- certifications: Array of ALL certifications, licenses, and professional credentials with {name, issuer, year}. Look for: TOGAF, ITIL, PMP, AWS, Azure, COBIT, CISA, CGEIT, Scrum, Six Sigma, Lean, Kaizen, Prince2, CISSP, etc.
+- skills: Array of ALL technical and professional skills mentioned (extract ALL, do not limit). Look for skills sections, but also extract skills mentioned in job descriptions.
 
-IMPORTANT: Extract EVERYTHING. Do not limit or truncate any arrays. If a field cannot be found, use an empty string or empty array. Return ONLY valid JSON, no markdown.`
+CRITICAL INSTRUCTIONS:
+1. Extract EVERYTHING - do not limit or truncate any arrays
+2. If text seems jumbled, use context to understand sections
+3. Look for section headers like "Experience", "Work History", "Education", "Skills", "Certifications" even if formatting is off
+4. For experience descriptions, combine multiple lines/bullets into the description field
+5. If a field cannot be found, use empty string or empty array
+6. Return ONLY valid JSON, no markdown code blocks`
         },
         {
           role: "user",
-          content: text.slice(0, 20000)
+          content: text.slice(0, 30000)
         }
       ],
       temperature: 0.1,
-      max_tokens: 4000,
+      max_tokens: 8000,
     });
 
     const content = response.choices[0]?.message?.content;
@@ -380,9 +388,20 @@ export async function parseCV(buffer: Buffer, fileName: string, fileId: string):
   try {
     if (extension === "pdf") {
       console.log(`Parsing PDF file: ${fileName}, buffer size: ${buffer.length}`);
-      const data = await pdfParse(buffer);
+      const data = await pdfParse(buffer, {
+        max: 0,
+      });
       text = data.text;
-      console.log(`PDF parsed successfully, extracted ${text.length} characters`);
+      
+      text = text
+        .replace(/\r\n/g, '\n')
+        .replace(/\r/g, '\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .replace(/[ \t]+/g, ' ')
+        .trim();
+      
+      console.log(`PDF parsed successfully, extracted ${text.length} characters, ${data.numpages} pages`);
+      console.log(`First 500 chars of extracted text: ${text.substring(0, 500)}`);
     } else if (extension === "docx" || extension === "doc") {
       console.log(`Parsing Word file: ${fileName}, buffer size: ${buffer.length}`);
       const result = await mammoth.extractRawText({ buffer });
