@@ -5,7 +5,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { MainContent } from "@/components/MainContent";
 import type { CVFile } from "@/components/FileList";
 import type { ParsedCV } from "@/components/CVPreview";
-import type { TemplateType } from "@/components/TemplateThumbnails";
+import type { TemplateType } from "@/components/TemplateModal";
 import { useToast } from "@/hooks/use-toast";
 
 function generateMockCV(fileName: string, id: string): ParsedCV {
