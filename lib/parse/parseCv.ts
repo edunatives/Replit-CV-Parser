@@ -1,20 +1,30 @@
 import type { ParsedCV } from "@/types/cv";
 
-async function parsePdfBuffer(buffer: Buffer): Promise<{ text: string; numpages: number }> {
-  const pdfModule = await import("pdf-parse");
-  let pdfParse: ((buffer: Buffer, options?: object) => Promise<{ text: string; numpages: number }>) | undefined;
+type PdfParseResult = { text: string; numpages: number };
+type PdfParseFunction = (buffer: Buffer, options?: object) => Promise<PdfParseResult>;
+
+async function parsePdfBuffer(buffer: Buffer): Promise<PdfParseResult> {
+  const pdfModule = await import("pdf-parse") as unknown as 
+    | PdfParseFunction 
+    | { default: PdfParseFunction | { default: PdfParseFunction } };
+  
+  let pdfParse: PdfParseFunction | undefined;
   
   if (typeof pdfModule === "function") {
-    pdfParse = pdfModule as typeof pdfParse;
-  } else if (typeof pdfModule.default === "function") {
-    pdfParse = pdfModule.default;
-  } else if (pdfModule.default && typeof pdfModule.default.default === "function") {
-    pdfParse = pdfModule.default.default;
+    pdfParse = pdfModule;
+  } else if (typeof (pdfModule as { default: unknown }).default === "function") {
+    pdfParse = (pdfModule as { default: PdfParseFunction }).default;
+  } else if (
+    (pdfModule as { default: { default: unknown } }).default && 
+    typeof (pdfModule as { default: { default: PdfParseFunction } }).default.default === "function"
+  ) {
+    pdfParse = (pdfModule as { default: { default: PdfParseFunction } }).default.default;
   }
   
   if (!pdfParse || typeof pdfParse !== "function") {
-    console.error("pdf-parse module structure:", JSON.stringify(Object.keys(pdfModule)));
-    throw new Error(`pdf-parse module not callable. Keys: ${Object.keys(pdfModule).join(", ")}`);
+    const keys = Object.keys(pdfModule as object);
+    console.error("pdf-parse module structure:", JSON.stringify(keys));
+    throw new Error(`pdf-parse module not callable. Keys: ${keys.join(", ")}`);
   }
   
   return pdfParse(buffer, { max: 0 });
