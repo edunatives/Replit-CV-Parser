@@ -44,6 +44,57 @@ interface JDMatchResult {
   tokenUsage: { promptTokens: number; completionTokens: number; totalTokens: number };
 }
 
+// Normalize assessment response to handle potential snake_case from AI
+function normalizeAssessment(raw: Record<string, unknown>): CVAssessment {
+  const sections = (raw.sections || raw.section_scores || []) as Array<Record<string, unknown>>;
+  const tokenUsageRaw = (raw.tokenUsage || raw.token_usage || { promptTokens: 0, completionTokens: 0, totalTokens: 0 }) as Record<string, unknown>;
+  return {
+    overallScore: (raw.overallScore ?? raw.overall_score ?? 0) as number,
+    sections: sections.map((s: Record<string, unknown>) => ({
+      name: (s.name ?? s.section ?? "") as string,
+      score: (s.score ?? 0) as number,
+      feedback: (s.feedback ?? "") as string,
+    })),
+    strengths: (raw.strengths ?? []) as string[],
+    weaknesses: (raw.weaknesses ?? []) as string[],
+    recommendations: (raw.recommendations ?? []) as string[],
+    tokenUsage: normalizeTokenUsage(tokenUsageRaw),
+  };
+}
+
+// Normalize JD match response
+function normalizeJDMatch(raw: Record<string, unknown>): JDMatchResult {
+  const expMatch = (raw.experienceMatch || raw.experience_match || { score: 0, feedback: "" }) as Record<string, unknown>;
+  const eduMatch = (raw.educationMatch || raw.education_match || { score: 0, feedback: "" }) as Record<string, unknown>;
+  const tokenUsageRaw = (raw.tokenUsage || raw.token_usage || { promptTokens: 0, completionTokens: 0, totalTokens: 0 }) as Record<string, unknown>;
+  return {
+    matchScore: (raw.matchScore ?? raw.match_score ?? 0) as number,
+    matchedSkills: (raw.matchedSkills ?? raw.matched_skills ?? []) as string[],
+    missingSkills: (raw.missingSkills ?? raw.missing_skills ?? []) as string[],
+    experienceMatch: {
+      score: (expMatch.score ?? 0) as number,
+      feedback: (expMatch.feedback ?? "") as string,
+    },
+    educationMatch: {
+      score: (eduMatch.score ?? 0) as number,
+      feedback: (eduMatch.feedback ?? "") as string,
+    },
+    overallFeedback: (raw.overallFeedback ?? raw.overall_feedback ?? "") as string,
+    suggestions: (raw.suggestions ?? []) as string[],
+    keywordOptimizations: (raw.keywordOptimizations ?? raw.keyword_optimizations ?? []) as string[],
+    tokenUsage: normalizeTokenUsage(tokenUsageRaw),
+  };
+}
+
+// Normalize token usage
+function normalizeTokenUsage(raw: Record<string, unknown>): { promptTokens: number; completionTokens: number; totalTokens: number } {
+  return {
+    promptTokens: (raw.promptTokens ?? raw.prompt_tokens ?? 0) as number,
+    completionTokens: (raw.completionTokens ?? raw.completion_tokens ?? 0) as number,
+    totalTokens: (raw.totalTokens ?? raw.total_tokens ?? 0) as number,
+  };
+}
+
 export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
   const [jdText, setJdText] = useState("");
   const [chatMessage, setChatMessage] = useState("");
@@ -89,8 +140,9 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
         const data = await response.json();
         throw new Error(data.error || "Failed to assess CV");
       }
-      const { assessment } = await response.json();
-      setAssessment(assessment);
+      const { assessment: rawAssessment } = await response.json();
+      const normalized = normalizeAssessment(rawAssessment as Record<string, unknown>);
+      setAssessment(normalized);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to run assessment");
     } finally {
@@ -141,8 +193,9 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
         const data = await response.json();
         throw new Error(data.error || "Failed to analyze match");
       }
-      const { match } = await response.json();
-      setJdMatch(match);
+      const { match: rawMatch } = await response.json();
+      const normalized = normalizeJDMatch(rawMatch as Record<string, unknown>);
+      setJdMatch(normalized);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to analyze job match");
     } finally {
