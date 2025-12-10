@@ -509,9 +509,9 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
   const A4_WIDTH = "210mm";
   const A4_HEIGHT = "297mm";
   const A4_HEIGHT_PX = 1123; // 297mm at 96dpi
-  const HEADER_HEIGHT_PX = 140;
-  const PAGE_PADDING_PX = 48;
-  const BOTTOM_GUTTER = 40;
+  const HEADER_HEIGHT_PX = 110; // Actual header height (reduced from 140)
+  const PAGE_PADDING_PX = 24; // p: 3 = 24px padding
+  const BOTTOM_GUTTER = 24;
 
   // Page item types for granular pagination
   type PageItem = 
@@ -532,47 +532,52 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
 
   // Calculate page assignments with entry-level splitting
   const pages = useMemo((): PageData[] => {
-    const AVAILABLE_FIRST = A4_HEIGHT_PX - HEADER_HEIGHT_PX - PAGE_PADDING_PX - BOTTOM_GUTTER;
-    const AVAILABLE_SUBSEQUENT = A4_HEIGHT_PX - PAGE_PADDING_PX - BOTTOM_GUTTER - 40; // 40 for PageBadge
+    const AVAILABLE_FIRST = A4_HEIGHT_PX - HEADER_HEIGHT_PX - PAGE_PADDING_PX * 2 - BOTTOM_GUTTER;
+    const AVAILABLE_SUBSEQUENT = A4_HEIGHT_PX - PAGE_PADDING_PX * 2 - BOTTOM_GUTTER - 32; // 32 for PageBadge
 
-    const SECTION_HEADER = 48;
-    const LINE_HEIGHT = 24;
-    const CHARS_PER_LINE = 70;
+    const SECTION_HEADER = 36; // Reduced from 48 - actual header with margin
+    const LINE_HEIGHT = 20; // More accurate line height
+    const CHARS_PER_LINE = 80; // More chars fit per line at body2 font size
 
-    // Height estimation functions
+    // Height estimation functions - tighter estimates to minimize whitespace
     const estimateSummaryHeight = (): number => {
-      const lines = Math.ceil((cv.summary?.length || 100) / CHARS_PER_LINE);
-      return SECTION_HEADER + lines * LINE_HEIGHT + 24;
+      const text = cv.summary || "";
+      const lines = Math.ceil(text.length / CHARS_PER_LINE);
+      return SECTION_HEADER + lines * LINE_HEIGHT + 16;
     };
 
     const estimateExperienceEntryHeight = (exp: typeof cv.experience[0]): number => {
-      const headerHeight = 80; // Title, company, date lines
-      const lines = Math.ceil((exp.description?.length || 0) / CHARS_PER_LINE);
-      return headerHeight + lines * LINE_HEIGHT + 24;
+      const headerHeight = 56; // Title, company, date lines (reduced from 80)
+      const desc = exp.description || "";
+      // Count actual newlines for bullet points
+      const bulletLines = (desc.match(/\n/g) || []).length;
+      const textLines = Math.ceil(desc.length / CHARS_PER_LINE);
+      const lines = Math.max(bulletLines, textLines);
+      return headerHeight + lines * LINE_HEIGHT + 12;
     };
 
     const estimateEducationEntryHeight = (): number => {
-      return 60; // Fixed height per education entry
+      return 48; // Fixed height per education entry (reduced from 60)
     };
 
     const estimateSkillsHeight = (): number => {
       const count = cv.skills?.length || 0;
-      // Compact chips: ~8 skills per row at 24px height per row
-      const rows = Math.ceil(count / 8);
-      return SECTION_HEADER + rows * 28 + 12;
+      // Compact chips: ~10 skills per row at 24px height per row
+      const rows = Math.ceil(count / 10);
+      return SECTION_HEADER + rows * 26 + 8;
     };
 
     const estimateStrengthsHeight = (): number => {
       const count = cv.strengths?.length || 0;
-      const rows = Math.ceil(count / 6);
-      return SECTION_HEADER + rows * 28 + 12;
+      const rows = Math.ceil(count / 8);
+      return SECTION_HEADER + rows * 26 + 8;
     };
 
     const estimateCertificationsHeight = (): number => {
-      // Certifications now displayed as compact inline chips, ~4 per row
+      // Certifications now displayed as compact inline chips, ~5 per row
       const count = cv.certifications?.length || 0;
-      const rows = Math.ceil(count / 4);
-      return SECTION_HEADER + rows * 28 + 12;
+      const rows = Math.ceil(count / 5);
+      return SECTION_HEADER + rows * 26 + 8;
     };
 
     const result: PageData[] = [];
