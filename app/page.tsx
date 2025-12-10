@@ -13,6 +13,7 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
+import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
 import { Dashboard } from "@/components/Dashboard";
 import { CVWorkspace } from "@/components/CVWorkspace";
@@ -23,6 +24,7 @@ type View = "dashboard" | "workspace";
 
 export default function Home() {
   const [view, setView] = useState<View>("dashboard");
+  const [activeMenuItem, setActiveMenuItem] = useState("ai-career-chat");
   const [cvs, setCvs] = useState<ParsedCV[]>([]);
   const [selectedCV, setSelectedCV] = useState<ParsedCV | null>(null);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
@@ -37,6 +39,13 @@ export default function Home() {
 
   const showSnackbar = (message: string, severity: "success" | "error" | "info" = "info") => {
     setSnackbar({ open: true, message, severity });
+  };
+
+  const handleMenuItemClick = (item: string) => {
+    setActiveMenuItem(item);
+    if (item === "ai-career-chat") {
+      setView("dashboard");
+    }
   };
 
   const handleUploadNew = useCallback(() => {
@@ -115,35 +124,41 @@ export default function Home() {
   }, []);
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
-      {view === "dashboard" && (
-        <>
-          <Header />
-          {isProcessing && (
-            <Box sx={{ width: "100%" }}>
-              <LinearProgress />
-              <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center", py: 1 }}>
-                Processing your CV...
-              </Typography>
-            </Box>
-          )}
-          <Dashboard
-            cvs={cvs}
-            onUploadNew={handleUploadNew}
-            onSelectCV={handleSelectCV}
-            onDeleteCV={handleDeleteCV}
-            onDuplicateCV={handleDuplicateCV}
-          />
-        </>
-      )}
+    <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "background.default" }}>
+      <Sidebar activeItem={activeMenuItem} onItemClick={handleMenuItemClick} />
+      
+      <Box sx={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        <Header />
+        
+        {isProcessing && (
+          <Box sx={{ width: "100%" }}>
+            <LinearProgress />
+            <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center", py: 1 }}>
+              Processing your CV...
+            </Typography>
+          </Box>
+        )}
 
-      {view === "workspace" && selectedCV && (
-        <CVWorkspace
-          cv={selectedCV}
-          onBack={handleBackToDashboard}
-          onUpdateCV={handleUpdateCV}
-        />
-      )}
+        <Box sx={{ flex: 1, overflow: "auto" }}>
+          {view === "dashboard" && (
+            <Dashboard
+              cvs={cvs}
+              onUploadNew={handleUploadNew}
+              onSelectCV={handleSelectCV}
+              onDeleteCV={handleDeleteCV}
+              onDuplicateCV={handleDuplicateCV}
+            />
+          )}
+
+          {view === "workspace" && selectedCV && (
+            <CVWorkspace
+              cv={selectedCV}
+              onBack={handleBackToDashboard}
+              onUpdateCV={handleUpdateCV}
+            />
+          )}
+        </Box>
+      </Box>
 
       <Dialog 
         open={uploadDialogOpen} 
@@ -151,7 +166,7 @@ export default function Home() {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle sx={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 600 }}>
+        <DialogTitle sx={{ fontWeight: 600 }}>
           Upload Your Resume
         </DialogTitle>
         <DialogContent>

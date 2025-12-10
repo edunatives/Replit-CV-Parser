@@ -23,7 +23,7 @@ export function CVWorkspace({ cv, onBack, onUpdateCV }: CVWorkspaceProps) {
   const [activeTrack, setActiveTrack] = useState<AssessmentTrack>("assessment");
 
   return (
-    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column", bgcolor: "background.default" }}>
+    <Box sx={{ height: "100%", display: "flex", flexDirection: "column", bgcolor: "background.default" }}>
       <Box 
         sx={{ 
           display: "flex", 

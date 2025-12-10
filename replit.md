@@ -81,9 +81,13 @@ Custom MUI theme with:
 
 ### UX Flow
 
-**Dashboard-First Architecture:**
-1. **Dashboard** (entry point): Shows "My Resumes" with CV grid cards and upload section
-2. **CV Workspace** (after upload/selection): Two-pane layout
+**Sidebar-Based Architecture:**
+1. **Left Sidebar** (240px): EduNatives navigation with menu sections
+   - Main: Home, Opportunities, My Work, Jobs, AI career chat
+   - Communication: Timeline, Inbox, Calendar, Events, My Communities
+   - Default Spaces: Department Wall, National Network
+2. **Dashboard** (AI career chat): Shows "My Resumes" with CV grid cards and upload section
+3. **CV Workspace** (after upload/selection): Two-pane layout
    - Left pane: CV template preview with inline editing
    - Right pane: AI Analysis panel with three tabs
 
