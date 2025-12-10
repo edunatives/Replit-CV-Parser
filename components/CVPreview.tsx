@@ -446,8 +446,8 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
   };
 
   return (
-    <Box sx={{ py: 3, px: 2, bgcolor: "#f5f5f5" }} data-testid="cv-preview">
-      <Paper elevation={3} sx={{ ...a4PageStyle, overflow: "hidden" }}>
+    <Box sx={{ py: 3, px: 2, bgcolor: "#f5f5f5" }}>
+      <Paper elevation={3} sx={{ ...a4PageStyle, overflow: "hidden" }} data-testid="cv-preview">
         <Box sx={{ 
           bgcolor: style.headerBg, 
           py: 1.5, 
