@@ -500,7 +500,7 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
               Summary
             </Typography>
           )}
-          <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
+          <Typography variant="body2" sx={{ color: style.bodyTextSecondary, whiteSpace: "pre-wrap" }} component="div">
             <EditableField 
               value={cv.summary} 
               onChange={(v) => updateField("summary", v)} 
@@ -567,7 +567,7 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
                   />
                 </Typography>
               </Box>
-              <Typography variant="body2" sx={{ mt: 0.5, color: style.bodyText }} component="div">
+              <Typography variant="body2" sx={{ mt: 0.5, color: style.bodyText, whiteSpace: "pre-wrap" }} component="div">
                 <EditableField 
                   value={exp.description} 
                   onChange={(v) => updateExperience(index, "description", v)} 
