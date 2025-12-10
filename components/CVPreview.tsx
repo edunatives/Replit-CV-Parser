@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Typography, Paper, Chip, Divider, TextField, IconButton, InputAdornment, Tooltip } from "@mui/material";
+import { Box, Typography, Paper, Chip, Divider, TextField, IconButton, InputAdornment, Tooltip, Button } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
@@ -11,11 +11,11 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import LinkIcon from "@mui/icons-material/Link";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
+import SwapVertIcon from "@mui/icons-material/SwapVert";
 import type { ParsedCV, TemplateType, CVSection } from "@/types/cv";
+import { SectionRearrangeModal } from "./SectionRearrangeModal";
 import { DEFAULT_SECTION_ORDER } from "@/types/cv";
 import { useState, useRef } from "react";
 import { isDeveloperRole } from "@/lib/ai/rules";
@@ -30,17 +30,11 @@ interface CVPreviewProps {
 
 function SectionHeader({ 
   title, 
-  section,
   style, 
-  sectionOrder,
-  onMoveSection,
   rightContent 
 }: { 
   title: string; 
-  section: CVSection;
   style: ReturnType<typeof getTemplateStyle>;
-  sectionOrder: CVSection[];
-  onMoveSection: (section: CVSection, direction: "up" | "down") => void;
   rightContent?: React.ReactNode;
 }) {
   const isUnderline = style.sectionHeaderVariant === "underline";
@@ -48,7 +42,7 @@ function SectionHeader({
   
   return (
     <Box sx={{ mb: 1 }}>
-      <Box sx={{ display: "flex", alignItems: "center", "&:hover .order-btns": { opacity: 1 } }}>
+      <Box sx={{ display: "flex", alignItems: "center" }}>
         {isCenteredLines && <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />}
         <Typography 
           variant="h6" 
@@ -64,34 +58,6 @@ function SectionHeader({
           {title}
         </Typography>
         {isCenteredLines && <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />}
-        <Box className="order-btns" sx={{ display: "flex", opacity: 0.4, ml: 1, transition: "opacity 0.2s" }}>
-          <Tooltip title="Move up">
-            <span>
-              <IconButton 
-                size="small" 
-                onClick={() => onMoveSection(section, "up")}
-                disabled={sectionOrder.indexOf(section) === 0}
-                sx={{ color: style.accent, p: 0.25 }}
-                data-testid={`button-move-${section}-up`}
-              >
-                <KeyboardArrowUpIcon fontSize="small" />
-              </IconButton>
-            </span>
-          </Tooltip>
-          <Tooltip title="Move down">
-            <span>
-              <IconButton 
-                size="small" 
-                onClick={() => onMoveSection(section, "down")}
-                disabled={sectionOrder.indexOf(section) === sectionOrder.length - 1}
-                sx={{ color: style.accent, p: 0.25 }}
-                data-testid={`button-move-${section}-down`}
-              >
-                <KeyboardArrowDownIcon fontSize="small" />
-              </IconButton>
-            </span>
-          </Tooltip>
-        </Box>
         {!isCenteredLines && <Box sx={{ flex: 1 }} />}
         {rightContent}
       </Box>
@@ -357,20 +323,13 @@ function EditableContactField({
 
 export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
   const sectionOrder = cv.sectionOrder || DEFAULT_SECTION_ORDER;
+  const [rearrangeModalOpen, setRearrangeModalOpen] = useState(false);
 
   const updateField = (field: keyof ParsedCV, value: string | string[]) => {
     onUpdateCV({ ...cv, [field]: value });
   };
 
-  const moveSection = (section: CVSection, direction: "up" | "down") => {
-    const currentIndex = sectionOrder.indexOf(section);
-    if (currentIndex === -1) return;
-    
-    const newIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
-    if (newIndex < 0 || newIndex >= sectionOrder.length) return;
-    
-    const newOrder = [...sectionOrder];
-    [newOrder[currentIndex], newOrder[newIndex]] = [newOrder[newIndex], newOrder[currentIndex]];
+  const applySectionOrder = (newOrder: CVSection[]) => {
     onUpdateCV({ ...cv, sectionOrder: newOrder });
   };
 
@@ -553,13 +512,31 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
       </Box>
 
       <Box sx={{ p: 3, color: style.bodyText }}>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<SwapVertIcon />}
+            onClick={() => setRearrangeModalOpen(true)}
+            sx={{ 
+              textTransform: "none",
+              borderColor: style.accent,
+              color: style.accent,
+              "&:hover": {
+                borderColor: style.accent,
+                bgcolor: `${style.accent}10`,
+              }
+            }}
+            data-testid="button-rearrange-sections"
+          >
+            Rearrange Sections
+          </Button>
+        </Box>
+        
         <Box sx={{ mb: 3 }}>
           <SectionHeader
             title="Summary"
-            section="summary"
             style={style}
-            sectionOrder={sectionOrder}
-            onMoveSection={moveSection}
           />
           <Typography variant="body2" sx={{ color: style.bodyTextSecondary, whiteSpace: "pre-wrap" }} component="div">
             <EditableField 
@@ -574,10 +551,7 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
         <Box sx={{ mb: 3 }}>
           <SectionHeader
             title="Experience"
-            section="experience"
             style={style}
-            sectionOrder={sectionOrder}
-            onMoveSection={moveSection}
             rightContent={
               <IconButton size="small" onClick={addExperience} sx={{ color: style.accent }} data-testid="button-add-experience">
                 <AddIcon fontSize="small" />
@@ -650,10 +624,7 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
         <Box sx={{ mb: 3 }}>
           <SectionHeader
             title="Education"
-            section="education"
             style={style}
-            sectionOrder={sectionOrder}
-            onMoveSection={moveSection}
             rightContent={
               <IconButton size="small" onClick={addEducation} sx={{ color: style.accent }} data-testid="button-add-education">
                 <AddIcon fontSize="small" />
@@ -708,10 +679,7 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
         <Box sx={{ mb: 3 }}>
           <SectionHeader
             title="Skills"
-            section="skills"
             style={style}
-            sectionOrder={sectionOrder}
-            onMoveSection={moveSection}
             rightContent={
               <IconButton size="small" onClick={addSkill} sx={{ color: style.accent }} data-testid="button-add-skill">
                 <AddIcon fontSize="small" />
@@ -740,10 +708,7 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
         <Box sx={{ mb: 3 }}>
           <SectionHeader
             title="Key Strengths"
-            section="strengths"
             style={style}
-            sectionOrder={sectionOrder}
-            onMoveSection={moveSection}
             rightContent={
               <IconButton size="small" onClick={addStrength} sx={{ color: style.accent }} data-testid="button-add-strength">
                 <AddIcon fontSize="small" />
@@ -772,10 +737,7 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
         <Box>
           <SectionHeader
             title="Certifications"
-            section="certifications"
             style={style}
-            sectionOrder={sectionOrder}
-            onMoveSection={moveSection}
             rightContent={
               <IconButton size="small" onClick={addCertification} sx={{ color: style.accent }} data-testid="button-add-certification">
                 <AddIcon fontSize="small" />
@@ -803,6 +765,13 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
           )}
         </Box>
       </Box>
+      
+      <SectionRearrangeModal
+        open={rearrangeModalOpen}
+        onClose={() => setRearrangeModalOpen(false)}
+        sectionOrder={sectionOrder}
+        onApply={applySectionOrder}
+      />
     </Paper>
   );
 }
