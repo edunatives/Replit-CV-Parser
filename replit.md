@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **AI Rules Module v10.0**: Merged Forensic CV Engine with existing security layer:
+  - Unified `buildForensicPrompt()` combines parsing + audit in single API call
+  - `ForensicAuditor` class with retry logic (3 attempts, exponential backoff)
+  - `parseAIResponse<T>` with JSON repair fallback for truncated responses
+  - `ForensicHighlight` interface for inline CV text annotation (red/green/yellow)
+  - Security: `containsInjectionAttempt()`, `sanitizeAIInput()` with unicode normalization
+  - Weighted scoring: AUDIT_WEIGHTS (experience 30%, summary 20%, education 15%, skills 15%, contact 10%, presentation 10%)
+  - Backup at `lib/ai/rules.backup.ts` for rollback if needed
+- **A4 page layout**: CV preview now renders in proper A4 dimensions (210mm x 297mm) with gray background and white page with shadow
 - **Section rearrange modal**: Drag-and-drop modal for reordering CV sections (summary, experience, education, skills, strengths, certifications). Replaces inline up/down arrows with cleaner modal UX via SectionRearrangeModal component
 - **Dynamic section ordering**: CV sections render based on `sectionOrder` array stored in CV data
 - **Header layout**: EduNatives logo moved from sidebar to header bar, with centered search bar and People/Filter buttons

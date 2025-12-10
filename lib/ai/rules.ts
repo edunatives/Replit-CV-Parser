@@ -1,12 +1,18 @@
 /**
- * @fileoverview AI Rules and Prompt Builders Module
- * @description Centralized module for all AI-related prompts, scoring rubrics,
- * and response formatting rules. This module provides:
+ * @fileoverview EduNatives AI Rules & Forensic CV Engine - Merged Module
+ * @version 10.0
+ * @description Unified module combining:
+ * - Forensic CV Engine v9.0 prompt structure (unified parse+audit)
+ * - Security guidelines (injection protection, sanitization)
+ * - Token control and rate limiting
+ * - Retry logic with exponential backoff
+ * - Response cleaning and JSON repair utilities
+ * 
+ * This module provides:
  * - Prompt builders for CV parsing, assessment, JD matching, and advisor
- * - Shared constants for scoring criteria and field definitions
- * - CV summary formatters for consistent AI context
- * - Response cleaning utilities
- * - Security guidelines for token control, prompt safety, and code security
+ * - Forensic audit with weighted scoring and highlight extraction
+ * - Security utilities for prompt injection prevention
+ * - Robust API communication patterns
  */
 
 import type { ParsedCV } from "@/types/cv";
@@ -20,14 +26,14 @@ import type { ParsedCV } from "@/types/cv";
  * Rules to keep AI API token usage under control:
  * 
  * 1. INPUT LIMITS:
- *    - Max CV text: 50,000 characters (truncate longer documents)
+ *    - Max CV text: 30,000 characters (optimized for combined parse+audit prompts)
  *    - Max job description: 10,000 characters
  *    - Max chat message: 2,000 characters
  *    - Max conversation history: 20 messages (older messages dropped)
  * 
  * 2. RESPONSE LIMITS:
- *    - Set maxOutputTokens in API calls (e.g., 2048 for parsing, 1024 for chat)
- *    - Truncate AI responses over 5,000 characters before display
+ *    - Set maxOutputTokens in API calls (e.g., 4096 for forensic, 1024 for chat)
+ *    - Truncate AI responses over 8,000 characters before display
  * 
  * 3. CACHING STRATEGY:
  *    - Cache identical CV assessments for 24 hours (hash CV content)
@@ -44,11 +50,12 @@ import type { ParsedCV } from "@/types/cv";
  *    - Alert when daily token usage exceeds 80% of budget
  */
 export const TOKEN_LIMITS = {
-  maxCVTextLength: 50000,
+  maxCVTextLength: 30000, // Optimized for combined prompts
   maxJobDescriptionLength: 10000,
   maxChatMessageLength: 2000,
   maxConversationHistory: 20,
   maxOutputTokens: {
+    forensic: 4096, // Combined parse+audit needs more tokens
     parsing: 2048,
     assessment: 1024,
     jdMatch: 1024,
@@ -58,6 +65,10 @@ export const TOKEN_LIMITS = {
     perMinute: 10,
     perHour: 100,
   },
+  retryConfig: {
+    maxRetries: 3,
+    baseDelayMs: 1000,
+  },
 } as const;
 
 /**
@@ -66,24 +77,20 @@ export const TOKEN_LIMITS = {
  * 
  * 1. INPUT SANITIZATION:
  *    - Strip control characters (except newlines/tabs)
- *    - Remove potential prompt injection patterns: "ignore previous", "system:", etc.
+ *    - Remove potential prompt injection patterns
  *    - Normalize unicode to prevent homograph attacks
  *    - Redact detected secrets/API keys before sending to AI
  * 
  * 2. OUTPUT VALIDATION:
  *    - Validate AI responses against expected JSON schema
  *    - Reject responses containing executable code patterns
- *    - Filter URLs/emails that weren't in original input (prevent hallucination)
+ *    - Filter URLs/emails that weren't in original input
  *    - Scan for toxic/offensive content before display
  * 
  * 3. PROMPT STRUCTURE:
  *    - Always use immutable system prompts (user cannot override)
- *    - Clearly delimit user content with markers: "CV TEXT:", "USER'S QUESTION:"
+ *    - Clearly delimit user content with markers
  *    - Never interpolate user input directly into instruction sections
- * 
- * 4. LOGGING & MONITORING:
- *    - Log suspicious inputs (potential injections) for review
- *    - Quarantine flagged requests for manual triage
  */
 export const DANGEROUS_PATTERNS = [
   /ignore\s+(all\s+)?previous\s+instructions?/i,
@@ -94,6 +101,10 @@ export const DANGEROUS_PATTERNS = [
   /data:text\/html/i,
   /eval\s*\(/i,
   /exec\s*\(/i,
+  /disregard\s+(all\s+)?above/i,
+  /forget\s+(everything|all)/i,
+  /new\s+instructions?:/i,
+  /override\s+prompt/i,
 ];
 
 /**
@@ -107,53 +118,27 @@ export function containsInjectionAttempt(text: string): boolean {
 
 /**
  * Sanitize user input before sending to AI
+ * Removes control characters, normalizes unicode, and enforces length limits
  * @param text - Raw user input
+ * @param maxLength - Maximum allowed length (defaults to CV limit)
  * @returns Sanitized text
  */
-export function sanitizeAIInput(text: string): string {
+export function sanitizeAIInput(text: string, maxLength: number = TOKEN_LIMITS.maxCVTextLength): string {
   let sanitized = text;
+  // Remove control characters except newlines and tabs
   sanitized = sanitized.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "");
+  // Normalize unicode to prevent homograph attacks
   sanitized = sanitized.normalize("NFKC");
-  if (sanitized.length > TOKEN_LIMITS.maxCVTextLength) {
-    sanitized = sanitized.substring(0, TOKEN_LIMITS.maxCVTextLength);
+  // Enforce length limit
+  if (sanitized.length > maxLength) {
+    sanitized = sanitized.substring(0, maxLength);
   }
   return sanitized;
 }
 
 /**
  * CODE SECURITY GUIDELINES
- * Rules to prevent vulnerabilities in the application:
- * 
- * 1. FILE UPLOAD SECURITY:
- *    - Validate file type by magic bytes, not just extension
- *    - Max file size: 3MB
- *    - Allowed types: PDF, DOCX, DOC, TXT only
- *    - Scan uploaded files for malware (future: integrate ClamAV)
- *    - Process uploads in isolated sandbox
- * 
- * 2. API SECURITY:
- *    - Validate all request bodies with Zod schemas
- *    - Use parameterized queries for MongoDB (never string concatenation)
- *    - Implement CSRF protection for state-changing operations
- *    - Set strict CORS policy (only allow known origins)
- *    - Add security headers: X-Content-Type-Options, X-Frame-Options, CSP
- * 
- * 3. DATA VALIDATION:
- *    - Validate all inputs at API boundary (never trust client data)
- *    - Sanitize outputs to prevent XSS
- *    - Use TypeScript strict mode for type safety
- * 
- * 4. SECRETS MANAGEMENT:
- *    - Never log or expose secrets
- *    - Use Replit Secrets Manager for all credentials
- *    - Validate required env vars on startup
- *    - Rotate API keys periodically
- * 
- * 5. DATABASE SECURITY:
- *    - Use connection pooling with limits
- *    - Implement query timeouts
- *    - Validate ObjectId before queries
- *    - Never expose internal IDs in error messages
+ * Rules to prevent vulnerabilities in the application
  */
 export const UPLOAD_LIMITS = {
   maxFileSize: 3 * 1024 * 1024, // 3MB
@@ -167,19 +152,43 @@ export const UPLOAD_LIMITS = {
 } as const;
 
 // ============================================================================
-// SHARED CONSTANTS
+// SCORING CONSTANTS (from Forensic Engine v9.0)
 // ============================================================================
+
+/**
+ * Weighted scoring breakdown for CV audit
+ * Total weights must sum to 100
+ */
+export const AUDIT_WEIGHTS = {
+  workExperience: 30,
+  summary: 20,
+  education: 15,
+  skills: 15,
+  contactInfo: 10,
+  presentation: 10,
+} as const;
+
+/**
+ * Scoring rubric for CV assessment
+ */
+export const SCORING_RUBRIC = {
+  exceptional: { min: 90, max: 100, label: "Exceptional", description: "No improvements needed" },
+  strong: { min: 80, max: 89, label: "Strong", description: "Minor refinements" },
+  good: { min: 70, max: 79, label: "Good", description: "Some improvements needed" },
+  fair: { min: 60, max: 69, label: "Fair", description: "Needs attention" },
+  needsWork: { min: 0, max: 59, label: "Needs Work", description: "Significant improvements required" },
+} as const;
 
 /**
  * Assessment section definitions with scoring criteria
  */
 export const ASSESSMENT_SECTIONS = [
-  { name: "Contact Information", weight: 10 },
-  { name: "Professional Summary", weight: 20 },
-  { name: "Work Experience", weight: 30 },
-  { name: "Education", weight: 15 },
-  { name: "Skills", weight: 15 },
-  { name: "Overall Presentation", weight: 10 },
+  { name: "Contact Information", weight: AUDIT_WEIGHTS.contactInfo },
+  { name: "Professional Summary", weight: AUDIT_WEIGHTS.summary },
+  { name: "Work Experience", weight: AUDIT_WEIGHTS.workExperience },
+  { name: "Education", weight: AUDIT_WEIGHTS.education },
+  { name: "Skills", weight: AUDIT_WEIGHTS.skills },
+  { name: "Overall Presentation", weight: AUDIT_WEIGHTS.presentation },
 ] as const;
 
 /**
@@ -201,6 +210,71 @@ export const RESPONSE_GUIDELINES = {
   focus: "specific, data-driven recommendations",
   atsConsideration: "always factor in ATS compatibility",
 };
+
+// ============================================================================
+// FORENSIC SCHEMA TYPES
+// ============================================================================
+
+/**
+ * Highlight annotation for inline CV markup
+ */
+export interface ForensicHighlight {
+  snippet: string;  // Exact text from CV to highlight
+  type: "red" | "green" | "yellow";  // Critical / Strength / Warning
+  comment: string;  // Explanation for the highlight
+}
+
+/**
+ * Section-level audit result
+ */
+export interface ForensicSection {
+  name: string;
+  score: number;
+  feedback: string;
+}
+
+/**
+ * Complete forensic audit result
+ */
+export interface ForensicResult {
+  parsed_cv: {
+    basics: {
+      name: string;
+      label: string;
+      email: string;
+      phone: string;
+      location: string;
+      links: string[];
+    };
+    summary: string;
+    experience: Array<{
+      company: string;
+      position: string;
+      date: string;
+      location: string;
+      highlights: string[];
+    }>;
+    education: Array<{
+      institution: string;
+      area: string;
+      studyType: string;
+      date: string;
+    }>;
+    skills: string[];
+  };
+  forensic: {
+    score: number;
+    level: string;
+    inflation: boolean;
+    sections: ForensicSection[];
+    verdict: string;
+  };
+  structure: {
+    issues: string[];
+    fixes: string[];
+  };
+  highlights: ForensicHighlight[];
+}
 
 // ============================================================================
 // CV SUMMARY FORMATTER
@@ -262,15 +336,134 @@ ${cv.certifications?.map(cert => `- ${cert.name} by ${cert.issuer}`).join("\n") 
 }
 
 // ============================================================================
-// PROMPT BUILDERS
+// FORENSIC PROMPT BUILDER (Combined Parse + Audit)
 // ============================================================================
 
 /**
- * Build prompt for CV parsing/extraction
+ * Build the unified forensic prompt that combines parsing and auditing
+ * This is more efficient than separate API calls
+ * @param rawText - Raw text extracted from CV document
+ * @returns Complete forensic prompt
+ */
+export function buildForensicPrompt(rawText: string): string {
+  const sanitized = sanitizeAIInput(rawText);
+  
+  // Check for injection attempts
+  if (containsInjectionAttempt(sanitized)) {
+    throw new Error("Security: Suspicious content detected in CV text");
+  }
+  
+  return `You are the EduNatives Forensic CV Engine (v10.0).
+
+I will provide a resume text. You must perform TWO distinct tasks in one output:
+1. PARSE it into a clean JSON structure suitable for professional templates.
+2. AUDIT it using the Strict Scoring Rubric provided below.
+
+RESUME TEXT:
+"""
+${sanitized}
+"""
+
+--- TASK 1: SCORING RUBRIC & WEIGHTS ---
+Calculate a 'weighted_score' based on the following breakdown:
+- Work Experience (Weight: ${AUDIT_WEIGHTS.workExperience})
+- Professional Summary (Weight: ${AUDIT_WEIGHTS.summary})
+- Education (Weight: ${AUDIT_WEIGHTS.education})
+- Skills (Weight: ${AUDIT_WEIGHTS.skills})
+- Contact Information (Weight: ${AUDIT_WEIGHTS.contactInfo})
+- Overall Presentation (Weight: ${AUDIT_WEIGHTS.presentation})
+
+Score Interpretation:
+- ${SCORING_RUBRIC.exceptional.min}-${SCORING_RUBRIC.exceptional.max}: ${SCORING_RUBRIC.exceptional.label} (${SCORING_RUBRIC.exceptional.description})
+- ${SCORING_RUBRIC.strong.min}-${SCORING_RUBRIC.strong.max}: ${SCORING_RUBRIC.strong.label} (${SCORING_RUBRIC.strong.description})
+- ${SCORING_RUBRIC.good.min}-${SCORING_RUBRIC.good.max}: ${SCORING_RUBRIC.good.label} (${SCORING_RUBRIC.good.description})
+- ${SCORING_RUBRIC.fair.min}-${SCORING_RUBRIC.fair.max}: ${SCORING_RUBRIC.fair.label} (${SCORING_RUBRIC.fair.description})
+- Below ${SCORING_RUBRIC.fair.min}: ${SCORING_RUBRIC.needsWork.label} (${SCORING_RUBRIC.needsWork.description})
+
+--- TASK 2: OUTPUT SCHEMA ---
+You must return ONLY a valid JSON object matching this structure exactly:
+{
+    "parsed_cv": {
+        "basics": { 
+            "name": "String", 
+            "label": "String (Job Title)", 
+            "email": "String", 
+            "phone": "String", 
+            "location": "String", 
+            "links": ["String (URLs for LinkedIn, GitHub, Portfolio, etc.)"] 
+        },
+        "summary": "String (Professional summary or objective)",
+        "experience": [
+            { 
+                "company": "String", 
+                "position": "String", 
+                "date": "String (e.g., Jan 2020 - Present)", 
+                "location": "String", 
+                "highlights": ["String (Key achievements with bullet points)"] 
+            }
+        ],
+        "education": [
+            { 
+                "institution": "String", 
+                "area": "String (Field of study)", 
+                "studyType": "String (e.g., Bachelor's, Master's)", 
+                "date": "String" 
+            }
+        ],
+        "skills": ["String"]
+    },
+    "forensic": {
+        "score": Number (0-100, strictly calculated based on weights above),
+        "level": "String (Exceptional/Strong/Good/Fair/Needs Work)",
+        "inflation": Boolean (true if claims appear exaggerated or unverifiable),
+        "sections": [
+            { "name": "Contact Information", "score": 0-100, "feedback": "String" },
+            { "name": "Professional Summary", "score": 0-100, "feedback": "String" },
+            { "name": "Work Experience", "score": 0-100, "feedback": "String" },
+            { "name": "Education", "score": 0-100, "feedback": "String" },
+            { "name": "Skills", "score": 0-100, "feedback": "String" },
+            { "name": "Overall Presentation", "score": 0-100, "feedback": "String" }
+        ],
+        "verdict": "String (A concise 2-3 sentence summary of the findings)"
+    },
+    "structure": { 
+        "issues": ["String (List of specific Red Flags or problems found)"], 
+        "fixes": ["String (List of actionable Recommendations)"] 
+    },
+    "highlights": [
+        { 
+            "snippet": "EXACT TEXT snippet from the input CV to be highlighted in the UI", 
+            "type": "red (critical issue) / green (strength) / yellow (warning)", 
+            "comment": "Why this specific text was flagged" 
+        }
+    ]
+}
+
+IMPORTANT INSTRUCTIONS:
+- Return ONLY valid JSON, no markdown code blocks, no explanations
+- Extract ALL information from the CV text accurately
+- Be specific and actionable in feedback
+- Consider ATS (Applicant Tracking System) compatibility
+- Flag any claims that seem inflated or unverifiable
+- Include 3-5 highlights for UI annotation (mix of strengths and issues)`;
+}
+
+// ============================================================================
+// STANDARD PROMPT BUILDERS (for backward compatibility)
+// ============================================================================
+
+/**
+ * Build prompt for CV parsing/extraction (standalone version)
  * @param rawText - Raw text extracted from CV document
  * @returns Complete prompt for AI extraction
  */
 export function buildCVParsingPrompt(rawText: string): string {
+  const sanitized = sanitizeAIInput(rawText);
+  
+  if (containsInjectionAttempt(sanitized)) {
+    throw new Error("Security: Suspicious content detected in CV text");
+  }
+  
   return `You are an expert CV/Resume parser. Extract structured information from the following CV text and return it as a valid JSON object.
 
 IMPORTANT: Return ONLY a valid JSON object, no markdown formatting, no code blocks, no explanations.
@@ -304,7 +497,7 @@ Extract the following fields:
 If a field is not found in the CV, use an empty string for text fields or an empty array for array fields.
 
 CV TEXT:
-${rawText}
+${sanitized}
 
 Return ONLY the JSON object:`;
 }
@@ -339,11 +532,11 @@ Provide your assessment as a valid JSON object with this exact structure:
 }
 
 SCORING RUBRIC:
-- 90-100: Exceptional - Industry-leading, no improvements needed
-- 80-89: Strong - Minor refinements could enhance
-- 70-79: Good - Some improvements recommended
-- 60-69: Fair - Needs attention in key areas
-- Below 60: Needs Work - Significant improvements required
+- ${SCORING_RUBRIC.exceptional.min}-${SCORING_RUBRIC.exceptional.max}: ${SCORING_RUBRIC.exceptional.label} - ${SCORING_RUBRIC.exceptional.description}
+- ${SCORING_RUBRIC.strong.min}-${SCORING_RUBRIC.strong.max}: ${SCORING_RUBRIC.strong.label} - ${SCORING_RUBRIC.strong.description}
+- ${SCORING_RUBRIC.good.min}-${SCORING_RUBRIC.good.max}: ${SCORING_RUBRIC.good.label} - ${SCORING_RUBRIC.good.description}
+- ${SCORING_RUBRIC.fair.min}-${SCORING_RUBRIC.fair.max}: ${SCORING_RUBRIC.fair.label} - ${SCORING_RUBRIC.fair.description}
+- Below ${SCORING_RUBRIC.fair.min}: ${SCORING_RUBRIC.needsWork.label} - ${SCORING_RUBRIC.needsWork.description}
 
 IMPORTANT:
 - Return ONLY valid JSON, no markdown, no code blocks, no explanations
@@ -360,12 +553,14 @@ IMPORTANT:
  * @returns Complete prompt for AI JD matching
  */
 export function buildJDMatchPrompt(cvSummary: string, jobDescription: string): string {
+  const sanitizedJD = sanitizeAIInput(jobDescription, TOKEN_LIMITS.maxJobDescriptionLength);
+  
   return `You are an expert recruiter and ATS (Applicant Tracking System) specialist. Compare the candidate's CV against the job description and provide a detailed match analysis.
 
 ${cvSummary}
 
 JOB DESCRIPTION:
-${jobDescription}
+${sanitizedJD}
 
 Analyze the match and provide your assessment as a valid JSON object with this exact structure:
 {
@@ -420,6 +615,8 @@ export function buildAdvisorPrompt(
   conversationHistory: string,
   userMessage: string
 ): string {
+  const sanitizedMessage = sanitizeAIInput(userMessage, TOKEN_LIMITS.maxChatMessageLength);
+  
   return `You are an expert career advisor and CV consultant helping a job seeker improve their resume. You have access to their CV information and should provide personalized, actionable advice.
 
 ${cvContext}
@@ -436,7 +633,7 @@ GUIDELINES:
 - If asked about something not in the CV, suggest they add it
 - Focus on practical improvements they can make immediately
 
-USER'S QUESTION: ${userMessage}
+USER'S QUESTION: ${sanitizedMessage}
 
 Provide a helpful response:`;
 }
@@ -453,6 +650,7 @@ Provide a helpful response:`;
 export function cleanAIResponse(responseText: string): string {
   let cleaned = responseText.trim();
   
+  // Remove various markdown code fence formats
   if (cleaned.startsWith("```json")) {
     cleaned = cleaned.slice(7);
   } else if (cleaned.startsWith("```")) {
@@ -464,6 +662,56 @@ export function cleanAIResponse(responseText: string): string {
   }
   
   return cleaned.trim();
+}
+
+/**
+ * Attempt to repair truncated or malformed JSON
+ * @param jsonStr - Potentially malformed JSON string
+ * @returns Repaired JSON string or original if repair fails
+ */
+export function repairJSON(jsonStr: string): string {
+  let repaired = jsonStr.trim();
+  
+  // Count brackets to detect truncation
+  const openBraces = (repaired.match(/{/g) || []).length;
+  const closeBraces = (repaired.match(/}/g) || []).length;
+  const openBrackets = (repaired.match(/\[/g) || []).length;
+  const closeBrackets = (repaired.match(/]/g) || []).length;
+  
+  // Add missing closing brackets/braces
+  const missingBrackets = openBrackets - closeBrackets;
+  const missingBraces = openBraces - closeBraces;
+  
+  if (missingBrackets > 0 || missingBraces > 0) {
+    // Remove trailing comma if present
+    repaired = repaired.replace(/,\s*$/, "");
+    // Add missing closures
+    repaired += "]".repeat(Math.max(0, missingBrackets));
+    repaired += "}".repeat(Math.max(0, missingBraces));
+  }
+  
+  return repaired;
+}
+
+/**
+ * Parse JSON response with repair fallback
+ * @param responseText - Raw AI response
+ * @returns Parsed JSON object
+ */
+export function parseAIResponse<T>(responseText: string): T {
+  const cleaned = cleanAIResponse(responseText);
+  
+  try {
+    return JSON.parse(cleaned) as T;
+  } catch (firstError) {
+    // Attempt repair
+    const repaired = repairJSON(cleaned);
+    try {
+      return JSON.parse(repaired) as T;
+    } catch (secondError) {
+      throw new Error(`Failed to parse AI response: ${(firstError as Error).message}`);
+    }
+  }
 }
 
 /**
@@ -494,4 +742,113 @@ export function isDeveloperRole(title: string, summary: string): boolean {
   const titleLower = (title || "").toLowerCase();
   const summaryLower = (summary || "").toLowerCase();
   return DEVELOPER_KEYWORDS.some(kw => titleLower.includes(kw) || summaryLower.includes(kw));
+}
+
+/**
+ * Get score level label from numeric score
+ * @param score - Numeric score 0-100
+ * @returns Score level label
+ */
+export function getScoreLevel(score: number): string {
+  if (score >= SCORING_RUBRIC.exceptional.min) return SCORING_RUBRIC.exceptional.label;
+  if (score >= SCORING_RUBRIC.strong.min) return SCORING_RUBRIC.strong.label;
+  if (score >= SCORING_RUBRIC.good.min) return SCORING_RUBRIC.good.label;
+  if (score >= SCORING_RUBRIC.fair.min) return SCORING_RUBRIC.fair.label;
+  return SCORING_RUBRIC.needsWork.label;
+}
+
+// ============================================================================
+// FORENSIC AUDITOR CLASS (with retry logic)
+// ============================================================================
+
+/**
+ * ForensicAuditor class for robust API communication
+ * Includes retry logic with exponential backoff
+ */
+export class ForensicAuditor {
+  private modelEndpoint: string;
+  
+  constructor(endpoint?: string) {
+    this.modelEndpoint = endpoint || 
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent";
+  }
+  
+  /**
+   * Execute API request with retry logic
+   * @param apiKey - Google Gemini API Key
+   * @param prompt - Complete prompt to send
+   * @returns Parsed JSON response
+   */
+  async executeWithRetry<T>(apiKey: string, prompt: string): Promise<T> {
+    const url = `${this.modelEndpoint}?key=${apiKey}`;
+    const { maxRetries, baseDelayMs } = TOKEN_LIMITS.retryConfig;
+    
+    let attempt = 0;
+    let lastError: Error | null = null;
+    
+    while (attempt <= maxRetries) {
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { 
+              responseMimeType: "application/json",
+              maxOutputTokens: TOKEN_LIMITS.maxOutputTokens.forensic,
+            },
+          }),
+        });
+        
+        if (!response.ok) {
+          const errBody = await response.json().catch(() => ({}));
+          const msg = errBody.error?.message || response.statusText;
+          
+          // Don't retry on 400 Bad Request (prompt issue)
+          if (response.status === 400) {
+            throw new Error(`API Error 400: ${msg}`);
+          }
+          
+          throw new Error(`${response.status}: ${msg}`);
+        }
+        
+        const data = await response.json();
+        const rawJson = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        
+        if (!rawJson) {
+          throw new Error("Empty response from API");
+        }
+        
+        return parseAIResponse<T>(rawJson);
+        
+      } catch (error) {
+        attempt++;
+        lastError = error as Error;
+        
+        console.warn(`Attempt ${attempt} failed:`, lastError.message);
+        
+        // Don't retry on 400 errors or if max retries exceeded
+        if (lastError.message.includes("400") || attempt > maxRetries) {
+          break;
+        }
+        
+        // Exponential backoff
+        const delay = Math.pow(2, attempt) * baseDelayMs;
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+    
+    throw lastError || new Error("Max retries exceeded");
+  }
+  
+  /**
+   * Run forensic analysis on CV text
+   * @param apiKey - Google Gemini API Key
+   * @param cvText - Raw text extracted from CV
+   * @returns Complete forensic result
+   */
+  async analyze(apiKey: string, cvText: string): Promise<ForensicResult> {
+    const prompt = buildForensicPrompt(cvText);
+    return this.executeWithRetry<ForensicResult>(apiKey, prompt);
+  }
 }

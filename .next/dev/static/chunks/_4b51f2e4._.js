@@ -2097,23 +2097,35 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 "use strict";
 
 /**
- * @fileoverview AI Rules and Prompt Builders Module
- * @description Centralized module for all AI-related prompts, scoring rubrics,
- * and response formatting rules. This module provides:
+ * @fileoverview EduNatives AI Rules & Forensic CV Engine - Merged Module
+ * @version 10.0
+ * @description Unified module combining:
+ * - Forensic CV Engine v9.0 prompt structure (unified parse+audit)
+ * - Security guidelines (injection protection, sanitization)
+ * - Token control and rate limiting
+ * - Retry logic with exponential backoff
+ * - Response cleaning and JSON repair utilities
+ * 
+ * This module provides:
  * - Prompt builders for CV parsing, assessment, JD matching, and advisor
- * - Shared constants for scoring criteria and field definitions
- * - CV summary formatters for consistent AI context
- * - Response cleaning utilities
- * - Security guidelines for token control, prompt safety, and code security
+ * - Forensic audit with weighted scoring and highlight extraction
+ * - Security utilities for prompt injection prevention
+ * - Robust API communication patterns
  */ __turbopack_context__.s([
     "ASSESSMENT_SECTIONS",
     ()=>ASSESSMENT_SECTIONS,
+    "AUDIT_WEIGHTS",
+    ()=>AUDIT_WEIGHTS,
     "DANGEROUS_PATTERNS",
     ()=>DANGEROUS_PATTERNS,
     "DEVELOPER_KEYWORDS",
     ()=>DEVELOPER_KEYWORDS,
+    "ForensicAuditor",
+    ()=>ForensicAuditor,
     "RESPONSE_GUIDELINES",
     ()=>RESPONSE_GUIDELINES,
+    "SCORING_RUBRIC",
+    ()=>SCORING_RUBRIC,
     "TOKEN_LIMITS",
     ()=>TOKEN_LIMITS,
     "UPLOAD_LIMITS",
@@ -2124,6 +2136,8 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
     ()=>buildAssessmentPrompt,
     "buildCVParsingPrompt",
     ()=>buildCVParsingPrompt,
+    "buildForensicPrompt",
+    ()=>buildForensicPrompt,
     "buildJDMatchPrompt",
     ()=>buildJDMatchPrompt,
     "cleanAIResponse",
@@ -2136,17 +2150,24 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
     ()=>formatCVSummary,
     "formatConversationHistory",
     ()=>formatConversationHistory,
+    "getScoreLevel",
+    ()=>getScoreLevel,
     "isDeveloperRole",
     ()=>isDeveloperRole,
+    "parseAIResponse",
+    ()=>parseAIResponse,
+    "repairJSON",
+    ()=>repairJSON,
     "sanitizeAIInput",
     ()=>sanitizeAIInput
 ]);
 const TOKEN_LIMITS = {
-    maxCVTextLength: 50000,
+    maxCVTextLength: 30000,
     maxJobDescriptionLength: 10000,
     maxChatMessageLength: 2000,
     maxConversationHistory: 20,
     maxOutputTokens: {
+        forensic: 4096,
         parsing: 2048,
         assessment: 1024,
         jdMatch: 1024,
@@ -2155,6 +2176,10 @@ const TOKEN_LIMITS = {
     rateLimit: {
         perMinute: 10,
         perHour: 100
+    },
+    retryConfig: {
+        maxRetries: 3,
+        baseDelayMs: 1000
     }
 };
 const DANGEROUS_PATTERNS = [
@@ -2165,17 +2190,24 @@ const DANGEROUS_PATTERNS = [
     /javascript:/i,
     /data:text\/html/i,
     /eval\s*\(/i,
-    /exec\s*\(/i
+    /exec\s*\(/i,
+    /disregard\s+(all\s+)?above/i,
+    /forget\s+(everything|all)/i,
+    /new\s+instructions?:/i,
+    /override\s+prompt/i
 ];
 function containsInjectionAttempt(text) {
     return DANGEROUS_PATTERNS.some((pattern)=>pattern.test(text));
 }
-function sanitizeAIInput(text) {
+function sanitizeAIInput(text, maxLength = TOKEN_LIMITS.maxCVTextLength) {
     let sanitized = text;
+    // Remove control characters except newlines and tabs
     sanitized = sanitized.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "");
+    // Normalize unicode to prevent homograph attacks
     sanitized = sanitized.normalize("NFKC");
-    if (sanitized.length > TOKEN_LIMITS.maxCVTextLength) {
-        sanitized = sanitized.substring(0, TOKEN_LIMITS.maxCVTextLength);
+    // Enforce length limit
+    if (sanitized.length > maxLength) {
+        sanitized = sanitized.substring(0, maxLength);
     }
     return sanitized;
 }
@@ -2194,30 +2226,70 @@ const UPLOAD_LIMITS = {
         ".txt"
     ]
 };
+const AUDIT_WEIGHTS = {
+    workExperience: 30,
+    summary: 20,
+    education: 15,
+    skills: 15,
+    contactInfo: 10,
+    presentation: 10
+};
+const SCORING_RUBRIC = {
+    exceptional: {
+        min: 90,
+        max: 100,
+        label: "Exceptional",
+        description: "No improvements needed"
+    },
+    strong: {
+        min: 80,
+        max: 89,
+        label: "Strong",
+        description: "Minor refinements"
+    },
+    good: {
+        min: 70,
+        max: 79,
+        label: "Good",
+        description: "Some improvements needed"
+    },
+    fair: {
+        min: 60,
+        max: 69,
+        label: "Fair",
+        description: "Needs attention"
+    },
+    needsWork: {
+        min: 0,
+        max: 59,
+        label: "Needs Work",
+        description: "Significant improvements required"
+    }
+};
 const ASSESSMENT_SECTIONS = [
     {
         name: "Contact Information",
-        weight: 10
+        weight: AUDIT_WEIGHTS.contactInfo
     },
     {
         name: "Professional Summary",
-        weight: 20
+        weight: AUDIT_WEIGHTS.summary
     },
     {
         name: "Work Experience",
-        weight: 30
+        weight: AUDIT_WEIGHTS.workExperience
     },
     {
         name: "Education",
-        weight: 15
+        weight: AUDIT_WEIGHTS.education
     },
     {
         name: "Skills",
-        weight: 15
+        weight: AUDIT_WEIGHTS.skills
     },
     {
         name: "Overall Presentation",
-        weight: 10
+        weight: AUDIT_WEIGHTS.presentation
     }
 ];
 const DEVELOPER_KEYWORDS = [
@@ -2299,7 +2371,111 @@ Skills: ${cv.skills?.join(", ") || "None"}
 Certifications:
 ${cv.certifications?.map((cert)=>`- ${cert.name} by ${cert.issuer}`).join("\n") || "None"}`;
 }
+function buildForensicPrompt(rawText) {
+    const sanitized = sanitizeAIInput(rawText);
+    // Check for injection attempts
+    if (containsInjectionAttempt(sanitized)) {
+        throw new Error("Security: Suspicious content detected in CV text");
+    }
+    return `You are the EduNatives Forensic CV Engine (v10.0).
+
+I will provide a resume text. You must perform TWO distinct tasks in one output:
+1. PARSE it into a clean JSON structure suitable for professional templates.
+2. AUDIT it using the Strict Scoring Rubric provided below.
+
+RESUME TEXT:
+"""
+${sanitized}
+"""
+
+--- TASK 1: SCORING RUBRIC & WEIGHTS ---
+Calculate a 'weighted_score' based on the following breakdown:
+- Work Experience (Weight: ${AUDIT_WEIGHTS.workExperience})
+- Professional Summary (Weight: ${AUDIT_WEIGHTS.summary})
+- Education (Weight: ${AUDIT_WEIGHTS.education})
+- Skills (Weight: ${AUDIT_WEIGHTS.skills})
+- Contact Information (Weight: ${AUDIT_WEIGHTS.contactInfo})
+- Overall Presentation (Weight: ${AUDIT_WEIGHTS.presentation})
+
+Score Interpretation:
+- ${SCORING_RUBRIC.exceptional.min}-${SCORING_RUBRIC.exceptional.max}: ${SCORING_RUBRIC.exceptional.label} (${SCORING_RUBRIC.exceptional.description})
+- ${SCORING_RUBRIC.strong.min}-${SCORING_RUBRIC.strong.max}: ${SCORING_RUBRIC.strong.label} (${SCORING_RUBRIC.strong.description})
+- ${SCORING_RUBRIC.good.min}-${SCORING_RUBRIC.good.max}: ${SCORING_RUBRIC.good.label} (${SCORING_RUBRIC.good.description})
+- ${SCORING_RUBRIC.fair.min}-${SCORING_RUBRIC.fair.max}: ${SCORING_RUBRIC.fair.label} (${SCORING_RUBRIC.fair.description})
+- Below ${SCORING_RUBRIC.fair.min}: ${SCORING_RUBRIC.needsWork.label} (${SCORING_RUBRIC.needsWork.description})
+
+--- TASK 2: OUTPUT SCHEMA ---
+You must return ONLY a valid JSON object matching this structure exactly:
+{
+    "parsed_cv": {
+        "basics": { 
+            "name": "String", 
+            "label": "String (Job Title)", 
+            "email": "String", 
+            "phone": "String", 
+            "location": "String", 
+            "links": ["String (URLs for LinkedIn, GitHub, Portfolio, etc.)"] 
+        },
+        "summary": "String (Professional summary or objective)",
+        "experience": [
+            { 
+                "company": "String", 
+                "position": "String", 
+                "date": "String (e.g., Jan 2020 - Present)", 
+                "location": "String", 
+                "highlights": ["String (Key achievements with bullet points)"] 
+            }
+        ],
+        "education": [
+            { 
+                "institution": "String", 
+                "area": "String (Field of study)", 
+                "studyType": "String (e.g., Bachelor's, Master's)", 
+                "date": "String" 
+            }
+        ],
+        "skills": ["String"]
+    },
+    "forensic": {
+        "score": Number (0-100, strictly calculated based on weights above),
+        "level": "String (Exceptional/Strong/Good/Fair/Needs Work)",
+        "inflation": Boolean (true if claims appear exaggerated or unverifiable),
+        "sections": [
+            { "name": "Contact Information", "score": 0-100, "feedback": "String" },
+            { "name": "Professional Summary", "score": 0-100, "feedback": "String" },
+            { "name": "Work Experience", "score": 0-100, "feedback": "String" },
+            { "name": "Education", "score": 0-100, "feedback": "String" },
+            { "name": "Skills", "score": 0-100, "feedback": "String" },
+            { "name": "Overall Presentation", "score": 0-100, "feedback": "String" }
+        ],
+        "verdict": "String (A concise 2-3 sentence summary of the findings)"
+    },
+    "structure": { 
+        "issues": ["String (List of specific Red Flags or problems found)"], 
+        "fixes": ["String (List of actionable Recommendations)"] 
+    },
+    "highlights": [
+        { 
+            "snippet": "EXACT TEXT snippet from the input CV to be highlighted in the UI", 
+            "type": "red (critical issue) / green (strength) / yellow (warning)", 
+            "comment": "Why this specific text was flagged" 
+        }
+    ]
+}
+
+IMPORTANT INSTRUCTIONS:
+- Return ONLY valid JSON, no markdown code blocks, no explanations
+- Extract ALL information from the CV text accurately
+- Be specific and actionable in feedback
+- Consider ATS (Applicant Tracking System) compatibility
+- Flag any claims that seem inflated or unverifiable
+- Include 3-5 highlights for UI annotation (mix of strengths and issues)`;
+}
 function buildCVParsingPrompt(rawText) {
+    const sanitized = sanitizeAIInput(rawText);
+    if (containsInjectionAttempt(sanitized)) {
+        throw new Error("Security: Suspicious content detected in CV text");
+    }
     return `You are an expert CV/Resume parser. Extract structured information from the following CV text and return it as a valid JSON object.
 
 IMPORTANT: Return ONLY a valid JSON object, no markdown formatting, no code blocks, no explanations.
@@ -2333,7 +2509,7 @@ Extract the following fields:
 If a field is not found in the CV, use an empty string for text fields or an empty array for array fields.
 
 CV TEXT:
-${rawText}
+${sanitized}
 
 Return ONLY the JSON object:`;
 }
@@ -2361,11 +2537,11 @@ Provide your assessment as a valid JSON object with this exact structure:
 }
 
 SCORING RUBRIC:
-- 90-100: Exceptional - Industry-leading, no improvements needed
-- 80-89: Strong - Minor refinements could enhance
-- 70-79: Good - Some improvements recommended
-- 60-69: Fair - Needs attention in key areas
-- Below 60: Needs Work - Significant improvements required
+- ${SCORING_RUBRIC.exceptional.min}-${SCORING_RUBRIC.exceptional.max}: ${SCORING_RUBRIC.exceptional.label} - ${SCORING_RUBRIC.exceptional.description}
+- ${SCORING_RUBRIC.strong.min}-${SCORING_RUBRIC.strong.max}: ${SCORING_RUBRIC.strong.label} - ${SCORING_RUBRIC.strong.description}
+- ${SCORING_RUBRIC.good.min}-${SCORING_RUBRIC.good.max}: ${SCORING_RUBRIC.good.label} - ${SCORING_RUBRIC.good.description}
+- ${SCORING_RUBRIC.fair.min}-${SCORING_RUBRIC.fair.max}: ${SCORING_RUBRIC.fair.label} - ${SCORING_RUBRIC.fair.description}
+- Below ${SCORING_RUBRIC.fair.min}: ${SCORING_RUBRIC.needsWork.label} - ${SCORING_RUBRIC.needsWork.description}
 
 IMPORTANT:
 - Return ONLY valid JSON, no markdown, no code blocks, no explanations
@@ -2375,12 +2551,13 @@ IMPORTANT:
 - Recommendations should be specific and actionable`;
 }
 function buildJDMatchPrompt(cvSummary, jobDescription) {
+    const sanitizedJD = sanitizeAIInput(jobDescription, TOKEN_LIMITS.maxJobDescriptionLength);
     return `You are an expert recruiter and ATS (Applicant Tracking System) specialist. Compare the candidate's CV against the job description and provide a detailed match analysis.
 
 ${cvSummary}
 
 JOB DESCRIPTION:
-${jobDescription}
+${sanitizedJD}
 
 Analyze the match and provide your assessment as a valid JSON object with this exact structure:
 {
@@ -2423,6 +2600,7 @@ IMPORTANT:
 - List keywords that should be added to the CV for ATS optimization`;
 }
 function buildAdvisorPrompt(cvContext, conversationHistory, userMessage) {
+    const sanitizedMessage = sanitizeAIInput(userMessage, TOKEN_LIMITS.maxChatMessageLength);
     return `You are an expert career advisor and CV consultant helping a job seeker improve their resume. You have access to their CV information and should provide personalized, actionable advice.
 
 ${cvContext}
@@ -2439,12 +2617,13 @@ GUIDELINES:
 - If asked about something not in the CV, suggest they add it
 - Focus on practical improvements they can make immediately
 
-USER'S QUESTION: ${userMessage}
+USER'S QUESTION: ${sanitizedMessage}
 
 Provide a helpful response:`;
 }
 function cleanAIResponse(responseText) {
     let cleaned = responseText.trim();
+    // Remove various markdown code fence formats
     if (cleaned.startsWith("```json")) {
         cleaned = cleaned.slice(7);
     } else if (cleaned.startsWith("```")) {
@@ -2455,6 +2634,39 @@ function cleanAIResponse(responseText) {
     }
     return cleaned.trim();
 }
+function repairJSON(jsonStr) {
+    let repaired = jsonStr.trim();
+    // Count brackets to detect truncation
+    const openBraces = (repaired.match(/{/g) || []).length;
+    const closeBraces = (repaired.match(/}/g) || []).length;
+    const openBrackets = (repaired.match(/\[/g) || []).length;
+    const closeBrackets = (repaired.match(/]/g) || []).length;
+    // Add missing closing brackets/braces
+    const missingBrackets = openBrackets - closeBrackets;
+    const missingBraces = openBraces - closeBraces;
+    if (missingBrackets > 0 || missingBraces > 0) {
+        // Remove trailing comma if present
+        repaired = repaired.replace(/,\s*$/, "");
+        // Add missing closures
+        repaired += "]".repeat(Math.max(0, missingBrackets));
+        repaired += "}".repeat(Math.max(0, missingBraces));
+    }
+    return repaired;
+}
+function parseAIResponse(responseText) {
+    const cleaned = cleanAIResponse(responseText);
+    try {
+        return JSON.parse(cleaned);
+    } catch (firstError) {
+        // Attempt repair
+        const repaired = repairJSON(cleaned);
+        try {
+            return JSON.parse(repaired);
+        } catch (secondError) {
+            throw new Error(`Failed to parse AI response: ${firstError.message}`);
+        }
+    }
+}
 function formatConversationHistory(history, maxMessages = 10) {
     if (!history || history.length === 0) return "";
     return history.slice(-maxMessages).map((msg)=>`${msg.role === "user" ? "User" : "Advisor"}: ${msg.content}`).join("\n\n");
@@ -2463,6 +2675,91 @@ function isDeveloperRole(title, summary) {
     const titleLower = (title || "").toLowerCase();
     const summaryLower = (summary || "").toLowerCase();
     return DEVELOPER_KEYWORDS.some((kw)=>titleLower.includes(kw) || summaryLower.includes(kw));
+}
+function getScoreLevel(score) {
+    if (score >= SCORING_RUBRIC.exceptional.min) return SCORING_RUBRIC.exceptional.label;
+    if (score >= SCORING_RUBRIC.strong.min) return SCORING_RUBRIC.strong.label;
+    if (score >= SCORING_RUBRIC.good.min) return SCORING_RUBRIC.good.label;
+    if (score >= SCORING_RUBRIC.fair.min) return SCORING_RUBRIC.fair.label;
+    return SCORING_RUBRIC.needsWork.label;
+}
+class ForensicAuditor {
+    modelEndpoint;
+    constructor(endpoint){
+        this.modelEndpoint = endpoint || "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent";
+    }
+    /**
+   * Execute API request with retry logic
+   * @param apiKey - Google Gemini API Key
+   * @param prompt - Complete prompt to send
+   * @returns Parsed JSON response
+   */ async executeWithRetry(apiKey, prompt) {
+        const url = `${this.modelEndpoint}?key=${apiKey}`;
+        const { maxRetries, baseDelayMs } = TOKEN_LIMITS.retryConfig;
+        let attempt = 0;
+        let lastError = null;
+        while(attempt <= maxRetries){
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        contents: [
+                            {
+                                parts: [
+                                    {
+                                        text: prompt
+                                    }
+                                ]
+                            }
+                        ],
+                        generationConfig: {
+                            responseMimeType: "application/json",
+                            maxOutputTokens: TOKEN_LIMITS.maxOutputTokens.forensic
+                        }
+                    })
+                });
+                if (!response.ok) {
+                    const errBody = await response.json().catch(()=>({}));
+                    const msg = errBody.error?.message || response.statusText;
+                    // Don't retry on 400 Bad Request (prompt issue)
+                    if (response.status === 400) {
+                        throw new Error(`API Error 400: ${msg}`);
+                    }
+                    throw new Error(`${response.status}: ${msg}`);
+                }
+                const data = await response.json();
+                const rawJson = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!rawJson) {
+                    throw new Error("Empty response from API");
+                }
+                return parseAIResponse(rawJson);
+            } catch (error) {
+                attempt++;
+                lastError = error;
+                console.warn(`Attempt ${attempt} failed:`, lastError.message);
+                // Don't retry on 400 errors or if max retries exceeded
+                if (lastError.message.includes("400") || attempt > maxRetries) {
+                    break;
+                }
+                // Exponential backoff
+                const delay = Math.pow(2, attempt) * baseDelayMs;
+                await new Promise((resolve)=>setTimeout(resolve, delay));
+            }
+        }
+        throw lastError || new Error("Max retries exceeded");
+    }
+    /**
+   * Run forensic analysis on CV text
+   * @param apiKey - Google Gemini API Key
+   * @param cvText - Raw text extracted from CV
+   * @returns Complete forensic result
+   */ async analyze(apiKey, cvText) {
+        const prompt = buildForensicPrompt(cvText);
+        return this.executeWithRetry(apiKey, prompt);
+    }
 }
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
