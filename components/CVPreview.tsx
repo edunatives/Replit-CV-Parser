@@ -266,7 +266,7 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
     return devKeywords.some(kw => titleLower.includes(kw) || summaryLower.includes(kw));
   };
 
-  const showGitHub = isDeveloperRole() || (cv.github && cv.github.trim() !== "");
+  const showGitHub = isDeveloperRole();
 
   return (
     <Paper elevation={2} sx={{ overflow: "hidden", bgcolor: style.bodyBg }} data-testid="cv-preview">
