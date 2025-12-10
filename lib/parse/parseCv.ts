@@ -90,6 +90,7 @@ interface GeminiCVResponse {
     year: string;
   }>;
   skills: string[];
+  strengths: string[];
 }
 
 interface GeminiExtractionResult {
@@ -310,6 +311,7 @@ export async function parseCV(buffer: Buffer, fileName: string, fileId: string):
         year: cert.year || "",
       })),
       skills: normalizeSkills(geminiData.skills || []),
+      strengths: (geminiData.strengths || []).map(s => normalizeWhitespace(s)),
       originalFilename: fileName,
       uploadedAt: new Date(),
       rawText: text,
@@ -333,6 +335,7 @@ export async function parseCV(buffer: Buffer, fileName: string, fileId: string):
       education: [],
       certifications: [],
       skills: [],
+      strengths: [],
       originalFilename: fileName,
       uploadedAt: new Date(),
       rawText: text,

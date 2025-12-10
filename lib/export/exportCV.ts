@@ -192,50 +192,57 @@ export async function exportToPDF(cv: ParsedCV, filename: string, template: Temp
 
   if (cv.certifications && cv.certifications.length > 0) {
     addSection("Certifications");
-    for (const cert of cv.certifications) {
-      const certText = cert.issuer ? `${cert.name} - ${cert.issuer}` : cert.name;
-      doc.setFillColor(accent.r, accent.g, accent.b);
-      doc.circle(marginLeft + 2, y - 2, 1.5, "F");
-      doc.setTextColor(bodyText.r, bodyText.g, bodyText.b);
-      doc.setFontSize(10);
-      doc.text(`${certText}${cert.year ? ` (${cert.year})` : ""}`, marginLeft + 8, y);
-      y += lineHeight;
+    const certNames = cv.certifications.map(cert => cert.name).join(", ");
+    doc.setTextColor(bodyText.r, bodyText.g, bodyText.b);
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    const certLines = doc.splitTextToSize(certNames, maxWidth);
+    for (const line of certLines) {
+      if (y > pageHeight - 15) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.text(line, marginLeft, y);
+      y += lineHeight - 1;
     }
+    y += 2;
   }
 
   if (cv.skills && cv.skills.length > 0) {
-    addSection("Skills");
-    let skillX = marginLeft;
-    const skillY = y;
-    const chipPadding = 4;
-    const chipHeight = 7;
-    const chipSpacing = 3;
-    let currentY = skillY;
-
-    for (const skill of cv.skills) {
-      const textWidth = doc.getTextWidth(skill);
-      const chipWidth = textWidth + chipPadding * 2;
-
-      if (skillX + chipWidth > pageWidth - marginRight) {
-        skillX = marginLeft;
-        currentY += chipHeight + chipSpacing;
-      }
-
-      if (currentY > pageHeight - 15) {
+    addSection("Core Competencies");
+    const skillsText = cv.skills.join(", ");
+    doc.setTextColor(bodyText.r, bodyText.g, bodyText.b);
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    const skillLines = doc.splitTextToSize(skillsText, maxWidth);
+    for (const line of skillLines) {
+      if (y > pageHeight - 15) {
         doc.addPage();
-        currentY = 20;
-        skillX = marginLeft;
+        y = 20;
       }
-
-      doc.setFillColor(accent.r, accent.g, accent.b);
-      doc.roundedRect(skillX, currentY - 5, chipWidth, chipHeight, 2, 2, "F");
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(8);
-      doc.text(skill, skillX + chipPadding, currentY);
-
-      skillX += chipWidth + chipSpacing;
+      doc.text(line, marginLeft, y);
+      y += lineHeight - 1;
     }
-    y = currentY + chipHeight + 5;
+    y += 2;
+  }
+
+  if (cv.strengths && cv.strengths.length > 0) {
+    addSection("Key Strengths");
+    for (const strength of cv.strengths) {
+      if (y > pageHeight - 15) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.setTextColor(bodyText.r, bodyText.g, bodyText.b);
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "normal");
+      const strengthLines = doc.splitTextToSize(`• ${strength}`, maxWidth);
+      for (const line of strengthLines) {
+        doc.text(line, marginLeft, y);
+        y += lineHeight - 1;
+      }
+    }
+    y += 2;
   }
 
   doc.save(filename);
@@ -408,42 +415,38 @@ export async function exportToDOCX(cv: ParsedCV, filename: string, template: Tem
 
   if (cv.certifications && cv.certifications.length > 0) {
     addSectionHeader("Certifications");
-    for (const cert of cv.certifications) {
-      const certText = cert.issuer ? `${cert.name} - ${cert.issuer}` : cert.name;
+    const certNames = cv.certifications.map(cert => cert.name).join(", ");
+    children.push(
+      new Paragraph({
+        children: [new TextRun({ text: certNames, size: 20, color: bodyTextHex })],
+        spacing: { after: 150 },
+      })
+    );
+  }
+
+  if (cv.skills && cv.skills.length > 0) {
+    addSectionHeader("Core Competencies");
+    children.push(
+      new Paragraph({
+        children: [new TextRun({ text: cv.skills.join(", "), size: 20, color: bodyTextHex })],
+        spacing: { after: 150 },
+      })
+    );
+  }
+
+  if (cv.strengths && cv.strengths.length > 0) {
+    addSectionHeader("Key Strengths");
+    for (const strength of cv.strengths) {
       children.push(
         new Paragraph({
           children: [
-            new TextRun({ text: "\u2022 ", size: 22, color: accentHex }),
-            new TextRun({
-              text: `${certText}${cert.year ? ` (${cert.year})` : ""}`,
-              size: 22,
-              color: bodyTextHex,
-            }),
+            new TextRun({ text: "• ", size: 20, color: accentHex }),
+            new TextRun({ text: strength, size: 20, color: bodyTextHex }),
           ],
           spacing: { after: 50 },
         })
       );
     }
-  }
-
-  if (cv.skills && cv.skills.length > 0) {
-    addSectionHeader("Skills");
-    children.push(
-      new Paragraph({
-        children: cv.skills.map((skill, i) => [
-          new TextRun({
-            text: skill,
-            size: 22,
-            color: accentHex,
-            bold: true,
-          }),
-          ...(i < cv.skills.length - 1
-            ? [new TextRun({ text: "  •  ", size: 22, color: bodyTextSecondaryHex })]
-            : []),
-        ]).flat(),
-        spacing: { after: 200 },
-      })
-    );
   }
 
   const docx = new Document({
@@ -543,6 +546,14 @@ export function exportToTXT(cv: ParsedCV, filename: string): void {
     lines.push("");
     lines.push("=== SKILLS ===");
     lines.push(cv.skills.join(", "));
+  }
+
+  if (cv.strengths && cv.strengths.length > 0) {
+    lines.push("");
+    lines.push("=== KEY STRENGTHS ===");
+    for (const strength of cv.strengths) {
+      lines.push(`- ${strength}`);
+    }
   }
 
   const blob = new Blob([lines.join("\n")], { type: "text/plain" });

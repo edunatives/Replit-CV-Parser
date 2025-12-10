@@ -270,6 +270,21 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
     onUpdateCV({ ...cv, skills: [...cv.skills, "New Skill"] });
   };
 
+  const updateStrength = (index: number, value: string) => {
+    const newStrengths = [...(cv.strengths || [])];
+    newStrengths[index] = value;
+    onUpdateCV({ ...cv, strengths: newStrengths });
+  };
+
+  const deleteStrength = (index: number) => {
+    const newStrengths = (cv.strengths || []).filter((_, i) => i !== index);
+    onUpdateCV({ ...cv, strengths: newStrengths });
+  };
+
+  const addStrength = () => {
+    onUpdateCV({ ...cv, strengths: [...(cv.strengths || []), "New Strength"] });
+  };
+
   const updateCertification = (index: number, field: string, value: string) => {
     const newCerts = [...(cv.certifications || [])];
     newCerts[index] = { ...newCerts[index], [field]: value };
@@ -527,6 +542,34 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
           )}
         </Box>
 
+        <Box sx={{ mb: 3 }}>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
+            <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Arial', sans-serif" }}>
+              Key Strengths
+            </Typography>
+            <IconButton size="small" onClick={addStrength} sx={{ color: style.accent }} data-testid="button-add-strength">
+              <AddIcon fontSize="small" />
+            </IconButton>
+          </Box>
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+            {(cv.strengths || []).map((strength, index) => (
+              <EditableStrengthChip
+                key={index}
+                strength={strength}
+                accentColor={style.accent}
+                onUpdate={(v) => updateStrength(index, v)}
+                onDelete={() => deleteStrength(index)}
+                testId={`strength-${index}`}
+              />
+            ))}
+          </Box>
+          {(!cv.strengths || cv.strengths.length === 0) && (
+            <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
+              Click + to add strengths
+            </Typography>
+          )}
+        </Box>
+
         <Box>
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
             <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Arial', sans-serif" }}>
@@ -697,6 +740,68 @@ function EditableCertChip({
       }}
       onDelete={onDelete}
       sx={{ borderColor: accentColor, color: bodyText, cursor: "pointer" }}
+      data-testid={testId}
+    />
+  );
+}
+
+function EditableStrengthChip({ 
+  strength, 
+  accentColor, 
+  onUpdate, 
+  onDelete,
+  testId
+}: { 
+  strength: string; 
+  accentColor: string; 
+  onUpdate: (v: string) => void; 
+  onDelete: () => void;
+  testId: string;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [tempValue, setTempValue] = useState(strength);
+
+  if (editing) {
+    return (
+      <TextField
+        size="small"
+        value={tempValue}
+        onChange={(e) => setTempValue(e.target.value)}
+        onBlur={() => {
+          if (tempValue.trim()) {
+            onUpdate(tempValue);
+          }
+          setEditing(false);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            if (tempValue.trim()) {
+              onUpdate(tempValue);
+            }
+            setEditing(false);
+          }
+          if (e.key === "Escape") {
+            setTempValue(strength);
+            setEditing(false);
+          }
+        }}
+        autoFocus
+        sx={{ width: 180 }}
+      />
+    );
+  }
+
+  return (
+    <Chip
+      label={strength}
+      size="small"
+      variant="outlined"
+      onClick={() => {
+        setTempValue(strength);
+        setEditing(true);
+      }}
+      onDelete={onDelete}
+      sx={{ borderColor: accentColor, color: accentColor, cursor: "pointer" }}
       data-testid={testId}
     />
   );

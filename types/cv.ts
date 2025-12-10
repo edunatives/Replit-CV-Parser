@@ -41,6 +41,7 @@ export interface ParsedCV {
   education: Education[];
   certifications: Certification[];
   skills: string[];
+  strengths?: string[];
   originalFilename?: string;
   mimeType?: string;
   size?: number;

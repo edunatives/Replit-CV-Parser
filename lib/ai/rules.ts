@@ -143,6 +143,7 @@ Extract the following fields:
   - issuer: Issuing organization
   - year: Year obtained
 - skills: Array of technical and soft skills as strings
+- strengths: Array of key professional strengths (e.g., "Strategic Leadership", "Cross-functional Collaboration", "Results-Driven Execution"). Extract 3-5 high-level strengths that summarize the candidate's core value proposition.
 
 If a field is not found in the CV, use an empty string for text fields or an empty array for array fields.
 
