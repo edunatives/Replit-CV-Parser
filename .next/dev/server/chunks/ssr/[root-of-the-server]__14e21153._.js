@@ -1817,13 +1817,20 @@ const DEFAULT_SECTION_ORDER = [
  * - Shared constants for scoring criteria and field definitions
  * - CV summary formatters for consistent AI context
  * - Response cleaning utilities
+ * - Security guidelines for token control, prompt safety, and code security
  */ __turbopack_context__.s([
     "ASSESSMENT_SECTIONS",
     ()=>ASSESSMENT_SECTIONS,
+    "DANGEROUS_PATTERNS",
+    ()=>DANGEROUS_PATTERNS,
     "DEVELOPER_KEYWORDS",
     ()=>DEVELOPER_KEYWORDS,
     "RESPONSE_GUIDELINES",
     ()=>RESPONSE_GUIDELINES,
+    "TOKEN_LIMITS",
+    ()=>TOKEN_LIMITS,
+    "UPLOAD_LIMITS",
+    ()=>UPLOAD_LIMITS,
     "buildAdvisorPrompt",
     ()=>buildAdvisorPrompt,
     "buildAssessmentPrompt",
@@ -1834,6 +1841,8 @@ const DEFAULT_SECTION_ORDER = [
     ()=>buildJDMatchPrompt,
     "cleanAIResponse",
     ()=>cleanAIResponse,
+    "containsInjectionAttempt",
+    ()=>containsInjectionAttempt,
     "formatCVForJDMatch",
     ()=>formatCVForJDMatch,
     "formatCVSummary",
@@ -1841,8 +1850,63 @@ const DEFAULT_SECTION_ORDER = [
     "formatConversationHistory",
     ()=>formatConversationHistory,
     "isDeveloperRole",
-    ()=>isDeveloperRole
+    ()=>isDeveloperRole,
+    "sanitizeAIInput",
+    ()=>sanitizeAIInput
 ]);
+const TOKEN_LIMITS = {
+    maxCVTextLength: 50000,
+    maxJobDescriptionLength: 10000,
+    maxChatMessageLength: 2000,
+    maxConversationHistory: 10,
+    maxOutputTokens: {
+        parsing: 2048,
+        assessment: 1024,
+        jdMatch: 1024,
+        advisor: 512
+    },
+    rateLimit: {
+        perMinute: 10,
+        perHour: 100
+    }
+};
+const DANGEROUS_PATTERNS = [
+    /ignore\s+(all\s+)?previous\s+instructions?/i,
+    /system\s*:/i,
+    /\[\[.*?\]\]/,
+    /<\/?script/i,
+    /javascript:/i,
+    /data:text\/html/i,
+    /eval\s*\(/i,
+    /exec\s*\(/i
+];
+function containsInjectionAttempt(text) {
+    return DANGEROUS_PATTERNS.some((pattern)=>pattern.test(text));
+}
+function sanitizeAIInput(text) {
+    let sanitized = text;
+    sanitized = sanitized.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "");
+    sanitized = sanitized.normalize("NFKC");
+    if (sanitized.length > TOKEN_LIMITS.maxCVTextLength) {
+        sanitized = sanitized.substring(0, TOKEN_LIMITS.maxCVTextLength);
+    }
+    return sanitized;
+}
+const UPLOAD_LIMITS = {
+    maxFileSize: 10 * 1024 * 1024,
+    allowedMimeTypes: [
+        "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/msword",
+        "text/plain"
+    ],
+    allowedExtensions: [
+        ".pdf",
+        ".docx",
+        ".doc",
+        ".txt"
+    ]
+};
 const ASSESSMENT_SECTIONS = [
     {
         name: "Contact Information",

@@ -6,9 +6,165 @@
  * - Shared constants for scoring criteria and field definitions
  * - CV summary formatters for consistent AI context
  * - Response cleaning utilities
+ * - Security guidelines for token control, prompt safety, and code security
  */
 
 import type { ParsedCV } from "@/types/cv";
+
+// ============================================================================
+// SECURITY GUIDELINES
+// ============================================================================
+
+/**
+ * TOKEN CONSUMPTION CONTROL
+ * Rules to keep AI API token usage under control:
+ * 
+ * 1. INPUT LIMITS:
+ *    - Max CV text: 50,000 characters (truncate longer documents)
+ *    - Max job description: 10,000 characters
+ *    - Max chat message: 2,000 characters
+ *    - Max conversation history: 10 messages (older messages dropped)
+ * 
+ * 2. RESPONSE LIMITS:
+ *    - Set maxOutputTokens in API calls (e.g., 2048 for parsing, 1024 for chat)
+ *    - Truncate AI responses over 5,000 characters before display
+ * 
+ * 3. CACHING STRATEGY:
+ *    - Cache identical CV assessments for 24 hours (hash CV content)
+ *    - Cache JD match results for same CV+JD pair for 1 hour
+ *    - Use in-memory cache or Redis for production
+ * 
+ * 4. RATE LIMITING:
+ *    - Max 10 AI requests per user per minute
+ *    - Max 100 AI requests per user per hour
+ *    - Circuit breaker: pause if token usage exceeds daily budget
+ * 
+ * 5. MONITORING:
+ *    - Log usageMetadata (promptTokens, completionTokens) from each request
+ *    - Alert when daily token usage exceeds 80% of budget
+ */
+export const TOKEN_LIMITS = {
+  maxCVTextLength: 50000,
+  maxJobDescriptionLength: 10000,
+  maxChatMessageLength: 2000,
+  maxConversationHistory: 10,
+  maxOutputTokens: {
+    parsing: 2048,
+    assessment: 1024,
+    jdMatch: 1024,
+    advisor: 512,
+  },
+  rateLimit: {
+    perMinute: 10,
+    perHour: 100,
+  },
+} as const;
+
+/**
+ * AI PROMPT INJECTION PREVENTION
+ * Rules to prevent prompt attacks and malicious content:
+ * 
+ * 1. INPUT SANITIZATION:
+ *    - Strip control characters (except newlines/tabs)
+ *    - Remove potential prompt injection patterns: "ignore previous", "system:", etc.
+ *    - Normalize unicode to prevent homograph attacks
+ *    - Redact detected secrets/API keys before sending to AI
+ * 
+ * 2. OUTPUT VALIDATION:
+ *    - Validate AI responses against expected JSON schema
+ *    - Reject responses containing executable code patterns
+ *    - Filter URLs/emails that weren't in original input (prevent hallucination)
+ *    - Scan for toxic/offensive content before display
+ * 
+ * 3. PROMPT STRUCTURE:
+ *    - Always use immutable system prompts (user cannot override)
+ *    - Clearly delimit user content with markers: "CV TEXT:", "USER'S QUESTION:"
+ *    - Never interpolate user input directly into instruction sections
+ * 
+ * 4. LOGGING & MONITORING:
+ *    - Log suspicious inputs (potential injections) for review
+ *    - Quarantine flagged requests for manual triage
+ */
+export const DANGEROUS_PATTERNS = [
+  /ignore\s+(all\s+)?previous\s+instructions?/i,
+  /system\s*:/i,
+  /\[\[.*?\]\]/,
+  /<\/?script/i,
+  /javascript:/i,
+  /data:text\/html/i,
+  /eval\s*\(/i,
+  /exec\s*\(/i,
+];
+
+/**
+ * Check if text contains potential prompt injection
+ * @param text - Text to check
+ * @returns True if suspicious patterns found
+ */
+export function containsInjectionAttempt(text: string): boolean {
+  return DANGEROUS_PATTERNS.some(pattern => pattern.test(text));
+}
+
+/**
+ * Sanitize user input before sending to AI
+ * @param text - Raw user input
+ * @returns Sanitized text
+ */
+export function sanitizeAIInput(text: string): string {
+  let sanitized = text;
+  sanitized = sanitized.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "");
+  sanitized = sanitized.normalize("NFKC");
+  if (sanitized.length > TOKEN_LIMITS.maxCVTextLength) {
+    sanitized = sanitized.substring(0, TOKEN_LIMITS.maxCVTextLength);
+  }
+  return sanitized;
+}
+
+/**
+ * CODE SECURITY GUIDELINES
+ * Rules to prevent vulnerabilities in the application:
+ * 
+ * 1. FILE UPLOAD SECURITY:
+ *    - Validate file type by magic bytes, not just extension
+ *    - Max file size: 10MB
+ *    - Allowed types: PDF, DOCX, DOC, TXT only
+ *    - Scan uploaded files for malware (future: integrate ClamAV)
+ *    - Process uploads in isolated sandbox
+ * 
+ * 2. API SECURITY:
+ *    - Validate all request bodies with Zod schemas
+ *    - Use parameterized queries for MongoDB (never string concatenation)
+ *    - Implement CSRF protection for state-changing operations
+ *    - Set strict CORS policy (only allow known origins)
+ *    - Add security headers: X-Content-Type-Options, X-Frame-Options, CSP
+ * 
+ * 3. DATA VALIDATION:
+ *    - Validate all inputs at API boundary (never trust client data)
+ *    - Sanitize outputs to prevent XSS
+ *    - Use TypeScript strict mode for type safety
+ * 
+ * 4. SECRETS MANAGEMENT:
+ *    - Never log or expose secrets
+ *    - Use Replit Secrets Manager for all credentials
+ *    - Validate required env vars on startup
+ *    - Rotate API keys periodically
+ * 
+ * 5. DATABASE SECURITY:
+ *    - Use connection pooling with limits
+ *    - Implement query timeouts
+ *    - Validate ObjectId before queries
+ *    - Never expose internal IDs in error messages
+ */
+export const UPLOAD_LIMITS = {
+  maxFileSize: 10 * 1024 * 1024, // 10MB
+  allowedMimeTypes: [
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/msword",
+    "text/plain",
+  ],
+  allowedExtensions: [".pdf", ".docx", ".doc", ".txt"],
+} as const;
 
 // ============================================================================
 // SHARED CONSTANTS
