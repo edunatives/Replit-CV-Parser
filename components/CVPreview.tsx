@@ -44,12 +44,25 @@ function EditableField({
     if (inputRef.current) {
       const start = inputRef.current.selectionStart || 0;
       const end = inputRef.current.selectionEnd || 0;
-      const newValue = tempValue.slice(0, start) + "• " + tempValue.slice(end);
+      
+      const isAtLineStart = start === 0 || tempValue[start - 1] === "\n";
+      
+      let prefix = "";
+      let cursorOffset = 2;
+      
+      if (!isAtLineStart) {
+        prefix = "\n";
+        cursorOffset = 3;
+      }
+      
+      const newValue = tempValue.slice(0, start) + prefix + "• " + tempValue.slice(end);
       setTempValue(newValue);
+      
       setTimeout(() => {
         if (inputRef.current) {
-          inputRef.current.selectionStart = start + 2;
-          inputRef.current.selectionEnd = start + 2;
+          const newPos = start + cursorOffset;
+          inputRef.current.selectionStart = newPos;
+          inputRef.current.selectionEnd = newPos;
           inputRef.current.focus();
         }
       }, 0);
@@ -86,21 +99,23 @@ function EditableField({
           autoFocus
           fullWidth
           sx={{ my: 0.5 }}
-          InputProps={showBulletTool && multiline ? {
-            endAdornment: (
-              <InputAdornment position="end" sx={{ alignSelf: "flex-start", mt: 1 }}>
-                <Tooltip title="Insert bullet point">
-                  <IconButton
-                    size="small"
-                    onClick={insertBullet}
-                    data-bullet-btn="true"
-                    data-testid="button-insert-bullet"
-                  >
-                    <FormatListBulletedIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              </InputAdornment>
-            )
+          slotProps={showBulletTool && multiline ? {
+            input: {
+              startAdornment: (
+                <InputAdornment position="start" sx={{ alignSelf: "flex-start", mt: 0.5 }}>
+                  <Tooltip title="Add bullet point (new line)">
+                    <IconButton
+                      size="small"
+                      onClick={insertBullet}
+                      data-bullet-btn="true"
+                      data-testid="button-insert-bullet"
+                    >
+                      <FormatListBulletedIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </InputAdornment>
+              )
+            }
           } : undefined}
         />
       </Box>
