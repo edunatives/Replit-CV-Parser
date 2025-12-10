@@ -1,9 +1,46 @@
+/**
+ * @fileoverview Batch CV File Parse API
+ * @description Handles parsing of multiple CV/resume files in a single request.
+ * Processes up to 50 files per batch with individual error handling.
+ * Each file is parsed independently, allowing partial success.
+ * 
+ * @endpoint POST /api/parse/batch
+ * @accepts multipart/form-data with 'files' field (array)
+ * @returns {Object} { results: BatchResult[] }
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { parseCV } from "@/lib/parse/parseCv";
 import { getCollection } from "@/lib/db/mongodb";
 
 export const runtime = "nodejs";
 
+/**
+ * Parse multiple CV files in a single batch request
+ * 
+ * @param {NextRequest} request - The incoming request with FormData containing multiple files
+ * @returns {Promise<NextResponse>} JSON response with array of parse results
+ * 
+ * @example
+ * // Request
+ * const formData = new FormData();
+ * formData.append('files', cv1File);
+ * formData.append('files', cv2File);
+ * formData.append('files', cv3File);
+ * 
+ * // Response
+ * {
+ *   results: [
+ *     { fileName: "resume1.pdf", cv: {...}, rawText: "...", error: null },
+ *     { fileName: "resume2.docx", cv: {...}, rawText: "...", error: null },
+ *     { fileName: "invalid.jpg", cv: null, rawText: null, error: "Invalid file type" }
+ *   ]
+ * }
+ * 
+ * @throws {400} No files uploaded
+ * @throws {400} Too many files (max 50 per batch)
+ * @throws {500} Batch processing error
+ */
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();

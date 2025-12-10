@@ -1,9 +1,49 @@
+/**
+ * @fileoverview Single CV File Parse API
+ * @description Handles parsing of individual CV/resume files (PDF, DOCX, TXT).
+ * Uses AI-powered extraction via Gemini 2.5 Flash for intelligent field parsing.
+ * Saves parsed CVs to MongoDB for persistence.
+ * 
+ * @endpoint POST /api/parse
+ * @accepts multipart/form-data with 'file' field
+ * @returns {Object} { cv: ParsedCV, rawText: string }
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { parseCV } from "@/lib/parse/parseCv";
 import { getCollection } from "@/lib/db/mongodb";
 
 export const runtime = "nodejs";
 
+/**
+ * Parse a single CV file and extract structured data
+ * 
+ * @param {NextRequest} request - The incoming request with FormData
+ * @returns {Promise<NextResponse>} JSON response with parsed CV data
+ * 
+ * @example
+ * // Request
+ * const formData = new FormData();
+ * formData.append('file', cvFile);
+ * formData.append('fileId', 'optional-custom-id');
+ * 
+ * // Response
+ * {
+ *   cv: {
+ *     id: "file-123",
+ *     name: "John Doe",
+ *     title: "Software Engineer",
+ *     email: "john@example.com",
+ *     // ... other fields
+ *   },
+ *   rawText: "Raw extracted text from document..."
+ * }
+ * 
+ * @throws {400} No file uploaded
+ * @throws {400} Invalid file type (only PDF, DOCX, TXT allowed)
+ * @throws {400} File too large (max 10MB)
+ * @throws {500} Parse error
+ */
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();

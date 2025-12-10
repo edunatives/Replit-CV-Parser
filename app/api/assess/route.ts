@@ -1,7 +1,27 @@
+/**
+ * @fileoverview CV Assessment API
+ * @description AI-powered CV/resume analysis and scoring using Gemini 2.5 Flash.
+ * Evaluates CV quality across 6 sections and provides actionable recommendations.
+ * 
+ * @endpoint POST /api/assess
+ * @accepts application/json with { cv: ParsedCV }
+ * @returns {Object} { assessment: CVAssessment }
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import type { ParsedCV } from "@/types/cv";
 
+/**
+ * CV Assessment result structure
+ * @typedef {Object} CVAssessment
+ * @property {number} overallScore - Overall CV quality score (0-100)
+ * @property {SectionScore[]} sections - Individual section scores
+ * @property {string[]} strengths - Top 3 strengths identified
+ * @property {string[]} weaknesses - Top 3 weaknesses identified  
+ * @property {string[]} recommendations - 5 actionable improvement suggestions
+ * @property {TokenUsage} tokenUsage - AI token consumption metrics
+ */
 export interface CVAssessment {
   overallScore: number;
   sections: {
@@ -19,6 +39,43 @@ export interface CVAssessment {
   };
 }
 
+/**
+ * Analyze a CV and return comprehensive assessment with scores
+ * 
+ * @param {NextRequest} request - Request containing ParsedCV data
+ * @returns {Promise<NextResponse>} JSON response with CVAssessment
+ * 
+ * @example
+ * // Request
+ * {
+ *   cv: {
+ *     name: "John Doe",
+ *     title: "Software Engineer",
+ *     experience: [...],
+ *     // ... other CV fields
+ *   }
+ * }
+ * 
+ * // Response
+ * {
+ *   assessment: {
+ *     overallScore: 78,
+ *     sections: [
+ *       { name: "Contact Information", score: 90, feedback: "..." },
+ *       { name: "Professional Summary", score: 75, feedback: "..." },
+ *       // ... 6 sections total
+ *     ],
+ *     strengths: ["Strong technical skills", "Clear experience progression", "..."],
+ *     weaknesses: ["Summary could be more concise", "..."],
+ *     recommendations: ["Add quantifiable achievements", "..."],
+ *     tokenUsage: { promptTokens: 1200, completionTokens: 500, totalTokens: 1700 }
+ *   }
+ * }
+ * 
+ * @throws {400} CV data not provided
+ * @throws {500} AI service not configured
+ * @throws {500} Assessment generation failed
+ */
 export async function POST(request: NextRequest) {
   try {
     const { cv } = await request.json() as { cv: ParsedCV };
