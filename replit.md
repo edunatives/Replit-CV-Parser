@@ -32,13 +32,18 @@ Preferred communication style: Simple, everyday language.
 - CV parsing implemented in `/lib/parse/parseCv.ts` using:
   - `mammoth` for DOCX parsing
   - `pdf-parse` for PDF text extraction
-  - **AI-powered extraction** using OpenAI GPT-4o-mini for intelligent parsing
+  - **AI-powered extraction** using Gemini 2.5 Flash for intelligent parsing
   - Regex-based fallback for emails, phones, LinkedIn profiles
 
 **API Endpoints**:
 - `POST /api/parse` - Single file parsing
 - `POST /api/parse/batch` - Batch file parsing
 - `GET/DELETE /api/cvs` - CV CRUD operations
+
+**AI-Powered Extraction**:
+- Uses **Gemini 2.5 Flash** via Replit AI Integrations (no API key required, charges billed to credits)
+- Structured JSON extraction for all CV sections
+- Fallback to regex-based extraction if AI unavailable
 
 ### NestJS Backend (Alternative Architecture)
 
@@ -119,7 +124,7 @@ Custom MUI theme with:
 
 ### Backend Libraries
 - `mongodb` - MongoDB driver for data persistence
-- `openai` - OpenAI API for AI-powered CV parsing
+- `@google/genai` - Gemini API for AI-powered CV parsing (via Replit AI Integrations)
 
 ### Build Tools
 - `next` - Next.js 15 framework

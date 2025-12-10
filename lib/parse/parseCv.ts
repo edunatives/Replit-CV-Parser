@@ -9,9 +9,8 @@ import {
   normalizeUrl,
   normalizeSkills,
   validateAndNormalizeCV,
-  extractSection,
-  SECTION_ALIASES,
 } from "./normalize";
+import { GoogleGenAI } from "@google/genai";
 
 type PdfParseResult = { text: string; numpages: number };
 type PdfParseFunction = (buffer: Buffer, options?: object) => Promise<PdfParseResult>;
@@ -50,6 +49,118 @@ async function parseDocxBuffer(buffer: Buffer): Promise<string> {
   return result.value;
 }
 
+interface GeminiCVResponse {
+  name: string;
+  title: string;
+  email: string;
+  phone: string;
+  location: string;
+  website: string;
+  linkedin: string;
+  github: string;
+  summary: string;
+  experience: Array<{
+    company: string;
+    role: string;
+    duration: string;
+    description: string;
+  }>;
+  education: Array<{
+    institution: string;
+    degree: string;
+    year: string;
+  }>;
+  certifications: Array<{
+    name: string;
+    issuer: string;
+    year: string;
+  }>;
+  skills: string[];
+}
+
+async function extractWithGemini(text: string): Promise<GeminiCVResponse | null> {
+  const apiKey = process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
+  const baseUrl = process.env.AI_INTEGRATIONS_GEMINI_BASE_URL;
+  
+  if (!apiKey) {
+    console.log("Gemini API key not available, falling back to regex extraction");
+    return null;
+  }
+
+  try {
+    const ai = new GoogleGenAI({
+      apiKey,
+      httpOptions: {
+        apiVersion: "",
+        baseUrl: baseUrl,
+      },
+    });
+
+    const prompt = `You are an expert CV/Resume parser. Extract structured information from the following CV text and return it as a valid JSON object.
+
+IMPORTANT: Return ONLY a valid JSON object, no markdown formatting, no code blocks, no explanations.
+
+Extract the following fields:
+- name: Full name of the candidate
+- title: Professional title or current job title
+- email: Email address
+- phone: Phone number (include country code if present)
+- location: City, State/Country
+- website: Personal website URL (not LinkedIn or GitHub)
+- linkedin: LinkedIn profile URL or username
+- github: GitHub profile URL or username
+- summary: Professional summary or objective (combine multiple paragraphs if needed)
+- experience: Array of work experiences, each with:
+  - company: Company name
+  - role: Job title/role
+  - duration: Date range (e.g., "Jan 2020 - Present")
+  - description: Key responsibilities and achievements (combine bullet points)
+- education: Array of education entries, each with:
+  - institution: School/University name
+  - degree: Degree type and field (e.g., "Bachelor of Science in Computer Science")
+  - year: Graduation year or date range
+- certifications: Array of certifications, each with:
+  - name: Certification name
+  - issuer: Issuing organization
+  - year: Year obtained
+- skills: Array of technical and soft skills as strings
+
+If a field is not found in the CV, use an empty string for text fields or an empty array for array fields.
+
+CV TEXT:
+${text}
+
+Return ONLY the JSON object:`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+    });
+
+    const responseText = response.text?.trim() || "";
+    
+    // Clean up response - remove markdown code blocks if present
+    let jsonText = responseText;
+    if (jsonText.startsWith("```json")) {
+      jsonText = jsonText.slice(7);
+    } else if (jsonText.startsWith("```")) {
+      jsonText = jsonText.slice(3);
+    }
+    if (jsonText.endsWith("```")) {
+      jsonText = jsonText.slice(0, -3);
+    }
+    jsonText = jsonText.trim();
+
+    const parsed = JSON.parse(jsonText) as GeminiCVResponse;
+    console.log("Gemini extraction successful");
+    return parsed;
+  } catch (error) {
+    console.error("Gemini extraction error:", error);
+    return null;
+  }
+}
+
+// Fallback regex-based extraction (commented out AI, using basic regex)
 const EMAIL_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 const PHONE_PATTERNS = [
   /\+?\d{1,4}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}/g,
@@ -57,14 +168,13 @@ const PHONE_PATTERNS = [
 ];
 const LINKEDIN_REGEX = /(?:https?:\/\/)?(?:www\.)?linkedin\.com\/in\/([a-zA-Z0-9_-]+)/i;
 const GITHUB_REGEX = /(?:https?:\/\/)?(?:www\.)?github\.com\/([a-zA-Z0-9_-]+)/i;
-const DATE_RANGE_REGEX = /(?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s*)?\d{4}\s*[-–—to]+\s*(?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s*)?\d{4}|(?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s*)?\d{4}\s*[-–—to]+\s*(?:Present|Current|Now)|Since\s+\d{4}|\d{4}\s*[-–]\s*\d{4}|\d{4}\s*[-–]\s*(?:Present|Current)/gi;
 
-function extractEmail(text: string): string {
+function extractEmailFallback(text: string): string {
   const matches = text.match(EMAIL_REGEX);
   return matches ? normalizeEmail(matches[0]) : "";
 }
 
-function extractPhone(text: string): string {
+function extractPhoneFallback(text: string): string {
   for (const pattern of PHONE_PATTERNS) {
     const matches = text.match(pattern);
     if (matches) {
@@ -77,52 +187,17 @@ function extractPhone(text: string): string {
   return "";
 }
 
-function extractLinkedIn(text: string): string {
+function extractLinkedInFallback(text: string): string {
   const match = text.match(LINKEDIN_REGEX);
   return match ? `linkedin.com/in/${match[1]}` : "";
 }
 
-function extractGithub(text: string): string {
+function extractGithubFallback(text: string): string {
   const match = text.match(GITHUB_REGEX);
   return match && match[1] !== "in" && match[1] !== "www" ? `github.com/${match[1]}` : "";
 }
 
-function extractWebsite(text: string): string {
-  const websiteRegex = /(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9][a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\/[^\s]*)?)/gi;
-  const matches = text.match(websiteRegex);
-  if (matches) {
-    const filtered = matches.filter(m => 
-      !m.includes("linkedin.com") && 
-      !m.includes("github.com") &&
-      !m.includes("@") &&
-      !m.includes("gmail.com") &&
-      !m.includes("yahoo.com") &&
-      !m.includes("hotmail.com")
-    );
-    return filtered.length > 0 ? normalizeUrl(filtered[0]) : "";
-  }
-  return "";
-}
-
-function extractLocation(text: string): string {
-  const patterns = [
-    /(?:Location|Address|Based in|City):?\s*([A-Za-z\s,]+(?:,\s*[A-Za-z]+)?)/i,
-    /([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*,\s*(?:[A-Z]{2}|[A-Z][a-z]+))/,
-  ];
-  
-  for (const pattern of patterns) {
-    const match = text.match(pattern);
-    if (match && match[1]) {
-      const loc = normalizeWhitespace(match[1]);
-      if (loc.length > 3 && loc.length < 50) {
-        return loc;
-      }
-    }
-  }
-  return "";
-}
-
-function extractName(text: string): string {
+function extractNameFallback(text: string): string {
   const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
   
   const skipPatterns = [
@@ -145,312 +220,7 @@ function extractName(text: string): string {
     }
   }
   
-  const namePattern = /^([A-Z][a-z]+\s+(?:[A-Z][a-z]+\s*)+)/m;
-  const match = text.match(namePattern);
-  return match ? normalizeWhitespace(match[1]) : "";
-}
-
-const TITLE_KEYWORDS = [
-  "engineer", "developer", "architect", "consultant", "manager", "analyst",
-  "designer", "specialist", "director", "lead", "administrator", "coordinator",
-  "executive", "officer", "scientist", "technician", "expert", "strategist"
-];
-
-function extractTitle(text: string): string {
-  const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
-  const name = extractName(text).toLowerCase();
-  
-  for (let i = 0; i < Math.min(lines.length, 10); i++) {
-    const line = lines[i];
-    const lineLower = line.toLowerCase();
-    if (lineLower === name) continue;
-    if (/@/.test(line) || /\d{3}/.test(line)) continue;
-    
-    if (TITLE_KEYWORDS.some(k => lineLower.includes(k))) {
-      return normalizeWhitespace(line);
-    }
-  }
-  
   return "";
-}
-
-function extractSummary(text: string): string {
-  const sectionText = extractSection(text, "summary");
-  
-  if (sectionText) {
-    const cleaned = sectionText
-      .split("\n")
-      .filter(l => l.trim().length > 0)
-      .slice(0, 6)
-      .join(" ");
-    
-    const summary = normalizeWhitespace(cleaned);
-    if (summary.length > 30 && summary.length < 1500) {
-      return summary;
-    }
-  }
-  
-  return "";
-}
-
-function extractExperience(text: string, fileId: string): Experience[] {
-  const sectionText = extractSection(text, "experience");
-  const textToProcess = sectionText || text;
-  const experiences: Experience[] = [];
-  
-  const lines = textToProcess.split("\n").map(l => l.trim()).filter(l => l.length > 0);
-  
-  let currentRole = "";
-  let currentCompany = "";
-  let currentDuration = "";
-  let currentDescription: string[] = [];
-  
-  const rolePatterns = [
-    /^(Senior|Junior|Lead|Principal|Staff|Associate|Chief|Head|VP|Vice\s*President)\s+[A-Za-z\s]+/i,
-    /^[A-Z][a-zA-Z\s&\/,]+(Engineer|Developer|Architect|Consultant|Manager|Analyst|Designer|Specialist|Director|Lead|Coordinator|Administrator|Executive|Intern|Officer|Scientist)/i,
-  ];
-  
-  const companyPatterns = [
-    /^(?:at\s+)?([A-Z][A-Za-z\s&,\.]+(?:Inc|LLC|Ltd|Corp|Company|Co|Group|Technologies|Solutions|Services|Systems)?)$/i,
-    /^([A-Z][A-Za-z\s&]+),?\s*(?:[A-Z][a-z]+,?\s*[A-Z]{0,2})?$/,
-  ];
-  
-  const saveExperience = () => {
-    if (currentRole && (currentCompany || currentDescription.length > 0)) {
-      experiences.push({
-        id: generateStableId("exp", experiences.length, fileId),
-        role: normalizeWhitespace(currentRole),
-        company: normalizeWhitespace(currentCompany),
-        duration: normalizeDateRange(currentDuration),
-        description: normalizeWhitespace(currentDescription.join(" ").substring(0, 500)),
-      });
-    }
-  };
-  
-  for (const line of lines) {
-    const dateMatch = line.match(DATE_RANGE_REGEX);
-    let matchedRole = false;
-    
-    for (const pattern of rolePatterns) {
-      if (pattern.test(line)) {
-        saveExperience();
-        currentRole = line.replace(DATE_RANGE_REGEX, "").trim();
-        currentDuration = dateMatch ? dateMatch[0] : "";
-        currentCompany = "";
-        currentDescription = [];
-        matchedRole = true;
-        break;
-      }
-    }
-    
-    if (!matchedRole && currentRole) {
-      let matchedCompany = false;
-      
-      if (!currentCompany) {
-        for (const pattern of companyPatterns) {
-          const match = line.match(pattern);
-          if (match && match[1] && match[1].length > 2 && match[1].length < 60) {
-            const potential = match[1].trim();
-            const isSection = SECTION_ALIASES.experience.some(a => 
-              potential.toLowerCase().includes(a.toLowerCase())
-            );
-            if (!isSection) {
-              currentCompany = potential;
-              if (dateMatch && !currentDuration) {
-                currentDuration = dateMatch[0];
-              }
-              matchedCompany = true;
-              break;
-            }
-          }
-        }
-      }
-      
-      if (!matchedCompany && line.length > 10) {
-        if (/^[-]\s*/.test(line) || line.length > 30) {
-          currentDescription.push(line.replace(/^[-]\s*/, ""));
-        }
-      }
-    }
-  }
-  
-  saveExperience();
-  
-  return experiences.slice(0, 15);
-}
-
-function extractEducation(text: string, fileId: string): Education[] {
-  const sectionText = extractSection(text, "education");
-  const textToProcess = sectionText || text;
-  const education: Education[] = [];
-  
-  const degreePatterns = [
-    /((?:Bachelor|Master|Doctor|Ph\.?D\.?|M\.?B\.?A\.?|B\.?S\.?|M\.?S\.?|B\.?A\.?|M\.?A\.?|B\.?E\.?|M\.?E\.?|B\.?Tech|M\.?Tech|Associate|Diploma)[^\n,]*)/gi,
-  ];
-  
-  const institutionPatterns = [
-    /((?:University|College|Institute|School|Academy|Polytechnic)[^\n,]*)/gi,
-  ];
-  
-  const yearPattern = /\b(19|20)\d{2}\b/g;
-  
-  const degrees: string[] = [];
-  const institutions: string[] = [];
-  const years: string[] = [];
-  
-  for (const pattern of degreePatterns) {
-    const matches = textToProcess.match(pattern);
-    if (matches) {
-      degrees.push(...matches.map(m => normalizeWhitespace(m)));
-    }
-  }
-  
-  for (const pattern of institutionPatterns) {
-    const matches = textToProcess.match(pattern);
-    if (matches) {
-      institutions.push(...matches.map(m => normalizeWhitespace(m)));
-    }
-  }
-  
-  const yearMatches = textToProcess.match(yearPattern);
-  if (yearMatches) {
-    years.push(...yearMatches);
-  }
-  
-  const maxEntries = Math.max(degrees.length, institutions.length, 1);
-  for (let i = 0; i < Math.min(maxEntries, 5); i++) {
-    if (degrees[i] || institutions[i]) {
-      education.push({
-        id: generateStableId("edu", i, fileId),
-        degree: degrees[i] || "",
-        institution: institutions[i] || "",
-        year: years[i] || "",
-      });
-    }
-  }
-  
-  return education;
-}
-
-const COMMON_SKILLS = [
-  "JavaScript", "TypeScript", "Python", "Java", "C++", "C#", "Go", "Rust", "Ruby", "PHP", "Swift", "Kotlin",
-  "React", "Vue", "Angular", "Next.js", "Node.js", "Express", "Django", "Flask", "Spring", "Laravel",
-  "AWS", "Azure", "GCP", "Google Cloud", "Docker", "Kubernetes", "Git", "Linux", "Unix",
-  "SQL", "MySQL", "PostgreSQL", "MongoDB", "Redis", "Elasticsearch", "Oracle",
-  "Machine Learning", "Deep Learning", "TensorFlow", "PyTorch", "NLP",
-  "Agile", "Scrum", "Kanban", "DevOps", "CI/CD", "Jenkins", "GitLab",
-  "REST", "GraphQL", "API", "Microservices", "Serverless",
-  "TOGAF", "ITIL", "COBIT", "CISA", "CISSP", "PMP", "PRINCE2",
-  "SAP", "Salesforce", "ServiceNow", "Jira", "Confluence",
-  "Power BI", "Tableau", "Excel", "HTML", "CSS", "SASS", "Tailwind", "Bootstrap",
-  "Terraform", "Ansible",
-];
-
-function extractSkills(text: string): string[] {
-  const sectionText = extractSection(text, "skills");
-  const skills: string[] = [];
-  
-  if (sectionText) {
-    const lines = sectionText.split("\n").filter(l => l.trim().length > 0);
-    
-    for (const line of lines) {
-      const items = line.split(/[,;|]/).map(s => s.trim());
-      for (const item of items) {
-        const cleaned = item.replace(/^[-]\s*/, "").trim();
-        if (cleaned.length > 1 && cleaned.length < 40 && !/^\d+$/.test(cleaned)) {
-          skills.push(cleaned);
-        }
-      }
-    }
-  }
-  
-  for (const skill of COMMON_SKILLS) {
-    if (!skills.some(s => s.toLowerCase() === skill.toLowerCase())) {
-      const regex = new RegExp(`\\b${skill.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i");
-      if (regex.test(text)) {
-        skills.push(skill);
-      }
-    }
-  }
-  
-  return normalizeSkills(skills);
-}
-
-const CERT_PATTERNS = [
-  { pattern: /\b(TOGAF[\s\d.]*(?:Certified|Foundation|Practitioner)?)\b/gi, issuer: "The Open Group" },
-  { pattern: /\b(IT4IT[\s\d.]*(?:Certified|Foundation)?)\b/gi, issuer: "The Open Group" },
-  { pattern: /\b(ITIL[\s\d.v]*(?:Foundation|Practitioner|Expert|Master)?)\b/gi, issuer: "Axelos" },
-  { pattern: /\b(PMP|Project Management Professional)\b/gi, issuer: "PMI" },
-  { pattern: /\b(COBIT[\s\d.]*(?:Foundation)?)\b/gi, issuer: "ISACA" },
-  { pattern: /\b(CISA|Certified Information Systems Auditor)\b/gi, issuer: "ISACA" },
-  { pattern: /\b(AWS[\s\w-]*(?:Certified|Architect|Developer|SysOps)?)\b/gi, issuer: "Amazon" },
-  { pattern: /\b(Azure[\s\w-]*(?:Certified|Administrator|Developer)?)\b/gi, issuer: "Microsoft" },
-  { pattern: /\b(Google Cloud[\s\w-]*(?:Certified)?)\b/gi, issuer: "Google" },
-  { pattern: /\b(Lean[\s\w]*Six Sigma[\s\w]*(?:Green|Black|Yellow)?[\s\w]*Belt)\b/gi, issuer: "" },
-  { pattern: /\b(Six Sigma[\s\w]*(?:Green|Black|Yellow)?[\s\w]*Belt)\b/gi, issuer: "" },
-  { pattern: /\b(CSM|Certified Scrum Master)\b/gi, issuer: "Scrum Alliance" },
-  { pattern: /\b(PRINCE2[\s\w]*(?:Foundation|Practitioner)?)\b/gi, issuer: "Axelos" },
-  { pattern: /\b(CISSP)\b/gi, issuer: "ISC2" },
-];
-
-function extractCertifications(text: string, fileId: string): Certification[] {
-  const sectionText = extractSection(text, "certifications");
-  const certifications: Certification[] = [];
-  const seen = new Set<string>();
-  
-  if (sectionText) {
-    const lines = sectionText.split("\n").filter(l => l.trim().length > 3);
-    
-    for (const line of lines) {
-      const cleaned = line.replace(/^[-]\s*/, "").trim();
-      if (cleaned.length > 5 && cleaned.length < 150) {
-        const yearMatch = cleaned.match(/\b(19|20)\d{2}\b/);
-        const issuerMatch = cleaned.match(/[-–—]\s*([A-Za-z\s]+)(?:,|\(|$)/);
-        
-        let name = cleaned.replace(/\b(19|20)\d{2}\b/, "").trim();
-        let issuer = "";
-        
-        if (issuerMatch) {
-          issuer = normalizeWhitespace(issuerMatch[1]);
-          name = name.replace(issuerMatch[0], "").trim();
-        }
-        
-        name = normalizeWhitespace(name.replace(/[-–—,]\s*$/, ""));
-        const key = name.toLowerCase();
-        
-        if (name.length > 3 && !seen.has(key)) {
-          seen.add(key);
-          certifications.push({
-            id: generateStableId("cert", certifications.length, fileId),
-            name,
-            issuer,
-            year: yearMatch ? yearMatch[0] : "",
-          });
-        }
-      }
-    }
-  }
-  
-  for (const { pattern, issuer } of CERT_PATTERNS) {
-    const matches = text.match(pattern);
-    if (matches) {
-      for (const match of matches) {
-        const name = normalizeWhitespace(match);
-        const key = name.toLowerCase();
-        if (!seen.has(key)) {
-          seen.add(key);
-          certifications.push({
-            id: generateStableId("cert", certifications.length, fileId),
-            name,
-            issuer,
-            year: "",
-          });
-        }
-      }
-    }
-  }
-  
-  return certifications.slice(0, 20);
 }
 
 export async function parseCV(buffer: Buffer, fileName: string, fileId: string): Promise<{ cv: ParsedCV; rawText: string }> {
@@ -477,25 +247,73 @@ export async function parseCV(buffer: Buffer, fileName: string, fileId: string):
     text = normalizeText(buffer.toString("utf-8"));
   }
   
-  const rawCv: ParsedCV = {
-    id: fileId,
-    name: extractName(text),
-    title: extractTitle(text),
-    email: extractEmail(text),
-    phone: extractPhone(text),
-    location: extractLocation(text),
-    website: extractWebsite(text),
-    linkedin: extractLinkedIn(text),
-    github: extractGithub(text),
-    summary: extractSummary(text),
-    experience: extractExperience(text, fileId),
-    education: extractEducation(text, fileId),
-    certifications: extractCertifications(text, fileId),
-    skills: extractSkills(text),
-    originalFilename: fileName,
-    uploadedAt: new Date(),
-    rawText: text,
-  };
+  // Try Gemini AI extraction first
+  const geminiData = await extractWithGemini(text);
+  
+  let rawCv: ParsedCV;
+  
+  if (geminiData) {
+    // Use Gemini-extracted data
+    rawCv = {
+      id: fileId,
+      name: normalizeWhitespace(geminiData.name || ""),
+      title: normalizeWhitespace(geminiData.title || ""),
+      email: normalizeEmail(geminiData.email || ""),
+      phone: normalizePhone(geminiData.phone || ""),
+      location: normalizeWhitespace(geminiData.location || ""),
+      website: normalizeUrl(geminiData.website || ""),
+      linkedin: geminiData.linkedin ? 
+        (geminiData.linkedin.includes("linkedin.com") ? geminiData.linkedin : `linkedin.com/in/${geminiData.linkedin}`) : "",
+      github: geminiData.github ?
+        (geminiData.github.includes("github.com") ? geminiData.github : `github.com/${geminiData.github}`) : "",
+      summary: normalizeWhitespace(geminiData.summary || ""),
+      experience: (geminiData.experience || []).map((exp, i) => ({
+        id: generateStableId("exp", i, fileId),
+        company: normalizeWhitespace(exp.company || ""),
+        role: normalizeWhitespace(exp.role || ""),
+        duration: normalizeDateRange(exp.duration || ""),
+        description: normalizeWhitespace(exp.description || ""),
+      })),
+      education: (geminiData.education || []).map((edu, i) => ({
+        id: generateStableId("edu", i, fileId),
+        institution: normalizeWhitespace(edu.institution || ""),
+        degree: normalizeWhitespace(edu.degree || ""),
+        year: edu.year || "",
+      })),
+      certifications: (geminiData.certifications || []).map((cert, i) => ({
+        id: generateStableId("cert", i, fileId),
+        name: normalizeWhitespace(cert.name || ""),
+        issuer: normalizeWhitespace(cert.issuer || ""),
+        year: cert.year || "",
+      })),
+      skills: normalizeSkills(geminiData.skills || []),
+      originalFilename: fileName,
+      uploadedAt: new Date(),
+      rawText: text,
+    };
+  } else {
+    // Fallback to basic regex extraction
+    console.log("Using fallback regex extraction");
+    rawCv = {
+      id: fileId,
+      name: extractNameFallback(text),
+      title: "",
+      email: extractEmailFallback(text),
+      phone: extractPhoneFallback(text),
+      location: "",
+      website: "",
+      linkedin: extractLinkedInFallback(text),
+      github: extractGithubFallback(text),
+      summary: "",
+      experience: [],
+      education: [],
+      certifications: [],
+      skills: [],
+      originalFilename: fileName,
+      uploadedAt: new Date(),
+      rawText: text,
+    };
+  }
   
   const cv = validateAndNormalizeCV(rawCv);
   

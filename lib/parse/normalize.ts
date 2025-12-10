@@ -42,28 +42,53 @@ const MONTH_MAP: Record<string, string> = {
 export function normalizeDateRange(dateStr: string): string {
   if (!dateStr) return "";
   
-  let normalized = dateStr.toLowerCase().trim();
+  let normalized = dateStr.trim();
   
+  // First, normalize "Present", "Current", etc. before lowercasing
+  normalized = normalized.replace(/\b(present|current|now|ongoing)\b/gi, "PRESENT_MARKER");
+  
+  normalized = normalized.toLowerCase();
+  
+  // Normalize months
   for (const month of MONTH_NAMES) {
     const regex = new RegExp(`\\b${month}\\.?\\b`, "gi");
     normalized = normalized.replace(regex, MONTH_MAP[month] || month);
   }
   
-  normalized = normalized.replace(/\s*[-–—to]+\s*/gi, " - ");
-  normalized = normalized.replace(/\b(present|current|now|ongoing)\b/gi, "Present");
+  // Normalize dashes and "to" (but not individual t/o chars)
+  normalized = normalized.replace(/\s*[-–—]+\s*/g, " - ");
+  normalized = normalized.replace(/\s+to\s+/gi, " - ");
+  
+  // Restore Present marker
+  normalized = normalized.replace(/present_marker/gi, "Present");
   normalized = normalized.replace(/since\s+(\d{4})/gi, "$1 - Present");
   
-  const words = normalized.split(" ");
+  const words = normalized.split(/\s+/);
   const result: string[] = [];
+  
   for (const word of words) {
-    if (word === "-" || /^\d{4}$/.test(word) || MONTH_MAP[word.toLowerCase()] || word === "Present") {
-      result.push(word.charAt(0).toUpperCase() + word.slice(1));
-    } else if (/^[A-Z][a-z]{2}$/.test(word)) {
-      result.push(word);
+    const cleanWord = word.trim();
+    if (!cleanWord) continue;
+    
+    if (cleanWord === "-") {
+      result.push("-");
+    } else if (/^\d{4}$/.test(cleanWord)) {
+      result.push(cleanWord);
+    } else if (cleanWord.toLowerCase() === "present") {
+      result.push("Present");
+    } else if (MONTH_MAP[cleanWord.toLowerCase()]) {
+      result.push(MONTH_MAP[cleanWord.toLowerCase()]);
+    } else if (/^[A-Z][a-z]{2}$/.test(cleanWord)) {
+      result.push(cleanWord);
     }
   }
   
-  return result.join(" ").replace(/\s+/g, " ").trim() || dateStr.trim();
+  // Clean up double dashes
+  let final = result.join(" ").replace(/\s+/g, " ").trim();
+  final = final.replace(/\s*-\s*-\s*/g, " - ");
+  final = final.replace(/\s*-\s*$/g, ""); // Remove trailing dash
+  
+  return final || dateStr.trim();
 }
 
 export function normalizeEmail(email: string): string {
@@ -139,7 +164,7 @@ function normalizeEducation(education: Education[], fileId: string): Education[]
     id: edu.id || generateStableId("edu", index, fileId),
     degree: normalizeWhitespace(edu.degree || ""),
     institution: normalizeWhitespace(edu.institution || ""),
-    year: edu.year?.trim() || "",
+    year: String(edu.year || "").trim(),
   })).filter(edu => edu.degree || edu.institution);
 }
 
@@ -150,7 +175,7 @@ function normalizeCertifications(certs: Certification[], fileId: string): Certif
     id: cert.id || generateStableId("cert", index, fileId),
     name: normalizeWhitespace(cert.name || ""),
     issuer: normalizeWhitespace(cert.issuer || ""),
-    year: cert.year?.trim() || "",
+    year: String(cert.year || "").trim(),
   })).filter(cert => {
     if (!cert.name) return false;
     const key = cert.name.toLowerCase();
