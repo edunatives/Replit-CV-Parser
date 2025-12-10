@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import type { ParsedCV } from "@/types/cv";
+import { formatCVSummary, buildAssessmentPrompt, cleanAIResponse } from "@/lib/ai/rules";
 
 /**
  * CV Assessment result structure
@@ -99,59 +100,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const cvSummary = `
-Name: ${cv.name || "Not provided"}
-Title: ${cv.title || "Not provided"}
-Email: ${cv.email || "Not provided"}
-Phone: ${cv.phone || "Not provided"}
-Location: ${cv.location || "Not provided"}
-LinkedIn: ${cv.linkedin || "Not provided"}
-GitHub: ${cv.github || "Not provided"}
-Website: ${cv.website || "Not provided"}
-
-Summary:
-${cv.summary || "Not provided"}
-
-Experience (${cv.experience?.length || 0} positions):
-${cv.experience?.map(exp => `- ${exp.role} at ${exp.company} (${exp.duration})\n  ${exp.description}`).join("\n") || "None listed"}
-
-Education (${cv.education?.length || 0} entries):
-${cv.education?.map(edu => `- ${edu.degree} from ${edu.institution} (${edu.year})`).join("\n") || "None listed"}
-
-Skills (${cv.skills?.length || 0}):
-${cv.skills?.join(", ") || "None listed"}
-
-Certifications (${cv.certifications?.length || 0}):
-${cv.certifications?.map(cert => `- ${cert.name} by ${cert.issuer} (${cert.year})`).join("\n") || "None listed"}
-`;
-
-    const prompt = `You are an expert CV/Resume analyst and career advisor. Analyze the following CV and provide a comprehensive assessment.
-
-CV DATA:
-${cvSummary}
-
-Provide your assessment as a valid JSON object with this exact structure:
-{
-  "overallScore": <number 0-100>,
-  "sections": [
-    {"name": "Contact Information", "score": <0-100>, "feedback": "<specific feedback>"},
-    {"name": "Professional Summary", "score": <0-100>, "feedback": "<specific feedback>"},
-    {"name": "Work Experience", "score": <0-100>, "feedback": "<specific feedback>"},
-    {"name": "Education", "score": <0-100>, "feedback": "<specific feedback>"},
-    {"name": "Skills", "score": <0-100>, "feedback": "<specific feedback>"},
-    {"name": "Overall Presentation", "score": <0-100>, "feedback": "<specific feedback>"}
-  ],
-  "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
-  "weaknesses": ["<weakness 1>", "<weakness 2>", "<weakness 3>"],
-  "recommendations": ["<actionable recommendation 1>", "<actionable recommendation 2>", "<actionable recommendation 3>", "<actionable recommendation 4>", "<actionable recommendation 5>"]
-}
-
-IMPORTANT:
-- Return ONLY valid JSON, no markdown, no code blocks, no explanations
-- Be specific and actionable in your feedback
-- Consider ATS (Applicant Tracking System) compatibility
-- Score based on completeness, clarity, impact, and professional presentation
-- Recommendations should be specific and actionable`;
+    const cvSummary = formatCVSummary(cv);
+    const prompt = buildAssessmentPrompt(cvSummary);
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
@@ -159,14 +109,7 @@ IMPORTANT:
     });
 
     const responseText = response.text?.trim() || "";
-    
-    let jsonText = responseText;
-    if (responseText.includes("```json")) {
-      jsonText = responseText.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
-    } else if (responseText.includes("```")) {
-      jsonText = responseText.replace(/```\s*/g, "").trim();
-    }
-
+    const jsonText = cleanAIResponse(responseText);
     const assessment = JSON.parse(jsonText);
 
     const tokenUsage = {

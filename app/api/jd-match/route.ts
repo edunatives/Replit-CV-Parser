@@ -12,6 +12,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import type { ParsedCV } from "@/types/cv";
+import { formatCVForJDMatch, buildJDMatchPrompt, cleanAIResponse } from "@/lib/ai/rules";
 
 /**
  * Job Description match analysis result
@@ -106,64 +107,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const cvSummary = `
-CANDIDATE'S CV:
-Name: ${cv.name || "Not provided"}
-Title: ${cv.title || "Not provided"}
-Summary: ${cv.summary || "Not provided"}
-
-Experience:
-${cv.experience?.map(exp => `- ${exp.role} at ${exp.company} (${exp.duration})\n  ${exp.description}`).join("\n") || "None"}
-
-Education:
-${cv.education?.map(edu => `- ${edu.degree} from ${edu.institution} (${edu.year})`).join("\n") || "None"}
-
-Skills: ${cv.skills?.join(", ") || "None"}
-
-Certifications:
-${cv.certifications?.map(cert => `- ${cert.name} by ${cert.issuer}`).join("\n") || "None"}
-`;
-
-    const prompt = `You are an expert recruiter and ATS (Applicant Tracking System) specialist. Compare the candidate's CV against the job description and provide a detailed match analysis.
-
-${cvSummary}
-
-JOB DESCRIPTION:
-${jobDescription}
-
-Analyze the match and provide your assessment as a valid JSON object with this exact structure:
-{
-  "matchScore": <number 0-100 representing overall match percentage>,
-  "matchedSkills": ["<skill from CV that matches JD>", "<skill 2>", ...],
-  "missingSkills": ["<required skill not in CV>", "<skill 2>", ...],
-  "experienceMatch": {
-    "score": <0-100>,
-    "feedback": "<specific feedback about experience alignment>"
-  },
-  "educationMatch": {
-    "score": <0-100>,
-    "feedback": "<specific feedback about education requirements>"
-  },
-  "overallFeedback": "<2-3 sentence summary of how well the candidate matches>",
-  "suggestions": [
-    "<specific suggestion to improve match>",
-    "<suggestion 2>",
-    "<suggestion 3>"
-  ],
-  "keywordOptimizations": [
-    "<keyword from JD to add to CV>",
-    "<keyword 2>",
-    "<keyword 3>"
-  ]
-}
-
-IMPORTANT:
-- Return ONLY valid JSON, no markdown, no code blocks
-- Be specific about which skills match and which are missing
-- Consider both hard skills and soft skills
-- Factor in experience level requirements
-- Provide actionable suggestions for improving the match
-- List keywords that should be added to the CV for ATS optimization`;
+    const cvSummary = formatCVForJDMatch(cv);
+    const prompt = buildJDMatchPrompt(cvSummary, jobDescription);
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
@@ -171,14 +116,7 @@ IMPORTANT:
     });
 
     const responseText = response.text?.trim() || "";
-    
-    let jsonText = responseText;
-    if (responseText.includes("```json")) {
-      jsonText = responseText.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
-    } else if (responseText.includes("```")) {
-      jsonText = responseText.replace(/```\s*/g, "").trim();
-    }
-
+    const jsonText = cleanAIResponse(responseText);
     const matchResult = JSON.parse(jsonText);
 
     const tokenUsage = {

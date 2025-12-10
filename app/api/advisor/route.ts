@@ -12,6 +12,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import type { ParsedCV } from "@/types/cv";
+import { formatCVSummary, buildAdvisorPrompt, formatConversationHistory } from "@/lib/ai/rules";
 
 /**
  * Chat message structure for conversation history
@@ -80,48 +81,9 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const cvContext = `
-CANDIDATE'S CV INFORMATION:
-Name: ${cv.name || "Not provided"}
-Title: ${cv.title || "Not provided"}
-Summary: ${cv.summary || "Not provided"}
-
-Experience:
-${cv.experience?.map(exp => `- ${exp.role} at ${exp.company} (${exp.duration}): ${exp.description}`).join("\n") || "None listed"}
-
-Education:
-${cv.education?.map(edu => `- ${edu.degree} from ${edu.institution} (${edu.year})`).join("\n") || "None listed"}
-
-Skills: ${cv.skills?.join(", ") || "None listed"}
-
-Certifications:
-${cv.certifications?.map(cert => `- ${cert.name} by ${cert.issuer}`).join("\n") || "None listed"}
-`;
-
-    const conversationHistory = history
-      ?.slice(-10)
-      .map(msg => `${msg.role === "user" ? "User" : "Advisor"}: ${msg.content}`)
-      .join("\n\n") || "";
-
-    const systemPrompt = `You are an expert career advisor and CV consultant helping a job seeker improve their resume. You have access to their CV information and should provide personalized, actionable advice.
-
-${cvContext}
-
-PREVIOUS CONVERSATION:
-${conversationHistory}
-
-GUIDELINES:
-- Be friendly, encouraging, and professional
-- Provide specific, actionable advice based on their actual CV content
-- Reference specific sections of their CV when giving feedback
-- Consider industry best practices and ATS optimization
-- Keep responses concise but helpful (2-3 paragraphs max)
-- If asked about something not in the CV, suggest they add it
-- Focus on practical improvements they can make immediately
-
-USER'S QUESTION: ${message}
-
-Provide a helpful response:`;
+    const cvContext = formatCVSummary(cv);
+    const conversationHistoryText = formatConversationHistory(history || []);
+    const systemPrompt = buildAdvisorPrompt(cvContext, conversationHistoryText, message);
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",

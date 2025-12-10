@@ -13,6 +13,7 @@ import LinkIcon from "@mui/icons-material/Link";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import type { ParsedCV, TemplateType } from "@/types/cv";
 import { useState, useRef } from "react";
+import { isDeveloperRole } from "@/lib/ai/rules";
 
 interface CVPreviewProps {
   cv: ParsedCV;
@@ -301,14 +302,7 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
 
   const style = templateStyles[template] || templateStyles["modern-dark"];
 
-  const isDeveloperRole = () => {
-    const devKeywords = ["developer", "engineer", "programmer", "software", "frontend", "backend", "full stack", "fullstack", "devops", "sre", "coding", "web dev", "mobile dev", "ios", "android", "react", "node", "python", "java", "javascript", "typescript", "golang", "rust", "c++", "data engineer", "ml engineer", "machine learning", "ai engineer"];
-    const titleLower = (cv.title || "").toLowerCase();
-    const summaryLower = (cv.summary || "").toLowerCase();
-    return devKeywords.some(kw => titleLower.includes(kw) || summaryLower.includes(kw));
-  };
-
-  const showGitHub = isDeveloperRole();
+  const showGitHub = isDeveloperRole(cv.title || "", cv.summary || "");
 
   return (
     <Paper elevation={2} sx={{ overflow: "hidden", bgcolor: style.bodyBg }} data-testid="cv-preview">

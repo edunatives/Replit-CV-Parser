@@ -132,6 +132,7 @@ Custom MUI theme with:
   /cv                         - CV feature module
   /database                   - Database module
 /lib
+  /ai/rules.ts                - Centralized AI rules, prompts, and scoring rubrics
   /db/mongodb.ts              - MongoDB connection utility (JSDoc documented)
   /parse/parseCv.ts           - CV parsing logic with AI extraction (JSDoc documented)
   /parse/normalize.ts         - Deterministic normalization functions (JSDoc documented)

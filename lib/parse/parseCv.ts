@@ -24,6 +24,7 @@ import {
   validateAndNormalizeCV,
 } from "./normalize";
 import { GoogleGenAI } from "@google/genai";
+import { buildCVParsingPrompt, cleanAIResponse } from "@/lib/ai/rules";
 
 type PdfParseResult = { text: string; numpages: number };
 
@@ -122,41 +123,7 @@ async function extractWithGemini(text: string): Promise<GeminiExtractionResult |
       },
     });
 
-    const prompt = `You are an expert CV/Resume parser. Extract structured information from the following CV text and return it as a valid JSON object.
-
-IMPORTANT: Return ONLY a valid JSON object, no markdown formatting, no code blocks, no explanations.
-
-Extract the following fields:
-- name: Full name of the candidate
-- title: Professional title or current job title
-- email: Email address
-- phone: Phone number (include country code if present)
-- location: City, State/Country
-- website: Personal website URL (not LinkedIn or GitHub)
-- linkedin: LinkedIn profile URL or username
-- github: GitHub profile URL or username
-- summary: Professional summary or objective (combine multiple paragraphs if needed)
-- experience: Array of work experiences, each with:
-  - company: Company name
-  - role: Job title/role
-  - duration: Date range (e.g., "Jan 2020 - Present")
-  - description: Key responsibilities and achievements. IMPORTANT: Preserve bullet points using "• " prefix and separate each bullet with a newline character. Example format: "• Led team of 5 engineers\n• Increased revenue by 20%\n• Implemented CI/CD pipeline"
-- education: Array of education entries, each with:
-  - institution: School/University name
-  - degree: Degree type and field (e.g., "Bachelor of Science in Computer Science")
-  - year: Graduation year or date range
-- certifications: Array of certifications, each with:
-  - name: Certification name
-  - issuer: Issuing organization
-  - year: Year obtained
-- skills: Array of technical and soft skills as strings
-
-If a field is not found in the CV, use an empty string for text fields or an empty array for array fields.
-
-CV TEXT:
-${text}
-
-Return ONLY the JSON object:`;
+    const prompt = buildCVParsingPrompt(text);
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
@@ -176,17 +143,7 @@ Return ONLY the JSON object:`;
     console.log(`Gemini token usage - Prompt: ${tokenUsage.promptTokens}, Completion: ${tokenUsage.completionTokens}, Total: ${tokenUsage.totalTokens}`);
     
     // Clean up response - remove markdown code blocks if present
-    let jsonText = responseText;
-    if (jsonText.startsWith("```json")) {
-      jsonText = jsonText.slice(7);
-    } else if (jsonText.startsWith("```")) {
-      jsonText = jsonText.slice(3);
-    }
-    if (jsonText.endsWith("```")) {
-      jsonText = jsonText.slice(0, -3);
-    }
-    jsonText = jsonText.trim();
-
+    const jsonText = cleanAIResponse(responseText);
     const parsed = JSON.parse(jsonText) as GeminiCVResponse;
     console.log("Gemini extraction successful");
     return { data: parsed, tokenUsage };
