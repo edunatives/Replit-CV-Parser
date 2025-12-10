@@ -23,7 +23,7 @@ import type { ParsedCV } from "@/types/cv";
  *    - Max CV text: 50,000 characters (truncate longer documents)
  *    - Max job description: 10,000 characters
  *    - Max chat message: 2,000 characters
- *    - Max conversation history: 10 messages (older messages dropped)
+ *    - Max conversation history: 20 messages (older messages dropped)
  * 
  * 2. RESPONSE LIMITS:
  *    - Set maxOutputTokens in API calls (e.g., 2048 for parsing, 1024 for chat)
@@ -47,7 +47,7 @@ export const TOKEN_LIMITS = {
   maxCVTextLength: 50000,
   maxJobDescriptionLength: 10000,
   maxChatMessageLength: 2000,
-  maxConversationHistory: 10,
+  maxConversationHistory: 20,
   maxOutputTokens: {
     parsing: 2048,
     assessment: 1024,
@@ -126,7 +126,7 @@ export function sanitizeAIInput(text: string): string {
  * 
  * 1. FILE UPLOAD SECURITY:
  *    - Validate file type by magic bytes, not just extension
- *    - Max file size: 10MB
+ *    - Max file size: 3MB
  *    - Allowed types: PDF, DOCX, DOC, TXT only
  *    - Scan uploaded files for malware (future: integrate ClamAV)
  *    - Process uploads in isolated sandbox
@@ -156,7 +156,7 @@ export function sanitizeAIInput(text: string): string {
  *    - Never expose internal IDs in error messages
  */
 export const UPLOAD_LIMITS = {
-  maxFileSize: 10 * 1024 * 1024, // 10MB
+  maxFileSize: 3 * 1024 * 1024, // 3MB
   allowedMimeTypes: [
     "application/pdf",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",

@@ -1858,7 +1858,7 @@ const TOKEN_LIMITS = {
     maxCVTextLength: 50000,
     maxJobDescriptionLength: 10000,
     maxChatMessageLength: 2000,
-    maxConversationHistory: 10,
+    maxConversationHistory: 20,
     maxOutputTokens: {
         parsing: 2048,
         assessment: 1024,
@@ -1893,7 +1893,7 @@ function sanitizeAIInput(text) {
     return sanitized;
 }
 const UPLOAD_LIMITS = {
-    maxFileSize: 10 * 1024 * 1024,
+    maxFileSize: 3 * 1024 * 1024,
     allowedMimeTypes: [
         "application/pdf",
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
