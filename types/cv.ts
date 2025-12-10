@@ -4,6 +4,7 @@ export interface Experience {
   role: string;
   duration: string;
   description: string;
+  location?: string;
 }
 
 export interface Education {

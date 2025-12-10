@@ -19,11 +19,87 @@ import type { ParsedCV, TemplateType, CVSection } from "@/types/cv";
 import { DEFAULT_SECTION_ORDER } from "@/types/cv";
 import { useState, useRef } from "react";
 import { isDeveloperRole } from "@/lib/ai/rules";
+import { getTemplateStyle } from "@/lib/templates";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 
 interface CVPreviewProps {
   cv: ParsedCV;
   template: TemplateType;
   onUpdateCV: (cv: ParsedCV) => void;
+}
+
+function SectionHeader({ 
+  title, 
+  section,
+  style, 
+  sectionOrder,
+  onMoveSection,
+  rightContent 
+}: { 
+  title: string; 
+  section: CVSection;
+  style: ReturnType<typeof getTemplateStyle>;
+  sectionOrder: CVSection[];
+  onMoveSection: (section: CVSection, direction: "up" | "down") => void;
+  rightContent?: React.ReactNode;
+}) {
+  const isUnderline = style.sectionHeaderVariant === "underline";
+  const isCenteredLines = style.sectionHeaderVariant === "centeredLines";
+  
+  return (
+    <Box sx={{ mb: 1 }}>
+      <Box sx={{ display: "flex", alignItems: "center", "&:hover .order-btns": { visibility: "visible" } }}>
+        {isCenteredLines && <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />}
+        <Typography 
+          variant="h6" 
+          sx={{ 
+            color: style.accent, 
+            mx: isCenteredLines ? 2 : 0, 
+            fontFamily: "'Arial', sans-serif",
+            textTransform: isUnderline ? "uppercase" : "none",
+            fontWeight: isUnderline ? 600 : 500,
+            letterSpacing: isUnderline ? "0.05em" : "normal",
+          }}
+        >
+          {title}
+        </Typography>
+        {isCenteredLines && <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />}
+        <Box className="order-btns" sx={{ display: "flex", visibility: "hidden", ml: 1 }}>
+          <Tooltip title="Move up">
+            <span>
+              <IconButton 
+                size="small" 
+                onClick={() => onMoveSection(section, "up")}
+                disabled={sectionOrder.indexOf(section) === 0}
+                sx={{ color: style.accent, p: 0.25 }}
+                data-testid={`button-move-${section}-up`}
+              >
+                <KeyboardArrowUpIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Tooltip title="Move down">
+            <span>
+              <IconButton 
+                size="small" 
+                onClick={() => onMoveSection(section, "down")}
+                disabled={sectionOrder.indexOf(section) === sectionOrder.length - 1}
+                sx={{ color: style.accent, p: 0.25 }}
+                data-testid={`button-move-${section}-down`}
+              >
+                <KeyboardArrowDownIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+        </Box>
+        {!isCenteredLines && <Box sx={{ flex: 1 }} />}
+        {rightContent}
+      </Box>
+      {isUnderline && (
+        <Box sx={{ height: "2px", width: "100%", bgcolor: style.accent, mt: 0.5, mb: 1 }} />
+      )}
+    </Box>
+  );
 }
 
 function EditableField({ 
@@ -392,17 +468,7 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
     onUpdateCV({ ...cv, certifications: [...(cv.certifications || []), newCert] });
   };
 
-  const templateStyles = {
-    "modern-dark": { headerBg: "#1a1a2e", accent: "#d4af37", headerText: "#ffffff", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "none", headerCentered: false },
-    "classic-light": { headerBg: "#f5f5f5", accent: "#2c3e50", headerText: "#1a1a1a", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "1px solid #e0e0e0", headerCentered: false },
-    "executive": { headerBg: "#0a192f", accent: "#64ffda", headerText: "#ffffff", bodyBg: "#f8f9fa", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "none", headerCentered: false },
-    "minimal": { headerBg: "#ffffff", accent: "#000000", headerText: "#1a1a1a", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "2px solid #000000", headerCentered: false },
-    "creative": { headerBg: "#667eea", accent: "#9b59b6", headerText: "#ffffff", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "none", headerCentered: false },
-    "professional": { headerBg: "#2d3436", accent: "#74b9ff", headerText: "#ffffff", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "none", headerCentered: false },
-    "corporate": { headerBg: "#d4e5ed", accent: "#1a5276", headerText: "#1a5276", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "none", headerCentered: true },
-  };
-
-  const style = templateStyles[template] || templateStyles["modern-dark"];
+  const style = getTemplateStyle(template);
 
   const showGitHub = isDeveloperRole(cv.title || "", cv.summary || "");
 
@@ -487,41 +553,13 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
 
       <Box sx={{ p: 3, color: style.bodyText }}>
         <Box sx={{ mb: 3 }}>
-          <Box sx={{ display: "flex", alignItems: "center", mb: 1, "&:hover .order-btns": { visibility: "visible" } }}>
-            {style.headerCentered && <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />}
-            <Typography variant="h6" sx={{ color: style.accent, mx: style.headerCentered ? 2 : 0, fontFamily: "'Arial', sans-serif" }}>
-              Summary
-            </Typography>
-            {style.headerCentered && <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />}
-            <Box className="order-btns" sx={{ display: "flex", visibility: "hidden", ml: 1 }}>
-              <Tooltip title="Move up">
-                <span>
-                  <IconButton 
-                    size="small" 
-                    onClick={() => moveSection("summary", "up")}
-                    disabled={sectionOrder.indexOf("summary") === 0}
-                    sx={{ color: style.accent, p: 0.25 }}
-                    data-testid="button-move-summary-up"
-                  >
-                    <KeyboardArrowUpIcon fontSize="small" />
-                  </IconButton>
-                </span>
-              </Tooltip>
-              <Tooltip title="Move down">
-                <span>
-                  <IconButton 
-                    size="small" 
-                    onClick={() => moveSection("summary", "down")}
-                    disabled={sectionOrder.indexOf("summary") === sectionOrder.length - 1}
-                    sx={{ color: style.accent, p: 0.25 }}
-                    data-testid="button-move-summary-down"
-                  >
-                    <KeyboardArrowDownIcon fontSize="small" />
-                  </IconButton>
-                </span>
-              </Tooltip>
-            </Box>
-          </Box>
+          <SectionHeader
+            title="Summary"
+            section="summary"
+            style={style}
+            sectionOrder={sectionOrder}
+            onMoveSection={moveSection}
+          />
           <Typography variant="body2" sx={{ color: style.bodyTextSecondary, whiteSpace: "pre-wrap" }} component="div">
             <EditableField 
               value={cv.summary} 
@@ -533,33 +571,18 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
         </Box>
 
         <Box sx={{ mb: 3 }}>
-          <Box sx={{ display: "flex", alignItems: "center", mb: 1, "&:hover .order-btns": { visibility: "visible" } }}>
-            {style.headerCentered && <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />}
-            <Typography variant="h6" sx={{ color: style.accent, mx: style.headerCentered ? 2 : 0, fontFamily: "'Arial', sans-serif" }}>
-              Experience
-            </Typography>
-            {style.headerCentered && <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />}
-            <Box className="order-btns" sx={{ display: "flex", visibility: "hidden", ml: 1 }}>
-              <Tooltip title="Move up">
-                <span>
-                  <IconButton size="small" onClick={() => moveSection("experience", "up")} disabled={sectionOrder.indexOf("experience") === 0} sx={{ color: style.accent, p: 0.25 }}>
-                    <KeyboardArrowUpIcon fontSize="small" />
-                  </IconButton>
-                </span>
-              </Tooltip>
-              <Tooltip title="Move down">
-                <span>
-                  <IconButton size="small" onClick={() => moveSection("experience", "down")} disabled={sectionOrder.indexOf("experience") === sectionOrder.length - 1} sx={{ color: style.accent, p: 0.25 }}>
-                    <KeyboardArrowDownIcon fontSize="small" />
-                  </IconButton>
-                </span>
-              </Tooltip>
-            </Box>
-            <Box sx={{ flex: style.headerCentered ? 0 : 1 }} />
-            <IconButton size="small" onClick={addExperience} sx={{ color: style.accent }} data-testid="button-add-experience">
-              <AddIcon fontSize="small" />
-            </IconButton>
-          </Box>
+          <SectionHeader
+            title="Experience"
+            section="experience"
+            style={style}
+            sectionOrder={sectionOrder}
+            onMoveSection={moveSection}
+            rightContent={
+              <IconButton size="small" onClick={addExperience} sx={{ color: style.accent }} data-testid="button-add-experience">
+                <AddIcon fontSize="small" />
+              </IconButton>
+            }
+          />
           {cv.experience.map((exp, index) => (
             <Box key={exp.id} sx={{ mb: 2, position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
               <IconButton 
@@ -578,22 +601,30 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
                   placeholder="Job Title"
                 />
               </Typography>
-              <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap" }}>
-                <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
-                  <EditableField 
-                    value={exp.company} 
-                    onChange={(v) => updateExperience(index, "company", v)} 
-                    placeholder="Company Name"
-                  />
-                </Typography>
-                <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>|</Typography>
-                <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
+              <Typography variant="body2" sx={{ color: style.companyColor, fontWeight: 500 }}>
+                <EditableField 
+                  value={exp.company} 
+                  onChange={(v) => updateExperience(index, "company", v)} 
+                  placeholder="Company Name"
+                />
+              </Typography>
+              <Box sx={{ display: "flex", gap: 2, alignItems: "center", flexWrap: "wrap", mt: 0.25 }}>
+                {style.showMetaIcons && <CalendarMonthIcon sx={{ fontSize: 14, color: style.bodyTextSecondary }} />}
+                <Typography variant="body2" sx={{ color: style.bodyTextSecondary, ml: style.showMetaIcons ? -1.5 : 0 }}>
                   <EditableField 
                     value={exp.duration} 
                     onChange={(v) => updateExperience(index, "duration", v)} 
                     placeholder="Duration"
                   />
                 </Typography>
+                {exp.location && (
+                  <>
+                    {style.showMetaIcons && <LocationOnIcon sx={{ fontSize: 14, color: style.bodyTextSecondary }} />}
+                    <Typography variant="body2" sx={{ color: style.bodyTextSecondary, ml: style.showMetaIcons ? -1.5 : 0 }}>
+                      {exp.location}
+                    </Typography>
+                  </>
+                )}
               </Box>
               <Typography variant="body2" sx={{ mt: 0.5, color: style.bodyText, whiteSpace: "pre-wrap" }} component="div">
                 <EditableField 
@@ -616,33 +647,18 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
         </Box>
 
         <Box sx={{ mb: 3 }}>
-          <Box sx={{ display: "flex", alignItems: "center", mb: 1, "&:hover .order-btns": { visibility: "visible" } }}>
-            {style.headerCentered && <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />}
-            <Typography variant="h6" sx={{ color: style.accent, mx: style.headerCentered ? 2 : 0, fontFamily: "'Arial', sans-serif" }}>
-              Education
-            </Typography>
-            {style.headerCentered && <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />}
-            <Box className="order-btns" sx={{ display: "flex", visibility: "hidden", ml: 1 }}>
-              <Tooltip title="Move up">
-                <span>
-                  <IconButton size="small" onClick={() => moveSection("education", "up")} disabled={sectionOrder.indexOf("education") === 0} sx={{ color: style.accent, p: 0.25 }}>
-                    <KeyboardArrowUpIcon fontSize="small" />
-                  </IconButton>
-                </span>
-              </Tooltip>
-              <Tooltip title="Move down">
-                <span>
-                  <IconButton size="small" onClick={() => moveSection("education", "down")} disabled={sectionOrder.indexOf("education") === sectionOrder.length - 1} sx={{ color: style.accent, p: 0.25 }}>
-                    <KeyboardArrowDownIcon fontSize="small" />
-                  </IconButton>
-                </span>
-              </Tooltip>
-            </Box>
-            <Box sx={{ flex: style.headerCentered ? 0 : 1 }} />
-            <IconButton size="small" onClick={addEducation} sx={{ color: style.accent }} data-testid="button-add-education">
-              <AddIcon fontSize="small" />
-            </IconButton>
-          </Box>
+          <SectionHeader
+            title="Education"
+            section="education"
+            style={style}
+            sectionOrder={sectionOrder}
+            onMoveSection={moveSection}
+            rightContent={
+              <IconButton size="small" onClick={addEducation} sx={{ color: style.accent }} data-testid="button-add-education">
+                <AddIcon fontSize="small" />
+              </IconButton>
+            }
+          />
           {cv.education.map((edu, index) => (
             <Box key={edu.id} sx={{ mb: 1, position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
               <IconButton 
@@ -689,33 +705,18 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
         </Box>
 
         <Box sx={{ mb: 3 }}>
-          <Box sx={{ display: "flex", alignItems: "center", mb: 1, "&:hover .order-btns": { visibility: "visible" } }}>
-            {style.headerCentered && <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />}
-            <Typography variant="h6" sx={{ color: style.accent, mx: style.headerCentered ? 2 : 0, fontFamily: "'Arial', sans-serif" }}>
-              Skills
-            </Typography>
-            {style.headerCentered && <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />}
-            <Box className="order-btns" sx={{ display: "flex", visibility: "hidden", ml: 1 }}>
-              <Tooltip title="Move up">
-                <span>
-                  <IconButton size="small" onClick={() => moveSection("skills", "up")} disabled={sectionOrder.indexOf("skills") === 0} sx={{ color: style.accent, p: 0.25 }}>
-                    <KeyboardArrowUpIcon fontSize="small" />
-                  </IconButton>
-                </span>
-              </Tooltip>
-              <Tooltip title="Move down">
-                <span>
-                  <IconButton size="small" onClick={() => moveSection("skills", "down")} disabled={sectionOrder.indexOf("skills") === sectionOrder.length - 1} sx={{ color: style.accent, p: 0.25 }}>
-                    <KeyboardArrowDownIcon fontSize="small" />
-                  </IconButton>
-                </span>
-              </Tooltip>
-            </Box>
-            <Box sx={{ flex: style.headerCentered ? 0 : 1 }} />
-            <IconButton size="small" onClick={addSkill} sx={{ color: style.accent }} data-testid="button-add-skill">
-              <AddIcon fontSize="small" />
-            </IconButton>
-          </Box>
+          <SectionHeader
+            title="Skills"
+            section="skills"
+            style={style}
+            sectionOrder={sectionOrder}
+            onMoveSection={moveSection}
+            rightContent={
+              <IconButton size="small" onClick={addSkill} sx={{ color: style.accent }} data-testid="button-add-skill">
+                <AddIcon fontSize="small" />
+              </IconButton>
+            }
+          />
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
             {cv.skills.map((skill, index) => (
               <EditableSkillChip
@@ -736,33 +737,18 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
         </Box>
 
         <Box sx={{ mb: 3 }}>
-          <Box sx={{ display: "flex", alignItems: "center", mb: 1, "&:hover .order-btns": { visibility: "visible" } }}>
-            {style.headerCentered && <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />}
-            <Typography variant="h6" sx={{ color: style.accent, mx: style.headerCentered ? 2 : 0, fontFamily: "'Arial', sans-serif" }}>
-              Key Strengths
-            </Typography>
-            {style.headerCentered && <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />}
-            <Box className="order-btns" sx={{ display: "flex", visibility: "hidden", ml: 1 }}>
-              <Tooltip title="Move up">
-                <span>
-                  <IconButton size="small" onClick={() => moveSection("strengths", "up")} disabled={sectionOrder.indexOf("strengths") === 0} sx={{ color: style.accent, p: 0.25 }}>
-                    <KeyboardArrowUpIcon fontSize="small" />
-                  </IconButton>
-                </span>
-              </Tooltip>
-              <Tooltip title="Move down">
-                <span>
-                  <IconButton size="small" onClick={() => moveSection("strengths", "down")} disabled={sectionOrder.indexOf("strengths") === sectionOrder.length - 1} sx={{ color: style.accent, p: 0.25 }}>
-                    <KeyboardArrowDownIcon fontSize="small" />
-                  </IconButton>
-                </span>
-              </Tooltip>
-            </Box>
-            <Box sx={{ flex: style.headerCentered ? 0 : 1 }} />
-            <IconButton size="small" onClick={addStrength} sx={{ color: style.accent }} data-testid="button-add-strength">
-              <AddIcon fontSize="small" />
-            </IconButton>
-          </Box>
+          <SectionHeader
+            title="Key Strengths"
+            section="strengths"
+            style={style}
+            sectionOrder={sectionOrder}
+            onMoveSection={moveSection}
+            rightContent={
+              <IconButton size="small" onClick={addStrength} sx={{ color: style.accent }} data-testid="button-add-strength">
+                <AddIcon fontSize="small" />
+              </IconButton>
+            }
+          />
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
             {(cv.strengths || []).map((strength, index) => (
               <EditableStrengthChip
@@ -783,33 +769,18 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
         </Box>
 
         <Box>
-          <Box sx={{ display: "flex", alignItems: "center", mb: 1, "&:hover .order-btns": { visibility: "visible" } }}>
-            {style.headerCentered && <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />}
-            <Typography variant="h6" sx={{ color: style.accent, mx: style.headerCentered ? 2 : 0, fontFamily: "'Arial', sans-serif" }}>
-              Certifications
-            </Typography>
-            {style.headerCentered && <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />}
-            <Box className="order-btns" sx={{ display: "flex", visibility: "hidden", ml: 1 }}>
-              <Tooltip title="Move up">
-                <span>
-                  <IconButton size="small" onClick={() => moveSection("certifications", "up")} disabled={sectionOrder.indexOf("certifications") === 0} sx={{ color: style.accent, p: 0.25 }}>
-                    <KeyboardArrowUpIcon fontSize="small" />
-                  </IconButton>
-                </span>
-              </Tooltip>
-              <Tooltip title="Move down">
-                <span>
-                  <IconButton size="small" onClick={() => moveSection("certifications", "down")} disabled={sectionOrder.indexOf("certifications") === sectionOrder.length - 1} sx={{ color: style.accent, p: 0.25 }}>
-                    <KeyboardArrowDownIcon fontSize="small" />
-                  </IconButton>
-                </span>
-              </Tooltip>
-            </Box>
-            <Box sx={{ flex: style.headerCentered ? 0 : 1 }} />
-            <IconButton size="small" onClick={addCertification} sx={{ color: style.accent }} data-testid="button-add-certification">
-              <AddIcon fontSize="small" />
-            </IconButton>
-          </Box>
+          <SectionHeader
+            title="Certifications"
+            section="certifications"
+            style={style}
+            sectionOrder={sectionOrder}
+            onMoveSection={moveSection}
+            rightContent={
+              <IconButton size="small" onClick={addCertification} sx={{ color: style.accent }} data-testid="button-add-certification">
+                <AddIcon fontSize="small" />
+              </IconButton>
+            }
+          />
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
             {(cv.certifications || []).map((cert, index) => (
               <EditableCertChip

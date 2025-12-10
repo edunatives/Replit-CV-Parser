@@ -1,22 +1,15 @@
 "use client";
 
-import { Box, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from "@mui/material";
+import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from "@mui/material";
 import type { TemplateType } from "@/types/cv";
+import { getTemplateOptions } from "@/lib/templates";
 
 interface TemplateSelectorProps {
   template: TemplateType;
   onTemplateChange: (template: TemplateType) => void;
 }
 
-const templates: { value: TemplateType; label: string }[] = [
-  { value: "modern-dark", label: "Modern Dark" },
-  { value: "classic-light", label: "Classic Light" },
-  { value: "executive", label: "Executive" },
-  { value: "minimal", label: "Minimal" },
-  { value: "creative", label: "Creative" },
-  { value: "professional", label: "Professional" },
-  { value: "corporate", label: "Corporate" },
-];
+const templates = getTemplateOptions();
 
 export function TemplateSelector({ template, onTemplateChange }: TemplateSelectorProps) {
   const handleChange = (event: SelectChangeEvent) => {
