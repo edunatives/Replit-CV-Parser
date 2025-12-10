@@ -1150,14 +1150,20 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
             Rearrange Sections
           </Button>
           {onTemplateChange && (
-            <FormControl size="small" sx={{ minWidth: 150 }}>
-              <InputLabel id="cv-template-label">Template</InputLabel>
+            <FormControl size="small" sx={{ minWidth: 130 }}>
+              <InputLabel id="cv-template-label" sx={{ fontSize: "0.8rem" }}>Template</InputLabel>
               <Select
                 labelId="cv-template-label"
                 value={template}
                 label="Template"
                 onChange={handleTemplateChange}
                 data-testid="select-cv-template"
+                sx={{ fontSize: "0.8rem" }}
+                MenuProps={{
+                  PaperProps: {
+                    sx: { "& .MuiMenuItem-root": { fontSize: "0.8rem", py: 0.75 } }
+                  }
+                }}
               >
                 {templateOptions.map((t) => (
                   <MenuItem key={t.value} value={t.value}>
