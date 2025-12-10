@@ -432,16 +432,30 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
 
   const showGitHub = isDeveloperRole(cv.title || "", cv.summary || "");
 
+  const A4_WIDTH = "210mm";
+  const A4_MIN_HEIGHT = "297mm";
+
+  const a4PageStyle = {
+    width: A4_WIDTH,
+    minHeight: A4_MIN_HEIGHT,
+    maxWidth: "100%",
+    bgcolor: style.bodyBg,
+    boxShadow: 3,
+    mx: "auto",
+    position: "relative" as const,
+  };
+
   return (
-    <Paper elevation={2} sx={{ overflow: "hidden", bgcolor: style.bodyBg }} data-testid="cv-preview">
-      <Box sx={{ 
-        bgcolor: style.headerBg, 
-        py: 1.5, 
-        px: 3, 
-        color: style.headerText, 
-        borderBottom: style.borderBottom,
-        textAlign: style.headerCentered ? "center" : "left"
-      }}>
+    <Box sx={{ py: 3, px: 2, bgcolor: "#f5f5f5" }} data-testid="cv-preview">
+      <Paper elevation={3} sx={{ ...a4PageStyle, overflow: "hidden" }}>
+        <Box sx={{ 
+          bgcolor: style.headerBg, 
+          py: 1.5, 
+          px: 3, 
+          color: style.headerText, 
+          borderBottom: style.borderBottom,
+          textAlign: style.headerCentered ? "center" : "left"
+        }}>
         <Typography variant="h4" component="h2" sx={{ 
           fontFamily: "'Arial', sans-serif", 
           fontWeight: 600,
@@ -790,13 +804,15 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
         })}
       </Box>
       
+      </Paper>
+      
       <SectionRearrangeModal
         open={rearrangeModalOpen}
         onClose={() => setRearrangeModalOpen(false)}
         sectionOrder={sectionOrder}
         onApply={applySectionOrder}
       />
-    </Paper>
+    </Box>
   );
 }
 
