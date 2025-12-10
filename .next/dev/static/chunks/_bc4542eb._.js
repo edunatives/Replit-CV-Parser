@@ -602,6 +602,22 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$file$2d$save
         bodyBg: "#ffffff",
         bodyText: "#1a1a1a",
         bodyTextSecondary: "#4a4a4a"
+    },
+    "corporate": {
+        headerBg: "#1e3a5f",
+        accent: "#3498db",
+        headerText: "#ffffff",
+        bodyBg: "#f8f9fa",
+        bodyText: "#2c3e50",
+        bodyTextSecondary: "#5d6d7e"
+    },
+    "business": {
+        headerBg: "#1b4f72",
+        accent: "#1b4f72",
+        headerText: "#ffffff",
+        bodyBg: "#f8f9fa",
+        bodyText: "#2c3e50",
+        bodyTextSecondary: "#5d6d7e"
     }
 };
 /**
