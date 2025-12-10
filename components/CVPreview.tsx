@@ -557,18 +557,22 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
 
     const estimateSkillsHeight = (): number => {
       const count = cv.skills?.length || 0;
-      const rows = Math.ceil(count / 4);
-      return SECTION_HEADER + rows * 40 + 16;
+      // Compact chips: ~8 skills per row at 24px height per row
+      const rows = Math.ceil(count / 8);
+      return SECTION_HEADER + rows * 28 + 12;
     };
 
     const estimateStrengthsHeight = (): number => {
       const count = cv.strengths?.length || 0;
-      const rows = Math.ceil(count / 3);
-      return SECTION_HEADER + rows * 40 + 16;
+      const rows = Math.ceil(count / 6);
+      return SECTION_HEADER + rows * 28 + 12;
     };
 
     const estimateCertificationsHeight = (): number => {
-      return SECTION_HEADER + (cv.certifications?.length || 0) * 56 + 16;
+      // Certifications now displayed as compact inline chips, ~4 per row
+      const count = cv.certifications?.length || 0;
+      const rows = Math.ceil(count / 4);
+      return SECTION_HEADER + rows * 28 + 12;
     };
 
     const result: PageData[] = [];
@@ -910,7 +914,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
 
       case "skills":
         return (
-          <Box key="skills" sx={{ mb: isLast ? 0 : 3 }}>
+          <Box key="skills" sx={{ mb: isLast ? 0 : 2 }}>
             <SectionHeader
               title="Skills"
               style={style}
@@ -920,7 +924,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
                 </IconButton>
               }
             />
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
               {cv.skills.map((skill, index) => (
                 <EditableSkillChip 
                   key={`skill-${index}`}
@@ -929,6 +933,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
                   onUpdate={(v) => updateSkill(index, v)}
                   onDelete={() => deleteSkill(index)}
                   testId={`chip-skill-${index}`}
+                  compact
                 />
               ))}
             </Box>
@@ -938,7 +943,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
       case "strengths":
         if (!cv.strengths || cv.strengths.length === 0) return null;
         return (
-          <Box key="strengths" sx={{ mb: isLast ? 0 : 3 }}>
+          <Box key="strengths" sx={{ mb: isLast ? 0 : 2 }}>
             <SectionHeader
               title="Strengths"
               style={style}
@@ -948,7 +953,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
                 </IconButton>
               }
             />
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
               {cv.strengths.map((strength, index) => (
                 <EditableSkillChip 
                   key={`strength-${index}`}
@@ -957,6 +962,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
                   onUpdate={(v) => updateStrength(index, v)}
                   onDelete={() => deleteStrength(index)}
                   testId={`chip-strength-${index}`}
+                  compact
                 />
               ))}
             </Box>
@@ -966,7 +972,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
       case "certifications":
         if (!cv.certifications || cv.certifications.length === 0) return null;
         return (
-          <Box key="certifications" sx={{ mb: isLast ? 0 : 3 }}>
+          <Box key="certifications" sx={{ mb: isLast ? 0 : 2 }}>
             <SectionHeader
               title="Certifications"
               style={style}
@@ -976,46 +982,28 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
                 </IconButton>
               }
             />
-            {cv.certifications.map((cert, index) => (
-              <Box key={cert.id} sx={{ mb: 1, position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
-                <IconButton 
-                  className="delete-btn"
-                  size="small" 
-                  onClick={() => deleteCertification(index)}
-                  sx={{ position: "absolute", right: 0, top: 0, visibility: "hidden", color: "error.main" }}
-                  data-testid={`button-delete-certification-${index}`}
-                >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-                <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap" }}>
-                  <EditableSkillChip 
-                    skill={cert.name} 
-                    accentColor={style.accent} 
-                    onUpdate={(v) => updateCertification(index, "name", v)}
-                    onDelete={() => deleteCertification(index)}
-                    testId={`chip-certification-${index}`}
-                  />
-                  {cert.issuer && (
-                    <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
-                      - <EditableField 
-                        value={cert.issuer} 
-                        onChange={(v) => updateCertification(index, "issuer", v)} 
-                        placeholder="Issuer"
-                      />
-                    </Typography>
-                  )}
-                  {cert.year && (
-                    <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
-                      (<EditableField 
-                        value={cert.year} 
-                        onChange={(v) => updateCertification(index, "year", v)} 
-                        placeholder="Year"
-                      />)
-                    </Typography>
-                  )}
-                </Box>
-              </Box>
-            ))}
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+              {cv.certifications.map((cert, index) => (
+                <EditableSkillChip 
+                  key={cert.id}
+                  skill={cert.issuer ? `${cert.name} - ${cert.issuer}` : cert.name}
+                  accentColor={style.accent} 
+                  onUpdate={(v) => {
+                    // Parse back the combined format
+                    const parts = v.split(" - ");
+                    if (parts.length > 1) {
+                      updateCertification(index, "name", parts[0]);
+                      updateCertification(index, "issuer", parts.slice(1).join(" - "));
+                    } else {
+                      updateCertification(index, "name", v);
+                    }
+                  }}
+                  onDelete={() => deleteCertification(index)}
+                  testId={`chip-certification-${index}`}
+                  compact
+                />
+              ))}
+            </Box>
           </Box>
         );
 
@@ -1230,13 +1218,15 @@ function EditableSkillChip({
   accentColor, 
   onUpdate, 
   onDelete,
-  testId
+  testId,
+  compact = false
 }: { 
   skill: string; 
   accentColor: string; 
   onUpdate: (v: string) => void; 
   onDelete: () => void;
   testId: string;
+  compact?: boolean;
 }) {
   const [editing, setEditing] = useState(false);
   const [tempValue, setTempValue] = useState(skill);
@@ -1266,7 +1256,7 @@ function EditableSkillChip({
           }
         }}
         autoFocus
-        sx={{ width: 120 }}
+        sx={{ width: compact ? 100 : 120 }}
       />
     );
   }
@@ -1281,14 +1271,20 @@ function EditableSkillChip({
       }}
       onDelete={onDelete}
       sx={{ 
-        bgcolor: `${accentColor}30`, 
+        bgcolor: `${accentColor}20`, 
         color: accentColor, 
-        border: `1px solid ${accentColor}50`,
+        border: `1px solid ${accentColor}40`,
         cursor: "pointer",
         fontWeight: 500,
+        fontSize: compact ? "0.7rem" : "0.8125rem",
+        height: compact ? 22 : 24,
+        "& .MuiChip-label": {
+          px: compact ? 0.75 : 1,
+        },
         "& .MuiChip-deleteIcon": {
           color: accentColor,
-          opacity: 0.7,
+          opacity: 0.6,
+          fontSize: compact ? 14 : 16,
           "&:hover": { opacity: 1 }
         }
       }}
