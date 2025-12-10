@@ -91,34 +91,7 @@ export function Sidebar({ activeItem, onItemClick }: SidebarProps) {
       }}
       data-testid="sidebar"
     >
-      <Box sx={{ p: 2, display: "flex", alignItems: "center", gap: 1 }}>
-        <Box 
-          sx={{ 
-            width: 32, 
-            height: 32, 
-            background: "linear-gradient(135deg, #4F46E5 0%, #06B6D4 100%)",
-            borderRadius: "8px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Typography sx={{ color: "white", fontWeight: 700, fontSize: 18 }}>E</Typography>
-        </Box>
-        <Typography 
-          variant="h6" 
-          sx={{ 
-            fontWeight: 700, 
-            color: "primary.main",
-            fontSize: 20,
-          }}
-          data-testid="sidebar-logo"
-        >
-          EduNatives
-        </Typography>
-      </Box>
-
-      <Box sx={{ flex: 1, overflow: "auto", px: 1.5, py: 1 }}>
+      <Box sx={{ flex: 1, overflow: "auto", px: 1.5, py: 2 }}>
         <List disablePadding>
           {mainMenuItems.map(renderMenuItem)}
         </List>
