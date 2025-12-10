@@ -10,7 +10,8 @@ async function buildAll() {
   
   const entryPoint = `
 const { spawn } = require('child_process');
-const next = spawn('npx', ['next', 'start', '-p', '5000', '-H', '0.0.0.0'], {
+const port = process.env.PORT || 5000;
+const next = spawn('npx', ['next', 'start', '-p', port.toString(), '-H', '0.0.0.0'], {
   stdio: 'inherit',
   shell: true
 });
