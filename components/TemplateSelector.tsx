@@ -15,6 +15,7 @@ const templates: { value: TemplateType; label: string }[] = [
   { value: "minimal", label: "Minimal" },
   { value: "creative", label: "Creative" },
   { value: "professional", label: "Professional" },
+  { value: "corporate", label: "Corporate" },
 ];
 
 export function TemplateSelector({ template, onTemplateChange }: TemplateSelectorProps) {

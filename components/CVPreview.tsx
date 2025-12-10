@@ -393,12 +393,13 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
   };
 
   const templateStyles = {
-    "modern-dark": { headerBg: "#1a1a2e", accent: "#d4af37", headerText: "#ffffff", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "none" },
-    "classic-light": { headerBg: "#f5f5f5", accent: "#2c3e50", headerText: "#1a1a1a", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "1px solid #e0e0e0" },
-    "executive": { headerBg: "#0a192f", accent: "#64ffda", headerText: "#ffffff", bodyBg: "#f8f9fa", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "none" },
-    "minimal": { headerBg: "#ffffff", accent: "#000000", headerText: "#1a1a1a", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "2px solid #000000" },
-    "creative": { headerBg: "#667eea", accent: "#9b59b6", headerText: "#ffffff", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "none" },
-    "professional": { headerBg: "#2d3436", accent: "#74b9ff", headerText: "#ffffff", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "none" },
+    "modern-dark": { headerBg: "#1a1a2e", accent: "#d4af37", headerText: "#ffffff", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "none", headerCentered: false },
+    "classic-light": { headerBg: "#f5f5f5", accent: "#2c3e50", headerText: "#1a1a1a", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "1px solid #e0e0e0", headerCentered: false },
+    "executive": { headerBg: "#0a192f", accent: "#64ffda", headerText: "#ffffff", bodyBg: "#f8f9fa", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "none", headerCentered: false },
+    "minimal": { headerBg: "#ffffff", accent: "#000000", headerText: "#1a1a1a", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "2px solid #000000", headerCentered: false },
+    "creative": { headerBg: "#667eea", accent: "#9b59b6", headerText: "#ffffff", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "none", headerCentered: false },
+    "professional": { headerBg: "#2d3436", accent: "#74b9ff", headerText: "#ffffff", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "none", headerCentered: false },
+    "corporate": { headerBg: "#d4e5ed", accent: "#1a5276", headerText: "#1a5276", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a", borderBottom: "none", headerCentered: true },
   };
 
   const style = templateStyles[template] || templateStyles["modern-dark"];
@@ -407,15 +408,32 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
 
   return (
     <Paper elevation={2} sx={{ overflow: "hidden", bgcolor: style.bodyBg }} data-testid="cv-preview">
-      <Box sx={{ bgcolor: style.headerBg, py: 1.5, px: 3, color: style.headerText, borderBottom: style.borderBottom }}>
-        <Typography variant="h4" component="h2" sx={{ fontFamily: "'Arial', sans-serif", fontWeight: 600 }}>
+      <Box sx={{ 
+        bgcolor: style.headerBg, 
+        py: 1.5, 
+        px: 3, 
+        color: style.headerText, 
+        borderBottom: style.borderBottom,
+        textAlign: style.headerCentered ? "center" : "left"
+      }}>
+        <Typography variant="h4" component="h2" sx={{ 
+          fontFamily: "'Arial', sans-serif", 
+          fontWeight: 600,
+          display: style.headerCentered ? "block" : "inline-block"
+        }}>
           <EditableField value={cv.name} onChange={(v) => updateField("name", v)} placeholder="Your Name" />
         </Typography>
         <Typography variant="subtitle1" sx={{ color: style.accent, mt: 0.25, fontWeight: 500 }}>
           <EditableField value={cv.title} onChange={(v) => updateField("title", v)} placeholder="Your Title" />
         </Typography>
         
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, mt: 1 }}>
+        <Box sx={{ 
+          display: "flex", 
+          flexWrap: "wrap", 
+          gap: 1.5, 
+          mt: 1,
+          justifyContent: style.headerCentered ? "center" : "flex-start"
+        }}>
           <EditableContactField
             icon={EmailIcon}
             value={cv.email}
@@ -469,9 +487,19 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
 
       <Box sx={{ p: 3, color: style.bodyText }}>
         <Box sx={{ mb: 3 }}>
-          <Typography variant="h6" sx={{ color: style.accent, mb: 1, fontFamily: "'Arial', sans-serif" }}>
-            Summary
-          </Typography>
+          {style.headerCentered ? (
+            <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+              <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />
+              <Typography variant="h6" sx={{ color: style.accent, mx: 2, fontFamily: "'Arial', sans-serif" }}>
+                Summary
+              </Typography>
+              <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />
+            </Box>
+          ) : (
+            <Typography variant="h6" sx={{ color: style.accent, mb: 1, fontFamily: "'Arial', sans-serif" }}>
+              Summary
+            </Typography>
+          )}
           <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
             <EditableField 
               value={cv.summary} 
@@ -483,14 +511,27 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
         </Box>
 
         <Box sx={{ mb: 3 }}>
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
-            <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Arial', sans-serif" }}>
-              Experience
-            </Typography>
-            <IconButton size="small" onClick={addExperience} sx={{ color: style.accent }} data-testid="button-add-experience">
-              <AddIcon fontSize="small" />
-            </IconButton>
-          </Box>
+          {style.headerCentered ? (
+            <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+              <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />
+              <Typography variant="h6" sx={{ color: style.accent, mx: 2, fontFamily: "'Arial', sans-serif" }}>
+                Experience
+              </Typography>
+              <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />
+              <IconButton size="small" onClick={addExperience} sx={{ color: style.accent, ml: 1 }} data-testid="button-add-experience">
+                <AddIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          ) : (
+            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
+              <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Arial', sans-serif" }}>
+                Experience
+              </Typography>
+              <IconButton size="small" onClick={addExperience} sx={{ color: style.accent }} data-testid="button-add-experience">
+                <AddIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          )}
           {cv.experience.map((exp, index) => (
             <Box key={exp.id} sx={{ mb: 2, position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
               <IconButton 
@@ -547,14 +588,27 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
         </Box>
 
         <Box sx={{ mb: 3 }}>
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
-            <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Arial', sans-serif" }}>
-              Education
-            </Typography>
-            <IconButton size="small" onClick={addEducation} sx={{ color: style.accent }} data-testid="button-add-education">
-              <AddIcon fontSize="small" />
-            </IconButton>
-          </Box>
+          {style.headerCentered ? (
+            <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+              <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />
+              <Typography variant="h6" sx={{ color: style.accent, mx: 2, fontFamily: "'Arial', sans-serif" }}>
+                Education
+              </Typography>
+              <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />
+              <IconButton size="small" onClick={addEducation} sx={{ color: style.accent, ml: 1 }} data-testid="button-add-education">
+                <AddIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          ) : (
+            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
+              <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Arial', sans-serif" }}>
+                Education
+              </Typography>
+              <IconButton size="small" onClick={addEducation} sx={{ color: style.accent }} data-testid="button-add-education">
+                <AddIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          )}
           {cv.education.map((edu, index) => (
             <Box key={edu.id} sx={{ mb: 1, position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
               <IconButton 
@@ -601,14 +655,27 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
         </Box>
 
         <Box sx={{ mb: 3 }}>
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
-            <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Arial', sans-serif" }}>
-              Skills
-            </Typography>
-            <IconButton size="small" onClick={addSkill} sx={{ color: style.accent }} data-testid="button-add-skill">
-              <AddIcon fontSize="small" />
-            </IconButton>
-          </Box>
+          {style.headerCentered ? (
+            <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+              <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />
+              <Typography variant="h6" sx={{ color: style.accent, mx: 2, fontFamily: "'Arial', sans-serif" }}>
+                Skills
+              </Typography>
+              <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />
+              <IconButton size="small" onClick={addSkill} sx={{ color: style.accent, ml: 1 }} data-testid="button-add-skill">
+                <AddIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          ) : (
+            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
+              <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Arial', sans-serif" }}>
+                Skills
+              </Typography>
+              <IconButton size="small" onClick={addSkill} sx={{ color: style.accent }} data-testid="button-add-skill">
+                <AddIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          )}
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
             {cv.skills.map((skill, index) => (
               <EditableSkillChip
@@ -629,14 +696,27 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
         </Box>
 
         <Box sx={{ mb: 3 }}>
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
-            <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Arial', sans-serif" }}>
-              Key Strengths
-            </Typography>
-            <IconButton size="small" onClick={addStrength} sx={{ color: style.accent }} data-testid="button-add-strength">
-              <AddIcon fontSize="small" />
-            </IconButton>
-          </Box>
+          {style.headerCentered ? (
+            <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+              <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />
+              <Typography variant="h6" sx={{ color: style.accent, mx: 2, fontFamily: "'Arial', sans-serif" }}>
+                Key Strengths
+              </Typography>
+              <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />
+              <IconButton size="small" onClick={addStrength} sx={{ color: style.accent, ml: 1 }} data-testid="button-add-strength">
+                <AddIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          ) : (
+            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
+              <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Arial', sans-serif" }}>
+                Key Strengths
+              </Typography>
+              <IconButton size="small" onClick={addStrength} sx={{ color: style.accent }} data-testid="button-add-strength">
+                <AddIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          )}
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
             {(cv.strengths || []).map((strength, index) => (
               <EditableStrengthChip
@@ -657,14 +737,27 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
         </Box>
 
         <Box>
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
-            <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Arial', sans-serif" }}>
-              Certifications
-            </Typography>
-            <IconButton size="small" onClick={addCertification} sx={{ color: style.accent }} data-testid="button-add-certification">
-              <AddIcon fontSize="small" />
-            </IconButton>
-          </Box>
+          {style.headerCentered ? (
+            <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+              <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />
+              <Typography variant="h6" sx={{ color: style.accent, mx: 2, fontFamily: "'Arial', sans-serif" }}>
+                Certifications
+              </Typography>
+              <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />
+              <IconButton size="small" onClick={addCertification} sx={{ color: style.accent, ml: 1 }} data-testid="button-add-certification">
+                <AddIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          ) : (
+            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
+              <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Arial', sans-serif" }}>
+                Certifications
+              </Typography>
+              <IconButton size="small" onClick={addCertification} sx={{ color: style.accent }} data-testid="button-add-certification">
+                <AddIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          )}
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
             {(cv.certifications || []).map((cert, index) => (
               <EditableCertChip
