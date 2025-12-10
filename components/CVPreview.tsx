@@ -13,6 +13,8 @@ import LinkIcon from "@mui/icons-material/Link";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
 import type { ParsedCV, TemplateType, CVSection } from "@/types/cv";
 import { DEFAULT_SECTION_ORDER } from "@/types/cv";
 import { useState, useRef } from "react";
@@ -72,6 +74,18 @@ function EditableField({
     }
   };
 
+  const hasChanges = tempValue !== value;
+
+  const handleSave = () => {
+    onChange(tempValue);
+    setEditing(false);
+  };
+
+  const handleCancel = () => {
+    setTempValue(value);
+    setEditing(false);
+  };
+
   if (editing) {
     return (
       <Box sx={{ position: "relative" }}>
@@ -81,20 +95,20 @@ function EditableField({
           value={tempValue}
           onChange={(e) => setTempValue(e.target.value)}
           onBlur={(e) => {
-            if (e.relatedTarget?.getAttribute("data-bullet-btn") === "true") {
+            const target = e.relatedTarget as HTMLElement | null;
+            if (target?.getAttribute("data-action-btn") === "true") {
               return;
             }
-            onChange(tempValue);
-            setEditing(false);
+            if (!multiline) {
+              handleSave();
+            }
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !multiline) {
-              onChange(tempValue);
-              setEditing(false);
+              handleSave();
             }
             if (e.key === "Escape") {
-              setTempValue(value);
-              setEditing(false);
+              handleCancel();
             }
           }}
           multiline={multiline}
@@ -110,7 +124,7 @@ function EditableField({
                     <IconButton
                       size="small"
                       onClick={insertBullet}
-                      data-bullet-btn="true"
+                      data-action-btn="true"
                       data-testid="button-insert-bullet"
                     >
                       <FormatListBulletedIcon fontSize="small" />
@@ -121,6 +135,39 @@ function EditableField({
             }
           } : undefined}
         />
+        {multiline && (
+          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1, mt: 0.5 }}>
+            <Tooltip title="Cancel">
+              <IconButton 
+                size="small" 
+                onClick={handleCancel}
+                data-action-btn="true"
+                data-testid="button-cancel-edit"
+                sx={{ color: "text.secondary" }}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={hasChanges ? "Save changes" : "No changes"}>
+              <span>
+                <IconButton 
+                  size="small" 
+                  onClick={handleSave}
+                  data-action-btn="true"
+                  data-testid="button-save-edit"
+                  disabled={!hasChanges}
+                  sx={{ 
+                    color: hasChanges ? "success.main" : "text.disabled",
+                    bgcolor: hasChanges ? "success.light" : "transparent",
+                    "&:hover": hasChanges ? { bgcolor: "success.main", color: "white" } : {},
+                  }}
+                >
+                  <CheckIcon fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
+          </Box>
+        )}
       </Box>
     );
   }
