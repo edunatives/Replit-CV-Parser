@@ -43,6 +43,11 @@ Preferred communication style: Simple, everyday language.
 - `POST /api/advisor` - AI career advisor chat (personalized CV improvement advice)
 - `POST /api/jd-match` - Job description match analysis (match score, skill gaps, optimization tips)
 
+**API Documentation**:
+- Interactive Swagger UI available at `/api-docs`
+- OpenAPI 3.0 specification in `/lib/swagger.ts`
+- All routes have comprehensive JSDoc comments with examples
+
 **AI-Powered Extraction**:
 - Uses **Gemini 2.5 Flash** via Replit AI Integrations (no API key required, charges billed to credits)
 - Structured JSON extraction for all CV sections
@@ -127,11 +132,15 @@ Custom MUI theme with:
   /cv                         - CV feature module
   /database                   - Database module
 /lib
-  /db/mongodb.ts              - MongoDB connection utility
-  /parse/parseCv.ts           - CV parsing logic with AI extraction
-  /parse/normalize.ts         - Deterministic normalization functions
+  /db/mongodb.ts              - MongoDB connection utility (JSDoc documented)
+  /parse/parseCv.ts           - CV parsing logic with AI extraction (JSDoc documented)
+  /parse/normalize.ts         - Deterministic normalization functions (JSDoc documented)
+  /export/exportCV.ts         - CV export to PDF/DOCX/TXT/JSON (JSDoc documented)
+  /swagger.ts                 - OpenAPI 3.0 specification
 /types
   cv.ts                       - TypeScript interfaces
+/app
+  /api-docs/page.tsx          - Swagger UI documentation page
 ```
 
 ## External Dependencies
