@@ -64,4 +64,4 @@ export interface CVFile {
   error?: string;
 }
 
-export type TemplateType = "modern-dark" | "classic-light" | "executive" | "minimal" | "creative" | "professional" | "corporate";
+export type TemplateType = "modern-dark" | "classic-light" | "executive" | "minimal" | "creative" | "professional" | "corporate" | "business";
