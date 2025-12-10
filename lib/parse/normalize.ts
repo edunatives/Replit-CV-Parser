@@ -46,6 +46,40 @@ export function normalizeWhitespace(str: string): string {
 }
 
 /**
+ * Normalize description text while preserving bullet point formatting
+ * Converts inline bullets to newlined bullets for proper display
+ * 
+ * @param {string} str - Description text with potential bullet points
+ * @returns {string} Normalized text with bullets on separate lines
+ * 
+ * @example
+ * normalizeDescription("• point1 • point2") // "• point1\n• point2"
+ */
+export function normalizeDescription(str: string): string {
+  if (!str) return "";
+  
+  let normalized = str.trim();
+  
+  // Standardize different bullet characters to •
+  normalized = normalized.replace(/[•\u2022\u25CF\u25CB\u25AA\u25AB\u2023\u2043\u204C\u204D\u2219\u25E6]/g, "•");
+  normalized = normalized.replace(/^\s*[-*]\s+/gm, "• ");
+  
+  // Convert inline bullets to newlined bullets (• at start of line is fine, but • mid-text should get newline)
+  normalized = normalized.replace(/\s+•\s*/g, "\n• ");
+  
+  // Clean up multiple consecutive newlines
+  normalized = normalized.replace(/\n{3,}/g, "\n\n");
+  
+  // Clean up spaces within lines (but preserve newlines)
+  normalized = normalized.split("\n").map(line => line.replace(/[ \t]+/g, " ").trim()).join("\n");
+  
+  // Remove empty lines at start/end
+  normalized = normalized.replace(/^\n+|\n+$/g, "");
+  
+  return normalized;
+}
+
+/**
  * Generate a stable, deterministic ID for CV sections
  * 
  * @param {string} prefix - Type prefix (e.g., 'exp', 'edu', 'cert')
@@ -239,7 +273,8 @@ function normalizeExperience(experiences: Experience[], fileId: string): Experie
     role: normalizeWhitespace(exp.role || ""),
     company: normalizeWhitespace(exp.company || ""),
     duration: normalizeDateRange(exp.duration || ""),
-    description: normalizeWhitespace(exp.description || ""),
+    description: normalizeDescription(exp.description || ""),
+    location: exp.location ? normalizeWhitespace(exp.location) : undefined,
   })).filter(exp => exp.role || exp.company);
 }
 
