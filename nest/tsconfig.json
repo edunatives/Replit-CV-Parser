@@ -1,4 +1,5 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
     "module": "commonjs",
     "declaration": true,
@@ -9,7 +10,8 @@
     "target": "ES2021",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
+    "baseUrl": ".",
+    "rootDir": "..",
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
@@ -20,10 +22,12 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "moduleResolution": "node",
+    "noEmit": false,
+    "isolatedModules": false,
     "paths": {
       "@/*": ["../*"]
     }
   },
-  "include": ["./**/*.ts"],
+  "include": ["./**/*.ts", "../types/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
