@@ -433,21 +433,54 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
   const showGitHub = isDeveloperRole(cv.title || "", cv.summary || "");
 
   const A4_WIDTH = "210mm";
-  const A4_MIN_HEIGHT = "297mm";
+  const A4_HEIGHT = "297mm";
 
   const a4PageStyle = {
     width: A4_WIDTH,
-    minHeight: A4_MIN_HEIGHT,
+    minHeight: A4_HEIGHT,
     maxWidth: "100%",
     bgcolor: style.bodyBg,
-    boxShadow: 3,
+    boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
     mx: "auto",
     position: "relative" as const,
+    "@media print": {
+      boxShadow: "none",
+      margin: 0,
+      pageBreakAfter: "always" as const,
+    },
+  };
+
+  const pageBreakIndicatorStyle = {
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    py: 1,
+    my: 2,
+    bgcolor: "#e0e0e0",
+    borderTop: "2px dashed #9e9e9e",
+    borderBottom: "2px dashed #9e9e9e",
+    "@media print": {
+      display: "none",
+    },
   };
 
   return (
-    <Box sx={{ py: 3, px: 2, bgcolor: "#f5f5f5" }}>
-      <Paper elevation={3} sx={{ ...a4PageStyle, overflow: "hidden" }} data-testid="cv-preview">
+    <Box 
+      sx={{ 
+        py: 3, 
+        px: 2, 
+        bgcolor: "#e8e8e8",
+        backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 296mm, #bdbdbd 296mm, #bdbdbd 297mm)",
+        backgroundSize: `100% ${A4_HEIGHT}`,
+        "@media print": {
+          bgcolor: "transparent",
+          backgroundImage: "none",
+          padding: 0,
+        },
+      }}
+    >
+      <Paper elevation={3} sx={{ ...a4PageStyle, overflow: "visible" }} data-testid="cv-preview">
         <Box sx={{ 
           bgcolor: style.headerBg, 
           py: 1.5, 
