@@ -1,0 +1,219 @@
+/**
+ * @fileoverview EduNatives Forensic CV Engine - Core Logic
+ * @version 9.0
+ * @description Handles prompt construction, API communication, and response parsing.
+ * This module is UI-agnostic.
+ */
+
+// ============================================================================
+// CONFIGURATION & CONSTANTS
+// ============================================================================
+
+export const AUDIT_WEIGHTS = {
+    workExperience: 30,
+    summary: 20,
+    education: 15,
+    skills: 15,
+    contactInfo: 10,
+    presentation: 10
+};
+
+export const SCORING_RUBRIC = {
+    exceptional: "90-100", // No improvements needed
+    strong: "80-89",       // Minor refinements
+    good: "70-79",         // Some improvements needed
+    fair: "60-69",         // Needs attention
+    needsWork: "<60"       // Significant improvements required
+};
+
+// ============================================================================
+// PROMPT TEMPLATE
+// ============================================================================
+
+/**
+ * The master prompt that instructs the AI on how to parse and audit the CV.
+ * It enforces the schema and the scoring logic defined above.
+ */
+const MASTER_PROMPT_TEMPLATE = `
+You are the EduNatives Forensic CV Engine (v9.0).
+
+I will provide a resume text. You must perform TWO distinct tasks in one output:
+1. PARSE it into a clean JSON structure suitable for a specific "Modern Template".
+2. AUDIT it using the Strict Scoring Rubric provided below.
+
+RESUME TEXT:
+"""
+{{RESUME_TEXT}}
+"""
+
+--- TASK 1: SCORING RUBRIC & WEIGHTS ---
+Calculate a 'weighted_score' based on the following breakdown:
+- Work Experience (Weight: ${AUDIT_WEIGHTS.workExperience})
+- Professional Summary (Weight: ${AUDIT_WEIGHTS.summary})
+- Education (Weight: ${AUDIT_WEIGHTS.education})
+- Skills (Weight: ${AUDIT_WEIGHTS.skills})
+- Contact Information (Weight: ${AUDIT_WEIGHTS.contactInfo})
+- Overall Presentation (Weight: ${AUDIT_WEIGHTS.presentation})
+
+Score Interpretation:
+- ${SCORING_RUBRIC.exceptional}: Exceptional (No improvements needed)
+- ${SCORING_RUBRIC.strong}: Strong (Minor refinements)
+- ${SCORING_RUBRIC.good}: Good (Some improvements needed)
+- ${SCORING_RUBRIC.fair}: Fair (Needs attention)
+- Below 60: Needs Work
+
+--- TASK 2: OUTPUT SCHEMA ---
+You must return ONLY a valid JSON object matching this structure exactly:
+{
+    "parsed_cv": {
+        "basics": { 
+            "name": "String", 
+            "label": "String (Job Title)", 
+            "email": "String", 
+            "phone": "String", 
+            "location": "String", 
+            "links": ["String"] 
+        },
+        "summary": "String",
+        "experience": [
+            { 
+                "company": "String", 
+                "position": "String", 
+                "date": "String", 
+                "location": "String", 
+                "highlights": ["String"] 
+            }
+        ],
+        "education": [
+            { 
+                "institution": "String", 
+                "area": "String", 
+                "studyType": "String", 
+                "date": "String" 
+            }
+        ],
+        "skills": ["String"]
+    },
+    "forensic": {
+        "score": Number (0-100, strictly calculated based on weights),
+        "level": "String (Exceptional/Strong/Good/Fair/Needs Work)",
+        "inflation": Boolean,
+        "sections": [
+            { "name": "Contact Information", "score": 0-100, "feedback": "String" },
+            { "name": "Professional Summary", "score": 0-100, "feedback": "String" },
+            { "name": "Work Experience", "score": 0-100, "feedback": "String" },
+            { "name": "Education", "score": 0-100, "feedback": "String" },
+            { "name": "Skills", "score": 0-100, "feedback": "String" },
+            { "name": "Overall Presentation", "score": 0-100, "feedback": "String" }
+        ],
+        "verdict": "String (A concise 2-3 sentence summary of the findings)"
+    },
+    "structure": { 
+        "issues": ["String (List of specific Red Flags found)"], 
+        "fixes": ["String (List of actionable Recommendations)"] 
+    },
+    "highlights": [
+        { 
+            "snippet": "EXACT TEXT snippet from the input CV to be highlighted in the UI", 
+            "type": "red (critical) / green (strength) / yellow (warning)", 
+            "comment": "Why this specific text was flagged" 
+        }
+    ]
+}
+`;
+
+// ============================================================================
+// MAIN CLASS
+// ============================================================================
+
+export class ForensicAuditor {
+    
+    constructor() {
+        this.modelEndpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent";
+    }
+
+    /**
+     * Cleans raw text to prevent API errors (control characters, excessive length).
+     * @param {string} text 
+     * @returns {string} Sanitized text
+     */
+    sanitize(text) {
+        return text
+            .replace(/[\x00-\x09\x0B-\x0C\x0E-\x1F\x7F]/g, "") // Remove control characters
+            .substring(0, 30000); // Token limit safeguard
+    }
+
+    /**
+     * Cleans the AI response to ensure valid JSON parsing.
+     * Removes markdown code fences if present.
+     * @param {string} rawText 
+     * @returns {string} Clean JSON string
+     */
+    cleanResponse(rawText) {
+        let cleaned = rawText.trim();
+        if (cleaned.startsWith("```json")) cleaned = cleaned.slice(7);
+        else if (cleaned.startsWith("```")) cleaned = cleaned.slice(3);
+        if (cleaned.endsWith("```")) cleaned = cleaned.slice(0, -3);
+        return cleaned;
+    }
+
+    /**
+     * The main entry point to run the audit.
+     * @param {string} apiKey - Google Gemini API Key
+     * @param {string} cvText - Raw text extracted from PDF/Doc
+     * @returns {Promise<Object>} The structured JSON result
+     */
+    async analyze(apiKey, cvText) {
+        const cleanText = this.sanitize(cvText);
+        
+        // Inject the resume text into the prompt template
+        const finalPrompt = MASTER_PROMPT_TEMPLATE.replace('{{RESUME_TEXT}}', cleanText);
+        
+        const url = `${this.modelEndpoint}?key=${apiKey}`;
+        
+        // Retry logic for robustness (handling 503s)
+        let attempt = 0;
+        const maxRetries = 3;
+        
+        while (attempt <= maxRetries) {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: finalPrompt }] }],
+                        generationConfig: { responseMimeType: "application/json" }
+                    })
+                });
+
+                if (!response.ok) {
+                    const errBody = await response.json().catch(() => ({}));
+                    const msg = errBody.error ? errBody.error.message : response.statusText;
+                    
+                    // Do not retry on Bad Request (400) as the prompt is likely malformed or too long
+                    if (msg.includes('400')) throw new Error(`API Error 400: ${msg}`);
+                    
+                    throw new Error(`${response.status}: ${msg}`);
+                }
+
+                const data = await response.json();
+                const rawJson = data.candidates[0].content.parts[0].text;
+                const cleanJson = this.cleanResponse(rawJson);
+                
+                return JSON.parse(cleanJson);
+
+            } catch (e) {
+                attempt++;
+                console.warn(`Attempt ${attempt} failed:`, e);
+                
+                // If it's a fatal error or max retries reached, throw it
+                if (e.message.includes('400') || attempt > maxRetries) {
+                    throw e;
+                }
+                
+                // Exponential backoff
+                await new Promise(r => setTimeout(r, Math.pow(2, attempt) * 1000));
+            }
+        }
+    }
+}
