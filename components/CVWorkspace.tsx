@@ -8,7 +8,6 @@ import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DescriptionIcon from "@mui/icons-material/Description";
 import { CVPreview } from "./CVPreview";
-import { TemplateSelector } from "./TemplateSelector";
 import { AIAnalysisPanel } from "./AIAnalysisPanel";
 import { exportToPDF, exportToDOCX } from "@/lib/export/exportCV";
 import type { ParsedCV, TemplateType } from "@/types/cv";
@@ -130,26 +129,8 @@ export function CVWorkspace({ cv, onBack, onUpdateCV }: CVWorkspaceProps) {
             bgcolor: "background.paper",
           }}
         >
-          <Box 
-            sx={{ 
-              display: "flex", 
-              alignItems: "center", 
-              justifyContent: "space-between",
-              gap: 2,
-              px: 3, 
-              py: 1.5,
-              borderBottom: "1px solid",
-              borderColor: "divider",
-            }}
-          >
-            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-              CV Preview
-            </Typography>
-            <TemplateSelector template={template} onTemplateChange={setTemplate} />
-          </Box>
-          
-          <Box sx={{ flex: 1, overflow: "auto", p: 3 }}>
-            <CVPreview cv={cv} template={template} onUpdateCV={onUpdateCV} />
+          <Box sx={{ flex: 1, overflow: "auto" }}>
+            <CVPreview cv={cv} template={template} onUpdateCV={onUpdateCV} onTemplateChange={setTemplate} />
           </Box>
         </Box>
 

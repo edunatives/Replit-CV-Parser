@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Typography, Paper, Chip, Divider, TextField, IconButton, InputAdornment, Tooltip, Button } from "@mui/material";
+import { Box, Typography, Paper, Chip, Divider, TextField, IconButton, InputAdornment, Tooltip, Button, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
@@ -19,7 +19,7 @@ import { SectionRearrangeModal } from "./SectionRearrangeModal";
 import { DEFAULT_SECTION_ORDER } from "@/types/cv";
 import { useState, useRef, useMemo } from "react";
 import { isDeveloperRole } from "@/lib/ai/rules";
-import { getTemplateStyle } from "@/lib/templates";
+import { getTemplateStyle, getTemplateOptions } from "@/lib/templates";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import InsertPageBreakIcon from "@mui/icons-material/InsertPageBreak";
 import DescriptionIcon from "@mui/icons-material/Description";
@@ -98,6 +98,7 @@ interface CVPreviewProps {
   cv: ParsedCV;
   template: TemplateType;
   onUpdateCV: (cv: ParsedCV) => void;
+  onTemplateChange?: (template: TemplateType) => void;
 }
 
 function SectionHeader({ 
@@ -393,7 +394,8 @@ function EditableContactField({
   );
 }
 
-export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
+export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPreviewProps) {
+  const templateOptions = getTemplateOptions();
   const sectionOrder = cv.sectionOrder || DEFAULT_SECTION_ORDER;
   const [rearrangeModalOpen, setRearrangeModalOpen] = useState(false);
 
@@ -933,10 +935,16 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
     </Box>
   );
 
+  const handleTemplateChange = (event: SelectChangeEvent) => {
+    if (onTemplateChange) {
+      onTemplateChange(event.target.value as TemplateType);
+    }
+  };
+
   return (
     <Box 
       sx={{ 
-        py: 3, 
+        py: 2, 
         px: 2, 
         bgcolor: "#e8e8e8",
         "@media print": {
@@ -945,6 +953,63 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
         },
       }}
     >
+      <Paper
+        elevation={1}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 2,
+          px: 2,
+          py: 1,
+          mb: 2,
+          bgcolor: "#fff",
+          borderRadius: 1,
+          maxWidth: A4_WIDTH,
+          mx: "auto",
+          "@media print": {
+            display: "none",
+          },
+        }}
+        data-testid="cv-toolbar"
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          {onTemplateChange && (
+            <FormControl size="small" sx={{ minWidth: 150 }}>
+              <InputLabel id="cv-template-label">Template</InputLabel>
+              <Select
+                labelId="cv-template-label"
+                value={template}
+                label="Template"
+                onChange={handleTemplateChange}
+                data-testid="select-cv-template"
+              >
+                {templateOptions.map((t) => (
+                  <MenuItem key={t.value} value={t.value}>
+                    {t.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+        </Box>
+        
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<SwapVertIcon />}
+            onClick={() => setRearrangeModalOpen(true)}
+            sx={{ 
+              textTransform: "none",
+            }}
+            data-testid="button-rearrange-sections"
+          >
+            Rearrange
+          </Button>
+        </Box>
+      </Paper>
+
       {pages.map((page, pageIdx) => (
         <Paper 
           key={page.pageNumber}
@@ -960,26 +1025,6 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
             <>
               {renderHeader()}
               <Box sx={{ p: 3, color: style.bodyText, pb: `${BOTTOM_GUTTER}px` }}>
-                <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    startIcon={<SwapVertIcon />}
-                    onClick={() => setRearrangeModalOpen(true)}
-                    sx={{ 
-                      textTransform: "none",
-                      borderColor: style.accent,
-                      color: style.accent,
-                      "&:hover": {
-                        borderColor: style.accent,
-                        bgcolor: `${style.accent}10`,
-                      }
-                    }}
-                    data-testid="button-rearrange-sections"
-                  >
-                    Rearrange Sections
-                  </Button>
-                </Box>
                 {page.sections.map((sectionName, idx) => 
                   renderSection(sectionName, idx === page.sections.length - 1)
                 )}
