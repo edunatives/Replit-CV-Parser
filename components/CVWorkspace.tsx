@@ -1,13 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { Box, Typography, Tabs, Tab, IconButton, Button, Chip } from "@mui/material";
+import { Box, Typography, Tabs, Tab, IconButton, Button, Chip, Menu, MenuItem, ListItemIcon, ListItemText } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import TokenIcon from "@mui/icons-material/Token";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import DescriptionIcon from "@mui/icons-material/Description";
 import { CVPreview } from "./CVPreview";
 import { TemplateSelector } from "./TemplateSelector";
 import { AIAnalysisPanel } from "./AIAnalysisPanel";
+import { exportToPDF, exportToDOCX } from "@/lib/export/exportCV";
 import type { ParsedCV, TemplateType } from "@/types/cv";
 
 interface CVWorkspaceProps {
@@ -21,6 +24,27 @@ type AssessmentTrack = "assessment" | "advisor" | "jd-match";
 export function CVWorkspace({ cv, onBack, onUpdateCV }: CVWorkspaceProps) {
   const [template, setTemplate] = useState<TemplateType>("modern-dark");
   const [activeTrack, setActiveTrack] = useState<AssessmentTrack>("assessment");
+  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
+
+  const handleExportClick = (event: React.MouseEvent<HTMLElement>) => {
+    setExportMenuAnchor(event.currentTarget);
+  };
+
+  const handleExportClose = () => {
+    setExportMenuAnchor(null);
+  };
+
+  const handleExportPDF = async () => {
+    const filename = `${cv.name || "resume"}_${new Date().toISOString().split("T")[0]}.pdf`;
+    await exportToPDF(cv, filename, template);
+    handleExportClose();
+  };
+
+  const handleExportDOCX = async () => {
+    const filename = `${cv.name || "resume"}_${new Date().toISOString().split("T")[0]}.docx`;
+    await exportToDOCX(cv, filename, template);
+    handleExportClose();
+  };
 
   return (
     <Box sx={{ height: "100%", display: "flex", flexDirection: "column", bgcolor: "background.default" }}>
@@ -67,10 +91,31 @@ export function CVWorkspace({ cv, onBack, onUpdateCV }: CVWorkspaceProps) {
             variant="outlined"
             size="small"
             startIcon={<FileDownloadIcon />}
+            onClick={handleExportClick}
             data-testid="button-export"
           >
             Export
           </Button>
+          <Menu
+            anchorEl={exportMenuAnchor}
+            open={Boolean(exportMenuAnchor)}
+            onClose={handleExportClose}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            transformOrigin={{ vertical: "top", horizontal: "right" }}
+          >
+            <MenuItem onClick={handleExportPDF} data-testid="menu-export-pdf">
+              <ListItemIcon>
+                <PictureAsPdfIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>Export as PDF</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={handleExportDOCX} data-testid="menu-export-docx">
+              <ListItemIcon>
+                <DescriptionIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>Export as DOCX</ListItemText>
+            </MenuItem>
+          </Menu>
         </Box>
       </Box>
 

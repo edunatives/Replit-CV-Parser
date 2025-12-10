@@ -9,6 +9,7 @@ import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import DescriptionIcon from "@mui/icons-material/Description";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import { exportToPDF } from "@/lib/export/exportCV";
 import type { ParsedCV } from "@/types/cv";
 
 interface DashboardProps {
@@ -30,6 +31,11 @@ export function Dashboard({ cvs, onUploadNew, onSelectCV, onDeleteCV, onDuplicat
       hour: "2-digit",
       minute: "2-digit"
     });
+  };
+
+  const handleDownload = async (cv: ParsedCV) => {
+    const filename = `${cv.name || "resume"}_${new Date().toISOString().split("T")[0]}.pdf`;
+    await exportToPDF(cv, filename, "modern-dark");
   };
 
   return (
@@ -174,6 +180,7 @@ export function Dashboard({ cvs, onUploadNew, onSelectCV, onDeleteCV, onDuplicat
                       </Button>
                       <Button 
                         size="small"
+                        onClick={() => handleDownload(cv)}
                         sx={{ color: "text.primary", justifyContent: "flex-start", p: 0, minWidth: "auto" }}
                         data-testid={`button-download-cv-${cv.id}`}
                       >
