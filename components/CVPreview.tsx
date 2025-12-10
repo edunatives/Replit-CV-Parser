@@ -21,6 +21,50 @@ import { useState, useRef } from "react";
 import { isDeveloperRole } from "@/lib/ai/rules";
 import { getTemplateStyle } from "@/lib/templates";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import InsertPageBreakIcon from "@mui/icons-material/InsertPageBreak";
+
+function PageBreakIndicator({ pageNumber }: { pageNumber: number }) {
+  return (
+    <Box
+      sx={{
+        width: "calc(100% + 48px)",
+        mx: -3,
+        my: 3,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        py: 1.5,
+        bgcolor: "#f0f0f0",
+        borderTop: "2px dashed #bdbdbd",
+        borderBottom: "2px dashed #bdbdbd",
+        position: "relative",
+        "@media print": {
+          display: "none",
+          pageBreakBefore: "always",
+        },
+      }}
+      data-testid={`page-break-${pageNumber}`}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          bgcolor: "#fff",
+          px: 2,
+          py: 0.5,
+          borderRadius: 1,
+          border: "1px solid #e0e0e0",
+        }}
+      >
+        <InsertPageBreakIcon sx={{ fontSize: 16, color: "#757575" }} />
+        <Typography variant="caption" sx={{ color: "#757575", fontWeight: 500 }}>
+          Page {pageNumber}
+        </Typography>
+      </Box>
+    </Box>
+  );
+}
 
 interface CVPreviewProps {
   cv: ParsedCV;
