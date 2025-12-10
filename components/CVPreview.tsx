@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Typography, Paper, Chip, Divider, TextField, IconButton } from "@mui/material";
+import { Box, Typography, Paper, Chip, Divider, TextField, IconButton, InputAdornment, Tooltip } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
@@ -10,8 +10,9 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import LinkIcon from "@mui/icons-material/Link";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import type { ParsedCV, TemplateType } from "@/types/cv";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 interface CVPreviewProps {
   cv: ParsedCV;
@@ -24,43 +25,84 @@ function EditableField({
   onChange, 
   multiline = false,
   placeholder = "(click to edit)",
-  rows = 3
+  rows = 3,
+  showBulletTool = false
 }: { 
   value: string; 
   onChange: (v: string) => void; 
   multiline?: boolean;
   placeholder?: string;
   rows?: number;
+  showBulletTool?: boolean;
 }) {
   const [editing, setEditing] = useState(false);
   const [tempValue, setTempValue] = useState(value);
+  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
+
+  const insertBullet = () => {
+    if (inputRef.current) {
+      const start = inputRef.current.selectionStart || 0;
+      const end = inputRef.current.selectionEnd || 0;
+      const newValue = tempValue.slice(0, start) + "• " + tempValue.slice(end);
+      setTempValue(newValue);
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.selectionStart = start + 2;
+          inputRef.current.selectionEnd = start + 2;
+          inputRef.current.focus();
+        }
+      }, 0);
+    }
+  };
 
   if (editing) {
     return (
-      <TextField
-        size="small"
-        value={tempValue}
-        onChange={(e) => setTempValue(e.target.value)}
-        onBlur={() => {
-          onChange(tempValue);
-          setEditing(false);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && !multiline) {
+      <Box sx={{ position: "relative" }}>
+        <TextField
+          inputRef={inputRef}
+          size="small"
+          value={tempValue}
+          onChange={(e) => setTempValue(e.target.value)}
+          onBlur={(e) => {
+            if (e.relatedTarget?.getAttribute("data-bullet-btn") === "true") {
+              return;
+            }
             onChange(tempValue);
             setEditing(false);
-          }
-          if (e.key === "Escape") {
-            setTempValue(value);
-            setEditing(false);
-          }
-        }}
-        multiline={multiline}
-        rows={multiline ? rows : 1}
-        autoFocus
-        fullWidth
-        sx={{ my: 0.5 }}
-      />
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !multiline) {
+              onChange(tempValue);
+              setEditing(false);
+            }
+            if (e.key === "Escape") {
+              setTempValue(value);
+              setEditing(false);
+            }
+          }}
+          multiline={multiline}
+          rows={multiline ? rows : 1}
+          autoFocus
+          fullWidth
+          sx={{ my: 0.5 }}
+          InputProps={showBulletTool && multiline ? {
+            endAdornment: (
+              <InputAdornment position="end" sx={{ alignSelf: "flex-start", mt: 1 }}>
+                <Tooltip title="Insert bullet point">
+                  <IconButton
+                    size="small"
+                    onClick={insertBullet}
+                    data-bullet-btn="true"
+                    data-testid="button-insert-bullet"
+                  >
+                    <FormatListBulletedIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </InputAdornment>
+            )
+          } : undefined}
+        />
+      </Box>
     );
   }
 
@@ -300,14 +342,16 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
             placeholder="City, Country"
             headerText={style.headerText}
           />
-          <EditableContactField
-            icon={LinkedInIcon}
-            value={cv.linkedin}
-            onChange={(v) => updateField("linkedin", v)}
-            placeholder="linkedin.com/in/..."
-            headerText={style.headerText}
-          />
-          {showGitHub && (
+          {cv.linkedin && (
+            <EditableContactField
+              icon={LinkedInIcon}
+              value={cv.linkedin}
+              onChange={(v) => updateField("linkedin", v)}
+              placeholder="linkedin.com/in/..."
+              headerText={style.headerText}
+            />
+          )}
+          {showGitHub && cv.github && (
             <EditableContactField
               icon={GitHubIcon}
               value={cv.github}
@@ -316,13 +360,15 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
               headerText={style.headerText}
             />
           )}
-          <EditableContactField
-            icon={LinkIcon}
-            value={cv.website}
-            onChange={(v) => updateField("website", v)}
-            placeholder="yourwebsite.com"
-            headerText={style.headerText}
-          />
+          {cv.website && (
+            <EditableContactField
+              icon={LinkIcon}
+              value={cv.website}
+              onChange={(v) => updateField("website", v)}
+              placeholder="yourwebsite.com"
+              headerText={style.headerText}
+            />
+          )}
         </Box>
       </Box>
 
@@ -385,13 +431,14 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
                   />
                 </Typography>
               </Box>
-              <Typography variant="body2" sx={{ mt: 0.5, color: style.bodyText }}>
+              <Typography variant="body2" sx={{ mt: 0.5, color: style.bodyText }} component="div">
                 <EditableField 
                   value={exp.description} 
                   onChange={(v) => updateExperience(index, "description", v)} 
                   multiline
                   rows={6}
                   placeholder="Describe your responsibilities and achievements..."
+                  showBulletTool={true}
                 />
               </Typography>
               {index < cv.experience.length - 1 && <Divider sx={{ mt: 2 }} />}
