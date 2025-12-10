@@ -10,6 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **Multi-Paper Pagination**: CVPreview now renders discrete Paper components for each page:
+  - `pages.map()` iterates over calculated pages array
+  - First page includes header (`renderHeader()`) + sections with Rearrange button
+  - Subsequent pages show `PageBadge` with page number + sections
+  - `BOTTOM_GUTTER` (48px) spacing applied to each page's content
+  - `renderSection()` helper handles all 6 section types (summary, experience, education, skills, strengths, certifications)
+  - Section height estimation via `SECTION_HEIGHTS` constant for page break calculation
 - **AI Rules Module v10.0**: Merged Forensic CV Engine with existing security layer:
   - Unified `buildForensicPrompt()` combines parsing + audit in single API call
   - `ForensicAuditor` class with retry logic (3 attempts, exponential backoff)
