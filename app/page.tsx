@@ -34,7 +34,8 @@ import { CVPreview } from "@/components/CVPreview";
 import { TemplateSelector } from "@/components/TemplateSelector";
 import { RawTextView } from "@/components/RawTextView";
 import { JsonView } from "@/components/JsonView";
-import type { CVFile, ParsedCV, TemplateType } from "@/types/cv";
+import type { CVFile, ParsedCV, TemplateType, TokenUsage } from "@/types/cv";
+import TokenIcon from "@mui/icons-material/Token";
 
 export default function Home() {
   const [files, setFiles] = useState<CVFile[]>([]);
@@ -345,6 +346,31 @@ export default function Home() {
                 </Tabs>
                 <TemplateSelector template={template} onTemplateChange={setTemplate} />
               </Box>
+
+              {selectedCV?.tokenUsage && (
+                <Box 
+                  sx={{ 
+                    display: "flex", 
+                    alignItems: "center", 
+                    gap: 1, 
+                    mb: 2,
+                    p: 1.5,
+                    bgcolor: "action.hover",
+                    borderRadius: 1,
+                  }}
+                  data-testid="token-usage-display"
+                >
+                  <TokenIcon sx={{ color: "primary.main", fontSize: 20 }} />
+                  <Typography variant="body2" color="text.secondary">
+                    <strong>Token Usage:</strong>{" "}
+                    {selectedCV.tokenUsage.promptTokens.toLocaleString()} prompt +{" "}
+                    {selectedCV.tokenUsage.completionTokens.toLocaleString()} completion ={" "}
+                    <Box component="span" sx={{ color: "primary.main", fontWeight: 600 }}>
+                      {selectedCV.tokenUsage.totalTokens.toLocaleString()} total
+                    </Box>
+                  </Typography>
+                </Box>
+              )}
 
               {!selectedCV && activeTab === 0 && (
                 <Box sx={{ p: 6, textAlign: "center" }}>

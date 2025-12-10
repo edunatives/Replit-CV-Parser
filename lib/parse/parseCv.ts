@@ -1,4 +1,4 @@
-import type { ParsedCV, Experience, Education, Certification } from "@/types/cv";
+import type { ParsedCV, Experience, Education, Certification, TokenUsage } from "@/types/cv";
 import {
   normalizeText,
   normalizeWhitespace,
@@ -78,7 +78,12 @@ interface GeminiCVResponse {
   skills: string[];
 }
 
-async function extractWithGemini(text: string): Promise<GeminiCVResponse | null> {
+interface GeminiExtractionResult {
+  data: GeminiCVResponse;
+  tokenUsage: TokenUsage;
+}
+
+async function extractWithGemini(text: string): Promise<GeminiExtractionResult | null> {
   const apiKey = process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
   const baseUrl = process.env.AI_INTEGRATIONS_GEMINI_BASE_URL;
   
@@ -139,6 +144,16 @@ Return ONLY the JSON object:`;
 
     const responseText = response.text?.trim() || "";
     
+    // Extract token usage from response metadata
+    const usageMetadata = response.usageMetadata;
+    const tokenUsage: TokenUsage = {
+      promptTokens: usageMetadata?.promptTokenCount || 0,
+      completionTokens: usageMetadata?.candidatesTokenCount || 0,
+      totalTokens: usageMetadata?.totalTokenCount || 0,
+    };
+    
+    console.log(`Gemini token usage - Prompt: ${tokenUsage.promptTokens}, Completion: ${tokenUsage.completionTokens}, Total: ${tokenUsage.totalTokens}`);
+    
     // Clean up response - remove markdown code blocks if present
     let jsonText = responseText;
     if (jsonText.startsWith("```json")) {
@@ -153,7 +168,7 @@ Return ONLY the JSON object:`;
 
     const parsed = JSON.parse(jsonText) as GeminiCVResponse;
     console.log("Gemini extraction successful");
-    return parsed;
+    return { data: parsed, tokenUsage };
   } catch (error) {
     console.error("Gemini extraction error:", error);
     return null;
@@ -248,11 +263,15 @@ export async function parseCV(buffer: Buffer, fileName: string, fileId: string):
   }
   
   // Try Gemini AI extraction first
-  const geminiData = await extractWithGemini(text);
+  const geminiResult = await extractWithGemini(text);
   
   let rawCv: ParsedCV;
+  let tokenUsage: TokenUsage | undefined;
   
-  if (geminiData) {
+  if (geminiResult) {
+    const geminiData = geminiResult.data;
+    tokenUsage = geminiResult.tokenUsage;
+    
     // Use Gemini-extracted data
     rawCv = {
       id: fileId,
@@ -290,6 +309,7 @@ export async function parseCV(buffer: Buffer, fileName: string, fileId: string):
       originalFilename: fileName,
       uploadedAt: new Date(),
       rawText: text,
+      tokenUsage: tokenUsage,
     };
   } else {
     // Fallback to basic regex extraction

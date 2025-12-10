@@ -146,6 +146,7 @@ export function validateAndNormalizeCV(cv: ParsedCV): ParsedCV {
     size: cv.size,
     uploadedAt: cv.uploadedAt,
     rawText: cv.rawText,
+    tokenUsage: cv.tokenUsage,
   };
 }
 

@@ -20,6 +20,12 @@ export interface Certification {
   year: string;
 }
 
+export interface TokenUsage {
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+}
+
 export interface ParsedCV {
   id: string;
   name: string;
@@ -40,6 +46,7 @@ export interface ParsedCV {
   size?: number;
   uploadedAt?: Date;
   rawText?: string;
+  tokenUsage?: TokenUsage;
 }
 
 export interface CVFile {

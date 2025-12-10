@@ -222,7 +222,8 @@ function validateAndNormalizeCV(cv) {
         mimeType: cv.mimeType,
         size: cv.size,
         uploadedAt: cv.uploadedAt,
-        rawText: cv.rawText
+        rawText: cv.rawText,
+        tokenUsage: cv.tokenUsage
     };
 }
 function normalizeExperience(experiences, fileId) {
@@ -566,6 +567,14 @@ Return ONLY the JSON object:`;
             contents: prompt
         });
         const responseText = response.text?.trim() || "";
+        // Extract token usage from response metadata
+        const usageMetadata = response.usageMetadata;
+        const tokenUsage = {
+            promptTokens: usageMetadata?.promptTokenCount || 0,
+            completionTokens: usageMetadata?.candidatesTokenCount || 0,
+            totalTokens: usageMetadata?.totalTokenCount || 0
+        };
+        console.log(`Gemini token usage - Prompt: ${tokenUsage.promptTokens}, Completion: ${tokenUsage.completionTokens}, Total: ${tokenUsage.totalTokens}`);
         // Clean up response - remove markdown code blocks if present
         let jsonText = responseText;
         if (jsonText.startsWith("```json")) {
@@ -579,7 +588,10 @@ Return ONLY the JSON object:`;
         jsonText = jsonText.trim();
         const parsed = JSON.parse(jsonText);
         console.log("Gemini extraction successful");
-        return parsed;
+        return {
+            data: parsed,
+            tokenUsage
+        };
     } catch (error) {
         console.error("Gemini extraction error:", error);
         return null;
@@ -660,9 +672,12 @@ async function parseCV(buffer, fileName, fileId) {
         text = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$parse$2f$normalize$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["normalizeText"])(buffer.toString("utf-8"));
     }
     // Try Gemini AI extraction first
-    const geminiData = await extractWithGemini(text);
+    const geminiResult = await extractWithGemini(text);
     let rawCv;
-    if (geminiData) {
+    let tokenUsage;
+    if (geminiResult) {
+        const geminiData = geminiResult.data;
+        tokenUsage = geminiResult.tokenUsage;
         // Use Gemini-extracted data
         rawCv = {
             id: fileId,
@@ -697,7 +712,8 @@ async function parseCV(buffer, fileName, fileId) {
             skills: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$parse$2f$normalize$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["normalizeSkills"])(geminiData.skills || []),
             originalFilename: fileName,
             uploadedAt: new Date(),
-            rawText: text
+            rawText: text,
+            tokenUsage: tokenUsage
         };
     } else {
         // Fallback to basic regex extraction
