@@ -39,6 +39,9 @@ Preferred communication style: Simple, everyday language.
 - `POST /api/parse` - Single file parsing
 - `POST /api/parse/batch` - Batch file parsing
 - `GET/DELETE /api/cvs` - CV CRUD operations
+- `POST /api/assess` - AI-powered CV assessment (scores, strengths, weaknesses, recommendations)
+- `POST /api/advisor` - AI career advisor chat (personalized CV improvement advice)
+- `POST /api/jd-match` - Job description match analysis (match score, skill gaps, optimization tips)
 
 **AI-Powered Extraction**:
 - Uses **Gemini 2.5 Flash** via Replit AI Integrations (no API key required, charges billed to credits)
