@@ -17,8 +17,8 @@ export function TemplateSelector({ template, onTemplateChange }: TemplateSelecto
   };
 
   return (
-    <FormControl size="small" sx={{ minWidth: 150 }}>
-      <InputLabel id="template-select-label">Template</InputLabel>
+    <FormControl size="small" sx={{ minWidth: 140 }}>
+      <InputLabel id="template-select-label" sx={{ fontSize: "0.875rem" }}>Template</InputLabel>
       <Select
         labelId="template-select-label"
         id="template-select"
@@ -26,9 +26,10 @@ export function TemplateSelector({ template, onTemplateChange }: TemplateSelecto
         label="Template"
         onChange={handleChange}
         data-testid="select-template"
+        sx={{ fontSize: "0.875rem" }}
       >
         {templates.map((t) => (
-          <MenuItem key={t.value} value={t.value}>
+          <MenuItem key={t.value} value={t.value} sx={{ fontSize: "0.875rem" }}>
             {t.label}
           </MenuItem>
         ))}
