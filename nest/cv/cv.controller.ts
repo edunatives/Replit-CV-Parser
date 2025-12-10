@@ -9,6 +9,7 @@ import {
   UseInterceptors,
   BadRequestException,
   PayloadTooLargeException,
+  Inject,
 } from "@nestjs/common";
 import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { CvService } from "./cv.service";
@@ -43,8 +44,8 @@ const uploadConfig = {
 @Controller("cv")
 export class CvController {
   constructor(
-    private readonly cvService: CvService,
-    private readonly parseService: ParseService
+    @Inject(CvService) private readonly cvService: CvService,
+    @Inject(ParseService) private readonly parseService: ParseService
   ) {}
 
   @Post("parse")

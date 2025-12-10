@@ -1,10 +1,10 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Inject } from "@nestjs/common";
 import { DatabaseService } from "../database/database.service";
 import type { ParsedCV } from "../../types/cv";
 
 @Injectable()
 export class CvService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(@Inject(DatabaseService) private readonly databaseService: DatabaseService) {}
 
   async saveCv(cv: ParsedCV): Promise<void> {
     const collection = this.databaseService.getCollection("cvs");

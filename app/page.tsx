@@ -124,7 +124,7 @@ export default function Home() {
         formData.append("file", actualFile);
         formData.append("fileId", file.id);
 
-        const response = await fetch("/api/parse", {
+        const response = await fetch("http://localhost:3001/api/cv/parse", {
           method: "POST",
           body: formData,
         });
