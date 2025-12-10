@@ -103,6 +103,12 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
   const [jdMatch, setJdMatch] = useState<JDMatchResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [promptComparison, setPromptComparison] = useState<{
+    oldPrompt: { label: string; assessment: CVAssessment };
+    newPrompt: { label: string; assessment: CVAssessment };
+    scoreDifference: { oldScore: number; newScore: number; diff: number };
+  } | null>(null);
+  const [comparingPrompts, setComparingPrompts] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const jdInputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -147,6 +153,39 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
       setError(err instanceof Error ? err.message : "Failed to run assessment");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const runPromptComparison = async () => {
+    setComparingPrompts(true);
+    setError(null);
+    setPromptComparison(null);
+    try {
+      const response = await fetch("/api/assess/compare", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cv }),
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to compare prompts");
+      }
+      const { comparison } = await response.json();
+      setPromptComparison({
+        oldPrompt: {
+          label: comparison.oldPrompt.label,
+          assessment: normalizeAssessment(comparison.oldPrompt.assessment as Record<string, unknown>),
+        },
+        newPrompt: {
+          label: comparison.newPrompt.label,
+          assessment: normalizeAssessment(comparison.newPrompt.assessment as Record<string, unknown>),
+        },
+        scoreDifference: comparison.scoreDifference,
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to compare prompts");
+    } finally {
+      setComparingPrompts(false);
     }
   };
 
@@ -324,6 +363,73 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
             >
               Re-run Analysis
             </Button>
+            
+            <Divider sx={{ my: 2 }} />
+            
+            <Button 
+              variant="text" 
+              fullWidth 
+              size="small"
+              onClick={runPromptComparison}
+              disabled={comparingPrompts}
+              sx={{ color: "text.secondary" }}
+              data-testid="button-compare-prompts"
+            >
+              {comparingPrompts ? "Comparing..." : "Compare Old vs New Prompt"}
+            </Button>
+
+            {promptComparison && (
+              <Box sx={{ mt: 2, p: 2, bgcolor: "grey.50", borderRadius: 1 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2 }}>
+                  Prompt Comparison Results
+                </Typography>
+                
+                <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+                  <Card sx={{ flex: 1, bgcolor: "grey.200" }}>
+                    <CardContent sx={{ py: 1.5 }}>
+                      <Typography variant="caption" color="text.secondary">OLD Prompt</Typography>
+                      <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                        {promptComparison.scoreDifference.oldScore}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                  <Card sx={{ flex: 1, bgcolor: "primary.main", color: "white" }}>
+                    <CardContent sx={{ py: 1.5 }}>
+                      <Typography variant="caption" sx={{ opacity: 0.8 }}>NEW Prompt</Typography>
+                      <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                        {promptComparison.scoreDifference.newScore}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Box>
+
+                <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 1 }}>
+                  Score difference: {promptComparison.scoreDifference.diff > 0 ? "+" : ""}{promptComparison.scoreDifference.diff}
+                </Typography>
+
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, mt: 2, mb: 1 }}>
+                  OLD Prompt Feedback:
+                </Typography>
+                {promptComparison.oldPrompt.assessment.sections?.map((s, i) => (
+                  <Box key={`old-${i}`} sx={{ mb: 1 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 600 }}>{s.name}: {s.score}</Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>{s.feedback}</Typography>
+                  </Box>
+                ))}
+
+                <Divider sx={{ my: 2 }} />
+
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                  NEW Prompt Feedback:
+                </Typography>
+                {promptComparison.newPrompt.assessment.sections?.map((s, i) => (
+                  <Box key={`new-${i}`} sx={{ mb: 1 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 600 }}>{s.name}: {s.score}</Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>{s.feedback}</Typography>
+                  </Box>
+                ))}
+              </Box>
+            )}
           </>
         ) : (
           <>
