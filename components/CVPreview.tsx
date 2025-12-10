@@ -260,7 +260,7 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
   return (
     <Paper elevation={2} sx={{ overflow: "hidden", bgcolor: style.bodyBg }} data-testid="cv-preview">
       <Box sx={{ bgcolor: style.headerBg, p: 3, color: style.headerText, borderBottom: style.borderBottom }}>
-        <Typography variant="h4" component="h2" sx={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 600 }}>
+        <Typography variant="h4" component="h2" sx={{ fontFamily: "'Arial', sans-serif", fontWeight: 600 }}>
           <EditableField value={cv.name} onChange={(v) => updateField("name", v)} placeholder="Your Name" />
         </Typography>
         <Typography variant="h6" sx={{ color: style.accent, mt: 0.5 }}>
@@ -315,7 +315,7 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
 
       <Box sx={{ p: 3, color: style.bodyText }}>
         <Box sx={{ mb: 3 }}>
-          <Typography variant="h6" sx={{ color: style.accent, mb: 1, fontFamily: "'Cormorant Garamond', serif" }}>
+          <Typography variant="h6" sx={{ color: style.accent, mb: 1, fontFamily: "'Arial', sans-serif" }}>
             Summary
           </Typography>
           <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
@@ -330,7 +330,7 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
 
         <Box sx={{ mb: 3 }}>
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
-            <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Cormorant Garamond', serif" }}>
+            <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Arial', sans-serif" }}>
               Experience
             </Typography>
             <IconButton size="small" onClick={addExperience} sx={{ color: style.accent }} data-testid="button-add-experience">
@@ -392,7 +392,7 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
 
         <Box sx={{ mb: 3 }}>
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
-            <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Cormorant Garamond', serif" }}>
+            <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Arial', sans-serif" }}>
               Education
             </Typography>
             <IconButton size="small" onClick={addEducation} sx={{ color: style.accent }} data-testid="button-add-education">
@@ -446,7 +446,7 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
 
         <Box sx={{ mb: 3 }}>
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
-            <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Cormorant Garamond', serif" }}>
+            <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Arial', sans-serif" }}>
               Skills
             </Typography>
             <IconButton size="small" onClick={addSkill} sx={{ color: style.accent }} data-testid="button-add-skill">
@@ -474,7 +474,7 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
 
         <Box>
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
-            <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Cormorant Garamond', serif" }}>
+            <Typography variant="h6" sx={{ color: style.accent, fontFamily: "'Arial', sans-serif" }}>
               Certifications
             </Typography>
             <IconButton size="small" onClick={addCertification} sx={{ color: style.accent }} data-testid="button-add-certification">

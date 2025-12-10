@@ -7,62 +7,72 @@ const lightTheme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#2f54eb",
-      light: "#597ef7",
-      dark: "#1d39c4",
+      main: "#4F46E5",
+      light: "#6366F1",
+      dark: "#4338CA",
     },
     secondary: {
-      main: "#13c2c2",
-      light: "#36cfc9",
-      dark: "#08979c",
+      main: "#06B6D4",
+      light: "#22D3EE",
+      dark: "#0891B2",
     },
     background: {
-      default: "#f7f7fb",
-      paper: "#ffffff",
+      default: "#F8FAFC",
+      paper: "#FFFFFF",
     },
     text: {
-      primary: "#1f1f1f",
-      secondary: "#434343",
+      primary: "#1E293B",
+      secondary: "#64748B",
     },
-    divider: "#e5e7eb",
+    divider: "#E2E8F0",
     success: {
-      main: "#52c41a",
-      light: "#73d13d",
+      main: "#22C55E",
+      light: "#4ADE80",
     },
     error: {
-      main: "#f5222d",
-      light: "#ff4d4f",
+      main: "#EF4444",
+      light: "#F87171",
     },
     warning: {
-      main: "#faad14",
-      light: "#ffc53d",
+      main: "#F59E0B",
+      light: "#FBBF24",
     },
   },
   typography: {
-    fontFamily: "'Source Sans 3', 'Roboto', 'Helvetica', 'Arial', sans-serif",
+    fontFamily: "'Inter', 'Roboto', 'Helvetica', 'Arial', sans-serif",
     h1: {
-      fontFamily: "'Cormorant Garamond', serif",
-      fontWeight: 600,
+      fontFamily: "'Inter', sans-serif",
+      fontWeight: 700,
     },
     h2: {
-      fontFamily: "'Cormorant Garamond', serif",
-      fontWeight: 600,
+      fontFamily: "'Inter', sans-serif",
+      fontWeight: 700,
     },
     h3: {
-      fontFamily: "'Cormorant Garamond', serif",
+      fontFamily: "'Inter', sans-serif",
       fontWeight: 600,
     },
     h4: {
-      fontFamily: "'Cormorant Garamond', serif",
+      fontFamily: "'Inter', sans-serif",
       fontWeight: 600,
     },
     h5: {
-      fontFamily: "'Cormorant Garamond', serif",
+      fontFamily: "'Inter', sans-serif",
       fontWeight: 600,
     },
     h6: {
-      fontFamily: "'Cormorant Garamond', serif",
+      fontFamily: "'Inter', sans-serif",
       fontWeight: 600,
+    },
+    body1: {
+      fontFamily: "'Inter', sans-serif",
+    },
+    body2: {
+      fontFamily: "'Inter', sans-serif",
+    },
+    button: {
+      fontFamily: "'Inter', sans-serif",
+      fontWeight: 500,
     },
   },
   shape: {

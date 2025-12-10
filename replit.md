@@ -73,10 +73,11 @@ cd nest && npx tsx --tsconfig tsconfig.json start.ts
 ### Design System
 
 Custom MUI theme with:
-- **Light/white theme** with blue (#2f54eb) primary and teal (#13c2c2) secondary accents
-- Typography: Cormorant Garamond for headings, Source Sans 3 for body
+- **Light/white theme** with indigo (#4F46E5) primary and cyan (#06B6D4) secondary accents
+- Typography: Inter for UI, Arial for CV templates
 - Soft shadows and rounded corners (8px border radius)
 - Six CV template styles (modern-dark, classic-light, executive, minimal, creative, professional)
+- EduNatives branding with gradient logo
 
 ### UX Flow
 
