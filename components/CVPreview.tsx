@@ -132,14 +132,21 @@ function EditableField({
         cursor: "pointer",
         "&:hover": { bgcolor: "action.hover", borderRadius: 1 },
         p: 0.5,
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 0.5,
+        display: multiline ? "block" : "inline-flex",
+        alignItems: multiline ? undefined : "center",
+        gap: multiline ? undefined : 0.5,
         minWidth: 50,
+        position: "relative",
       }}
     >
-      <span style={{ whiteSpace: multiline ? "pre-wrap" : "normal" }}>{value || placeholder}</span>
-      <EditIcon sx={{ fontSize: 14, opacity: 0.5 }} />
+      <span style={{ whiteSpace: multiline ? "pre-wrap" : "normal", display: multiline ? "block" : "inline" }}>{value || placeholder}</span>
+      <EditIcon sx={{ 
+        fontSize: 14, 
+        opacity: 0.5, 
+        position: multiline ? "absolute" : "static",
+        top: multiline ? 4 : undefined,
+        right: multiline ? 4 : undefined,
+      }} />
     </Box>
   );
 }
