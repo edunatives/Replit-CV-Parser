@@ -73,10 +73,23 @@ cd nest && npx tsx --tsconfig tsconfig.json start.ts
 ### Design System
 
 Custom MUI theme with:
-- Dark theme with gold accents as primary palette
+- **Light/white theme** with blue (#2f54eb) primary and teal (#13c2c2) secondary accents
 - Typography: Cormorant Garamond for headings, Source Sans 3 for body
-- Compact spacing scale optimized for data-dense interfaces
+- Soft shadows and rounded corners (8px border radius)
 - Six CV template styles (modern-dark, classic-light, executive, minimal, creative, professional)
+
+### UX Flow
+
+**Dashboard-First Architecture:**
+1. **Dashboard** (entry point): Shows "My Resumes" with CV grid cards and upload section
+2. **CV Workspace** (after upload/selection): Two-pane layout
+   - Left pane: CV template preview with inline editing
+   - Right pane: AI Analysis panel with three tabs
+
+**Three Assessment Tracks:**
+1. **CV Assessment**: AI-powered resume analysis with scores and recommendations
+2. **AI Advisor**: Chat interface for personalized CV improvement advice
+3. **JD Match**: Paste job description to see match rate and optimization tips
 
 ## Project Structure
 
@@ -89,14 +102,17 @@ Custom MUI theme with:
   layout.tsx                  - Root layout with MUI providers
   page.tsx                    - Main CV parser page (client component)
 /components
-  Header.tsx                  - App header with branding
+  Header.tsx                  - App header with branding and user menu
+  Dashboard.tsx               - CV grid dashboard with upload section
+  CVWorkspace.tsx             - Two-pane workspace (preview + AI analysis)
+  AIAnalysisPanel.tsx         - Right-pane AI analysis with 3 assessment tracks
   UploadDropzone.tsx          - File upload component
   FileList.tsx                - Uploaded files list
   CVPreview.tsx               - Parsed CV preview with templates
   TemplateSelector.tsx        - CV template picker
   RawTextView.tsx             - Raw extracted text view
   JsonView.tsx                - JSON data view
-  ThemeProvider.tsx           - MUI theme configuration
+  ThemeProvider.tsx           - MUI light theme configuration
 /nest                         - NestJS backend (for future expansion)
   start.ts                    - NestJS application entry point
   app.module.ts               - Root NestJS module
