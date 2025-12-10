@@ -56,10 +56,37 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../../app/api/advisor/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/advisor">> = Specific
+  const handler = {} as typeof import("../../../app/api/advisor/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../../app/api/assess/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/assess">> = Specific
+  const handler = {} as typeof import("../../../app/api/assess/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../../app/api/cvs/route.ts
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/cvs">> = Specific
   const handler = {} as typeof import("../../../app/api/cvs/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../../app/api/jd-match/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/jd-match">> = Specific
+  const handler = {} as typeof import("../../../app/api/jd-match/route.js")
   type __Check = __IsExpected<typeof handler>
   // @ts-ignore
   type __Unused = __Check
