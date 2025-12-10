@@ -2514,41 +2514,75 @@ ${sanitized}
 Return ONLY the JSON object:`;
 }
 function buildAssessmentPrompt(cvSummary) {
-    const sectionList = ASSESSMENT_SECTIONS.map((s)=>s.name).join(", ");
-    return `You are an expert CV/Resume analyst and career advisor. Analyze the following CV and provide a comprehensive assessment.
+    // Sanitize input for security
+    const sanitized = sanitizeAIInput(cvSummary);
+    // Check for injection attempts
+    if (containsInjectionAttempt(sanitized)) {
+        throw new Error("Security: Suspicious content detected in CV text");
+    }
+    return `You are the EduNatives Forensic CV Analyst (v10.0). Analyze the following CV using our strict weighted scoring system.
 
 CV DATA:
-${cvSummary}
+"""
+${sanitized}
+"""
 
-Provide your assessment as a valid JSON object with this exact structure:
+--- WEIGHTED SCORING SYSTEM ---
+Calculate the overall score as a WEIGHTED AVERAGE based on these exact weights:
+- Work Experience: ${AUDIT_WEIGHTS.workExperience}% weight
+- Professional Summary: ${AUDIT_WEIGHTS.summary}% weight
+- Education: ${AUDIT_WEIGHTS.education}% weight
+- Skills: ${AUDIT_WEIGHTS.skills}% weight
+- Contact Information: ${AUDIT_WEIGHTS.contactInfo}% weight
+- Overall Presentation: ${AUDIT_WEIGHTS.presentation}% weight
+
+Formula: overallScore = (section1Score * ${AUDIT_WEIGHTS.workExperience} + section2Score * ${AUDIT_WEIGHTS.summary} + ...) / 100
+
+--- SCORING RUBRIC (apply strictly) ---
+- ${SCORING_RUBRIC.exceptional.min}-${SCORING_RUBRIC.exceptional.max}: ${SCORING_RUBRIC.exceptional.label} (${SCORING_RUBRIC.exceptional.description})
+- ${SCORING_RUBRIC.strong.min}-${SCORING_RUBRIC.strong.max}: ${SCORING_RUBRIC.strong.label} (${SCORING_RUBRIC.strong.description})
+- ${SCORING_RUBRIC.good.min}-${SCORING_RUBRIC.good.max}: ${SCORING_RUBRIC.good.label} (${SCORING_RUBRIC.good.description})
+- ${SCORING_RUBRIC.fair.min}-${SCORING_RUBRIC.fair.max}: ${SCORING_RUBRIC.fair.label} (${SCORING_RUBRIC.fair.description})
+- Below ${SCORING_RUBRIC.fair.min}: ${SCORING_RUBRIC.needsWork.label} (${SCORING_RUBRIC.needsWork.description})
+
+--- FORENSIC ANALYSIS CRITERIA ---
+For each section, evaluate:
+1. COMPLETENESS: Is all expected information present?
+2. CLARITY: Is the content clear, concise, and well-organized?
+3. IMPACT: Are achievements quantified? Are action verbs used?
+4. ATS COMPATIBILITY: Will it pass Applicant Tracking Systems?
+5. AUTHENTICITY: Do claims seem realistic and verifiable? Flag any inflation.
+
+--- OUTPUT FORMAT ---
+Return ONLY a valid JSON object with this exact structure:
 {
-  "overallScore": <number 0-100>,
+  "overallScore": <number 0-100, calculated using weighted average>,
   "sections": [
-    {"name": "Contact Information", "score": <0-100>, "feedback": "<specific feedback>"},
-    {"name": "Professional Summary", "score": <0-100>, "feedback": "<specific feedback>"},
-    {"name": "Work Experience", "score": <0-100>, "feedback": "<specific feedback>"},
-    {"name": "Education", "score": <0-100>, "feedback": "<specific feedback>"},
-    {"name": "Skills", "score": <0-100>, "feedback": "<specific feedback>"},
-    {"name": "Overall Presentation", "score": <0-100>, "feedback": "<specific feedback>"}
+    {"name": "Contact Information", "score": <0-100>, "feedback": "<detailed forensic feedback on completeness, professional email, LinkedIn presence, etc.>"},
+    {"name": "Professional Summary", "score": <0-100>, "feedback": "<forensic analysis of clarity, impact, quantified achievements, keyword optimization>"},
+    {"name": "Work Experience", "score": <0-100>, "feedback": "<forensic review of job progression, achievement quantification, action verbs, gaps analysis>"},
+    {"name": "Education", "score": <0-100>, "feedback": "<analysis of relevance, completeness, certifications, honors>"},
+    {"name": "Skills", "score": <0-100>, "feedback": "<review of skill relevance, categorization, proficiency indicators>"},
+    {"name": "Overall Presentation", "score": <0-100>, "feedback": "<assessment of formatting, consistency, length, visual organization>"}
   ],
-  "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
-  "weaknesses": ["<weakness 1>", "<weakness 2>", "<weakness 3>"],
-  "recommendations": ["<actionable recommendation 1>", "<actionable recommendation 2>", "<actionable recommendation 3>", "<actionable recommendation 4>", "<actionable recommendation 5>"]
+  "strengths": ["<specific strength with evidence from CV>", "<strength 2>", "<strength 3>"],
+  "weaknesses": ["<specific weakness with recommendation>", "<weakness 2>", "<weakness 3>"],
+  "recommendations": [
+    "<specific actionable recommendation with example>",
+    "<recommendation 2>",
+    "<recommendation 3>",
+    "<recommendation 4>",
+    "<recommendation 5>"
+  ]
 }
 
-SCORING RUBRIC:
-- ${SCORING_RUBRIC.exceptional.min}-${SCORING_RUBRIC.exceptional.max}: ${SCORING_RUBRIC.exceptional.label} - ${SCORING_RUBRIC.exceptional.description}
-- ${SCORING_RUBRIC.strong.min}-${SCORING_RUBRIC.strong.max}: ${SCORING_RUBRIC.strong.label} - ${SCORING_RUBRIC.strong.description}
-- ${SCORING_RUBRIC.good.min}-${SCORING_RUBRIC.good.max}: ${SCORING_RUBRIC.good.label} - ${SCORING_RUBRIC.good.description}
-- ${SCORING_RUBRIC.fair.min}-${SCORING_RUBRIC.fair.max}: ${SCORING_RUBRIC.fair.label} - ${SCORING_RUBRIC.fair.description}
-- Below ${SCORING_RUBRIC.fair.min}: ${SCORING_RUBRIC.needsWork.label} - ${SCORING_RUBRIC.needsWork.description}
-
-IMPORTANT:
-- Return ONLY valid JSON, no markdown, no code blocks, no explanations
-- Be specific and actionable in your feedback
-- Consider ATS (Applicant Tracking System) compatibility
-- Score based on completeness, clarity, impact, and professional presentation
-- Recommendations should be specific and actionable`;
+CRITICAL INSTRUCTIONS:
+- Return ONLY valid JSON, no markdown code blocks, no explanations
+- Calculate overallScore using the weighted formula above - do NOT just average
+- Be forensically specific - cite actual content from the CV in feedback
+- Flag any claims that appear inflated or unverifiable
+- Consider ATS keyword optimization in recommendations
+- Each recommendation should be immediately actionable`;
 }
 function buildJDMatchPrompt(cvSummary, jobDescription) {
     const sanitizedJD = sanitizeAIInput(jobDescription, TOKEN_LIMITS.maxJobDescriptionLength);
