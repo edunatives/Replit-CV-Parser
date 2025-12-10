@@ -40,10 +40,28 @@
       "namedRegex": "^/_not\\-found(?:/)?$"
     },
     {
+      "page": "/api/advisor",
+      "regex": "^/api/advisor(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/advisor(?:/)?$"
+    },
+    {
+      "page": "/api/assess",
+      "regex": "^/api/assess(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/assess(?:/)?$"
+    },
+    {
       "page": "/api/cvs",
       "regex": "^/api/cvs(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/api/cvs(?:/)?$"
+    },
+    {
+      "page": "/api/jd-match",
+      "regex": "^/api/jd\\-match(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/jd\\-match(?:/)?$"
     },
     {
       "page": "/api/parse",
@@ -56,6 +74,12 @@
       "regex": "^/api/parse/batch(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/api/parse/batch(?:/)?$"
+    },
+    {
+      "page": "/api-docs",
+      "regex": "^/api\\-docs(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api\\-docs(?:/)?$"
     }
   ],
   "dataRoutes": [],

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "functions": {
-    "/api/parse": {},
-    "/api/parse/batch": {}
+    "/api/parse/batch": {},
+    "/api/parse": {}
   }
 }

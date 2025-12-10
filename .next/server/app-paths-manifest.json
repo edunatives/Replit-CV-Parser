@@ -1,7 +1,11 @@
 {
   "/_global-error/page": "app/_global-error/page.js",
   "/_not-found/page": "app/_not-found/page.js",
+  "/api-docs/page": "app/api-docs/page.js",
+  "/api/advisor/route": "app/api/advisor/route.js",
+  "/api/assess/route": "app/api/assess/route.js",
   "/api/cvs/route": "app/api/cvs/route.js",
+  "/api/jd-match/route": "app/api/jd-match/route.js",
   "/api/parse/batch/route": "app/api/parse/batch/route.js",
   "/api/parse/route": "app/api/parse/route.js",
   "/page": "app/page.js"

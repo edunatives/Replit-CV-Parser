@@ -1,0 +1,3 @@
+module.exports=[35112,(a,b,c)=>{"use strict";b.exports=a.r(97877).vendored["react-ssr"].ReactDOM},22734,(a,b,c)=>{b.exports=a.x("fs",()=>require("fs"))},14747,(a,b,c)=>{b.exports=a.x("path",()=>require("path"))},874,(a,b,c)=>{b.exports=a.x("buffer",()=>require("buffer"))},37702,(a,b,c)=>{b.exports=a.x("worker_threads",()=>require("worker_threads"))}];
+
+//# sourceMappingURL=%5Broot-of-the-server%5D__b9dc93ad._.js.map
