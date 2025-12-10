@@ -391,7 +391,8 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
       role: "New Role",
       company: "Company Name",
       duration: "",
-      description: ""
+      description: "",
+      location: ""
     };
     onUpdateCV({ ...cv, experience: [...cv.experience, newExp] });
   };
@@ -617,14 +618,14 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
                     placeholder="Duration"
                   />
                 </Typography>
-                {exp.location && (
-                  <>
-                    {style.showMetaIcons && <LocationOnIcon sx={{ fontSize: 14, color: style.bodyTextSecondary }} />}
-                    <Typography variant="body2" sx={{ color: style.bodyTextSecondary, ml: style.showMetaIcons ? -1.5 : 0 }}>
-                      {exp.location}
-                    </Typography>
-                  </>
-                )}
+                {style.showMetaIcons && <LocationOnIcon sx={{ fontSize: 14, color: style.bodyTextSecondary }} />}
+                <Typography variant="body2" sx={{ color: style.bodyTextSecondary, ml: style.showMetaIcons ? -1.5 : 0 }}>
+                  <EditableField 
+                    value={exp.location || ""} 
+                    onChange={(v) => updateExperience(index, "location", v)} 
+                    placeholder="Location"
+                  />
+                </Typography>
               </Box>
               <Typography variant="body2" sx={{ mt: 0.5, color: style.bodyText, whiteSpace: "pre-wrap" }} component="div">
                 <EditableField 

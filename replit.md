@@ -84,7 +84,9 @@ Custom MUI theme with:
 - **Light/white theme** with indigo (#4F46E5) primary and cyan (#06B6D4) secondary accents
 - Typography: Inter for UI, Arial for CV templates
 - Soft shadows and rounded corners (8px border radius)
-- Six CV template styles (modern-dark, classic-light, executive, minimal, creative, professional)
+- Eight CV template styles managed via modular registry (`lib/templates/index.ts`):
+  - modern-dark, classic-light, executive, minimal, creative, professional, corporate, business
+- Template registry supports: header variants (default, centeredLines, underline), meta icons, company color customization
 - EduNatives branding with gradient logo
 
 ### UX Flow
@@ -138,6 +140,7 @@ Custom MUI theme with:
   /parse/normalize.ts         - Deterministic normalization functions (JSDoc documented)
   /export/exportCV.ts         - CV export to PDF/DOCX/TXT/JSON (JSDoc documented)
   /swagger.ts                 - OpenAPI 3.0 specification
+  /templates/index.ts         - CV template registry with TemplateStyle interface
 /types
   cv.ts                       - TypeScript interfaces
 /app
