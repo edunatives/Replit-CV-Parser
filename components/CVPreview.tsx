@@ -516,9 +516,9 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
   // Page item types for granular pagination
   type PageItem = 
     | { type: "summary" }
-    | { type: "experience-header" }
+    | { type: "experience-header"; continued?: boolean }
     | { type: "experience-entry"; index: number }
-    | { type: "education-header" }
+    | { type: "education-header"; continued?: boolean }
     | { type: "education-entry"; index: number }
     | { type: "skills" }
     | { type: "strengths" }
@@ -607,13 +607,46 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
         case "experience": {
           if (cv.experience.length === 0) break;
           
-          // Add section header
-          addItem({ type: "experience-header" }, SECTION_HEADER);
+          // Track if any entry has been rendered (for continuation logic)
+          let experienceEntryRendered = false;
 
-          // Add each experience entry individually
           cv.experience.forEach((exp, index) => {
             const entryHeight = estimateExperienceEntryHeight(exp);
-            addItem({ type: "experience-entry", index }, entryHeight);
+            const headerHeight = SECTION_HEADER;
+            
+            if (index === 0) {
+              // First entry: header + entry must stay together
+              const combined = headerHeight + entryHeight;
+              if (currentHeight + combined > getAvailable() && currentItems.length > 0) {
+                pushPage();
+              }
+              currentItems.push({ type: "experience-header", continued: false });
+              currentItems.push({ type: "experience-entry", index });
+              currentHeight += combined;
+              experienceEntryRendered = true;
+            } else {
+              // Subsequent entries: may break to new page with continuation header
+              // Calculate if we need a page break
+              if (currentHeight + entryHeight > getAvailable() && currentItems.length > 0) {
+                pushPage();
+                // Add continuation header + entry together (keep header with at least one entry)
+                const combined = headerHeight + entryHeight;
+                // If combined doesn't fit on fresh page, just add entry alone (shouldn't happen in practice)
+                if (combined <= getAvailable()) {
+                  currentItems.push({ type: "experience-header", continued: true });
+                  currentItems.push({ type: "experience-entry", index });
+                  currentHeight += combined;
+                } else {
+                  // Entry alone is too tall for a page, just add it
+                  currentItems.push({ type: "experience-entry", index });
+                  currentHeight += entryHeight;
+                }
+              } else {
+                currentItems.push({ type: "experience-entry", index });
+                currentHeight += entryHeight;
+              }
+              experienceEntryRendered = true;
+            }
           });
           break;
         }
@@ -621,13 +654,38 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
         case "education": {
           if (!cv.education || cv.education.length === 0) break;
 
-          // Add section header
-          addItem({ type: "education-header" }, SECTION_HEADER);
-
-          // Add each education entry individually
           cv.education.forEach((_, index) => {
             const entryHeight = estimateEducationEntryHeight();
-            addItem({ type: "education-entry", index }, entryHeight);
+            const headerHeight = SECTION_HEADER;
+            
+            if (index === 0) {
+              // First entry: header + entry must stay together
+              const combined = headerHeight + entryHeight;
+              if (currentHeight + combined > getAvailable() && currentItems.length > 0) {
+                pushPage();
+              }
+              currentItems.push({ type: "education-header", continued: false });
+              currentItems.push({ type: "education-entry", index });
+              currentHeight += combined;
+            } else {
+              // Subsequent entries: may break to new page with continuation header
+              if (currentHeight + entryHeight > getAvailable() && currentItems.length > 0) {
+                pushPage();
+                // Add continuation header + entry together (keep header with at least one entry)
+                const combined = headerHeight + entryHeight;
+                if (combined <= getAvailable()) {
+                  currentItems.push({ type: "education-header", continued: true });
+                  currentItems.push({ type: "education-entry", index });
+                  currentHeight += combined;
+                } else {
+                  currentItems.push({ type: "education-entry", index });
+                  currentHeight += entryHeight;
+                }
+              } else {
+                currentItems.push({ type: "education-entry", index });
+                currentHeight += entryHeight;
+              }
+            }
           });
           break;
         }
@@ -675,12 +733,119 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
     },
   };
 
-  // Helper function to render a section
-  const renderSection = (sectionName: CVSection, isLast: boolean) => {
-    switch (sectionName) {
+  // Render individual experience entry
+  const renderExperienceEntry = (index: number, isLast: boolean) => {
+    const exp = cv.experience[index];
+    if (!exp) return null;
+    
+    return (
+      <Box key={`exp-${exp.id}`} sx={{ mb: isLast ? 0 : 2, position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
+        <IconButton 
+          className="delete-btn"
+          size="small" 
+          onClick={() => deleteExperience(index)}
+          sx={{ position: "absolute", right: 0, top: 0, visibility: "hidden", color: "error.main" }}
+          data-testid={`button-delete-experience-${index}`}
+        >
+          <DeleteIcon fontSize="small" />
+        </IconButton>
+        <Typography variant="subtitle1" fontWeight={600} sx={{ color: style.bodyText }}>
+          <EditableField 
+            value={exp.role} 
+            onChange={(v) => updateExperience(index, "role", v)} 
+            placeholder="Job Title"
+          />
+        </Typography>
+        <Typography variant="body2" sx={{ color: style.companyColor, fontWeight: 500 }}>
+          <EditableField 
+            value={exp.company} 
+            onChange={(v) => updateExperience(index, "company", v)} 
+            placeholder="Company Name"
+          />
+        </Typography>
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center", flexWrap: "wrap", mt: 0.25 }}>
+          {style.showMetaIcons && <CalendarMonthIcon sx={{ fontSize: 14, color: style.bodyTextSecondary }} />}
+          <Typography variant="body2" sx={{ color: style.bodyTextSecondary, ml: style.showMetaIcons ? -1.5 : 0 }}>
+            <EditableField 
+              value={exp.duration} 
+              onChange={(v) => updateExperience(index, "duration", v)} 
+              placeholder="Duration"
+            />
+          </Typography>
+          {style.showMetaIcons && <LocationOnIcon sx={{ fontSize: 14, color: style.bodyTextSecondary }} />}
+          <Typography variant="body2" sx={{ color: style.bodyTextSecondary, ml: style.showMetaIcons ? -1.5 : 0 }}>
+            <EditableField 
+              value={exp.location || ""} 
+              onChange={(v) => updateExperience(index, "location", v)} 
+              placeholder="Location"
+            />
+          </Typography>
+        </Box>
+        <Typography variant="body2" sx={{ mt: 0.5, color: style.bodyText, whiteSpace: "pre-wrap" }} component="div">
+          <EditableField 
+            value={exp.description} 
+            onChange={(v) => updateExperience(index, "description", v)} 
+            multiline
+            rows={6}
+            placeholder="Describe your responsibilities and achievements..."
+            showBulletTool={true}
+          />
+        </Typography>
+        {!isLast && <Divider sx={{ mt: 2 }} />}
+      </Box>
+    );
+  };
+
+  // Render individual education entry
+  const renderEducationEntry = (index: number, isLast: boolean) => {
+    const edu = cv.education?.[index];
+    if (!edu) return null;
+
+    return (
+      <Box key={`edu-${edu.id}`} sx={{ mb: isLast ? 0 : 1, position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
+        <IconButton 
+          className="delete-btn"
+          size="small" 
+          onClick={() => deleteEducation(index)}
+          sx={{ position: "absolute", right: 0, top: 0, visibility: "hidden", color: "error.main" }}
+          data-testid={`button-delete-education-${index}`}
+        >
+          <DeleteIcon fontSize="small" />
+        </IconButton>
+        <Typography variant="subtitle2" fontWeight={600} sx={{ color: style.bodyText }}>
+          <EditableField 
+            value={edu.degree} 
+            onChange={(v) => updateEducation(index, "degree", v)} 
+            placeholder="Degree"
+          />
+        </Typography>
+        <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap" }}>
+          <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
+            <EditableField 
+              value={edu.institution} 
+              onChange={(v) => updateEducation(index, "institution", v)} 
+              placeholder="Institution"
+            />
+          </Typography>
+          <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>|</Typography>
+          <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
+            <EditableField 
+              value={edu.year} 
+              onChange={(v) => updateEducation(index, "year", v)} 
+              placeholder="Year"
+            />
+          </Typography>
+        </Box>
+      </Box>
+    );
+  };
+
+  // Helper function to render a page item
+  const renderItem = (item: PageItem, isLast: boolean, pageItems: PageItem[]) => {
+    switch (item.type) {
       case "summary":
         return (
-          <Box key="summary" sx={{ mb: isLast ? 0 : 3, pageBreakInside: "avoid" }}>
+          <Box key="summary" sx={{ mb: isLast ? 0 : 3 }}>
             <SectionHeader title="Summary" style={style} />
             <Typography variant="body2" sx={{ color: style.bodyTextSecondary, whiteSpace: "pre-wrap" }} component="div">
               <EditableField 
@@ -692,144 +857,60 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
             </Typography>
           </Box>
         );
-              
-      case "experience":
+
+      case "experience-header": {
         return (
-          <Box key="experience" sx={{ mb: isLast ? 0 : 3, pageBreakInside: "avoid" }}>
+          <Box key="experience-header" sx={{ mb: 1 }}>
             <SectionHeader
-              title="Experience"
+              title={item.continued ? "Experience (continued)" : "Experience"}
               style={style}
               rightContent={
-                <IconButton size="small" onClick={addExperience} sx={{ color: style.accent }} data-testid="button-add-experience">
-                  <AddIcon fontSize="small" />
-                </IconButton>
+                !item.continued ? (
+                  <IconButton size="small" onClick={addExperience} sx={{ color: style.accent }} data-testid="button-add-experience">
+                    <AddIcon fontSize="small" />
+                  </IconButton>
+                ) : undefined
               }
             />
-            {cv.experience.map((exp, index) => (
-              <Box key={exp.id} sx={{ mb: 2, position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
-                <IconButton 
-                  className="delete-btn"
-                  size="small" 
-                  onClick={() => deleteExperience(index)}
-                  sx={{ position: "absolute", right: 0, top: 0, visibility: "hidden", color: "error.main" }}
-                  data-testid={`button-delete-experience-${index}`}
-                >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-                <Typography variant="subtitle1" fontWeight={600} sx={{ color: style.bodyText }}>
-                  <EditableField 
-                    value={exp.role} 
-                    onChange={(v) => updateExperience(index, "role", v)} 
-                    placeholder="Job Title"
-                  />
-                </Typography>
-                <Typography variant="body2" sx={{ color: style.companyColor, fontWeight: 500 }}>
-                  <EditableField 
-                    value={exp.company} 
-                    onChange={(v) => updateExperience(index, "company", v)} 
-                    placeholder="Company Name"
-                  />
-                </Typography>
-                <Box sx={{ display: "flex", gap: 2, alignItems: "center", flexWrap: "wrap", mt: 0.25 }}>
-                  {style.showMetaIcons && <CalendarMonthIcon sx={{ fontSize: 14, color: style.bodyTextSecondary }} />}
-                  <Typography variant="body2" sx={{ color: style.bodyTextSecondary, ml: style.showMetaIcons ? -1.5 : 0 }}>
-                    <EditableField 
-                      value={exp.duration} 
-                      onChange={(v) => updateExperience(index, "duration", v)} 
-                      placeholder="Duration"
-                    />
-                  </Typography>
-                  {style.showMetaIcons && <LocationOnIcon sx={{ fontSize: 14, color: style.bodyTextSecondary }} />}
-                  <Typography variant="body2" sx={{ color: style.bodyTextSecondary, ml: style.showMetaIcons ? -1.5 : 0 }}>
-                    <EditableField 
-                      value={exp.location || ""} 
-                      onChange={(v) => updateExperience(index, "location", v)} 
-                      placeholder="Location"
-                    />
-                  </Typography>
-                </Box>
-                <Typography variant="body2" sx={{ mt: 0.5, color: style.bodyText, whiteSpace: "pre-wrap" }} component="div">
-                  <EditableField 
-                    value={exp.description} 
-                    onChange={(v) => updateExperience(index, "description", v)} 
-                    multiline
-                    rows={6}
-                    placeholder="Describe your responsibilities and achievements..."
-                    showBulletTool={true}
-                  />
-                </Typography>
-                {index < cv.experience.length - 1 && <Divider sx={{ mt: 2 }} />}
-              </Box>
-            ))}
-            {cv.experience.length === 0 && (
-              <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
-                Click + to add experience
-              </Typography>
-            )}
           </Box>
         );
-              
-      case "education":
+      }
+
+      case "experience-entry": {
+        const isLastExp = isLast || 
+          (pageItems.findIndex(i => i === item) === pageItems.length - 1) ||
+          (pageItems[pageItems.findIndex(i => i === item) + 1]?.type !== "experience-entry");
+        return renderExperienceEntry(item.index, isLastExp);
+      }
+
+      case "education-header": {
         return (
-          <Box key="education" sx={{ mb: isLast ? 0 : 3, pageBreakInside: "avoid" }}>
+          <Box key="education-header" sx={{ mb: 1 }}>
             <SectionHeader
-              title="Education"
+              title={item.continued ? "Education (continued)" : "Education"}
               style={style}
               rightContent={
-                <IconButton size="small" onClick={addEducation} sx={{ color: style.accent }} data-testid="button-add-education">
-                  <AddIcon fontSize="small" />
-                </IconButton>
+                !item.continued ? (
+                  <IconButton size="small" onClick={addEducation} sx={{ color: style.accent }} data-testid="button-add-education">
+                    <AddIcon fontSize="small" />
+                  </IconButton>
+                ) : undefined
               }
             />
-            {cv.education.map((edu, index) => (
-              <Box key={edu.id} sx={{ mb: 1, position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
-                <IconButton 
-                  className="delete-btn"
-                  size="small" 
-                  onClick={() => deleteEducation(index)}
-                  sx={{ position: "absolute", right: 0, top: 0, visibility: "hidden", color: "error.main" }}
-                  data-testid={`button-delete-education-${index}`}
-                >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-                <Typography variant="subtitle2" fontWeight={600} sx={{ color: style.bodyText }}>
-                  <EditableField 
-                    value={edu.degree} 
-                    onChange={(v) => updateEducation(index, "degree", v)} 
-                    placeholder="Degree"
-                  />
-                </Typography>
-                <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap" }}>
-                  <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
-                    <EditableField 
-                      value={edu.institution} 
-                      onChange={(v) => updateEducation(index, "institution", v)} 
-                      placeholder="Institution"
-                    />
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>(</Typography>
-                  <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
-                    <EditableField 
-                      value={edu.year} 
-                      onChange={(v) => updateEducation(index, "year", v)} 
-                      placeholder="Year"
-                    />
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>)</Typography>
-                </Box>
-              </Box>
-            ))}
-            {cv.education.length === 0 && (
-              <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
-                Click + to add education
-              </Typography>
-            )}
           </Box>
         );
-              
+      }
+
+      case "education-entry": {
+        const isLastEdu = isLast || 
+          (pageItems.findIndex(i => i === item) === pageItems.length - 1) ||
+          (pageItems[pageItems.findIndex(i => i === item) + 1]?.type !== "education-entry");
+        return renderEducationEntry(item.index, isLastEdu);
+      }
+
       case "skills":
         return (
-          <Box key="skills" sx={{ mb: isLast ? 0 : 3, pageBreakInside: "avoid" }}>
+          <Box key="skills" sx={{ mb: isLast ? 0 : 3 }}>
             <SectionHeader
               title="Skills"
               style={style}
@@ -841,29 +922,25 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
             />
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
               {cv.skills.map((skill, index) => (
-                <EditableSkillChip
-                  key={index}
-                  skill={skill}
-                  accentColor={style.accent}
+                <EditableSkillChip 
+                  key={`skill-${index}`}
+                  skill={skill} 
+                  accentColor={style.accent} 
                   onUpdate={(v) => updateSkill(index, v)}
                   onDelete={() => deleteSkill(index)}
-                  testId={`skill-${index}`}
+                  testId={`chip-skill-${index}`}
                 />
               ))}
             </Box>
-            {cv.skills.length === 0 && (
-              <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
-                Click + to add skills
-              </Typography>
-            )}
           </Box>
         );
-              
+
       case "strengths":
+        if (!cv.strengths || cv.strengths.length === 0) return null;
         return (
-          <Box key="strengths" sx={{ mb: isLast ? 0 : 3, pageBreakInside: "avoid" }}>
+          <Box key="strengths" sx={{ mb: isLast ? 0 : 3 }}>
             <SectionHeader
-              title="Key Strengths"
+              title="Strengths"
               style={style}
               rightContent={
                 <IconButton size="small" onClick={addStrength} sx={{ color: style.accent }} data-testid="button-add-strength">
@@ -872,28 +949,24 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
               }
             />
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-              {(cv.strengths || []).map((strength, index) => (
-                <EditableStrengthChip
-                  key={index}
-                  strength={strength}
-                  accentColor={style.accent}
+              {cv.strengths.map((strength, index) => (
+                <EditableSkillChip 
+                  key={`strength-${index}`}
+                  skill={strength} 
+                  accentColor={style.accent} 
                   onUpdate={(v) => updateStrength(index, v)}
                   onDelete={() => deleteStrength(index)}
-                  testId={`strength-${index}`}
+                  testId={`chip-strength-${index}`}
                 />
               ))}
             </Box>
-            {(!cv.strengths || cv.strengths.length === 0) && (
-              <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
-                Click + to add strengths
-              </Typography>
-            )}
           </Box>
         );
-              
+
       case "certifications":
+        if (!cv.certifications || cv.certifications.length === 0) return null;
         return (
-          <Box key="certifications" sx={{ mb: isLast ? 0 : 3, pageBreakInside: "avoid" }}>
+          <Box key="certifications" sx={{ mb: isLast ? 0 : 3 }}>
             <SectionHeader
               title="Certifications"
               style={style}
@@ -903,28 +976,49 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
                 </IconButton>
               }
             />
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-              {(cv.certifications || []).map((cert, index) => (
-                <EditableCertChip
-                  key={cert.id}
-                  cert={cert}
-                  accentColor={style.accent}
-                  bodyText={style.bodyText}
-                  onUpdateName={(v) => updateCertification(index, "name", v)}
-                  onUpdateIssuer={(v) => updateCertification(index, "issuer", v)}
-                  onDelete={() => deleteCertification(index)}
-                  testId={`cert-${index}`}
-                />
-              ))}
-            </Box>
-            {(!cv.certifications || cv.certifications.length === 0) && (
-              <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
-                Click + to add certifications
-              </Typography>
-            )}
+            {cv.certifications.map((cert, index) => (
+              <Box key={cert.id} sx={{ mb: 1, position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
+                <IconButton 
+                  className="delete-btn"
+                  size="small" 
+                  onClick={() => deleteCertification(index)}
+                  sx={{ position: "absolute", right: 0, top: 0, visibility: "hidden", color: "error.main" }}
+                  data-testid={`button-delete-certification-${index}`}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+                <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap" }}>
+                  <EditableSkillChip 
+                    skill={cert.name} 
+                    accentColor={style.accent} 
+                    onUpdate={(v) => updateCertification(index, "name", v)}
+                    onDelete={() => deleteCertification(index)}
+                    testId={`chip-certification-${index}`}
+                  />
+                  {cert.issuer && (
+                    <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
+                      - <EditableField 
+                        value={cert.issuer} 
+                        onChange={(v) => updateCertification(index, "issuer", v)} 
+                        placeholder="Issuer"
+                      />
+                    </Typography>
+                  )}
+                  {cert.year && (
+                    <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
+                      (<EditableField 
+                        value={cert.year} 
+                        onChange={(v) => updateCertification(index, "year", v)} 
+                        placeholder="Year"
+                      />)
+                    </Typography>
+                  )}
+                </Box>
+              </Box>
+            ))}
           </Box>
         );
-              
+
       default:
         return null;
     }
@@ -1100,8 +1194,8 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
             <>
               {renderHeader()}
               <Box sx={{ p: 3, color: style.bodyText, pb: `${BOTTOM_GUTTER}px` }}>
-                {page.sections.map((sectionName, idx) => 
-                  renderSection(sectionName, idx === page.sections.length - 1)
+                {page.items.map((item, idx) => 
+                  renderItem(item, idx === page.items.length - 1, page.items)
                 )}
               </Box>
             </>
@@ -1109,8 +1203,8 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
             <>
               <PageBadge pageNumber={page.pageNumber} totalPages={totalPages} />
               <Box sx={{ p: 3, color: style.bodyText, pb: `${BOTTOM_GUTTER}px` }}>
-                {page.sections.map((sectionName, idx) => 
-                  renderSection(sectionName, idx === page.sections.length - 1)
+                {page.items.map((item, idx) => 
+                  renderItem(item, idx === page.items.length - 1, page.items)
                 )}
               </Box>
             </>
