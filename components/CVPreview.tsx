@@ -122,7 +122,7 @@ function EditableField({
         minWidth: 50,
       }}
     >
-      <span>{value || placeholder}</span>
+      <span style={{ whiteSpace: multiline ? "pre-wrap" : "normal" }}>{value || placeholder}</span>
       <EditIcon sx={{ fontSize: 14, opacity: 0.5 }} />
     </Box>
   );

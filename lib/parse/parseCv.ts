@@ -140,7 +140,7 @@ Extract the following fields:
   - company: Company name
   - role: Job title/role
   - duration: Date range (e.g., "Jan 2020 - Present")
-  - description: Key responsibilities and achievements (combine bullet points)
+  - description: Key responsibilities and achievements. IMPORTANT: Preserve bullet points using "• " prefix and separate each bullet with a newline character. Example format: "• Led team of 5 engineers\n• Increased revenue by 20%\n• Implemented CI/CD pipeline"
 - education: Array of education entries, each with:
   - institution: School/University name
   - degree: Degree type and field (e.g., "Bachelor of Science in Computer Science")
