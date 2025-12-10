@@ -359,7 +359,8 @@ export const swaggerSpec = {
           role: { type: "string" },
           company: { type: "string" },
           duration: { type: "string" },
-          description: { type: "string" }
+          description: { type: "string", description: "Job responsibilities and achievements. Bullet points preserved with newlines." },
+          location: { type: "string", description: "Optional job location (city, state/country)" }
         }
       },
       Education: {

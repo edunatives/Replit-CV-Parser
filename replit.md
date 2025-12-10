@@ -8,6 +8,14 @@ CV Intelligence Parser is a web application for uploading, parsing, and exportin
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+- **Section reorder buttons**: Always visible at 40% opacity (full opacity on hover) for better touch device accessibility
+- **Header layout**: EduNatives logo moved from sidebar to header bar, with centered search bar and People/Filter buttons
+- **Bullet point preservation**: `normalizeDescription()` function preserves newlines in experience descriptions for proper bullet formatting
+- **Skills/Certifications styling**: Consistent chip style with muted accent background, bold text, and delete icons
+- **Template registry**: Added corporate and business templates to exportCV.ts for complete export support
+
 ## System Architecture
 
 ### Frontend Architecture
