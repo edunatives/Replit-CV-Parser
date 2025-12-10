@@ -11,7 +11,10 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import LinkIcon from "@mui/icons-material/Link";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import type { ParsedCV, TemplateType } from "@/types/cv";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import type { ParsedCV, TemplateType, CVSection } from "@/types/cv";
+import { DEFAULT_SECTION_ORDER } from "@/types/cv";
 import { useState, useRef } from "react";
 import { isDeveloperRole } from "@/lib/ai/rules";
 
@@ -230,8 +233,22 @@ function EditableContactField({
 }
 
 export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
+  const sectionOrder = cv.sectionOrder || DEFAULT_SECTION_ORDER;
+
   const updateField = (field: keyof ParsedCV, value: string | string[]) => {
     onUpdateCV({ ...cv, [field]: value });
+  };
+
+  const moveSection = (section: CVSection, direction: "up" | "down") => {
+    const currentIndex = sectionOrder.indexOf(section);
+    if (currentIndex === -1) return;
+    
+    const newIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+    if (newIndex < 0 || newIndex >= sectionOrder.length) return;
+    
+    const newOrder = [...sectionOrder];
+    [newOrder[currentIndex], newOrder[newIndex]] = [newOrder[newIndex], newOrder[currentIndex]];
+    onUpdateCV({ ...cv, sectionOrder: newOrder });
   };
 
   const updateExperience = (index: number, field: string, value: string) => {

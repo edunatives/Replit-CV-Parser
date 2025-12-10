@@ -26,6 +26,10 @@ export interface TokenUsage {
   totalTokens: number;
 }
 
+export type CVSection = "summary" | "experience" | "education" | "skills" | "certifications" | "strengths";
+
+export const DEFAULT_SECTION_ORDER: CVSection[] = ["summary", "experience", "education", "skills", "certifications", "strengths"];
+
 export interface ParsedCV {
   id: string;
   name: string;
@@ -42,6 +46,7 @@ export interface ParsedCV {
   certifications: Certification[];
   skills: string[];
   strengths?: string[];
+  sectionOrder?: CVSection[];
   originalFilename?: string;
   mimeType?: string;
   size?: number;
