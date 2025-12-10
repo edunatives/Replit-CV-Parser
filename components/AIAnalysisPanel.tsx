@@ -478,10 +478,13 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
                 disabled={loading}
                 title="Insert bullet point"
                 data-testid="button-insert-bullet"
+                color="primary"
                 sx={{ 
                   border: 1, 
-                  borderColor: "divider",
+                  borderColor: "primary.main",
                   borderRadius: 1,
+                  bgcolor: "primary.50",
+                  "&:hover": { bgcolor: "primary.100" }
                 }}
               >
                 <FormatListBulletedIcon fontSize="small" />

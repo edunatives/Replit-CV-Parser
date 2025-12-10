@@ -23,12 +23,14 @@ function EditableField({
   value, 
   onChange, 
   multiline = false,
-  placeholder = "(click to edit)"
+  placeholder = "(click to edit)",
+  rows = 3
 }: { 
   value: string; 
   onChange: (v: string) => void; 
   multiline?: boolean;
   placeholder?: string;
+  rows?: number;
 }) {
   const [editing, setEditing] = useState(false);
   const [tempValue, setTempValue] = useState(value);
@@ -54,7 +56,7 @@ function EditableField({
           }
         }}
         multiline={multiline}
-        rows={multiline ? 3 : 1}
+        rows={multiline ? rows : 1}
         autoFocus
         fullWidth
         sx={{ my: 0.5 }}
@@ -388,6 +390,7 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
                   value={exp.description} 
                   onChange={(v) => updateExperience(index, "description", v)} 
                   multiline
+                  rows={6}
                   placeholder="Describe your responsibilities and achievements..."
                 />
               </Typography>
