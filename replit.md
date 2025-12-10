@@ -10,13 +10,19 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **Entry-Level Pagination**: CVPreview now splits large sections at individual entry boundaries:
+  - PageItem types: `experience-header`, `experience-entry`, `education-header`, `education-entry`, `summary`, `skills`, `strengths`, `certifications`
+  - Each entry has its own height estimate (80px base + description lines x 24px for experience)
+  - Page breaks occur between entries, not just between sections
+  - Continuation headers ("Experience (continued)") appear when sections span multiple pages
+  - Headers always stay paired with at least one entry to prevent orphan headers
+  - `renderItem()` dispatches to dedicated render functions based on item type
 - **Multi-Paper Pagination**: CVPreview now renders discrete Paper components for each page:
   - `pages.map()` iterates over calculated pages array
-  - First page includes header (`renderHeader()`) + sections with Rearrange button
-  - Subsequent pages show `PageBadge` with page number + sections
+  - First page includes header (`renderHeader()`) + items
+  - Subsequent pages show `PageBadge` with page number + items
   - `BOTTOM_GUTTER` (48px) spacing applied to each page's content
-  - `renderSection()` helper handles all 6 section types (summary, experience, education, skills, strengths, certifications)
-  - Section height estimation via `SECTION_HEIGHTS` constant for page break calculation
+  - A4 dimensions (210mm x 297mm) with max content height ~1000px
 - **AI Rules Module v10.0**: Merged Forensic CV Engine with existing security layer:
   - Unified `buildForensicPrompt()` combines parsing + audit in single API call
   - `ForensicAuditor` class with retry logic (3 attempts, exponential backoff)
