@@ -537,7 +537,17 @@ module.exports = mod;
 "[project]/lib/export/exportCV.ts [app-ssr] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-__turbopack_context__.s([
+/**
+ * @fileoverview CV Export Module
+ * @description Provides export functionality for CVs in multiple formats.
+ * Supports PDF, DOCX, JSON, and TXT exports with template styling.
+ * Uses jsPDF for PDF generation and docx library for Word documents.
+ * 
+ * @exports exportToPDF - Export CV to styled PDF document
+ * @exports exportToDOCX - Export CV to Word document
+ * @exports exportToJSON - Export CV(s) to JSON file
+ * @exports exportToTXT - Export CV to plain text file
+ */ __turbopack_context__.s([
     "exportToDOCX",
     ()=>exportToDOCX,
     "exportToJSON",
@@ -553,7 +563,10 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$file$2d$save
 ;
 ;
 ;
-const templateStyles = {
+/**
+ * Available template styles for CV export
+ * Each template provides a unique color scheme
+ */ const templateStyles = {
     "modern-dark": {
         headerBg: "#1a1a2e",
         accent: "#d4af37",
@@ -603,7 +616,12 @@ const templateStyles = {
         bodyTextSecondary: "#4a4a4a"
     }
 };
-function hexToRgb(hex) {
+/**
+ * Convert hex color to RGB values
+ * @internal
+ * @param {string} hex - Hex color code
+ * @returns {{r: number, g: number, b: number}} RGB values
+ */ function hexToRgb(hex) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? {
         r: parseInt(result[1], 16),

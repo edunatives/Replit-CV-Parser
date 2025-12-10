@@ -1,8 +1,30 @@
+/**
+ * @fileoverview CV Export Module
+ * @description Provides export functionality for CVs in multiple formats.
+ * Supports PDF, DOCX, JSON, and TXT exports with template styling.
+ * Uses jsPDF for PDF generation and docx library for Word documents.
+ * 
+ * @exports exportToPDF - Export CV to styled PDF document
+ * @exports exportToDOCX - Export CV to Word document
+ * @exports exportToJSON - Export CV(s) to JSON file
+ * @exports exportToTXT - Export CV to plain text file
+ */
+
 import { jsPDF } from "jspdf";
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle } from "docx";
 import { saveAs } from "file-saver";
 import type { ParsedCV, TemplateType } from "@/types/cv";
 
+/**
+ * Template style configuration
+ * @typedef {Object} TemplateStyle
+ * @property {string} headerBg - Header background color (hex)
+ * @property {string} accent - Accent color for headings and highlights (hex)
+ * @property {string} headerText - Header text color (hex)
+ * @property {string} bodyBg - Body background color (hex)
+ * @property {string} bodyText - Main body text color (hex)
+ * @property {string} bodyTextSecondary - Secondary text color (hex)
+ */
 interface TemplateStyle {
   headerBg: string;
   accent: string;
@@ -12,6 +34,10 @@ interface TemplateStyle {
   bodyTextSecondary: string;
 }
 
+/**
+ * Available template styles for CV export
+ * Each template provides a unique color scheme
+ */
 const templateStyles: Record<TemplateType, TemplateStyle> = {
   "modern-dark": { headerBg: "#1a1a2e", accent: "#d4af37", headerText: "#ffffff", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a" },
   "classic-light": { headerBg: "#f5f5f5", accent: "#2c3e50", headerText: "#1a1a1a", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a" },
@@ -21,6 +47,12 @@ const templateStyles: Record<TemplateType, TemplateStyle> = {
   "professional": { headerBg: "#2d3436", accent: "#74b9ff", headerText: "#ffffff", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a" },
 };
 
+/**
+ * Convert hex color to RGB values
+ * @internal
+ * @param {string} hex - Hex color code
+ * @returns {{r: number, g: number, b: number}} RGB values
+ */
 function hexToRgb(hex: string): { r: number; g: number; b: number } {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
@@ -28,6 +60,18 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } {
     : { r: 0, g: 0, b: 0 };
 }
 
+/**
+ * Export CV to styled PDF document
+ * Generates a professional PDF with template-based styling
+ * 
+ * @param {ParsedCV} cv - Parsed CV data to export
+ * @param {string} filename - Output filename (should end in .pdf)
+ * @param {TemplateType} template - Template style to apply (default: "modern-dark")
+ * @returns {Promise<void>} Resolves when download is triggered
+ * 
+ * @example
+ * await exportToPDF(cv, "john_doe_resume.pdf", "executive");
+ */
 export async function exportToPDF(cv: ParsedCV, filename: string, template: TemplateType = "modern-dark"): Promise<void> {
   const style = templateStyles[template];
   const doc = new jsPDF();
@@ -197,6 +241,18 @@ export async function exportToPDF(cv: ParsedCV, filename: string, template: Temp
   doc.save(filename);
 }
 
+/**
+ * Export CV to Word document (DOCX)
+ * Generates a professional Word document with template-based styling
+ * 
+ * @param {ParsedCV} cv - Parsed CV data to export
+ * @param {string} filename - Output filename (should end in .docx)
+ * @param {TemplateType} template - Template style to apply (default: "modern-dark")
+ * @returns {Promise<void>} Resolves when download is triggered
+ * 
+ * @example
+ * await exportToDOCX(cv, "john_doe_resume.docx", "professional");
+ */
 export async function exportToDOCX(cv: ParsedCV, filename: string, template: TemplateType = "modern-dark"): Promise<void> {
   const style = templateStyles[template];
   const children: Paragraph[] = [];
@@ -398,6 +454,16 @@ export async function exportToDOCX(cv: ParsedCV, filename: string, template: Tem
   saveAs(blob, filename);
 }
 
+/**
+ * Export CV(s) to JSON file
+ * Useful for data backup or transfer
+ * 
+ * @param {Array<{fileName: string, cv: ParsedCV | undefined}>} cvs - Array of CV data with filenames
+ * @param {string} filename - Output filename (should end in .json)
+ * 
+ * @example
+ * exportToJSON([{ fileName: "resume.pdf", cv: parsedCv }], "cvs_backup.json");
+ */
 export function exportToJSON(cvs: Array<{ fileName: string; cv: ParsedCV | undefined }>, filename: string): void {
   const blob = new Blob([JSON.stringify(cvs, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -408,6 +474,16 @@ export function exportToJSON(cvs: Array<{ fileName: string; cv: ParsedCV | undef
   URL.revokeObjectURL(url);
 }
 
+/**
+ * Export CV to plain text file
+ * Simple text format for universal compatibility
+ * 
+ * @param {ParsedCV} cv - Parsed CV data to export
+ * @param {string} filename - Output filename (should end in .txt)
+ * 
+ * @example
+ * exportToTXT(cv, "john_doe_resume.txt");
+ */
 export function exportToTXT(cv: ParsedCV, filename: string): void {
   const lines: string[] = [];
 

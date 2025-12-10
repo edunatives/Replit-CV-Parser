@@ -1,3 +1,10 @@
+/**
+ * @fileoverview CV Data Normalization Module
+ * @description Provides deterministic normalization functions for CV data.
+ * Ensures consistent formatting across all parsed CVs regardless of source format.
+ * Handles text cleanup, date normalization, URL formatting, and data deduplication.
+ */
+
 import type { ParsedCV, Experience, Education, Certification } from "@/types/cv";
 
 const BULLET_CHARS = /[•\-\*\u2022\u25CF\u25CB\u25AA\u25AB\u2023\u2043\u204C\u204D\u2219\u25E6]/g;
@@ -5,6 +12,15 @@ const MULTIPLE_SPACES = /[ \t]+/g;
 const MULTIPLE_NEWLINES = /\n{3,}/g;
 const DASHES = /[–—―‐‑‒]/g;
 
+/**
+ * Normalize raw text by standardizing line endings, bullets, and whitespace
+ * 
+ * @param {string} text - Raw text extracted from document
+ * @returns {string} Cleaned and normalized text
+ * 
+ * @example
+ * normalizeText("Hello•World\r\n\r\n\r\nTest") // "Hello-World\n\nTest"
+ */
 export function normalizeText(text: string): string {
   return text
     .replace(/\r\n/g, "\n")
@@ -16,10 +32,30 @@ export function normalizeText(text: string): string {
     .trim();
 }
 
+/**
+ * Collapse all whitespace into single spaces
+ * 
+ * @param {string} str - Input string with potential extra whitespace
+ * @returns {string} String with normalized whitespace
+ * 
+ * @example
+ * normalizeWhitespace("John    Doe\n\t") // "John Doe"
+ */
 export function normalizeWhitespace(str: string): string {
   return str.replace(/\s+/g, " ").trim();
 }
 
+/**
+ * Generate a stable, deterministic ID for CV sections
+ * 
+ * @param {string} prefix - Type prefix (e.g., 'exp', 'edu', 'cert')
+ * @param {number} index - Position index in array
+ * @param {string} fileId - Parent CV file identifier
+ * @returns {string} Stable unique identifier
+ * 
+ * @example
+ * generateStableId('exp', 0, 'file-123') // "exp-file-123-0"
+ */
 export function generateStableId(prefix: string, index: number, fileId: string): string {
   return `${prefix}-${fileId}-${index}`;
 }
@@ -39,27 +75,34 @@ const MONTH_MAP: Record<string, string> = {
   oct: "Oct", nov: "Nov", dec: "Dec"
 };
 
+/**
+ * Normalize date ranges into consistent format "Mon YYYY - Mon YYYY" or "Mon YYYY - Present"
+ * 
+ * @param {string} dateStr - Raw date range string in various formats
+ * @returns {string} Normalized date range
+ * 
+ * @example
+ * normalizeDateRange("January 2020 to December 2023") // "Jan 2020 - Dec 2023"
+ * normalizeDateRange("2019 - present") // "2019 - Present"
+ * normalizeDateRange("since 2021") // "2021 - Present"
+ */
 export function normalizeDateRange(dateStr: string): string {
   if (!dateStr) return "";
   
   let normalized = dateStr.trim();
   
-  // First, normalize "Present", "Current", etc. before lowercasing
   normalized = normalized.replace(/\b(present|current|now|ongoing)\b/gi, "PRESENT_MARKER");
   
   normalized = normalized.toLowerCase();
   
-  // Normalize months
   for (const month of MONTH_NAMES) {
     const regex = new RegExp(`\\b${month}\\.?\\b`, "gi");
     normalized = normalized.replace(regex, MONTH_MAP[month] || month);
   }
   
-  // Normalize dashes and "to" (but not individual t/o chars)
   normalized = normalized.replace(/\s*[-–—]+\s*/g, " - ");
   normalized = normalized.replace(/\s+to\s+/gi, " - ");
   
-  // Restore Present marker
   normalized = normalized.replace(/present_marker/gi, "Present");
   normalized = normalized.replace(/since\s+(\d{4})/gi, "$1 - Present");
   
@@ -83,23 +126,43 @@ export function normalizeDateRange(dateStr: string): string {
     }
   }
   
-  // Clean up double dashes
   let final = result.join(" ").replace(/\s+/g, " ").trim();
   final = final.replace(/\s*-\s*-\s*/g, " - ");
-  final = final.replace(/\s*-\s*$/g, ""); // Remove trailing dash
+  final = final.replace(/\s*-\s*$/g, "");
   
   return final || dateStr.trim();
 }
 
+/**
+ * Normalize email to lowercase
+ * 
+ * @param {string} email - Email address
+ * @returns {string} Lowercase trimmed email
+ */
 export function normalizeEmail(email: string): string {
   return email.toLowerCase().trim();
 }
 
+/**
+ * Clean phone number by removing invalid characters
+ * 
+ * @param {string} phone - Raw phone number
+ * @returns {string} Cleaned phone number with standard formatting characters
+ */
 export function normalizePhone(phone: string): string {
   const cleaned = phone.replace(/[^\d+\-.\s()]/g, "").trim();
   return cleaned.replace(/\s+/g, " ");
 }
 
+/**
+ * Normalize URL by removing protocol and www prefix
+ * 
+ * @param {string} url - Full or partial URL
+ * @returns {string} Clean URL without protocol or www
+ * 
+ * @example
+ * normalizeUrl("https://www.linkedin.com/in/johndoe/") // "linkedin.com/in/johndoe"
+ */
 export function normalizeUrl(url: string): string {
   let normalized = url.trim().toLowerCase();
   normalized = normalized.replace(/^https?:\/\//, "");
@@ -108,6 +171,15 @@ export function normalizeUrl(url: string): string {
   return normalized;
 }
 
+/**
+ * Normalize skills array by deduplicating and sorting
+ * 
+ * @param {string[]} skills - Array of skill strings
+ * @returns {string[]} Deduplicated, sorted skills (2-50 chars each)
+ * 
+ * @example
+ * normalizeSkills(["Python", "python", "JavaScript", ""]) // ["JavaScript", "Python"]
+ */
 export function normalizeSkills(skills: string[]): string[] {
   const seen = new Set<string>();
   const result: string[] = [];
@@ -125,6 +197,13 @@ export function normalizeSkills(skills: string[]): string[] {
   return result.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
 }
 
+/**
+ * Validate and normalize all fields of a ParsedCV
+ * Master normalization function that processes entire CV
+ * 
+ * @param {ParsedCV} cv - Raw parsed CV data
+ * @returns {ParsedCV} Fully normalized CV
+ */
 export function validateAndNormalizeCV(cv: ParsedCV): ParsedCV {
   return {
     id: cv.id || generateStableId("cv", 0, Date.now().toString()),
@@ -150,6 +229,10 @@ export function validateAndNormalizeCV(cv: ParsedCV): ParsedCV {
   };
 }
 
+/**
+ * Normalize experience entries with stable IDs
+ * @internal
+ */
 function normalizeExperience(experiences: Experience[], fileId: string): Experience[] {
   return experiences.map((exp, index) => ({
     id: exp.id || generateStableId("exp", index, fileId),
@@ -160,6 +243,10 @@ function normalizeExperience(experiences: Experience[], fileId: string): Experie
   })).filter(exp => exp.role || exp.company);
 }
 
+/**
+ * Normalize education entries with stable IDs
+ * @internal
+ */
 function normalizeEducation(education: Education[], fileId: string): Education[] {
   return education.map((edu, index) => ({
     id: edu.id || generateStableId("edu", index, fileId),
@@ -169,6 +256,10 @@ function normalizeEducation(education: Education[], fileId: string): Education[]
   })).filter(edu => edu.degree || edu.institution);
 }
 
+/**
+ * Normalize and deduplicate certification entries
+ * @internal
+ */
 function normalizeCertifications(certs: Certification[], fileId: string): Certification[] {
   const seen = new Set<string>();
   
@@ -186,6 +277,10 @@ function normalizeCertifications(certs: Certification[], fileId: string): Certif
   });
 }
 
+/**
+ * Section name aliases for detecting CV sections in raw text
+ * Used by findSectionBoundaries for section detection
+ */
 export const SECTION_ALIASES: Record<string, string[]> = {
   experience: [
     "experience", "work experience", "professional experience", 
@@ -212,6 +307,13 @@ export const SECTION_ALIASES: Record<string, string[]> = {
   ]
 };
 
+/**
+ * Find section boundaries in raw CV text
+ * Used for fallback regex-based extraction
+ * 
+ * @param {string} text - Raw CV text
+ * @returns {Map<string, {start: number, end: number}>} Map of section names to text positions
+ */
 export function findSectionBoundaries(text: string): Map<string, { start: number; end: number }> {
   const boundaries = new Map<string, { start: number; end: number }>();
   const lines = text.split("\n");
@@ -253,6 +355,13 @@ export function findSectionBoundaries(text: string): Map<string, { start: number
   return boundaries;
 }
 
+/**
+ * Extract text content of a specific section
+ * 
+ * @param {string} text - Full CV text
+ * @param {string} section - Section name to extract (e.g., 'experience', 'education')
+ * @returns {string} Extracted section content or empty string if not found
+ */
 export function extractSection(text: string, section: string): string {
   const boundaries = findSectionBoundaries(text);
   const bounds = boundaries.get(section);

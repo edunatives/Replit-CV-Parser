@@ -1,3 +1,16 @@
+/**
+ * @fileoverview CV Parsing Engine
+ * @description Core parsing module for extracting structured data from CV documents.
+ * Supports PDF, DOCX, DOC, and TXT file formats.
+ * Uses AI-powered extraction (Gemini 2.5 Flash) with regex-based fallback.
+ * 
+ * @exports parseCV - Main parsing function
+ * 
+ * @example
+ * const buffer = fs.readFileSync('resume.pdf');
+ * const { cv, rawText } = await parseCV(buffer, 'resume.pdf', 'file-123');
+ */
+
 import type { ParsedCV, Experience, Education, Certification, TokenUsage } from "@/types/cv";
 import {
   normalizeText,
@@ -14,6 +27,12 @@ import { GoogleGenAI } from "@google/genai";
 
 type PdfParseResult = { text: string; numpages: number };
 
+/**
+ * Parse PDF file buffer using pdf-parse v2 API
+ * @internal
+ * @param {Buffer} buffer - PDF file buffer
+ * @returns {Promise<PdfParseResult>} Extracted text and page count
+ */
 async function parsePdfBuffer(buffer: Buffer): Promise<PdfParseResult> {
   const pdfModule = await import("pdf-parse");
   const PDFParse = pdfModule.PDFParse;
@@ -30,6 +49,12 @@ async function parsePdfBuffer(buffer: Buffer): Promise<PdfParseResult> {
   return { text: result.text || "", numpages: result.total || 1 };
 }
 
+/**
+ * Parse Word document (DOCX) buffer using mammoth
+ * @internal
+ * @param {Buffer} buffer - DOCX file buffer
+ * @returns {Promise<string>} Extracted text content
+ */
 async function parseDocxBuffer(buffer: Buffer): Promise<string> {
   const mammothModule = await import("mammoth");
   const mammoth = mammothModule.default ?? mammothModule;
@@ -71,6 +96,14 @@ interface GeminiExtractionResult {
   tokenUsage: TokenUsage;
 }
 
+/**
+ * Extract structured CV data using Gemini 2.5 Flash AI
+ * Sends CV text to Gemini for intelligent parsing and returns structured JSON
+ * 
+ * @internal
+ * @param {string} text - Raw text extracted from CV document
+ * @returns {Promise<GeminiExtractionResult | null>} Parsed data with token usage, or null if AI unavailable
+ */
 async function extractWithGemini(text: string): Promise<GeminiExtractionResult | null> {
   const apiKey = process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
   const baseUrl = process.env.AI_INTEGRATIONS_GEMINI_BASE_URL;
@@ -226,6 +259,23 @@ function extractNameFallback(text: string): string {
   return "";
 }
 
+/**
+ * Parse a CV file and extract structured data
+ * Main entry point for CV parsing. Supports PDF, DOCX, DOC, and TXT formats.
+ * Uses Gemini AI for intelligent extraction with regex-based fallback.
+ * 
+ * @param {Buffer} buffer - File buffer containing CV content
+ * @param {string} fileName - Original filename (used for format detection)
+ * @param {string} fileId - Unique identifier for this CV
+ * @returns {Promise<{cv: ParsedCV, rawText: string}>} Parsed CV data and raw extracted text
+ * 
+ * @example
+ * const buffer = await readFile('resume.pdf');
+ * const { cv, rawText } = await parseCV(buffer, 'resume.pdf', 'file-123');
+ * console.log(cv.name, cv.email, cv.skills);
+ * 
+ * @throws {Error} PDF text extraction fails with insufficient content (<50 chars)
+ */
 export async function parseCV(buffer: Buffer, fileName: string, fileId: string): Promise<{ cv: ParsedCV; rawText: string }> {
   let text = "";
   
