@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -43,6 +43,12 @@ export function SectionRearrangeModal({
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
+  useEffect(() => {
+    if (open) {
+      setOrder(sectionOrder);
+    }
+  }, [open, sectionOrder]);
+
   const handleDragStart = (index: number) => {
     setDraggedIndex(index);
   };
@@ -75,7 +81,6 @@ export function SectionRearrangeModal({
   };
 
   const handleClose = () => {
-    setOrder(sectionOrder);
     onClose();
   };
 
@@ -171,15 +176,13 @@ export function SectionRearrangeModal({
           onClick={handleApply}
           fullWidth
           sx={{ 
-            bgcolor: "#4ade80",
-            "&:hover": { bgcolor: "#22c55e" },
             textTransform: "none",
             fontWeight: 600,
             py: 1.2,
           }}
           data-testid="button-apply-rearrange"
         >
-          Continue Editing
+          Apply Changes
         </Button>
       </DialogActions>
     </Dialog>

@@ -10,7 +10,8 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-- **Section reorder buttons**: Always visible at 40% opacity (full opacity on hover) for better touch device accessibility
+- **Section rearrange modal**: Drag-and-drop modal for reordering CV sections (summary, experience, education, skills, strengths, certifications). Replaces inline up/down arrows with cleaner modal UX via SectionRearrangeModal component
+- **Dynamic section ordering**: CV sections render based on `sectionOrder` array stored in CV data
 - **Header layout**: EduNatives logo moved from sidebar to header bar, with centered search bar and People/Filter buttons
 - **Bullet point preservation**: `normalizeDescription()` function preserves newlines in experience descriptions for proper bullet formatting
 - **Skills/Certifications styling**: Consistent chip style with muted accent background, bold text, and delete icons

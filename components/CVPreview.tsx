@@ -533,237 +533,261 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
           </Button>
         </Box>
         
-        <Box sx={{ mb: 3 }}>
-          <SectionHeader
-            title="Summary"
-            style={style}
-          />
-          <Typography variant="body2" sx={{ color: style.bodyTextSecondary, whiteSpace: "pre-wrap" }} component="div">
-            <EditableField 
-              value={cv.summary} 
-              onChange={(v) => updateField("summary", v)} 
-              multiline 
-              placeholder="Write a professional summary..."
-            />
-          </Typography>
-        </Box>
-
-        <Box sx={{ mb: 3 }}>
-          <SectionHeader
-            title="Experience"
-            style={style}
-            rightContent={
-              <IconButton size="small" onClick={addExperience} sx={{ color: style.accent }} data-testid="button-add-experience">
-                <AddIcon fontSize="small" />
-              </IconButton>
-            }
-          />
-          {cv.experience.map((exp, index) => (
-            <Box key={exp.id} sx={{ mb: 2, position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
-              <IconButton 
-                className="delete-btn"
-                size="small" 
-                onClick={() => deleteExperience(index)}
-                sx={{ position: "absolute", right: 0, top: 0, visibility: "hidden", color: "error.main" }}
-                data-testid={`button-delete-experience-${index}`}
-              >
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-              <Typography variant="subtitle1" fontWeight={600} sx={{ color: style.bodyText }}>
-                <EditableField 
-                  value={exp.role} 
-                  onChange={(v) => updateExperience(index, "role", v)} 
-                  placeholder="Job Title"
-                />
-              </Typography>
-              <Typography variant="body2" sx={{ color: style.companyColor, fontWeight: 500 }}>
-                <EditableField 
-                  value={exp.company} 
-                  onChange={(v) => updateExperience(index, "company", v)} 
-                  placeholder="Company Name"
-                />
-              </Typography>
-              <Box sx={{ display: "flex", gap: 2, alignItems: "center", flexWrap: "wrap", mt: 0.25 }}>
-                {style.showMetaIcons && <CalendarMonthIcon sx={{ fontSize: 14, color: style.bodyTextSecondary }} />}
-                <Typography variant="body2" sx={{ color: style.bodyTextSecondary, ml: style.showMetaIcons ? -1.5 : 0 }}>
-                  <EditableField 
-                    value={exp.duration} 
-                    onChange={(v) => updateExperience(index, "duration", v)} 
-                    placeholder="Duration"
+        {sectionOrder.map((sectionName, idx) => {
+          const isLast = idx === sectionOrder.length - 1;
+          
+          switch (sectionName) {
+            case "summary":
+              return (
+                <Box key="summary" sx={{ mb: isLast ? 0 : 3 }}>
+                  <SectionHeader title="Summary" style={style} />
+                  <Typography variant="body2" sx={{ color: style.bodyTextSecondary, whiteSpace: "pre-wrap" }} component="div">
+                    <EditableField 
+                      value={cv.summary} 
+                      onChange={(v) => updateField("summary", v)} 
+                      multiline 
+                      placeholder="Write a professional summary..."
+                    />
+                  </Typography>
+                </Box>
+              );
+              
+            case "experience":
+              return (
+                <Box key="experience" sx={{ mb: isLast ? 0 : 3 }}>
+                  <SectionHeader
+                    title="Experience"
+                    style={style}
+                    rightContent={
+                      <IconButton size="small" onClick={addExperience} sx={{ color: style.accent }} data-testid="button-add-experience">
+                        <AddIcon fontSize="small" />
+                      </IconButton>
+                    }
                   />
-                </Typography>
-                {style.showMetaIcons && <LocationOnIcon sx={{ fontSize: 14, color: style.bodyTextSecondary }} />}
-                <Typography variant="body2" sx={{ color: style.bodyTextSecondary, ml: style.showMetaIcons ? -1.5 : 0 }}>
-                  <EditableField 
-                    value={exp.location || ""} 
-                    onChange={(v) => updateExperience(index, "location", v)} 
-                    placeholder="Location"
+                  {cv.experience.map((exp, index) => (
+                    <Box key={exp.id} sx={{ mb: 2, position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
+                      <IconButton 
+                        className="delete-btn"
+                        size="small" 
+                        onClick={() => deleteExperience(index)}
+                        sx={{ position: "absolute", right: 0, top: 0, visibility: "hidden", color: "error.main" }}
+                        data-testid={`button-delete-experience-${index}`}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                      <Typography variant="subtitle1" fontWeight={600} sx={{ color: style.bodyText }}>
+                        <EditableField 
+                          value={exp.role} 
+                          onChange={(v) => updateExperience(index, "role", v)} 
+                          placeholder="Job Title"
+                        />
+                      </Typography>
+                      <Typography variant="body2" sx={{ color: style.companyColor, fontWeight: 500 }}>
+                        <EditableField 
+                          value={exp.company} 
+                          onChange={(v) => updateExperience(index, "company", v)} 
+                          placeholder="Company Name"
+                        />
+                      </Typography>
+                      <Box sx={{ display: "flex", gap: 2, alignItems: "center", flexWrap: "wrap", mt: 0.25 }}>
+                        {style.showMetaIcons && <CalendarMonthIcon sx={{ fontSize: 14, color: style.bodyTextSecondary }} />}
+                        <Typography variant="body2" sx={{ color: style.bodyTextSecondary, ml: style.showMetaIcons ? -1.5 : 0 }}>
+                          <EditableField 
+                            value={exp.duration} 
+                            onChange={(v) => updateExperience(index, "duration", v)} 
+                            placeholder="Duration"
+                          />
+                        </Typography>
+                        {style.showMetaIcons && <LocationOnIcon sx={{ fontSize: 14, color: style.bodyTextSecondary }} />}
+                        <Typography variant="body2" sx={{ color: style.bodyTextSecondary, ml: style.showMetaIcons ? -1.5 : 0 }}>
+                          <EditableField 
+                            value={exp.location || ""} 
+                            onChange={(v) => updateExperience(index, "location", v)} 
+                            placeholder="Location"
+                          />
+                        </Typography>
+                      </Box>
+                      <Typography variant="body2" sx={{ mt: 0.5, color: style.bodyText, whiteSpace: "pre-wrap" }} component="div">
+                        <EditableField 
+                          value={exp.description} 
+                          onChange={(v) => updateExperience(index, "description", v)} 
+                          multiline
+                          rows={6}
+                          placeholder="Describe your responsibilities and achievements..."
+                          showBulletTool={true}
+                        />
+                      </Typography>
+                      {index < cv.experience.length - 1 && <Divider sx={{ mt: 2 }} />}
+                    </Box>
+                  ))}
+                  {cv.experience.length === 0 && (
+                    <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
+                      Click + to add experience
+                    </Typography>
+                  )}
+                </Box>
+              );
+              
+            case "education":
+              return (
+                <Box key="education" sx={{ mb: isLast ? 0 : 3 }}>
+                  <SectionHeader
+                    title="Education"
+                    style={style}
+                    rightContent={
+                      <IconButton size="small" onClick={addEducation} sx={{ color: style.accent }} data-testid="button-add-education">
+                        <AddIcon fontSize="small" />
+                      </IconButton>
+                    }
                   />
-                </Typography>
-              </Box>
-              <Typography variant="body2" sx={{ mt: 0.5, color: style.bodyText, whiteSpace: "pre-wrap" }} component="div">
-                <EditableField 
-                  value={exp.description} 
-                  onChange={(v) => updateExperience(index, "description", v)} 
-                  multiline
-                  rows={6}
-                  placeholder="Describe your responsibilities and achievements..."
-                  showBulletTool={true}
-                />
-              </Typography>
-              {index < cv.experience.length - 1 && <Divider sx={{ mt: 2 }} />}
-            </Box>
-          ))}
-          {cv.experience.length === 0 && (
-            <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
-              Click + to add experience
-            </Typography>
-          )}
-        </Box>
-
-        <Box sx={{ mb: 3 }}>
-          <SectionHeader
-            title="Education"
-            style={style}
-            rightContent={
-              <IconButton size="small" onClick={addEducation} sx={{ color: style.accent }} data-testid="button-add-education">
-                <AddIcon fontSize="small" />
-              </IconButton>
-            }
-          />
-          {cv.education.map((edu, index) => (
-            <Box key={edu.id} sx={{ mb: 1, position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
-              <IconButton 
-                className="delete-btn"
-                size="small" 
-                onClick={() => deleteEducation(index)}
-                sx={{ position: "absolute", right: 0, top: 0, visibility: "hidden", color: "error.main" }}
-                data-testid={`button-delete-education-${index}`}
-              >
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-              <Typography variant="subtitle2" fontWeight={600} sx={{ color: style.bodyText }}>
-                <EditableField 
-                  value={edu.degree} 
-                  onChange={(v) => updateEducation(index, "degree", v)} 
-                  placeholder="Degree"
-                />
-              </Typography>
-              <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap" }}>
-                <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
-                  <EditableField 
-                    value={edu.institution} 
-                    onChange={(v) => updateEducation(index, "institution", v)} 
-                    placeholder="Institution"
+                  {cv.education.map((edu, index) => (
+                    <Box key={edu.id} sx={{ mb: 1, position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
+                      <IconButton 
+                        className="delete-btn"
+                        size="small" 
+                        onClick={() => deleteEducation(index)}
+                        sx={{ position: "absolute", right: 0, top: 0, visibility: "hidden", color: "error.main" }}
+                        data-testid={`button-delete-education-${index}`}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                      <Typography variant="subtitle2" fontWeight={600} sx={{ color: style.bodyText }}>
+                        <EditableField 
+                          value={edu.degree} 
+                          onChange={(v) => updateEducation(index, "degree", v)} 
+                          placeholder="Degree"
+                        />
+                      </Typography>
+                      <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap" }}>
+                        <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
+                          <EditableField 
+                            value={edu.institution} 
+                            onChange={(v) => updateEducation(index, "institution", v)} 
+                            placeholder="Institution"
+                          />
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>(</Typography>
+                        <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
+                          <EditableField 
+                            value={edu.year} 
+                            onChange={(v) => updateEducation(index, "year", v)} 
+                            placeholder="Year"
+                          />
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>)</Typography>
+                      </Box>
+                    </Box>
+                  ))}
+                  {cv.education.length === 0 && (
+                    <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
+                      Click + to add education
+                    </Typography>
+                  )}
+                </Box>
+              );
+              
+            case "skills":
+              return (
+                <Box key="skills" sx={{ mb: isLast ? 0 : 3 }}>
+                  <SectionHeader
+                    title="Skills"
+                    style={style}
+                    rightContent={
+                      <IconButton size="small" onClick={addSkill} sx={{ color: style.accent }} data-testid="button-add-skill">
+                        <AddIcon fontSize="small" />
+                      </IconButton>
+                    }
                   />
-                </Typography>
-                <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>(</Typography>
-                <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
-                  <EditableField 
-                    value={edu.year} 
-                    onChange={(v) => updateEducation(index, "year", v)} 
-                    placeholder="Year"
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                    {cv.skills.map((skill, index) => (
+                      <EditableSkillChip
+                        key={index}
+                        skill={skill}
+                        accentColor={style.accent}
+                        onUpdate={(v) => updateSkill(index, v)}
+                        onDelete={() => deleteSkill(index)}
+                        testId={`skill-${index}`}
+                      />
+                    ))}
+                  </Box>
+                  {cv.skills.length === 0 && (
+                    <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
+                      Click + to add skills
+                    </Typography>
+                  )}
+                </Box>
+              );
+              
+            case "strengths":
+              return (
+                <Box key="strengths" sx={{ mb: isLast ? 0 : 3 }}>
+                  <SectionHeader
+                    title="Key Strengths"
+                    style={style}
+                    rightContent={
+                      <IconButton size="small" onClick={addStrength} sx={{ color: style.accent }} data-testid="button-add-strength">
+                        <AddIcon fontSize="small" />
+                      </IconButton>
+                    }
                   />
-                </Typography>
-                <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>)</Typography>
-              </Box>
-            </Box>
-          ))}
-          {cv.education.length === 0 && (
-            <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
-              Click + to add education
-            </Typography>
-          )}
-        </Box>
-
-        <Box sx={{ mb: 3 }}>
-          <SectionHeader
-            title="Skills"
-            style={style}
-            rightContent={
-              <IconButton size="small" onClick={addSkill} sx={{ color: style.accent }} data-testid="button-add-skill">
-                <AddIcon fontSize="small" />
-              </IconButton>
-            }
-          />
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-            {cv.skills.map((skill, index) => (
-              <EditableSkillChip
-                key={index}
-                skill={skill}
-                accentColor={style.accent}
-                onUpdate={(v) => updateSkill(index, v)}
-                onDelete={() => deleteSkill(index)}
-                testId={`skill-${index}`}
-              />
-            ))}
-          </Box>
-          {cv.skills.length === 0 && (
-            <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
-              Click + to add skills
-            </Typography>
-          )}
-        </Box>
-
-        <Box sx={{ mb: 3 }}>
-          <SectionHeader
-            title="Key Strengths"
-            style={style}
-            rightContent={
-              <IconButton size="small" onClick={addStrength} sx={{ color: style.accent }} data-testid="button-add-strength">
-                <AddIcon fontSize="small" />
-              </IconButton>
-            }
-          />
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-            {(cv.strengths || []).map((strength, index) => (
-              <EditableStrengthChip
-                key={index}
-                strength={strength}
-                accentColor={style.accent}
-                onUpdate={(v) => updateStrength(index, v)}
-                onDelete={() => deleteStrength(index)}
-                testId={`strength-${index}`}
-              />
-            ))}
-          </Box>
-          {(!cv.strengths || cv.strengths.length === 0) && (
-            <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
-              Click + to add strengths
-            </Typography>
-          )}
-        </Box>
-
-        <Box>
-          <SectionHeader
-            title="Certifications"
-            style={style}
-            rightContent={
-              <IconButton size="small" onClick={addCertification} sx={{ color: style.accent }} data-testid="button-add-certification">
-                <AddIcon fontSize="small" />
-              </IconButton>
-            }
-          />
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-            {(cv.certifications || []).map((cert, index) => (
-              <EditableCertChip
-                key={cert.id}
-                cert={cert}
-                accentColor={style.accent}
-                bodyText={style.bodyText}
-                onUpdateName={(v) => updateCertification(index, "name", v)}
-                onUpdateIssuer={(v) => updateCertification(index, "issuer", v)}
-                onDelete={() => deleteCertification(index)}
-                testId={`cert-${index}`}
-              />
-            ))}
-          </Box>
-          {(!cv.certifications || cv.certifications.length === 0) && (
-            <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
-              Click + to add certifications
-            </Typography>
-          )}
-        </Box>
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                    {(cv.strengths || []).map((strength, index) => (
+                      <EditableStrengthChip
+                        key={index}
+                        strength={strength}
+                        accentColor={style.accent}
+                        onUpdate={(v) => updateStrength(index, v)}
+                        onDelete={() => deleteStrength(index)}
+                        testId={`strength-${index}`}
+                      />
+                    ))}
+                  </Box>
+                  {(!cv.strengths || cv.strengths.length === 0) && (
+                    <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
+                      Click + to add strengths
+                    </Typography>
+                  )}
+                </Box>
+              );
+              
+            case "certifications":
+              return (
+                <Box key="certifications" sx={{ mb: isLast ? 0 : 3 }}>
+                  <SectionHeader
+                    title="Certifications"
+                    style={style}
+                    rightContent={
+                      <IconButton size="small" onClick={addCertification} sx={{ color: style.accent }} data-testid="button-add-certification">
+                        <AddIcon fontSize="small" />
+                      </IconButton>
+                    }
+                  />
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+                    {(cv.certifications || []).map((cert, index) => (
+                      <EditableCertChip
+                        key={cert.id}
+                        cert={cert}
+                        accentColor={style.accent}
+                        bodyText={style.bodyText}
+                        onUpdateName={(v) => updateCertification(index, "name", v)}
+                        onUpdateIssuer={(v) => updateCertification(index, "issuer", v)}
+                        onDelete={() => deleteCertification(index)}
+                        testId={`cert-${index}`}
+                      />
+                    ))}
+                  </Box>
+                  {(!cv.certifications || cv.certifications.length === 0) && (
+                    <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
+                      Click + to add certifications
+                    </Typography>
+                  )}
+                </Box>
+              );
+              
+            default:
+              return null;
+          }
+        })}
       </Box>
       
       <SectionRearrangeModal
