@@ -1143,6 +1143,24 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
         data-testid="cv-toolbar"
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "text.primary" }}>
+            CV Preview
+          </Typography>
+        </Box>
+        
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<SwapVertIcon />}
+            onClick={() => setRearrangeModalOpen(true)}
+            sx={{ 
+              textTransform: "none",
+            }}
+            data-testid="button-rearrange-sections"
+          >
+            Rearrange Sections
+          </Button>
           {onTemplateChange && (
             <FormControl size="small" sx={{ minWidth: 150 }}>
               <InputLabel id="cv-template-label">Template</InputLabel>
@@ -1161,21 +1179,6 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
               </Select>
             </FormControl>
           )}
-        </Box>
-        
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Button
-            variant="outlined"
-            size="small"
-            startIcon={<SwapVertIcon />}
-            onClick={() => setRearrangeModalOpen(true)}
-            sx={{ 
-              textTransform: "none",
-            }}
-            data-testid="button-rearrange-sections"
-          >
-            Rearrange
-          </Button>
         </Box>
       </Paper>
 
