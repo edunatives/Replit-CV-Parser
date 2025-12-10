@@ -66,3 +66,83 @@ export interface CVFile {
 }
 
 export type TemplateType = "modern-dark" | "classic-light" | "executive" | "minimal" | "creative" | "professional" | "corporate" | "business";
+
+// ============================================================================
+// FORENSIC ASSESSMENT TYPES (v9.3)
+// ============================================================================
+
+export interface ForensicHighlight {
+  snippet: string;
+  type: "red" | "green" | "yellow";
+  comment: string;
+}
+
+export interface ForensicSection {
+  name: string;
+  score: number;
+  feedback: string;
+}
+
+export interface ForensicResult {
+  score: number;
+  level: "Exceptional" | "Strong" | "Good" | "Fair" | "Needs Work";
+  inflation: boolean;
+  sections: ForensicSection[];
+  verdict: string;
+  strengths: string[];
+  weaknesses: string[];
+  recommendations: string[];
+}
+
+export interface AssessmentResult {
+  overallScore: number;
+  level: string;
+  inflation: boolean;
+  verdict: string;
+  sections: ForensicSection[];
+  strengths: string[];
+  weaknesses: string[];
+  recommendations: string[];
+  highlights: ForensicHighlight[];
+}
+
+// ============================================================================
+// JD MATCH TYPES (v9.3)
+// ============================================================================
+
+export interface JDParsing {
+  role_title: string;
+  company: string;
+  mandatory_skills: string[];
+  nice_to_have_skills: string[];
+}
+
+export interface EvidenceMapEntry {
+  jd_requirement: string;
+  cv_evidence: string;
+  status: "Match" | "Weak" | "Missing";
+}
+
+export interface MatchAnalysis {
+  overall_match_score: number;
+  verdict: "Excellent Match" | "Good Match" | "Partial Match" | "Limited Match";
+  summary: string;
+  matched_skills: string[];
+  missing_skills: string[];
+  experience_match: {
+    score: number;
+    feedback: string;
+  };
+  education_match: {
+    score: number;
+    feedback: string;
+  };
+  keyword_optimizations: string[];
+  suggestions: string[];
+}
+
+export interface JDMatchResult {
+  jd_parsing: JDParsing;
+  match_analysis: MatchAnalysis;
+  evidence_map: EvidenceMapEntry[];
+}

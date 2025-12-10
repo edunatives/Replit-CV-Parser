@@ -23,14 +23,13 @@ Preferred communication style: Simple, everyday language.
   - Subsequent pages show `PageBadge` with page number + items
   - `BOTTOM_GUTTER` (48px) spacing applied to each page's content
   - A4 dimensions (210mm x 297mm) with max content height ~1000px
-- **AI Rules Module v10.0**: Merged Forensic CV Engine with existing security layer:
-  - Unified `buildForensicPrompt()` combines parsing + audit in single API call
-  - `ForensicAuditor` class with retry logic (3 attempts, exponential backoff)
-  - `parseAIResponse<T>` with JSON repair fallback for truncated responses
-  - `ForensicHighlight` interface for inline CV text annotation (red/green/yellow)
-  - Security: `containsInjectionAttempt()`, `sanitizeAIInput()` with unicode normalization
+- **Forensic CV Engine v9.3 Upgrade**: Enhanced assessment and JD match prompts:
+  - **Assessment Output**: `overallScore`, `level` (Exceptional/Strong/Good/Fair/Needs Work), `inflation` flag, `verdict` (2-3 sentence summary), `sections`, `strengths`, `weaknesses`, `recommendations`, `highlights` (inline CV annotations with red/green/yellow types)
+  - **JD Match Output**: `jd_parsing` (role_title, company, mandatory_skills, nice_to_have_skills), `match_analysis` (overall_match_score, verdict, summary, matched_skills, missing_skills), `evidence_map` (jd_requirement -> cv_evidence with Match/Weak/Missing status)
+  - Security: All existing checks preserved (`containsInjectionAttempt()`, `sanitizeAIInput()`, `DANGEROUS_PATTERNS`, unicode normalization)
   - Weighted scoring: AUDIT_WEIGHTS (experience 30%, summary 20%, education 15%, skills 15%, contact 10%, presentation 10%)
-  - Backup at `lib/ai/rules.backup.ts` for rollback if needed
+  - JD Match weights: Hard Skills 40%, Experience 25%, Responsibilities 20%, Soft Skills 10%, Education 5%
+  - UI updated to display: level badge, inflation warning chip, verdict text, highlights with color-coded borders, evidence map with status chips
 - **A4 page layout**: CV preview now renders in proper A4 dimensions (210mm x 297mm) with gray background and white page with shadow
 - **Section rearrange modal**: Drag-and-drop modal for reordering CV sections (summary, experience, education, skills, strengths, certifications). Replaces inline up/down arrows with cleaner modal UX via SectionRearrangeModal component
 - **Dynamic section ordering**: CV sections render based on `sectionOrder` array stored in CV data

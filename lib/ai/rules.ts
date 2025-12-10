@@ -503,7 +503,7 @@ Return ONLY the JSON object:`;
 }
 
 /**
- * Build prompt for CV assessment
+ * Build prompt for CV assessment (v9.3 Forensic Engine)
  * @param cvSummary - Formatted CV summary text
  * @returns Complete prompt for AI assessment
  */
@@ -516,30 +516,32 @@ export function buildAssessmentPrompt(cvSummary: string): string {
     throw new Error("Security: Suspicious content detected in CV text");
   }
   
-  return `You are the EduNatives Forensic CV Analyst (v10.0). Analyze the following CV using our strict weighted scoring system.
+  return `You are the EduNatives Forensic CV Engine (v9.3).
+
+AUDIT this CV using the Strict Scoring Rubric below.
 
 CV DATA:
 """
 ${sanitized}
 """
 
---- WEIGHTED SCORING SYSTEM ---
-Calculate the overall score as a WEIGHTED AVERAGE based on these exact weights:
-- Work Experience: ${AUDIT_WEIGHTS.workExperience}% weight
-- Professional Summary: ${AUDIT_WEIGHTS.summary}% weight
-- Education: ${AUDIT_WEIGHTS.education}% weight
-- Skills: ${AUDIT_WEIGHTS.skills}% weight
-- Contact Information: ${AUDIT_WEIGHTS.contactInfo}% weight
-- Overall Presentation: ${AUDIT_WEIGHTS.presentation}% weight
+--- TASK 1: SCORING RUBRIC & WEIGHTS ---
+Calculate a 'weighted_score' based on the following breakdown:
+- Work Experience (Weight: ${AUDIT_WEIGHTS.workExperience}%)
+- Professional Summary (Weight: ${AUDIT_WEIGHTS.summary}%)
+- Education (Weight: ${AUDIT_WEIGHTS.education}%)
+- Skills (Weight: ${AUDIT_WEIGHTS.skills}%)
+- Contact Information (Weight: ${AUDIT_WEIGHTS.contactInfo}%)
+- Overall Presentation (Weight: ${AUDIT_WEIGHTS.presentation}%)
 
-Formula: overallScore = (section1Score * ${AUDIT_WEIGHTS.workExperience} + section2Score * ${AUDIT_WEIGHTS.summary} + ...) / 100
+Formula: overallScore = (workExpScore * ${AUDIT_WEIGHTS.workExperience} + summaryScore * ${AUDIT_WEIGHTS.summary} + eduScore * ${AUDIT_WEIGHTS.education} + skillsScore * ${AUDIT_WEIGHTS.skills} + contactScore * ${AUDIT_WEIGHTS.contactInfo} + presentationScore * ${AUDIT_WEIGHTS.presentation}) / 100
 
---- SCORING RUBRIC (apply strictly) ---
-- ${SCORING_RUBRIC.exceptional.min}-${SCORING_RUBRIC.exceptional.max}: ${SCORING_RUBRIC.exceptional.label} (${SCORING_RUBRIC.exceptional.description})
-- ${SCORING_RUBRIC.strong.min}-${SCORING_RUBRIC.strong.max}: ${SCORING_RUBRIC.strong.label} (${SCORING_RUBRIC.strong.description})
-- ${SCORING_RUBRIC.good.min}-${SCORING_RUBRIC.good.max}: ${SCORING_RUBRIC.good.label} (${SCORING_RUBRIC.good.description})
-- ${SCORING_RUBRIC.fair.min}-${SCORING_RUBRIC.fair.max}: ${SCORING_RUBRIC.fair.label} (${SCORING_RUBRIC.fair.description})
-- Below ${SCORING_RUBRIC.fair.min}: ${SCORING_RUBRIC.needsWork.label} (${SCORING_RUBRIC.needsWork.description})
+--- SCORING LEVELS ---
+- 90-100: Exceptional
+- 80-89: Strong
+- 70-79: Good
+- 60-69: Fair
+- Below 60: Needs Work
 
 --- FORENSIC ANALYSIS CRITERIA ---
 For each section, evaluate:
@@ -549,40 +551,54 @@ For each section, evaluate:
 4. ATS COMPATIBILITY: Will it pass Applicant Tracking Systems?
 5. AUTHENTICITY: Do claims seem realistic and verifiable? Flag any inflation.
 
---- OUTPUT FORMAT ---
-Return ONLY a valid JSON object with this exact structure:
+--- TASK 2: OUTPUT SCHEMA ---
+Return ONLY a valid JSON object matching this structure exactly:
 {
-  "overallScore": <number 0-100, calculated using weighted average>,
-  "sections": [
-    {"name": "Contact Information", "score": <0-100>, "feedback": "<detailed forensic feedback on completeness, professional email, LinkedIn presence, etc.>"},
-    {"name": "Professional Summary", "score": <0-100>, "feedback": "<forensic analysis of clarity, impact, quantified achievements, keyword optimization>"},
-    {"name": "Work Experience", "score": <0-100>, "feedback": "<forensic review of job progression, achievement quantification, action verbs, gaps analysis>"},
-    {"name": "Education", "score": <0-100>, "feedback": "<analysis of relevance, completeness, certifications, honors>"},
-    {"name": "Skills", "score": <0-100>, "feedback": "<review of skill relevance, categorization, proficiency indicators>"},
-    {"name": "Overall Presentation", "score": <0-100>, "feedback": "<assessment of formatting, consistency, length, visual organization>"}
-  ],
-  "strengths": ["<specific strength with evidence from CV>", "<strength 2>", "<strength 3>"],
-  "weaknesses": ["<specific weakness with recommendation>", "<weakness 2>", "<weakness 3>"],
-  "recommendations": [
-    "<specific actionable recommendation with example>",
-    "<recommendation 2>",
-    "<recommendation 3>",
-    "<recommendation 4>",
-    "<recommendation 5>"
-  ]
+    "overallScore": <number 0-100, weighted>,
+    "level": "<Exceptional/Strong/Good/Fair/Needs Work>",
+    "inflation": <boolean - true if claims appear exaggerated>,
+    "verdict": "<A concise 2-3 sentence summary of the CV quality>",
+    "sections": [
+        { "name": "Contact Information", "score": 0-100, "feedback": "<Evaluate Completeness, Clarity, and Online Presence>" },
+        { "name": "Professional Summary", "score": 0-100, "feedback": "<Evaluate Impact, Quantification, and ATS keywords>" },
+        { "name": "Work Experience", "score": 0-100, "feedback": "<Evaluate Action Verbs, Metrics/Results, and Career Progression>" },
+        { "name": "Education", "score": 0-100, "feedback": "<analysis of relevance, completeness>" },
+        { "name": "Skills", "score": 0-100, "feedback": "<Evaluate Relevance and Hard/Soft balance>" },
+        { "name": "Overall Presentation", "score": 0-100, "feedback": "<Evaluate Formatting, Length, and consistency>" }
+    ],
+    "strengths": ["<top strength with evidence from CV>", "<strength 2>", "<strength 3>", "<strength 4>", "<strength 5>"],
+    "weaknesses": ["<specific weakness found>", "<weakness 2>", "<weakness 3>", "<weakness 4>", "<weakness 5>"],
+    "recommendations": ["<actionable fix 1>", "<fix 2>", "<fix 3>", "<fix 4>", "<fix 5>"],
+    "highlights": [
+        { "snippet": "<EXACT TEXT snippet from the CV to highlight>", "type": "green", "comment": "<Why this is a strength>" },
+        { "snippet": "<EXACT TEXT snippet from the CV>", "type": "red", "comment": "<Why this is a critical issue>" },
+        { "snippet": "<EXACT TEXT snippet from the CV>", "type": "yellow", "comment": "<Why this is a warning>" }
+    ]
 }
 
 CRITICAL INSTRUCTIONS:
 - Return ONLY valid JSON, no markdown code blocks, no explanations
-- Calculate overallScore using the weighted formula above - do NOT just average
+- Calculate overallScore using the weighted formula - do NOT just average
 - Be forensically specific - cite actual content from the CV in feedback
-- Flag any claims that appear inflated or unverifiable
-- Consider ATS keyword optimization in recommendations
-- Each recommendation should be immediately actionable`;
+- Set inflation=true if ANY claims appear exaggerated or unverifiable
+- Include 3-5 highlights with EXACT text snippets from the CV
+- Each recommendation should be immediately actionable
+- Verdict should summarize overall quality in 2-3 sentences`;
 }
 
 /**
- * Build prompt for JD matching analysis
+ * JD Match scoring rubric
+ */
+export const JD_MATCH_WEIGHTS = {
+  hardSkills: 40,
+  experience: 25,
+  responsibilities: 20,
+  softSkills: 10,
+  education: 5,
+} as const;
+
+/**
+ * Build prompt for JD matching analysis (v9.3)
  * @param cvSummary - Formatted CV summary text
  * @param jobDescription - Job description text
  * @returns Complete prompt for AI JD matching
@@ -590,52 +606,95 @@ CRITICAL INSTRUCTIONS:
 export function buildJDMatchPrompt(cvSummary: string, jobDescription: string): string {
   const sanitizedJD = sanitizeAIInput(jobDescription, TOKEN_LIMITS.maxJobDescriptionLength);
   
-  return `You are an expert recruiter and ATS (Applicant Tracking System) specialist. Compare the candidate's CV against the job description and provide a detailed match analysis.
+  // Check for injection attempts
+  if (containsInjectionAttempt(sanitizedJD)) {
+    throw new Error("Security: Suspicious content detected in job description");
+  }
+  
+  return `You are the EduNatives Recruitment Match Engine.
 
+Act as an ATS (Applicant Tracking System) and Senior Recruiter to determine the fit.
+
+--- INPUTS ---
+CANDIDATE CV:
+"""
 ${cvSummary}
+"""
 
 JOB DESCRIPTION:
+"""
 ${sanitizedJD}
+"""
 
-Analyze the match and provide your assessment as a valid JSON object with this exact structure:
+--- SCORING RUBRIC (Strict) ---
+Calculate 'overall_match_score' based on these ranges:
+- 85-100: Excellent Match
+- 70-84: Good Match
+- 55-69: Partial Match
+- Below 55: Limited Match
+
+Weights: Hard Skills (${JD_MATCH_WEIGHTS.hardSkills}%), Experience (${JD_MATCH_WEIGHTS.experience}%), Responsibilities (${JD_MATCH_WEIGHTS.responsibilities}%), Soft Skills (${JD_MATCH_WEIGHTS.softSkills}%), Education (${JD_MATCH_WEIGHTS.education}%).
+
+--- OUTPUT SCHEMA ---
+Return ONLY a valid JSON object:
 {
-  "matchScore": <number 0-100 representing overall match percentage>,
-  "matchedSkills": ["<skill from CV that matches JD>", "<skill 2>", ...],
-  "missingSkills": ["<required skill not in CV>", "<skill 2>", ...],
-  "experienceMatch": {
-    "score": <0-100>,
-    "feedback": "<specific feedback about experience alignment>"
+  "jd_parsing": {
+    "role_title": "<extracted job title>",
+    "company": "<company name if mentioned>",
+    "mandatory_skills": ["<required skill 1>", "<skill 2>", ...],
+    "nice_to_have_skills": ["<preferred skill 1>", "<skill 2>", ...]
   },
-  "educationMatch": {
-    "score": <0-100>,
-    "feedback": "<specific feedback about education requirements>"
+  "match_analysis": {
+    "overall_match_score": <number 0-100>,
+    "verdict": "<Excellent Match / Good Match / Partial Match / Limited Match>",
+    "summary": "<2-3 sentences explaining the fit>",
+    "matched_skills": ["<skill from CV that matches>", ...],
+    "missing_skills": ["<required skill not in CV>", ...],
+    "experience_match": {
+        "score": <0-100>,
+        "feedback": "<specific feedback about experience alignment>"
+    },
+    "education_match": {
+        "score": <0-100>,
+        "feedback": "<specific feedback about education requirements>"
+    },
+    "keyword_optimizations": [
+        "<keyword from JD to add to CV for ATS>",
+        "<keyword 2>",
+        "<keyword 3>"
+    ],
+    "suggestions": [
+        "<actionable advice 1>",
+        "<advice 2>",
+        "<advice 3>"
+    ]
   },
-  "overallFeedback": "<2-3 sentence summary of how well the candidate matches>",
-  "suggestions": [
-    "<specific suggestion to improve match>",
-    "<suggestion 2>",
-    "<suggestion 3>"
-  ],
-  "keywordOptimizations": [
-    "<keyword from JD to add to CV>",
-    "<keyword 2>",
-    "<keyword 3>"
+  "evidence_map": [
+    {
+      "jd_requirement": "<e.g., '5+ years React'>",
+      "cv_evidence": "<e.g., 'Senior Frontend Dev 2018-2023'>",
+      "status": "Match"
+    },
+    {
+      "jd_requirement": "<requirement from JD>",
+      "cv_evidence": "<partial evidence or 'Not found'>",
+      "status": "Weak"
+    },
+    {
+      "jd_requirement": "<missing requirement>",
+      "cv_evidence": "Not found in CV",
+      "status": "Missing"
+    }
   ]
 }
 
-MATCH SCORE INTERPRETATION:
-- 85-100: Excellent match - Strong candidate
-- 70-84: Good match - Meets most requirements
-- 55-69: Partial match - Has transferable skills
-- Below 55: Limited match - Significant skill gaps
-
 IMPORTANT:
 - Return ONLY valid JSON, no markdown, no code blocks
+- Parse the JD to extract mandatory vs nice-to-have skills
+- Build evidence_map with at least 5 key requirement-to-evidence mappings
 - Be specific about which skills match and which are missing
 - Consider both hard skills and soft skills
-- Factor in experience level requirements
-- Provide actionable suggestions for improving the match
-- List keywords that should be added to the CV for ATS optimization`;
+- Provide actionable suggestions for improving the match`;
 }
 
 /**

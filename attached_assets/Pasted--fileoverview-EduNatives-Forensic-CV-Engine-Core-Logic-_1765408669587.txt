@@ -1,0 +1,303 @@
+/**
+ * @fileoverview EduNatives Forensic CV Engine - Core Logic
+ * @version 9.3
+ * @description Handles prompt construction, API communication, and response parsing.
+ * HYBRID UPDATE: Restored "Strengths/Weaknesses" text lists and "Completeness/Clarity" feedback depth from Production Prompt.
+ */
+
+// ============================================================================
+// CONFIGURATION & CONSTANTS
+// ============================================================================
+
+export const AUDIT_WEIGHTS = {
+    workExperience: 30,
+    summary: 20,
+    education: 15,
+    skills: 15,
+    contactInfo: 10,
+    presentation: 10
+};
+
+export const JD_MATCH_WEIGHTS = {
+    hardSkills: 40,
+    experience: 25,
+    responsibilities: 20,
+    softSkills: 10,
+    education: 5
+};
+
+export const CV_SCORING_RUBRIC = {
+    exceptional: "90-100", 
+    strong: "80-89",       
+    good: "70-79",         
+    fair: "60-69",         
+    needsWork: "<60"       
+};
+
+export const JD_SCORING_RUBRIC = {
+    excellent: "85-100", 
+    good: "70-84",       
+    partial: "55-69",    
+    limited: "<55"       
+};
+
+// ============================================================================
+// PROMPT TEMPLATES
+// ============================================================================
+
+/**
+ * The master prompt for CV Audit.
+ * Updated to include explicit Strengths/Weaknesses lists and structured feedback.
+ */
+const MASTER_PROMPT_TEMPLATE = `
+You are the EduNatives Forensic CV Engine (v9.3).
+
+I will provide a resume text. You must perform TWO distinct tasks in one output:
+1. PARSE it into a clean JSON structure suitable for a specific "Modern Template".
+2. AUDIT it using the Strict Scoring Rubric provided below.
+
+RESUME TEXT:
+"""
+{{RESUME_TEXT}}
+"""
+
+--- TASK 1: SCORING RUBRIC & WEIGHTS ---
+Calculate a 'weighted_score' based on the following breakdown:
+- Work Experience (Weight: ${AUDIT_WEIGHTS.workExperience})
+- Professional Summary (Weight: ${AUDIT_WEIGHTS.summary})
+- Education (Weight: ${AUDIT_WEIGHTS.education})
+- Skills (Weight: ${AUDIT_WEIGHTS.skills})
+- Contact Information (Weight: ${AUDIT_WEIGHTS.contactInfo})
+- Overall Presentation (Weight: ${AUDIT_WEIGHTS.presentation})
+
+--- TASK 2: OUTPUT SCHEMA ---
+You must return ONLY a valid JSON object matching this structure exactly:
+{
+    "parsed_cv": {
+        "basics": { 
+            "name": "String", 
+            "label": "String (Job Title)", 
+            "email": "String", 
+            "phone": "String", 
+            "location": "String", 
+            "links": ["String"] 
+        },
+        "summary": "String",
+        "experience": [
+            { 
+                "company": "String", 
+                "position": "String", 
+                "date": "String", 
+                "location": "String", 
+                "highlights": ["String"] 
+            }
+        ],
+        "education": [
+            { 
+                "institution": "String", 
+                "area": "String", 
+                "studyType": "String", 
+                "date": "String" 
+            }
+        ],
+        "skills": ["String"]
+    },
+    "forensic": {
+        "score": Number (0-100, weighted),
+        "level": "String (Exceptional/Strong/Good/Fair/Needs Work)",
+        "inflation": Boolean,
+        "sections": [
+            { 
+                "name": "Contact Information", 
+                "score": 0-100, 
+                "feedback": "String (Evaluate Completeness, Clarity, and Online Presence)" 
+            },
+            { 
+                "name": "Professional Summary", 
+                "score": 0-100, 
+                "feedback": "String (Evaluate Impact, Quantification, and ATS keywords)" 
+            },
+            { 
+                "name": "Work Experience", 
+                "score": 0-100, 
+                "feedback": "String (Evaluate Action Verbs, Metrics/Results, and Career Progression)" 
+            },
+            { 
+                "name": "Education", 
+                "score": 0-100, 
+                "feedback": "String" 
+            },
+            { 
+                "name": "Skills", 
+                "score": 0-100, 
+                "feedback": "String (Evaluate Relevance and Hard/Soft balance)" 
+            },
+            { 
+                "name": "Overall Presentation", 
+                "score": 0-100, 
+                "feedback": "String (Evaluate Formatting, Length, and consistency)" 
+            }
+        ],
+        "verdict": "String (A concise 2-3 sentence summary)",
+        "strengths": ["String (List of top 3-5 specific strengths found in the content)"],
+        "weaknesses": ["String (List of top 3-5 specific weaknesses found)"],
+        "recommendations": ["String (List of 3-5 actionable fixes)"]
+    },
+    "highlights": [
+        { 
+            "snippet": "EXACT TEXT snippet from the input CV to be highlighted in the UI", 
+            "type": "red (critical) / green (strength) / yellow (warning)", 
+            "comment": "Why this specific text was flagged" 
+        }
+    ]
+}
+`;
+
+/**
+ * The specialized prompt for JD Matching.
+ */
+const JD_PROMPT_TEMPLATE = `
+You are the EduNatives Recruitment Match Engine.
+
+I will provide a Candidate CV and a Job Description (JD). 
+Your task is to act as an ATS (Applicant Tracking System) and Senior Recruiter to determine the fit.
+
+--- INPUTS ---
+CANDIDATE CV:
+"""
+{{RESUME_TEXT}}
+"""
+
+JOB DESCRIPTION:
+"""
+{{JD_TEXT}}
+"""
+
+--- SCORING RUBRIC (Strict) ---
+Calculate 'overall_match_score' based on these ranges:
+- ${JD_SCORING_RUBRIC.excellent}: Excellent Match
+- ${JD_SCORING_RUBRIC.good}: Good Match
+- ${JD_SCORING_RUBRIC.partial}: Partial Match
+- ${JD_SCORING_RUBRIC.limited}: Limited Match
+
+Weights: Hard Skills (${JD_MATCH_WEIGHTS.hardSkills}%), Experience (${JD_MATCH_WEIGHTS.experience}%), Responsibilities (${JD_MATCH_WEIGHTS.responsibilities}%), Soft Skills (${JD_MATCH_WEIGHTS.softSkills}%), Education (${JD_MATCH_WEIGHTS.education}%).
+
+--- OUTPUT SCHEMA ---
+Return ONLY a valid JSON object:
+{
+  "jd_parsing": {
+    "role_title": "String",
+    "company": "String",
+    "mandatory_skills": ["String"],
+    "nice_to_have_skills": ["String"]
+  },
+  "match_analysis": {
+    "overall_match_score": Number (0-100),
+    "verdict": "String (Excellent Match / Good Match / Partial Match / Limited Match)",
+    "summary": "String (2-3 sentences explaining the fit)",
+    "matched_skills": ["String"],
+    "missing_skills": ["String"],
+    "experience_match": {
+        "score": Number (0-100),
+        "feedback": "String"
+    },
+    "education_match": {
+        "score": Number (0-100),
+        "feedback": "String"
+    },
+    "keyword_optimizations": [
+        "String (Specific keywords from JD that should be added to the CV)"
+    ],
+    "suggestions": [
+        "String (Actionable advice)"
+    ]
+  },
+  "evidence_map": [
+    {
+      "jd_requirement": "String (e.g., '5+ years React')",
+      "cv_evidence": "String (e.g., 'Senior Frontend Dev 2018-2023')",
+      "status": "Match/Weak/Missing"
+    }
+  ]
+}
+`;
+
+// ============================================================================
+// MAIN CLASS
+// ============================================================================
+
+export class ForensicAuditor {
+    
+    constructor() {
+        this.modelEndpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent";
+    }
+
+    sanitize(text) {
+        return text
+            .replace(/[\x00-\x09\x0B-\x0C\x0E-\x1F\x7F]/g, "") 
+            .substring(0, 30000); 
+    }
+
+    cleanResponse(rawText) {
+        let cleaned = rawText.trim();
+        if (cleaned.startsWith("```json")) cleaned = cleaned.slice(7);
+        else if (cleaned.startsWith("```")) cleaned = cleaned.slice(3);
+        if (cleaned.endsWith("```")) cleaned = cleaned.slice(0, -3);
+        return cleaned;
+    }
+
+    async _callAI(apiKey, prompt) {
+        const url = `${this.modelEndpoint}?key=${apiKey}`;
+        
+        let attempt = 0;
+        const maxRetries = 3;
+        
+        while (attempt <= maxRetries) {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: { responseMimeType: "application/json" }
+                    })
+                });
+
+                if (!response.ok) {
+                    const errBody = await response.json().catch(() => ({}));
+                    const msg = errBody.error ? errBody.error.message : response.statusText;
+                    if (msg.includes('400')) throw new Error(`API Error 400: ${msg}`);
+                    throw new Error(`${response.status}: ${msg}`);
+                }
+
+                const data = await response.json();
+                const rawJson = data.candidates[0].content.parts[0].text;
+                const cleanJson = this.cleanResponse(rawJson);
+                
+                return JSON.parse(cleanJson);
+
+            } catch (e) {
+                attempt++;
+                if (e.message.includes('400') || attempt > maxRetries) throw e;
+                await new Promise(r => setTimeout(r, Math.pow(2, attempt) * 1000));
+            }
+        }
+    }
+
+    async analyze(apiKey, cvText) {
+        const cleanText = this.sanitize(cvText);
+        const finalPrompt = MASTER_PROMPT_TEMPLATE.replace('{{RESUME_TEXT}}', cleanText);
+        return this._callAI(apiKey, finalPrompt);
+    }
+
+    async analyzeJD(apiKey, cvText, jdText) {
+        const cleanCV = this.sanitize(cvText);
+        const cleanJD = this.sanitize(jdText);
+        
+        const finalPrompt = JD_PROMPT_TEMPLATE
+            .replace('{{RESUME_TEXT}}', cleanCV)
+            .replace('{{JD_TEXT}}', cleanJD);
+            
+        return this._callAI(apiKey, finalPrompt);
+    }
+}

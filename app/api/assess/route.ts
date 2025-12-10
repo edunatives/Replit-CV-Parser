@@ -14,17 +14,33 @@ import type { ParsedCV } from "@/types/cv";
 import { formatCVSummary, buildAssessmentPrompt, cleanAIResponse } from "@/lib/ai/rules";
 
 /**
- * CV Assessment result structure
+ * Forensic highlight for inline CV annotation (v9.3)
+ */
+export interface ForensicHighlight {
+  snippet: string;
+  type: "red" | "green" | "yellow";
+  comment: string;
+}
+
+/**
+ * CV Assessment result structure (v9.3 Forensic Engine)
  * @typedef {Object} CVAssessment
  * @property {number} overallScore - Overall CV quality score (0-100)
+ * @property {string} level - Quality level (Exceptional/Strong/Good/Fair/Needs Work)
+ * @property {boolean} inflation - True if claims appear inflated
+ * @property {string} verdict - 2-3 sentence summary of CV quality
  * @property {SectionScore[]} sections - Individual section scores
- * @property {string[]} strengths - Top 3 strengths identified
- * @property {string[]} weaknesses - Top 3 weaknesses identified  
- * @property {string[]} recommendations - 5 actionable improvement suggestions
+ * @property {string[]} strengths - Top 3-5 strengths identified
+ * @property {string[]} weaknesses - Top 3-5 weaknesses identified
+ * @property {string[]} recommendations - 3-5 actionable improvement suggestions
+ * @property {ForensicHighlight[]} highlights - Text snippets for inline highlighting
  * @property {TokenUsage} tokenUsage - AI token consumption metrics
  */
 export interface CVAssessment {
   overallScore: number;
+  level: string;
+  inflation: boolean;
+  verdict: string;
   sections: {
     name: string;
     score: number;
@@ -33,6 +49,7 @@ export interface CVAssessment {
   strengths: string[];
   weaknesses: string[];
   recommendations: string[];
+  highlights: ForensicHighlight[];
   tokenUsage: {
     promptTokens: number;
     completionTokens: number;

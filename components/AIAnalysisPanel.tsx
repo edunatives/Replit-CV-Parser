@@ -18,12 +18,24 @@ interface AIAnalysisPanelProps {
   activeTrack: "assessment" | "advisor" | "jd-match";
 }
 
+// v9.3 Forensic highlight for inline CV annotation
+interface ForensicHighlight {
+  snippet: string;
+  type: "red" | "green" | "yellow";
+  comment: string;
+}
+
+// v9.3 CVAssessment with level, inflation, verdict, and highlights
 interface CVAssessment {
   overallScore: number;
+  level?: string;
+  inflation?: boolean;
+  verdict?: string;
   sections: { name: string; score: number; feedback: string }[];
   strengths: string[];
   weaknesses: string[];
   recommendations: string[];
+  highlights?: ForensicHighlight[];
   tokenUsage: { promptTokens: number; completionTokens: number; totalTokens: number };
 }
 
@@ -32,24 +44,48 @@ interface ChatMessage {
   content: string;
 }
 
+// v9.3 Evidence map entry
+interface EvidenceMapEntry {
+  jd_requirement: string;
+  cv_evidence: string;
+  status: "Match" | "Weak" | "Missing";
+}
+
+// v9.3 JD Parsing
+interface JDParsing {
+  role_title: string;
+  company: string;
+  mandatory_skills: string[];
+  nice_to_have_skills: string[];
+}
+
+// v9.3 JDMatchResult with evidence_map
 interface JDMatchResult {
+  jd_parsing?: JDParsing;
   matchScore: number;
+  verdict?: string;
+  summary?: string;
   matchedSkills: string[];
   missingSkills: string[];
   experienceMatch: { score: number; feedback: string };
   educationMatch: { score: number; feedback: string };
-  overallFeedback: string;
+  overallFeedback?: string;
   suggestions: string[];
   keywordOptimizations: string[];
+  evidenceMap?: EvidenceMapEntry[];
   tokenUsage: { promptTokens: number; completionTokens: number; totalTokens: number };
 }
 
-// Normalize assessment response to handle potential snake_case from AI
+// Normalize assessment response to handle v9.3 structure and snake_case
 function normalizeAssessment(raw: Record<string, unknown>): CVAssessment {
   const sections = (raw.sections || raw.section_scores || []) as Array<Record<string, unknown>>;
   const tokenUsageRaw = (raw.tokenUsage || raw.token_usage || { promptTokens: 0, completionTokens: 0, totalTokens: 0 }) as Record<string, unknown>;
+  const highlightsRaw = (raw.highlights || []) as Array<Record<string, unknown>>;
   return {
     overallScore: (raw.overallScore ?? raw.overall_score ?? 0) as number,
+    level: (raw.level ?? "") as string,
+    inflation: (raw.inflation ?? false) as boolean,
+    verdict: (raw.verdict ?? "") as string,
     sections: sections.map((s: Record<string, unknown>) => ({
       name: (s.name ?? s.section ?? "") as string,
       score: (s.score ?? 0) as number,
@@ -58,17 +94,32 @@ function normalizeAssessment(raw: Record<string, unknown>): CVAssessment {
     strengths: (raw.strengths ?? []) as string[],
     weaknesses: (raw.weaknesses ?? []) as string[],
     recommendations: (raw.recommendations ?? []) as string[],
+    highlights: highlightsRaw.map((h: Record<string, unknown>) => ({
+      snippet: (h.snippet ?? "") as string,
+      type: (h.type ?? "yellow") as "red" | "green" | "yellow",
+      comment: (h.comment ?? "") as string,
+    })),
     tokenUsage: normalizeTokenUsage(tokenUsageRaw),
   };
 }
 
-// Normalize JD match response
+// Normalize JD match response to handle v9.3 structure
 function normalizeJDMatch(raw: Record<string, unknown>): JDMatchResult {
   const expMatch = (raw.experienceMatch || raw.experience_match || { score: 0, feedback: "" }) as Record<string, unknown>;
   const eduMatch = (raw.educationMatch || raw.education_match || { score: 0, feedback: "" }) as Record<string, unknown>;
   const tokenUsageRaw = (raw.tokenUsage || raw.token_usage || { promptTokens: 0, completionTokens: 0, totalTokens: 0 }) as Record<string, unknown>;
+  const jdParsingRaw = (raw.jd_parsing || null) as Record<string, unknown> | null;
+  const evidenceMapRaw = (raw.evidenceMap || raw.evidence_map || []) as Array<Record<string, unknown>>;
   return {
+    jd_parsing: jdParsingRaw ? {
+      role_title: (jdParsingRaw.role_title ?? "") as string,
+      company: (jdParsingRaw.company ?? "") as string,
+      mandatory_skills: (jdParsingRaw.mandatory_skills ?? []) as string[],
+      nice_to_have_skills: (jdParsingRaw.nice_to_have_skills ?? []) as string[],
+    } : undefined,
     matchScore: (raw.matchScore ?? raw.match_score ?? 0) as number,
+    verdict: (raw.verdict ?? "") as string,
+    summary: (raw.summary ?? "") as string,
     matchedSkills: (raw.matchedSkills ?? raw.matched_skills ?? []) as string[],
     missingSkills: (raw.missingSkills ?? raw.missing_skills ?? []) as string[],
     experienceMatch: {
@@ -79,9 +130,14 @@ function normalizeJDMatch(raw: Record<string, unknown>): JDMatchResult {
       score: (eduMatch.score ?? 0) as number,
       feedback: (eduMatch.feedback ?? "") as string,
     },
-    overallFeedback: (raw.overallFeedback ?? raw.overall_feedback ?? "") as string,
+    overallFeedback: (raw.overallFeedback ?? raw.overall_feedback ?? raw.summary ?? "") as string,
     suggestions: (raw.suggestions ?? []) as string[],
     keywordOptimizations: (raw.keywordOptimizations ?? raw.keyword_optimizations ?? []) as string[],
+    evidenceMap: evidenceMapRaw.map((e: Record<string, unknown>) => ({
+      jd_requirement: (e.jd_requirement ?? "") as string,
+      cv_evidence: (e.cv_evidence ?? "") as string,
+      status: (e.status ?? "Missing") as "Match" | "Weak" | "Missing",
+    })),
     tokenUsage: normalizeTokenUsage(tokenUsageRaw),
   };
 }
@@ -268,22 +324,46 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
           <>
             <Card sx={{ mb: 2, bgcolor: getScoreColor(assessment.overallScore), color: "white" }}>
               <CardContent sx={{ py: 2 }}>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1 }}>
                   <Box>
                     <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
                       Overall Score
                     </Typography>
-                    <Typography variant="h3" sx={{ fontWeight: 700 }}>
-                      {assessment.overallScore}
-                    </Typography>
+                    <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
+                      <Typography variant="h3" sx={{ fontWeight: 700 }}>
+                        {assessment.overallScore}
+                      </Typography>
+                      {assessment.level && (
+                        <Chip 
+                          label={assessment.level} 
+                          size="small" 
+                          sx={{ bgcolor: "rgba(255,255,255,0.3)", color: "white", fontWeight: 600 }} 
+                        />
+                      )}
+                    </Box>
                   </Box>
-                  <Chip
-                    icon={<TokenIcon sx={{ fontSize: 14 }} />}
-                    label={`${assessment.tokenUsage.totalTokens} tokens`}
-                    size="small"
-                    sx={{ bgcolor: "rgba(255,255,255,0.2)", color: "white" }}
-                  />
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, alignItems: "flex-end" }}>
+                    <Chip
+                      icon={<TokenIcon sx={{ fontSize: 14 }} />}
+                      label={`${assessment.tokenUsage.totalTokens} tokens`}
+                      size="small"
+                      sx={{ bgcolor: "rgba(255,255,255,0.2)", color: "white" }}
+                    />
+                    {assessment.inflation && (
+                      <Chip
+                        icon={<WarningIcon sx={{ fontSize: 14 }} />}
+                        label="Inflation Detected"
+                        size="small"
+                        sx={{ bgcolor: "rgba(255,100,100,0.4)", color: "white" }}
+                      />
+                    )}
+                  </Box>
                 </Box>
+                {assessment.verdict && (
+                  <Typography variant="body2" sx={{ mt: 1.5, opacity: 0.95, fontStyle: "italic" }}>
+                    {assessment.verdict}
+                  </Typography>
+                )}
               </CardContent>
             </Card>
 
@@ -352,6 +432,40 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
                 <Typography variant="body2">{rec}</Typography>
               </Box>
             ))}
+
+            {assessment.highlights && assessment.highlights.length > 0 && (
+              <>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, mt: 3, mb: 1, color: "text.secondary" }}>
+                  CV Highlights
+                </Typography>
+                {assessment.highlights.map((highlight, index) => (
+                  <Card 
+                    key={index} 
+                    sx={{ 
+                      mb: 1, 
+                      borderLeft: 4, 
+                      borderColor: highlight.type === "green" ? "success.main" : highlight.type === "red" ? "error.main" : "warning.main"
+                    }}
+                  >
+                    <CardContent sx={{ py: 1, px: 2 }}>
+                      <Typography 
+                        variant="body2" 
+                        sx={{ 
+                          fontStyle: "italic", 
+                          mb: 0.5,
+                          color: highlight.type === "green" ? "success.dark" : highlight.type === "red" ? "error.dark" : "warning.dark"
+                        }}
+                      >
+                        "{highlight.snippet}"
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {highlight.comment}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                ))}
+              </>
+            )}
 
             <Button 
               variant="outlined" 
@@ -699,13 +813,31 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
                   {jdMatch.matchScore}%
                 </Typography>
                 <Typography variant="subtitle1">
-                  Match Rate
+                  {jdMatch.verdict || "Match Rate"}
                 </Typography>
               </CardContent>
             </Card>
 
+            {jdMatch.jd_parsing && (
+              <Card sx={{ mb: 2, bgcolor: "grey.50" }}>
+                <CardContent sx={{ py: 1.5 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                    {jdMatch.jd_parsing.role_title}
+                    {jdMatch.jd_parsing.company && ` at ${jdMatch.jd_parsing.company}`}
+                  </Typography>
+                  {jdMatch.jd_parsing.mandatory_skills.length > 0 && (
+                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 1 }}>
+                      {jdMatch.jd_parsing.mandatory_skills.slice(0, 5).map((skill, i) => (
+                        <Chip key={i} label={skill} size="small" color="primary" variant="filled" sx={{ fontSize: "0.7rem" }} />
+                      ))}
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
             <Typography variant="body2" sx={{ mb: 3 }}>
-              {jdMatch.overallFeedback}
+              {jdMatch.summary || jdMatch.overallFeedback}
             </Typography>
 
             <Box sx={{ mb: 3 }}>
@@ -766,6 +898,41 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
                 <Chip key={index} label={keyword} size="small" variant="outlined" />
               ))}
             </Box>
+
+            {jdMatch.evidenceMap && jdMatch.evidenceMap.length > 0 && (
+              <>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, mt: 3, mb: 1, color: "text.secondary" }}>
+                  Evidence Map
+                </Typography>
+                {jdMatch.evidenceMap.map((entry, index) => (
+                  <Card 
+                    key={index} 
+                    sx={{ 
+                      mb: 1, 
+                      borderLeft: 4,
+                      borderColor: entry.status === "Match" ? "success.main" : entry.status === "Weak" ? "warning.main" : "error.main"
+                    }}
+                  >
+                    <CardContent sx={{ py: 1, px: 2 }}>
+                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                          {entry.jd_requirement}
+                        </Typography>
+                        <Chip 
+                          label={entry.status} 
+                          size="small" 
+                          color={entry.status === "Match" ? "success" : entry.status === "Weak" ? "warning" : "error"}
+                          sx={{ fontSize: "0.65rem", height: 20 }}
+                        />
+                      </Box>
+                      <Typography variant="caption" color="text.secondary">
+                        {entry.cv_evidence}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                ))}
+              </>
+            )}
           </>
         )}
       </Box>
