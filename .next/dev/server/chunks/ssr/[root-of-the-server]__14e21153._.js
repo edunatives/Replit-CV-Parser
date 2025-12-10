@@ -3961,9 +3961,18 @@ function EditableSkillChip({ skill, accentColor, onUpdate, onDelete, testId }) {
         },
         onDelete: onDelete,
         sx: {
-            bgcolor: accentColor,
-            color: "#ffffff",
-            cursor: "pointer"
+            bgcolor: `${accentColor}30`,
+            color: accentColor,
+            border: `1px solid ${accentColor}50`,
+            cursor: "pointer",
+            fontWeight: 500,
+            "& .MuiChip-deleteIcon": {
+                color: accentColor,
+                opacity: 0.7,
+                "&:hover": {
+                    opacity: 1
+                }
+            }
         },
         "data-testid": testId
     }, void 0, false, {
@@ -3994,7 +4003,7 @@ function EditableCertChip({ cert, accentColor, bodyText, onUpdateName, onUpdateI
                     }
                 }, void 0, false, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 895,
+                    lineNumber: 906,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$TextField$2f$TextField$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__TextField$3e$__["TextField"], {
@@ -4028,20 +4037,19 @@ function EditableCertChip({ cert, accentColor, bodyText, onUpdateName, onUpdateI
                     }
                 }, void 0, false, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 902,
+                    lineNumber: 913,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/CVPreview.tsx",
-            lineNumber: 894,
+            lineNumber: 905,
             columnNumber: 7
         }, this);
     }
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Chip$2f$Chip$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Chip$3e$__["Chip"], {
         label: cert.issuer ? `${cert.name} - ${cert.issuer}` : cert.name,
         size: "small",
-        variant: "outlined",
         onClick: ()=>{
             setTempName(cert.name);
             setTempIssuer(cert.issuer);
@@ -4049,14 +4057,23 @@ function EditableCertChip({ cert, accentColor, bodyText, onUpdateName, onUpdateI
         },
         onDelete: onDelete,
         sx: {
-            borderColor: accentColor,
-            color: bodyText,
-            cursor: "pointer"
+            bgcolor: `${accentColor}30`,
+            color: accentColor,
+            border: `1px solid ${accentColor}50`,
+            cursor: "pointer",
+            fontWeight: 500,
+            "& .MuiChip-deleteIcon": {
+                color: accentColor,
+                opacity: 0.7,
+                "&:hover": {
+                    opacity: 1
+                }
+            }
         },
         "data-testid": testId
     }, void 0, false, {
         fileName: "[project]/components/CVPreview.tsx",
-        lineNumber: 935,
+        lineNumber: 946,
         columnNumber: 5
     }, this);
 }
@@ -4092,28 +4109,36 @@ function EditableStrengthChip({ strength, accentColor, onUpdate, onDelete, testI
             }
         }, void 0, false, {
             fileName: "[project]/components/CVPreview.tsx",
-            lineNumber: 969,
+            lineNumber: 990,
             columnNumber: 7
         }, this);
     }
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Chip$2f$Chip$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Chip$3e$__["Chip"], {
         label: strength,
         size: "small",
-        variant: "outlined",
         onClick: ()=>{
             setTempValue(strength);
             setEditing(true);
         },
         onDelete: onDelete,
         sx: {
-            borderColor: accentColor,
+            bgcolor: `${accentColor}30`,
             color: accentColor,
-            cursor: "pointer"
+            border: `1px solid ${accentColor}50`,
+            cursor: "pointer",
+            fontWeight: 500,
+            "& .MuiChip-deleteIcon": {
+                color: accentColor,
+                opacity: 0.7,
+                "&:hover": {
+                    opacity: 1
+                }
+            }
         },
         "data-testid": testId
     }, void 0, false, {
         fileName: "[project]/components/CVPreview.tsx",
-        lineNumber: 998,
+        lineNumber: 1019,
         columnNumber: 5
     }, this);
 }

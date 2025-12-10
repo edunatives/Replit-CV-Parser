@@ -862,7 +862,18 @@ function EditableSkillChip({
         setEditing(true);
       }}
       onDelete={onDelete}
-      sx={{ bgcolor: accentColor, color: "#ffffff", cursor: "pointer" }}
+      sx={{ 
+        bgcolor: `${accentColor}30`, 
+        color: accentColor, 
+        border: `1px solid ${accentColor}50`,
+        cursor: "pointer",
+        fontWeight: 500,
+        "& .MuiChip-deleteIcon": {
+          color: accentColor,
+          opacity: 0.7,
+          "&:hover": { opacity: 1 }
+        }
+      }}
       data-testid={testId}
     />
   );
@@ -935,14 +946,24 @@ function EditableCertChip({
     <Chip
       label={cert.issuer ? `${cert.name} - ${cert.issuer}` : cert.name}
       size="small"
-      variant="outlined"
       onClick={() => {
         setTempName(cert.name);
         setTempIssuer(cert.issuer);
         setEditing(true);
       }}
       onDelete={onDelete}
-      sx={{ borderColor: accentColor, color: bodyText, cursor: "pointer" }}
+      sx={{ 
+        bgcolor: `${accentColor}30`, 
+        color: accentColor, 
+        border: `1px solid ${accentColor}50`,
+        cursor: "pointer",
+        fontWeight: 500,
+        "& .MuiChip-deleteIcon": {
+          color: accentColor,
+          opacity: 0.7,
+          "&:hover": { opacity: 1 }
+        }
+      }}
       data-testid={testId}
     />
   );
@@ -998,13 +1019,23 @@ function EditableStrengthChip({
     <Chip
       label={strength}
       size="small"
-      variant="outlined"
       onClick={() => {
         setTempValue(strength);
         setEditing(true);
       }}
       onDelete={onDelete}
-      sx={{ borderColor: accentColor, color: accentColor, cursor: "pointer" }}
+      sx={{ 
+        bgcolor: `${accentColor}30`, 
+        color: accentColor, 
+        border: `1px solid ${accentColor}50`,
+        cursor: "pointer",
+        fontWeight: 500,
+        "& .MuiChip-deleteIcon": {
+          color: accentColor,
+          opacity: 0.7,
+          "&:hover": { opacity: 1 }
+        }
+      }}
       data-testid={testId}
     />
   );
