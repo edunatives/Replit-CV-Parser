@@ -257,17 +257,26 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
 
   const style = templateStyles[template] || templateStyles["modern-dark"];
 
+  const isDeveloperRole = () => {
+    const devKeywords = ["developer", "engineer", "programmer", "software", "frontend", "backend", "full stack", "fullstack", "devops", "sre", "coding", "web dev", "mobile dev", "ios", "android", "react", "node", "python", "java", "javascript", "typescript", "golang", "rust", "c++", "data engineer", "ml engineer", "machine learning", "ai engineer"];
+    const titleLower = (cv.title || "").toLowerCase();
+    const summaryLower = (cv.summary || "").toLowerCase();
+    return devKeywords.some(kw => titleLower.includes(kw) || summaryLower.includes(kw));
+  };
+
+  const showGitHub = isDeveloperRole() || (cv.github && cv.github.trim() !== "");
+
   return (
     <Paper elevation={2} sx={{ overflow: "hidden", bgcolor: style.bodyBg }} data-testid="cv-preview">
-      <Box sx={{ bgcolor: style.headerBg, p: 3, color: style.headerText, borderBottom: style.borderBottom }}>
+      <Box sx={{ bgcolor: style.headerBg, py: 1.5, px: 3, color: style.headerText, borderBottom: style.borderBottom }}>
         <Typography variant="h4" component="h2" sx={{ fontFamily: "'Arial', sans-serif", fontWeight: 600 }}>
           <EditableField value={cv.name} onChange={(v) => updateField("name", v)} placeholder="Your Name" />
         </Typography>
-        <Typography variant="h6" sx={{ color: style.accent, mt: 0.5 }}>
+        <Typography variant="subtitle1" sx={{ color: style.accent, mt: 0.25, fontWeight: 500 }}>
           <EditableField value={cv.title} onChange={(v) => updateField("title", v)} placeholder="Your Title" />
         </Typography>
         
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mt: 2 }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, mt: 1 }}>
           <EditableContactField
             icon={EmailIcon}
             value={cv.email}
@@ -296,13 +305,15 @@ export function CVPreview({ cv, template, onUpdateCV }: CVPreviewProps) {
             placeholder="linkedin.com/in/..."
             headerText={style.headerText}
           />
-          <EditableContactField
-            icon={GitHubIcon}
-            value={cv.github}
-            onChange={(v) => updateField("github", v)}
-            placeholder="github.com/..."
-            headerText={style.headerText}
-          />
+          {showGitHub && (
+            <EditableContactField
+              icon={GitHubIcon}
+              value={cv.github}
+              onChange={(v) => updateField("github", v)}
+              placeholder="github.com/..."
+              headerText={style.headerText}
+            />
+          )}
           <EditableContactField
             icon={LinkIcon}
             value={cv.website}
