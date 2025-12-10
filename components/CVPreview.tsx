@@ -513,74 +513,149 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
   const PAGE_PADDING_PX = 48;
   const BOTTOM_GUTTER = 40;
 
-  // Calculate page assignments based on estimated section heights
-  const pages = useMemo(() => {
+  // Page item types for granular pagination
+  type PageItem = 
+    | { type: "summary" }
+    | { type: "experience-header" }
+    | { type: "experience-entry"; index: number }
+    | { type: "education-header" }
+    | { type: "education-entry"; index: number }
+    | { type: "skills" }
+    | { type: "strengths" }
+    | { type: "certifications" };
+
+  interface PageData {
+    pageNumber: number;
+    items: PageItem[];
+    isFirstPage: boolean;
+  }
+
+  // Calculate page assignments with entry-level splitting
+  const pages = useMemo((): PageData[] => {
     const AVAILABLE_FIRST = A4_HEIGHT_PX - HEADER_HEIGHT_PX - PAGE_PADDING_PX - BOTTOM_GUTTER;
     const AVAILABLE_SUBSEQUENT = A4_HEIGHT_PX - PAGE_PADDING_PX - BOTTOM_GUTTER - 40; // 40 for PageBadge
 
-    const estimateHeight = (section: CVSection): number => {
-      const SECTION_HEADER = 48;
-      const LINE_HEIGHT = 24;
-      const CHARS_PER_LINE = 70;
+    const SECTION_HEADER = 48;
+    const LINE_HEIGHT = 24;
+    const CHARS_PER_LINE = 70;
 
-      switch (section) {
-        case "summary": {
-          const lines = Math.ceil((cv.summary?.length || 100) / CHARS_PER_LINE);
-          return SECTION_HEADER + lines * LINE_HEIGHT + 24;
-        }
-        case "experience": {
-          let height = SECTION_HEADER;
-          (cv.experience || []).forEach(exp => {
-            height += 80;
-            const lines = Math.ceil((exp.description?.length || 0) / CHARS_PER_LINE);
-            height += lines * LINE_HEIGHT + 24;
-          });
-          return Math.max(height, 100);
-        }
-        case "education":
-          return SECTION_HEADER + (cv.education?.length || 1) * 60 + 16;
-        case "skills": {
-          const count = cv.skills?.length || 0;
-          const rows = Math.ceil(count / 4);
-          return SECTION_HEADER + rows * 40 + 16;
-        }
-        case "strengths": {
-          const count = cv.strengths?.length || 0;
-          const rows = Math.ceil(count / 3);
-          return SECTION_HEADER + rows * 40 + 16;
-        }
-        case "certifications":
-          return SECTION_HEADER + (cv.certifications?.length || 0) * 56 + 16;
-        default:
-          return 100;
+    // Height estimation functions
+    const estimateSummaryHeight = (): number => {
+      const lines = Math.ceil((cv.summary?.length || 100) / CHARS_PER_LINE);
+      return SECTION_HEADER + lines * LINE_HEIGHT + 24;
+    };
+
+    const estimateExperienceEntryHeight = (exp: typeof cv.experience[0]): number => {
+      const headerHeight = 80; // Title, company, date lines
+      const lines = Math.ceil((exp.description?.length || 0) / CHARS_PER_LINE);
+      return headerHeight + lines * LINE_HEIGHT + 24;
+    };
+
+    const estimateEducationEntryHeight = (): number => {
+      return 60; // Fixed height per education entry
+    };
+
+    const estimateSkillsHeight = (): number => {
+      const count = cv.skills?.length || 0;
+      const rows = Math.ceil(count / 4);
+      return SECTION_HEADER + rows * 40 + 16;
+    };
+
+    const estimateStrengthsHeight = (): number => {
+      const count = cv.strengths?.length || 0;
+      const rows = Math.ceil(count / 3);
+      return SECTION_HEADER + rows * 40 + 16;
+    };
+
+    const estimateCertificationsHeight = (): number => {
+      return SECTION_HEADER + (cv.certifications?.length || 0) * 56 + 16;
+    };
+
+    const result: PageData[] = [];
+    let currentItems: PageItem[] = [];
+    let currentHeight = 0;
+    let pageNumber = 1;
+
+    const getAvailable = () => pageNumber === 1 ? AVAILABLE_FIRST : AVAILABLE_SUBSEQUENT;
+
+    const pushPage = () => {
+      if (currentItems.length > 0) {
+        result.push({ pageNumber, items: [...currentItems], isFirstPage: pageNumber === 1 });
+        pageNumber++;
+        currentItems = [];
+        currentHeight = 0;
       }
     };
 
-    const result: { pageNumber: number; sections: CVSection[]; isFirstPage: boolean }[] = [];
-    let currentPage: CVSection[] = [];
-    let currentHeight = 48; // Rearrange button
-    let pageNumber = 1;
+    const addItem = (item: PageItem, height: number) => {
+      if (currentHeight + height > getAvailable() && currentItems.length > 0) {
+        pushPage();
+      }
+      currentItems.push(item);
+      currentHeight += height;
+    };
 
+    // Process each section in order
     for (const section of sectionOrder) {
-      const height = estimateHeight(section);
-      const available = pageNumber === 1 ? AVAILABLE_FIRST : AVAILABLE_SUBSEQUENT;
+      switch (section) {
+        case "summary": {
+          const height = estimateSummaryHeight();
+          addItem({ type: "summary" }, height);
+          break;
+        }
 
-      if (currentHeight + height > available && currentPage.length > 0) {
-        result.push({ pageNumber, sections: [...currentPage], isFirstPage: pageNumber === 1 });
-        pageNumber++;
-        currentPage = [section];
-        currentHeight = height;
-      } else {
-        currentPage.push(section);
-        currentHeight += height;
+        case "experience": {
+          if (cv.experience.length === 0) break;
+          
+          // Add section header
+          addItem({ type: "experience-header" }, SECTION_HEADER);
+
+          // Add each experience entry individually
+          cv.experience.forEach((exp, index) => {
+            const entryHeight = estimateExperienceEntryHeight(exp);
+            addItem({ type: "experience-entry", index }, entryHeight);
+          });
+          break;
+        }
+
+        case "education": {
+          if (!cv.education || cv.education.length === 0) break;
+
+          // Add section header
+          addItem({ type: "education-header" }, SECTION_HEADER);
+
+          // Add each education entry individually
+          cv.education.forEach((_, index) => {
+            const entryHeight = estimateEducationEntryHeight();
+            addItem({ type: "education-entry", index }, entryHeight);
+          });
+          break;
+        }
+
+        case "skills": {
+          const height = estimateSkillsHeight();
+          addItem({ type: "skills" }, height);
+          break;
+        }
+
+        case "strengths": {
+          const height = estimateStrengthsHeight();
+          addItem({ type: "strengths" }, height);
+          break;
+        }
+
+        case "certifications": {
+          const height = estimateCertificationsHeight();
+          addItem({ type: "certifications" }, height);
+          break;
+        }
       }
     }
 
-    if (currentPage.length > 0) {
-      result.push({ pageNumber, sections: currentPage, isFirstPage: pageNumber === 1 });
-    }
+    // Push final page
+    pushPage();
 
-    return result;
+    return result.length > 0 ? result : [{ pageNumber: 1, items: [], isFirstPage: true }];
   }, [cv, sectionOrder]);
 
   const totalPages = pages.length;
