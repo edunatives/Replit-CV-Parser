@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
         continue;
       }
 
-      if (file.size > 10 * 1024 * 1024) {
+      if (file.size > 3 * 1024 * 1024) {
         results.push({
           fileName: file.name,
           error: "File too large",

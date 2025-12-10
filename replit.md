@@ -36,7 +36,7 @@ Preferred communication style: Simple, everyday language.
 
 **Framework**: Next.js API Routes
 - API routes in `/app/api/` directory
-- File uploads handled via FormData with memory storage (10MB limit)
+- File uploads handled via FormData with memory storage (3MB limit)
 - CV parsing implemented in `/lib/parse/parseCv.ts` using:
   - `mammoth` for DOCX parsing
   - `pdf-parse` for PDF text extraction

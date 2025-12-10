@@ -6571,7 +6571,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$ico
 ;
 ;
 ;
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB in bytes
+const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB in bytes
 function UploadDropzone({ onFilesAdded, disabled }) {
     const [sizeError, setSizeError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
     const onDrop = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useCallback"])((acceptedFiles)=>{
@@ -6584,7 +6584,7 @@ function UploadDropzone({ onFilesAdded, disabled }) {
         const oversizedFiles = rejections.filter((r)=>r.errors.some((e)=>e.code === "file-too-large"));
         if (oversizedFiles.length > 0) {
             const names = oversizedFiles.map((r)=>r.file.name).join(", ");
-            setSizeError(`File(s) too large: ${names}. Maximum size is 2MB.`);
+            setSizeError(`File(s) too large: ${names}. Maximum size is 3MB.`);
         }
     }, []);
     const { getRootProps, getInputProps, isDragActive } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$dropzone$2f$dist$2f$es$2f$index$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$locals$3e$__["useDropzone"])({
@@ -6692,7 +6692,7 @@ function UploadDropzone({ onFilesAdded, disabled }) {
                                     display: "block",
                                     mt: 1
                                 },
-                                children: "Maximum file size: 2MB"
+                                children: "Maximum file size: 3MB"
                             }, void 0, false, {
                                 fileName: "[project]/components/UploadDropzone.tsx",
                                 lineNumber: 87,

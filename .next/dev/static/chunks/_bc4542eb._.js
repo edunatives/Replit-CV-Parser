@@ -6633,7 +6633,7 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB in bytes
+const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB in bytes
 function UploadDropzone({ onFilesAdded, disabled }) {
     _s();
     const [sizeError, setSizeError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
@@ -6656,7 +6656,7 @@ function UploadDropzone({ onFilesAdded, disabled }) {
                 const names = oversizedFiles.map({
                     "UploadDropzone.useCallback[onDropRejected].names": (r)=>r.file.name
                 }["UploadDropzone.useCallback[onDropRejected].names"]).join(", ");
-                setSizeError(`File(s) too large: ${names}. Maximum size is 2MB.`);
+                setSizeError(`File(s) too large: ${names}. Maximum size is 3MB.`);
             }
         }
     }["UploadDropzone.useCallback[onDropRejected]"], []);
@@ -6765,7 +6765,7 @@ function UploadDropzone({ onFilesAdded, disabled }) {
                                     display: "block",
                                     mt: 1
                                 },
-                                children: "Maximum file size: 2MB"
+                                children: "Maximum file size: 3MB"
                             }, void 0, false, {
                                 fileName: "[project]/components/UploadDropzone.tsx",
                                 lineNumber: 87,

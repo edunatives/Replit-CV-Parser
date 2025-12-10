@@ -6,7 +6,7 @@ import { Box, Typography, Paper, Alert } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB in bytes
+const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB in bytes
 
 interface UploadDropzoneProps {
   onFilesAdded: (files: File[]) => void;
@@ -28,7 +28,7 @@ export function UploadDropzone({ onFilesAdded, disabled }: UploadDropzoneProps) 
     
     if (oversizedFiles.length > 0) {
       const names = oversizedFiles.map(r => r.file.name).join(", ");
-      setSizeError(`File(s) too large: ${names}. Maximum size is 2MB.`);
+      setSizeError(`File(s) too large: ${names}. Maximum size is 3MB.`);
     }
   }, []);
 
@@ -85,7 +85,7 @@ export function UploadDropzone({ onFilesAdded, disabled }: UploadDropzoneProps) 
             or click to browse (PDF, DOCX, TXT)
           </Typography>
           <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 1 }}>
-            Maximum file size: 2MB
+            Maximum file size: 3MB
           </Typography>
         </Box>
       </Paper>

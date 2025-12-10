@@ -41,7 +41,7 @@ export const runtime = "nodejs";
  * 
  * @throws {400} No file uploaded
  * @throws {400} Invalid file type (only PDF, DOCX, TXT allowed)
- * @throws {400} File too large (max 10MB)
+ * @throws {400} File too large (max 3MB)
  * @throws {500} Parse error
  */
 export async function POST(request: NextRequest) {
@@ -67,9 +67,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (file.size > 10 * 1024 * 1024) {
+    if (file.size > 3 * 1024 * 1024) {
       return NextResponse.json(
-        { error: "File too large. Maximum size is 10MB." },
+        { error: "File too large. Maximum size is 3MB." },
         { status: 400 }
       );
     }
