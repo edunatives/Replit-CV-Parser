@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCollection } from "@/lib/db/mongodb";
+
+const NESTJS_API_URL = process.env.NESTJS_API_URL || "http://localhost:3001";
 
 export async function GET() {
   try {
-    const collection = await getCollection("cvs");
-    if (!collection) {
-      return NextResponse.json({ cvs: [] });
-    }
-    const cvs = await collection.find({}).sort({ createdAt: -1 }).limit(100).toArray();
-    return NextResponse.json({ cvs });
+    const response = await fetch(`${NESTJS_API_URL}/api/cv/list`);
+    const data = await response.json();
+    return NextResponse.json(data);
   } catch (error) {
-    console.error("Error fetching CVs:", error);
+    console.error("Error fetching CVs from NestJS:", error);
     return NextResponse.json({ cvs: [] });
   }
 }
@@ -24,15 +22,22 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "No ID provided" }, { status: 400 });
     }
 
-    const collection = await getCollection("cvs");
-    if (!collection) {
-      return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
+    const response = await fetch(`${NESTJS_API_URL}/api/cv?id=${id}`, {
+      method: "DELETE",
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      return NextResponse.json(
+        { error: data.message || data.error || "Failed to delete CV" },
+        { status: response.status }
+      );
     }
-    await collection.deleteOne({ id });
-
-    return NextResponse.json({ success: true });
+    
+    return NextResponse.json(data);
   } catch (error) {
-    console.error("Error deleting CV:", error);
+    console.error("Error deleting CV via NestJS:", error);
     return NextResponse.json({ error: "Failed to delete CV" }, { status: 500 });
   }
 }

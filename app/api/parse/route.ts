@@ -1,59 +1,49 @@
 import { NextRequest, NextResponse } from "next/server";
-import { parseCV } from "@/lib/parse/parseCv";
-import { getCollection } from "@/lib/db/mongodb";
 
 export const runtime = "nodejs";
+
+const NESTJS_API_URL = process.env.NESTJS_API_URL || "http://localhost:3001";
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
-    const fileId = (formData.get("fileId") as string) || `file-${Date.now()}`;
-
+    const fileId = formData.get("fileId") as string | null;
+    
     if (!file) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
-
-    const allowedTypes = [
-      "application/pdf",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "text/plain",
-    ];
-
-    if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json(
-        { error: "Invalid file type. Only PDF, DOCX, and TXT files are allowed." },
-        { status: 400 }
-      );
-    }
-
-    if (file.size > 10 * 1024 * 1024) {
-      return NextResponse.json(
-        { error: "File too large. Maximum size is 10MB." },
-        { status: 400 }
-      );
-    }
-
+    
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-
-    const { cv, rawText } = await parseCV(buffer, file.name, fileId);
-
-    cv.mimeType = file.type;
-    cv.size = file.size;
-
-    const collection = await getCollection("cvs");
-    if (collection) {
-      try {
-        await collection.insertOne({ ...cv, createdAt: new Date() });
-      } catch (dbError) {
-        console.log("Failed to save to MongoDB:", dbError);
-      }
+    
+    const blob = new Blob([buffer], { type: file.type });
+    const newFormData = new FormData();
+    newFormData.append("file", blob, file.name);
+    if (fileId) {
+      newFormData.append("fileId", fileId);
     }
-
-    return NextResponse.json({ cv, rawText });
+    
+    const response = await fetch(`${NESTJS_API_URL}/api/cv/parse`, {
+      method: "POST",
+      body: newFormData,
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      return NextResponse.json(
+        { error: data.message || data.error || "Failed to parse CV" },
+        { status: response.status }
+      );
+    }
+    
+    return NextResponse.json(data);
   } catch (error) {
-    console.error("Error parsing CV:", error);
-    return NextResponse.json({ error: "Failed to parse CV" }, { status: 500 });
+    console.error("Error proxying to NestJS:", error);
+    return NextResponse.json(
+      { error: "Failed to connect to parsing service" },
+      { status: 500 }
+    );
   }
 }

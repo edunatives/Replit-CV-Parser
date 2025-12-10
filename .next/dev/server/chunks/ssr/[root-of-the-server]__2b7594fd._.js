@@ -2750,7 +2750,7 @@ function Home() {
                 const formData = new FormData();
                 formData.append("file", actualFile);
                 formData.append("fileId", file.id);
-                const response = await fetch("http://localhost:3001/api/cv/parse", {
+                const response = await fetch("/api/parse", {
                     method: "POST",
                     body: formData
                 });
