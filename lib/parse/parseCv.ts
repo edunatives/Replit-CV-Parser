@@ -13,33 +13,21 @@ import {
 import { GoogleGenAI } from "@google/genai";
 
 type PdfParseResult = { text: string; numpages: number };
-type PdfParseFunction = (buffer: Buffer, options?: object) => Promise<PdfParseResult>;
 
 async function parsePdfBuffer(buffer: Buffer): Promise<PdfParseResult> {
-  const pdfModule = await import("pdf-parse") as unknown as 
-    | PdfParseFunction 
-    | { default: PdfParseFunction | { default: PdfParseFunction } };
+  const pdfModule = await import("pdf-parse");
+  const PDFParse = pdfModule.PDFParse;
   
-  let pdfParse: PdfParseFunction | undefined;
-  
-  if (typeof pdfModule === "function") {
-    pdfParse = pdfModule;
-  } else if (typeof (pdfModule as { default: unknown }).default === "function") {
-    pdfParse = (pdfModule as { default: PdfParseFunction }).default;
-  } else if (
-    (pdfModule as { default: { default: unknown } }).default && 
-    typeof (pdfModule as { default: { default: PdfParseFunction } }).default.default === "function"
-  ) {
-    pdfParse = (pdfModule as { default: { default: PdfParseFunction } }).default.default;
+  if (!PDFParse) {
+    throw new Error("PDFParse class not found in pdf-parse module");
   }
   
-  if (!pdfParse || typeof pdfParse !== "function") {
-    const keys = Object.keys(pdfModule as object);
-    console.error("pdf-parse module structure:", JSON.stringify(keys));
-    throw new Error(`pdf-parse module not callable. Keys: ${keys.join(", ")}`);
-  }
+  const parser = new PDFParse({ data: buffer, verbosity: 0 });
+  const result = await parser.getText();
   
-  return pdfParse(buffer, { max: 0 });
+  await parser.destroy();
+  
+  return { text: result.text || "", numpages: result.total || 1 };
 }
 
 async function parseDocxBuffer(buffer: Buffer): Promise<string> {
@@ -249,6 +237,10 @@ export async function parseCV(buffer: Buffer, fileName: string, fileId: string):
       const data = await parsePdfBuffer(buffer);
       text = normalizeText(data.text);
       console.log(`PDF parsed: ${text.length} chars, ${data.numpages} pages`);
+      
+      if (text.length < 50) {
+        throw new Error(`PDF text extraction returned insufficient content (${text.length} chars)`);
+      }
     } else if (extension === "docx" || extension === "doc") {
       console.log(`Parsing Word: ${fileName}, size: ${buffer.length}`);
       text = normalizeText(await parseDocxBuffer(buffer));
@@ -259,6 +251,11 @@ export async function parseCV(buffer: Buffer, fileName: string, fileId: string):
     }
   } catch (error) {
     console.error(`Parse error for ${fileName}:`, error);
+    
+    if (extension === "pdf") {
+      throw new Error(`Failed to extract text from PDF: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
+    
     text = normalizeText(buffer.toString("utf-8"));
   }
   
