@@ -10,6 +10,7 @@ import SendIcon from "@mui/icons-material/Send";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import WorkIcon from "@mui/icons-material/Work";
 import TokenIcon from "@mui/icons-material/Token";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import type { ParsedCV } from "@/types/cv";
 
 interface AIAnalysisPanelProps {
@@ -52,6 +53,24 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const jdInputRef = useRef<HTMLTextAreaElement>(null);
+
+  const insertBullet = () => {
+    const textarea = jdInputRef.current;
+    if (!textarea) return;
+    
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const bullet = "\u2022 ";
+    
+    const newText = jdText.substring(0, start) + bullet + jdText.substring(end);
+    setJdText(newText);
+    
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + bullet.length, start + bullet.length);
+    }, 0);
+  };
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -449,9 +468,25 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
 
         <Card sx={{ mb: 3 }}>
           <CardContent>
-            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2 }}>
-              Paste Job Description
-            </Typography>
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                Paste Job Description
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={insertBullet}
+                disabled={loading}
+                title="Insert bullet point"
+                data-testid="button-insert-bullet"
+                sx={{ 
+                  border: 1, 
+                  borderColor: "divider",
+                  borderRadius: 1,
+                }}
+              >
+                <FormatListBulletedIcon fontSize="small" />
+              </IconButton>
+            </Box>
             <TextField
               multiline
               rows={6}
@@ -460,6 +495,7 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
               value={jdText}
               onChange={(e) => setJdText(e.target.value)}
               disabled={loading}
+              inputRef={jdInputRef}
               data-testid="input-job-description"
             />
             <Button 
