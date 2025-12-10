@@ -48,7 +48,7 @@ function SectionHeader({
   
   return (
     <Box sx={{ mb: 1 }}>
-      <Box sx={{ display: "flex", alignItems: "center", "&:hover .order-btns": { visibility: "visible" } }}>
+      <Box sx={{ display: "flex", alignItems: "center", "&:hover .order-btns": { opacity: 1 } }}>
         {isCenteredLines && <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />}
         <Typography 
           variant="h6" 
@@ -64,7 +64,7 @@ function SectionHeader({
           {title}
         </Typography>
         {isCenteredLines && <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />}
-        <Box className="order-btns" sx={{ display: "flex", visibility: "hidden", ml: 1 }}>
+        <Box className="order-btns" sx={{ display: "flex", opacity: 0.4, ml: 1, transition: "opacity 0.2s" }}>
           <Tooltip title="Move up">
             <span>
               <IconButton 
