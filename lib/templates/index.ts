@@ -163,6 +163,23 @@ export const templateRegistry: Record<TemplateType, TemplateStyle> = {
     companyColor: "#1b4f72",
     summaryBoxed: true,
   },
+  "classic-underline": {
+    id: "classic-underline",
+    name: "Classic Underline",
+    description: "Professional style matching industry standards with underlined section headers",
+    headerBg: "#ffffff",
+    accent: "#1b4f72",
+    headerText: "#1b4f72",
+    bodyBg: "#ffffff",
+    bodyText: "#1a1a1a",
+    bodyTextSecondary: "#4a4a4a",
+    borderBottom: "none",
+    headerCentered: false,
+    sectionHeaderVariant: "underline",
+    showMetaIcons: true,
+    companyColor: "#2874a6",
+    summaryBoxed: false,
+  },
 };
 
 /**

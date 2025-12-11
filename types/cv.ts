@@ -41,6 +41,8 @@ export const COLOR_SCHEME_PRESETS: ColorScheme[] = [
   { id: "burgundy", name: "Burgundy", primary: "#6b1c23", secondary: "#922b3e" },
   { id: "charcoal", name: "Charcoal", primary: "#2d3436", secondary: "#636e72" },
   { id: "royal-purple", name: "Royal Purple", primary: "#4a148c", secondary: "#7b1fa2" },
+  { id: "black-lightblue", name: "Black & Light Blue", primary: "#1a1a1a", secondary: "#0ea5e9" },
+  { id: "black-purple", name: "Black & Purple", primary: "#1a1a1a", secondary: "#8b5cf6" },
 ];
 
 export type CVSection = "summary" | "experience" | "education" | "skills" | "certifications" | "strengths";
@@ -82,7 +84,7 @@ export interface CVFile {
   error?: string;
 }
 
-export type TemplateType = "modern-dark" | "classic-light" | "executive" | "minimal" | "creative" | "professional" | "corporate" | "business";
+export type TemplateType = "modern-dark" | "classic-light" | "executive" | "minimal" | "creative" | "professional" | "corporate" | "business" | "classic-underline";
 
 // ============================================================================
 // FORENSIC ASSESSMENT TYPES (v9.3)

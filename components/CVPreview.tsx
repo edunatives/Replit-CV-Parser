@@ -1105,12 +1105,13 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
     }}>
       <Typography variant="h4" component="div" sx={{ 
         fontFamily: "'Arial', sans-serif", 
-        fontWeight: 700,
-        fontSize: "1.85rem",
+        fontWeight: 800,
+        fontSize: "2.25rem",
         color: style.headerText,
         display: style.headerCentered ? "block" : "inline-block",
-        letterSpacing: "0.01em",
+        letterSpacing: "-0.01em",
         lineHeight: 1.1,
+        textTransform: "uppercase",
       }}>
         <EditableField value={cv.name} onChange={(v) => updateField("name", v)} placeholder="Your Name" />
       </Typography>

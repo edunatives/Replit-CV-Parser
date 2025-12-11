@@ -10,6 +10,10 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **CV Styling Improvements**:
+  - Name font increased to 2.25rem, weight 800, uppercase for stronger presence
+  - Added "Classic Underline" template matching industry-standard CV format (underlined section headers, no boxed summary)
+  - Added two new color schemes: "Black & Light Blue" and "Black & Purple"
 - **JD Match v2.2 - Experience Factors + Nature Fit** (Student View Only):
   - **Experience Factors (H1-H9)**: Years analysis, depth analysis, and growth areas with encouraging student messages
     - Years: total_years, relevant_domain_years, recency_score, meets_requirement, student_message
