@@ -1,17 +1,17 @@
 /**
  * @fileoverview CV Assessment API
  * @description AI-powered CV/resume analysis and scoring using Gemini 2.5 Flash.
- * Evaluates CV quality across 6 sections and provides actionable recommendations.
+ * Supports v9.3 (6 sections) and v2.11 (7 categories with multi-audience reports).
  * 
  * @endpoint POST /api/assess
- * @accepts application/json with { cv: ParsedCV }
- * @returns {Object} { assessment: CVAssessment }
+ * @accepts application/json with { cv: ParsedCV, version?: "9.3" | "2.11" }
+ * @returns {Object} { assessment: CVAssessment } or { analysis: ForensicAnalysisV211 }
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
-import type { ParsedCV } from "@/types/cv";
-import { formatCVSummary, buildAssessmentPrompt, cleanAIResponse } from "@/lib/ai/rules";
+import type { ParsedCV, ForensicAnalysisV211 } from "@/types/cv";
+import { formatCVSummary, buildAssessmentPrompt, buildV211AssessmentPrompt, cleanAIResponse } from "@/lib/ai/rules";
 
 /**
  * Forensic highlight for inline CV annotation (v9.3)
@@ -96,7 +96,8 @@ export interface CVAssessment {
  */
 export async function POST(request: NextRequest) {
   try {
-    const { cv } = await request.json() as { cv: ParsedCV };
+    const body = await request.json() as { cv: ParsedCV; version?: "9.3" | "2.11" };
+    const { cv, version = "2.11" } = body;
 
     if (!cv) {
       return NextResponse.json({ error: "CV data is required" }, { status: 400 });
@@ -118,6 +119,37 @@ export async function POST(request: NextRequest) {
     });
 
     const cvSummary = formatCVSummary(cv);
+    
+    // Use v2.11 or v9.3 prompt based on version parameter
+    if (version === "2.11") {
+      const prompt = buildV211AssessmentPrompt(cvSummary, cv.originalFilename || "cv.pdf");
+      
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: {
+          maxOutputTokens: 8192, // v2.11 needs more tokens for comprehensive output
+        },
+      });
+
+      const responseText = response.text?.trim() || "";
+      const jsonText = cleanAIResponse(responseText);
+      const analysis: ForensicAnalysisV211 = JSON.parse(jsonText);
+
+      const tokenUsage = {
+        promptTokens: response.usageMetadata?.promptTokenCount || 0,
+        completionTokens: response.usageMetadata?.candidatesTokenCount || 0,
+        totalTokens: response.usageMetadata?.totalTokenCount || 0,
+      };
+
+      return NextResponse.json({ 
+        analysis,
+        tokenUsage,
+        version: "2.11"
+      });
+    }
+    
+    // v9.3 legacy flow
     const prompt = buildAssessmentPrompt(cvSummary);
 
     const response = await ai.models.generateContent({

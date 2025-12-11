@@ -2132,6 +2132,8 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
     ()=>TOKEN_LIMITS,
     "UPLOAD_LIMITS",
     ()=>UPLOAD_LIMITS,
+    "V211_WEIGHTS",
+    ()=>V211_WEIGHTS,
     "buildAdvisorPrompt",
     ()=>buildAdvisorPrompt,
     "buildAssessmentPrompt",
@@ -2142,6 +2144,8 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
     ()=>buildForensicPrompt,
     "buildJDMatchPrompt",
     ()=>buildJDMatchPrompt,
+    "buildV211AssessmentPrompt",
+    ()=>buildV211AssessmentPrompt,
     "cleanAIResponse",
     ()=>cleanAIResponse,
     "containsInjectionAttempt",
@@ -2850,6 +2854,202 @@ class ForensicAuditor {
         const prompt = buildForensicPrompt(cvText);
         return this.executeWithRetry(apiKey, prompt);
     }
+}
+const V211_WEIGHTS = {
+    A_ats_structure: 15,
+    B_content_realism: 20,
+    C_skill_validation: 20,
+    D_strengths_discovery: 10,
+    E_tone_clarity: 10,
+    F_timeline_plausibility: 15,
+    G_nature_fit: 10
+};
+function buildV211AssessmentPrompt(cvSummary, cvFilename = "cv.pdf") {
+    const sanitized = sanitizeAIInput(cvSummary);
+    if (containsInjectionAttempt(sanitized)) {
+        throw new Error("Security: Suspicious content detected in CV text");
+    }
+    return `You are the EduNatives Forensic CV Engine (v2.11).
+
+Analyze this CV using seven scoring categories (A-G) and produce comprehensive assessment data for both student and HR audiences.
+
+CV DATA:
+"""
+${sanitized}
+"""
+
+=== SCORING CATEGORIES (Weights) ===
+A. ATS Structure (${V211_WEIGHTS.A_ats_structure}%): Contact info completeness, formatting, layout, length, typos
+B. Content Realism (${V211_WEIGHTS.B_content_realism}%): Claims believability, evidence quality, quantification
+C. Skill Validation (${V211_WEIGHTS.C_skill_validation}%): Skills backed by experience, ghost skills detection, proficiency levels 1-5
+D. Strengths Discovery (${V211_WEIGHTS.D_strengths_discovery}%): Key achievements, unique value propositions
+E. Tone & Clarity (${V211_WEIGHTS.E_tone_clarity}%): Readability, jargon levels, bullet length, repetition
+F. Timeline Plausibility (${V211_WEIGHTS.F_timeline_plausibility}%): Career gaps, seniority alignment, progression logic
+G. Nature Fit (${V211_WEIGHTS.G_nature_fit}%): Education-career alignment, domain depth, candidate profile
+
+=== ISSUE SEVERITY LEVELS ===
+- critical: Disqualifying issues (fake credentials, major red flags)
+- high: Significant problems that hurt candidacy (multiple typos, ghost skills)
+- medium: Notable issues worth fixing (missing LinkedIn, formatting issues)
+- low: Minor polish items (wordiness, minor improvements)
+
+=== OUTPUT SCHEMA ===
+Return ONLY valid JSON matching this structure:
+
+{
+  "version": "2.11",
+  "input": {
+    "cv_filename": "${cvFilename}",
+    "jd_provided": false,
+    "jd_title": null
+  },
+  "analysis_metadata": {
+    "cv_name": "String (extracted name)",
+    "analysis_date": "${new Date().toISOString()}",
+    "engine_version": "2.11",
+    "professional_age_years": Number (years since first job),
+    "inferred_seniority": "String (Entry/Mid/Senior/Lead/Principal/Executive)"
+  },
+  "cv_nature": {
+    "education_nature": {
+      "field": "String (IT/CS, Business, Engineering, Arts, Science, etc.)",
+      "field_specific": "String (specific major/field)",
+      "level": "String (High School/Associate/Bachelors/Masters/PhD)",
+      "technical_degree": Boolean,
+      "stem_degree": Boolean,
+      "relevance_to_career": "String (Direct/Related/Tangential/Unrelated)"
+    },
+    "domain_nature": {
+      "primary_domain": "String (Software Dev/Infrastructure/Data/Security/Product/Design/etc.)",
+      "secondary_domains": ["String"],
+      "specialization": "String",
+      "domain_depth": "String (Generalist/Specialist/Expert)"
+    },
+    "industry_nature": {
+      "current_industry": "String",
+      "industry_history": ["String"],
+      "industry_depth": "String (Single/Multi-Industry)"
+    },
+    "work_style_nature": {
+      "employment_pattern": "String (Full-time/Contract/Freelance/Mixed)",
+      "work_arrangement": "String (On-site/Remote/Hybrid)",
+      "company_size_history": "String (Startup/SMB/Enterprise/Mixed)",
+      "geographic_pattern": "String (Local/National/International)"
+    },
+    "career_path_nature": {
+      "trajectory": "String (Linear Progression/Career Change/Lateral/Entrepreneurial)",
+      "stability": "String (Stable/Moderate/Job Hopper)",
+      "gaps_present": Boolean,
+      "career_stage": "String (Entry/Early-Mid/Mid/Senior/Executive)",
+      "is_career_changer": Boolean,
+      "pivot_from": "String or null",
+      "pivot_to": "String or null"
+    },
+    "candidate_profile": {
+      "type": "String (Fresh Graduate/Rising Star/Industry Veteran/Career Changer/Specialist)",
+      "learning_style": "String (Self-Taught/Certification-Based/Formal Education/Mixed)",
+      "risk_profile": "String (Low Risk/Moderate Risk/High Risk)"
+    }
+  },
+  "category_scores": {
+    "A_ats_structure": {
+      "score": Number (0-100),
+      "grade": "String (A/A-/B+/B/B-/C+/C/D/F)",
+      "issues": [{"code": "A1-A9", "type": "String", "detail": "String", "severity": "critical|high|medium|low", "location": "String"}]
+    },
+    "B_content_realism": {
+      "score": Number,
+      "grade": "String",
+      "issues": [{"code": "B1-B9", "type": "String", "detail": "String", "severity": "String", "evidence": "String"}]
+    },
+    "C_skill_validation": {
+      "score": Number,
+      "grade": "String",
+      "validation_rate": "String (e.g., 85%)",
+      "skills": {
+        "validated": [{"skill": "String", "level": 1-5, "raw_level": 1-5, "evidence": ["String"], "penalty": "String or null", "cap_applied": Boolean}],
+        "implied": [{"skill": "String", "level": 1-5, "reason": "String"}],
+        "ghost": ["String (skills listed but no evidence)"]
+      },
+      "issues": [{"code": "C1-C9", "type": "String", "skill": "String", "detail": "String", "severity": "String"}]
+    },
+    "D_strengths_discovery": {
+      "score": Number,
+      "strengths": [{"code": "D1-D9", "type": "String", "detail": "String", "evidence": "String"}]
+    },
+    "E_tone_clarity": {
+      "score": Number,
+      "grade": "String",
+      "metrics": {"avg_bullet_length_words": Number, "technical_density": "String", "repeated_words": [{"word": "String", "count": Number}], "readability": "String"},
+      "issues": [{"code": "E1-E9", "type": "String", "detail": "String", "severity": "String"}]
+    },
+    "F_timeline_plausibility": {
+      "score": Number,
+      "grade": "String",
+      "issues": [{"code": "F1-F9", "type": "String", "detail": "String", "severity": "String"}]
+    },
+    "G_nature_fit": {
+      "score": Number,
+      "grade": "String",
+      "issues": [{"code": "G1-G9", "type": "String", "detail": "String", "severity": "String"}]
+    }
+  },
+  "ui_output": {
+    "overallScore": Number (weighted average of all category scores),
+    "level": "Exceptional|Strong|Good|Fair|Needs Work",
+    "inflation": Boolean,
+    "verdict": "String (2-3 sentence summary)",
+    "sections": [{"name": "String", "code": "A-G", "score": Number, "status": "good|warning|critical", "summary": "String"}],
+    "strengths": [{"code": "D1-D9", "icon": "check", "text": "String"}],
+    "weaknesses": [{"code": "String", "icon": "x", "severity": "critical|high|medium|low", "text": "String"}],
+    "recommendations": [{"priority": "high|medium|low", "icon": "lightbulb", "text": "String", "impact": "String (+X pts)"}],
+    "highlights": [{"type": "achievement|skill|concern|gap|education", "color": "green|blue|yellow|red|purple", "text": "String", "source": "String", "note": "String or null"}],
+    "quickStats": {
+      "professionalYears": Number,
+      "validatedSkills": Number,
+      "ghostSkills": Number,
+      "validationRate": Number (percentage),
+      "quantificationRate": Number (percentage of bullets with metrics),
+      "issueCount": {"critical": Number, "high": Number, "medium": Number, "low": Number}
+    }
+  },
+  "reports": {
+    "student_view": {
+      "headline": "String (encouraging headline)",
+      "overall_score": {"score": Number, "grade": "String", "message": "String"},
+      "your_strengths": [{"title": "String", "detail": "String", "icon": "trophy|star|sparkle|rocket"}],
+      "your_background": {"summary": "String", "unique_value": "String", "growth_areas": ["String"]},
+      "quick_wins": [{"action": "String", "impact": "String", "time": "String (e.g., 15 minutes)", "priority": "do_first|do_soon|do_later"}],
+      "improvement_roadmap": {
+        "this_week": {"actions": ["String"], "projected_gain": Number},
+        "this_month": {"actions": ["String"], "projected_gain": Number},
+        "long_term": {"actions": ["String"], "projected_gain": Number}
+      },
+      "encouragement": "String (positive closing message)"
+    },
+    "hr_view": {
+      "executive_summary": {
+        "candidate_name": "String",
+        "target_role": "String",
+        "overall_assessment": "String",
+        "recommendation": "Strong Recommend|Recommend|Consider|Do Not Recommend",
+        "confidence": Number (0-1)
+      },
+      "scores": {"raw_score": Number, "risk_score": Number, "validation_rate": "String", "integrity_rating": "String", "nature_fit_score": Number},
+      "risk_summary": {"critical_flags": ["String"], "high_flags": ["String"], "medium_flags": ["String"], "low_flags": ["String"], "nature_flags": ["String"]},
+      "verification_suggestions": [{"area": "String", "question": "String", "why": "String"}],
+      "hiring_notes": "String"
+    }
+  },
+  "recommended_rewrites": [{"type": "remove|evidence|add|reword", "location": "String", "original": "String", "suggested": "String", "impact": "String", "related_codes": ["String"]}]
+}
+
+IMPORTANT:
+- Return ONLY valid JSON, no markdown code blocks
+- Be thorough and specific in feedback
+- Calculate weighted overall score: A(15%) + B(20%) + C(20%) + D(10%) + E(10%) + F(15%) + G(10%)
+- Include 5-8 highlights mixing achievements, skills, concerns, and gaps
+- Provide actionable, specific recommendations with point impacts`;
 }
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
