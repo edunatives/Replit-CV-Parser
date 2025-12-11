@@ -367,7 +367,7 @@ function EditableContactField({
   if (editing) {
     return (
       <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-        <Icon fontSize="small" />
+        <Icon sx={{ fontSize: 14 }} />
         <TextField
           size="small"
           value={tempValue}
@@ -392,7 +392,7 @@ function EditableContactField({
               color: headerText,
               py: 0.5,
               px: 1,
-              fontSize: "0.875rem"
+              fontSize: "0.8125rem"
             },
             "& .MuiOutlinedInput-notchedOutline": {
               borderColor: "rgba(255,255,255,0.3)"
@@ -419,9 +419,9 @@ function EditableContactField({
         borderRadius: 1,
       }}
     >
-      <Icon fontSize="small" />
-      <Typography variant="body2">{value || placeholder}</Typography>
-      <EditIcon sx={{ fontSize: 12, opacity: 0.5 }} />
+      <Icon sx={{ fontSize: 14 }} />
+      <Typography variant="body2" sx={{ fontSize: "0.8125rem" }}>{value || placeholder}</Typography>
+      <EditIcon sx={{ fontSize: 11, opacity: 0.5 }} />
     </Box>
   );
 }
@@ -1119,9 +1119,9 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
       </Typography>
       <Typography variant="subtitle1" component="div" sx={{ 
         color: effectiveColors.secondary, 
-        mt: -0.5, 
-        fontWeight: 500,
-        fontSize: "0.875rem",
+        mt: 0.25, 
+        fontWeight: 700,
+        fontSize: "0.9375rem",
         lineHeight: 1.2,
       }}>
         <EditableField value={cv.title} onChange={(v) => updateField("title", v)} placeholder="Your Title" />

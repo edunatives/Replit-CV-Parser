@@ -4293,7 +4293,9 @@ function EditableContactField({ icon: Icon, value, onChange, placeholder, header
             },
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Icon, {
-                    fontSize: "small"
+                    sx: {
+                        fontSize: 14
+                    }
                 }, void 0, false, {
                     fileName: "[project]/components/CVPreview.tsx",
                     lineNumber: 370,
@@ -4323,7 +4325,7 @@ function EditableContactField({ icon: Icon, value, onChange, placeholder, header
                             color: headerText,
                             py: 0.5,
                             px: 1,
-                            fontSize: "0.875rem"
+                            fontSize: "0.8125rem"
                         },
                         "& .MuiOutlinedInput-notchedOutline": {
                             borderColor: "rgba(255,255,255,0.3)"
@@ -4359,7 +4361,9 @@ function EditableContactField({ icon: Icon, value, onChange, placeholder, header
         },
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(Icon, {
-                fontSize: "small"
+                sx: {
+                    fontSize: 14
+                }
             }, void 0, false, {
                 fileName: "[project]/components/CVPreview.tsx",
                 lineNumber: 422,
@@ -4367,6 +4371,9 @@ function EditableContactField({ icon: Icon, value, onChange, placeholder, header
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
                 variant: "body2",
+                sx: {
+                    fontSize: "0.8125rem"
+                },
                 children: value || placeholder
             }, void 0, false, {
                 fileName: "[project]/components/CVPreview.tsx",
@@ -4375,7 +4382,7 @@ function EditableContactField({ icon: Icon, value, onChange, placeholder, header
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$Edit$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                 sx: {
-                    fontSize: 12,
+                    fontSize: 11,
                     opacity: 0.5
                 }
             }, void 0, false, {
@@ -5609,9 +5616,9 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                     component: "div",
                     sx: {
                         color: effectiveColors.secondary,
-                        mt: -0.5,
-                        fontWeight: 500,
-                        fontSize: "0.875rem",
+                        mt: 0.25,
+                        fontWeight: 700,
+                        fontSize: "0.9375rem",
                         lineHeight: 1.2
                     },
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(EditableField, {
