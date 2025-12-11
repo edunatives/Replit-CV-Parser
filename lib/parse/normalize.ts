@@ -249,7 +249,7 @@ export function validateAndNormalizeCV(cv: ParsedCV): ParsedCV {
     website: cv.website ? normalizeUrl(cv.website) : "",
     linkedin: cv.linkedin ? normalizeUrl(cv.linkedin) : "",
     github: cv.github ? normalizeUrl(cv.github) : "",
-    summary: normalizeWhitespace(cv.summary || ""),
+    summary: normalizeDescription(cv.summary || ""),
     experience: normalizeExperience(cv.experience || [], cv.id),
     education: normalizeEducation(cv.education || [], cv.id),
     certifications: normalizeCertifications(cv.certifications || [], cv.id),
