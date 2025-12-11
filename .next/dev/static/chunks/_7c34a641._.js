@@ -4427,7 +4427,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange }) {
     const A4_HEIGHT_PX = 1123; // 297mm at 96dpi
     const HEADER_HEIGHT_PX = 130; // Header height with contact info (increased for accuracy)
     const PAGE_PADDING_PX = 24; // p: 3 = 24px padding
-    const BOTTOM_GUTTER = 48; // Increased to prevent overflow
+    const BOTTOM_GUTTER = 12; // Minimal gutter to maximize content space
     // Calculate page assignments with entry-level splitting
     const pages = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
         "CVPreview.useMemo[pages]": ()=>{
@@ -4436,25 +4436,25 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange }) {
             const SECTION_HEADER = 36; // Reduced from 48 - actual header with margin
             const LINE_HEIGHT = 20; // More accurate line height
             const CHARS_PER_LINE = 80; // More chars fit per line at body2 font size
-            // Height estimation functions - more conservative to prevent blank space issues
+            // Height estimation functions - tighter estimates to minimize white space
             const estimateSummaryHeight = {
                 "CVPreview.useMemo[pages].estimateSummaryHeight": ()=>{
                     const text = cv.summary || "";
-                    const lines = Math.ceil(text.length / CHARS_PER_LINE) + 1; // Add 1 for safety
+                    const lines = Math.ceil(text.length / CHARS_PER_LINE);
                     // Account for boxed summary padding if applicable
-                    const boxPadding = style.summaryBoxed ? 32 : 0;
-                    return SECTION_HEADER + lines * LINE_HEIGHT + boxPadding + 24;
+                    const boxPadding = style.summaryBoxed ? 24 : 0;
+                    return SECTION_HEADER + lines * LINE_HEIGHT + boxPadding + 8;
                 }
             }["CVPreview.useMemo[pages].estimateSummaryHeight"];
             const estimateExperienceEntryHeight = {
                 "CVPreview.useMemo[pages].estimateExperienceEntryHeight": (exp)=>{
-                    const headerHeight = 72; // Title, company, date lines (increased for accuracy)
+                    const headerHeight = 64; // Title, company, date lines - tighter
                     const desc = exp.description || "";
                     // Count actual newlines for bullet points
                     const bulletLines = (desc.match(/\n/g) || []).length + 1;
                     const textLines = Math.ceil(desc.length / CHARS_PER_LINE);
                     const lines = Math.max(bulletLines, textLines);
-                    return headerHeight + lines * LINE_HEIGHT + 16;
+                    return headerHeight + lines * LINE_HEIGHT + 8;
                 }
             }["CVPreview.useMemo[pages].estimateExperienceEntryHeight"];
             const estimateEducationEntryHeight = {
