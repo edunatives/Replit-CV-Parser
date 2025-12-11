@@ -587,19 +587,58 @@ CRITICAL INSTRUCTIONS:
 }
 
 /**
- * JD Match scoring rubric
+ * JD Match scoring rubric v2.2 - Honest Assessment Framework
+ * New three-score system: Raw Compatibility + TEI + Risk
  */
 export const JD_MATCH_WEIGHTS = {
-  hardSkills: 40,
-  experience: 25,
-  responsibilities: 20,
-  softSkills: 10,
-  education: 5,
+  mustHaveSkills: 25,      // Hard gate - if <50%, cap total at 50
+  domainExperience: 20,    // Years in specific domain
+  totalExperience: 10,     // Overall years
+  depthScope: 15,          // Responsibility level alignment
+  natureFit: 15,           // Education, background, trajectory
+  shouldHaveSkills: 10,
+  niceToHaveSkills: 5,
 } as const;
 
 /**
- * Build prompt for JD matching analysis (v2.2 - Experience Factors + Nature Fit)
- * Token-optimized with student-friendly messaging
+ * Hard gates that cap the maximum score
+ */
+export const JD_HARD_GATES = {
+  mustHaveSkillsBelow50: 50,     // Missing >50% Tier 1 skills → cap at 50
+  domainYearsBelow50: 55,        // Domain years <50% required → cap at 55
+  seniorityGapOver2: 45,         // Seniority gap >2 levels → cap at 45
+  educationNotMet: 40,           // Hard education requirement not met → cap at 40
+  industryNotMet: 50,            // Strict industry requirement not met → cap at 50
+} as const;
+
+/**
+ * Scoring tiers for JD Match v2.2
+ */
+export const JD_SCORING_TIERS = {
+  excellent: { min: 90, max: 100, grade: "A", label: "Excellent Match", meaning: "Direct fit. Could start tomorrow." },
+  strong: { min: 80, max: 89, grade: "A-", label: "Strong Match", meaning: "Minor gaps easily bridged." },
+  good: { min: 70, max: 79, grade: "B+", label: "Good Match", meaning: "Some gaps but competitive candidate." },
+  moderate: { min: 60, max: 69, grade: "B", label: "Moderate Match", meaning: "Notable gaps. Worth applying with strategy." },
+  stretch: { min: 50, max: 59, grade: "C+", label: "Stretch Match", meaning: "Significant gaps. Uphill battle." },
+  weak: { min: 40, max: 49, grade: "C", label: "Weak Match", meaning: "Major gaps. Low probability without transformation." },
+  poor: { min: 30, max: 39, grade: "D", label: "Poor Match", meaning: "Fundamental misalignment. Consider alternatives." },
+  noMatch: { min: 0, max: 29, grade: "F", label: "No Match", meaning: "Wrong role. Do not apply." },
+} as const;
+
+/**
+ * Transformation Effort Index (TEI) levels
+ */
+export const TEI_LEVELS = {
+  minimal: { level: 1, label: "Minimal", description: "CV reformatting, keyword optimization", timeline: "1-2 days" },
+  light: { level: 2, label: "Light", description: "Repositioning language, adding context", timeline: "1 week" },
+  moderate: { level: 3, label: "Moderate", description: "Significant reframing, skill evidence gathering", timeline: "2-4 weeks" },
+  heavy: { level: 4, label: "Heavy", description: "Gap-filling required (courses, projects, certs)", timeline: "1-6 months" },
+  majorPivot: { level: 5, label: "Major Pivot", description: "Fundamental reskilling or experience building", timeline: "6+ months" },
+} as const;
+
+/**
+ * Build prompt for JD matching analysis (v2.2 - Honest Assessment Framework)
+ * Three-score system: Raw Compatibility + TEI + Risk
  * @param cvSummary - Formatted CV summary text
  * @param jobDescription - Job description text
  * @returns Complete prompt for AI JD matching
@@ -612,7 +651,10 @@ export function buildJDMatchPrompt(cvSummary: string, jobDescription: string): s
     throw new Error("Security: Suspicious content detected in job description");
   }
   
-  return `You are EduNatives JD Match Engine v2.2. Analyze CV-to-JD fit with Experience Factors.
+  return `You are EduNatives JD Match Engine v2.2 - Honest Assessment Framework.
+
+PHILOSOPHY: HONEST OVER ENCOURAGING
+Raw scores reflect actual fit, not potential. Be truthful about gaps while remaining constructive.
 
 --- INPUTS ---
 CV:
@@ -625,9 +667,29 @@ JD:
 ${sanitizedJD}
 """
 
---- SCORING ---
-Weights: Skills ${JD_MATCH_WEIGHTS.hardSkills}%, Experience ${JD_MATCH_WEIGHTS.experience}%, Responsibilities ${JD_MATCH_WEIGHTS.responsibilities}%, Soft ${JD_MATCH_WEIGHTS.softSkills}%, Education ${JD_MATCH_WEIGHTS.education}%
-Verdict: 85+="Excellent Match", 70-84="Good Match", 55-69="Partial Match", <55="Limited Match"
+--- THREE-SCORE SYSTEM ---
+
+1. RAW COMPATIBILITY (0-100) - How well CV matches JD RIGHT NOW
+   Weights: Must-Have Skills ${JD_MATCH_WEIGHTS.mustHaveSkills}%, Domain Exp ${JD_MATCH_WEIGHTS.domainExperience}%, Total Exp ${JD_MATCH_WEIGHTS.totalExperience}%, Depth/Scope ${JD_MATCH_WEIGHTS.depthScope}%, Nature Fit ${JD_MATCH_WEIGHTS.natureFit}%, Should-Have ${JD_MATCH_WEIGHTS.shouldHaveSkills}%, Nice-to-Have ${JD_MATCH_WEIGHTS.niceToHaveSkills}%
+
+   HARD GATES (apply caps):
+   - Missing >50% must-have skills → Cap at 50
+   - Domain years <50% of required → Cap at 55
+   - Seniority gap >2 levels → Cap at 45
+   - Education hard requirement not met → Cap at 40
+
+   TIERS: 90-100=Excellent(A), 80-89=Strong(A-), 70-79=Good(B+), 60-69=Moderate(B), 50-59=Stretch(C+), 40-49=Weak(C), 30-39=Poor(D), 0-29=No Match(F)
+
+2. TRANSFORMATION EFFORT INDEX (TEI) 1-5
+   1=Minimal (1-2 days): CV tweaks
+   2=Light (1 week): Repositioning
+   3=Moderate (2-4 weeks): Significant reframing
+   4=Heavy (1-6 months): Gap-filling courses/certs
+   5=Major Pivot (6+ months): Reskilling needed
+
+3. RISK ASSESSMENT (0-100 each)
+   Candidate Risk: rejection likelihood, opportunity cost, interview exposure
+   Employer Risk: performance risk, ramp-up time, verification concerns
 
 --- OUTPUT (JSON only) ---
 {
@@ -635,99 +697,84 @@ Verdict: 85+="Excellent Match", 70-84="Good Match", 55-69="Partial Match", <55="
     "role_title": "<title>",
     "company": "<company or null>",
     "mandatory_skills": ["skill1", "skill2"],
-    "nice_to_have_skills": ["skill1"]
-  },
-  "jd_nature": {
-    "role_level": "<Junior|Mid|Senior|Lead|Staff|Principal|Director|VP|C-Level>",
-    "domain_required": "<primary domain>",
-    "industry_preferred": "<industry or null>",
-    "education_required": "<degree or null>",
+    "nice_to_have_skills": ["skill1"],
     "years_required": <number or null>,
-    "work_arrangement": "<Remote|On-site|Hybrid|Flexible or null>",
-    "company_stage": "<Startup|Growth|Enterprise or null>"
+    "education_required": "<degree or null>",
+    "seniority_level": "<Junior|Mid|Senior|Lead|Principal|Director|VP|C-Level>"
   },
-  "match_analysis": {
-    "overall_match_score": <0-100>,
-    "verdict": "<verdict>",
-    "summary": "<2-3 sentences>",
-    "matched_skills": ["skill1"],
-    "missing_skills": ["skill1"],
-    "experience_match": {"score": <0-100>, "feedback": "<feedback>"},
-    "education_match": {"score": <0-100>, "feedback": "<feedback>"},
-    "keyword_optimizations": ["keyword1", "keyword2"],
-    "suggestions": ["action1", "action2", "action3"]
+  "raw_compatibility": {
+    "score": <0-100>,
+    "grade": "<A|A-|B+|B|C+|C|D|F>",
+    "label": "<Excellent|Strong|Good|Moderate|Stretch|Weak|Poor|No Match>",
+    "hard_gate_applied": "<gate name or null>",
+    "uncapped_score": <0-100>,
+    "component_scores": {
+      "must_have_skills": {"score": <0-100>, "matched": ["skill"], "missing": ["skill"]},
+      "domain_experience": {"score": <0-100>, "cv_years": <num>, "required_years": <num>},
+      "total_experience": {"score": <0-100>, "cv_years": <num>, "required_years": <num>},
+      "depth_scope": {"score": <0-100>, "cv_level": "<level>", "required_level": "<level>"},
+      "nature_fit": {"score": <0-100>, "alignment": "<description>"},
+      "should_have_skills": {"score": <0-100>, "matched": ["skill"], "missing": ["skill"]},
+      "nice_to_have_skills": {"score": <0-100>, "matched": ["skill"]}
+    }
   },
-  "experience_factors": {
-    "years_analysis": {
-      "total_years": <number>,
-      "relevant_domain_years": <number>,
-      "recency_score": <0-100>,
-      "meets_requirement": <true|false>,
-      "student_message": "<encouraging message about experience level>"
-    },
-    "depth_analysis": {
-      "depth_level": "<Entry|Developing|Proficient|Expert>",
-      "scope_score": <0-100>,
-      "impact_score": <0-100>,
-      "complexity_handled": "<description of complexity>",
-      "student_message": "<encouraging message about depth>"
-    },
-    "issues": [
-      {
-        "code": "<H1-H9>",
-        "type": "<issue type>",
-        "message": "<ENCOURAGING student-friendly message, NOT critical>",
-        "cv_value": "<what CV shows>",
-        "jd_requirement": "<what JD wants>",
-        "gap_severity": "<minor|moderate|significant>"
-      }
-    ]
-  },
-  "nature_fit": {
-    "overall_fit": "<Excellent|Good|Partial|Challenging>",
-    "fit_score": <0-100>,
-    "issues": [
-      {
-        "code": "<G1-G9>",
-        "type": "<mismatch type>",
-        "message": "<ENCOURAGING message highlighting transferable value>",
-        "cv_nature": "<what CV shows>",
-        "jd_expects": "<what JD expects>",
-        "transferable": <true|false>
-      }
+  "transformation_effort": {
+    "tei_score": <1-5>,
+    "tei_label": "<Minimal|Light|Moderate|Heavy|Major Pivot>",
+    "timeline": "<estimated time>",
+    "gap_breakdown": [
+      {"area": "<gap area>", "points": <contribution>, "fixable_by_cv": <true|false>}
     ],
-    "strengths": ["<strength that aligns well>"]
+    "honest_assessment": "<1-2 sentences on what it would actually take>"
   },
-  "student_summary": {
-    "headline": "<one-line positive summary>",
-    "encouragement": "<2 sentences of genuine encouragement>",
-    "quick_wins": ["<immediate action 1>", "<action 2>", "<action 3>"]
+  "risk_assessment": {
+    "candidate_risk": {
+      "score": <0-100>,
+      "level": "<Low|Moderate|High|Critical>",
+      "factors": [
+        {"factor": "<rejection likelihood|opportunity cost|interview exposure>", "score": <0-100>, "detail": "<explanation>"}
+      ]
+    },
+    "employer_risk": {
+      "score": <0-100>,
+      "level": "<Low|Moderate|High|Critical>",
+      "factors": [
+        {"factor": "<performance|ramp-up|verification>", "score": <0-100>, "detail": "<explanation>"}
+      ]
+    }
+  },
+  "honest_verdict": {
+    "headline": "<one honest sentence about the match>",
+    "reality_check": "<2-3 sentences of honest truth about this application>",
+    "should_apply": "<Yes - strong fit|Yes - with strategy|Maybe - stretch role|Probably not|No - wrong role>",
+    "success_probability": "<percentage estimate>",
+    "better_fit_roles": ["<alternative role 1>", "<alternative role 2>", "<alternative role 3>"]
+  },
+  "student_guidance": {
+    "if_dream_role": "<advice if this is their dream pivot>",
+    "if_practical": "<advice if they want high-probability success>",
+    "quick_wins": ["<immediate action 1>", "<action 2>", "<action 3>"],
+    "long_term_path": "<what would actually help in 6-12 months>"
   },
   "evidence_map": [
-    {"jd_requirement": "<req>", "cv_evidence": "<evidence>", "status": "<Match|Weak|Missing>"}
+    {"jd_requirement": "<req>", "cv_evidence": "<evidence or 'Not found'>", "status": "<Match|Weak|Missing>", "gap_severity": "<none|minor|moderate|critical>"}
   ]
 }
 
-EXPERIENCE FACTOR CODES (H1-H9 - use encouraging student messages):
-H1: Total Years Gap - "You're building valuable experience! Quality over quantity."
-H2: Domain Years Gap - "Adjacent experience transfers well. Highlight relevant projects."
-H3: Industry Years Gap - "Cross-industry perspective brings fresh ideas!"
-H4: Recency Gap - "Re-engage with current practices. Recent projects help."
-H5: Scope Gap - "Growing scope shows trajectory. Emphasize largest impact."
-H6: Complexity Gap - "Complex challenges await! Show readiness with growth examples."
-H7: Impact Gap - "Quantify achievements more. Numbers tell your story."
-H8: Progression Gap - "Non-linear paths bring diverse perspectives!"
-H9: Depth/Breadth Mismatch - "Your focused expertise brings value!"
-
-NATURE FIT CODES (G1-G9 - highlight transferable value):
-G1: Education Field - G2: Education Level - G3: Domain - G4: Industry
-G5: Work Style - G6: Career Path - G7: Seniority - G8: Background Type - G9: Career Changer
+TONE GUIDELINES:
+- Raw Score >70%: Encouraging with actionable improvements
+- Raw Score 50-70%: Honest about stretch, provide transformation roadmap
+- Raw Score 40-50%: Direct about low probability, suggest alternatives
+- Raw Score <40%: Advise against applying, redirect to better fits
+- TEI >=4: Be clear this isn't a "CV fix" - it's a career gap
+- Risk >60%: Explicitly state risks before any encouragement
 
 CRITICAL:
 - Return ONLY valid JSON, no markdown
-- Be ENCOURAGING in all student messages - focus on transferable value
+- Be HONEST first, constructive second
+- Apply hard gates before final score
 - Limit evidence_map to top 5 requirements
-- Issues arrays: max 3 most relevant items each`;
+- better_fit_roles: suggest 3 roles that match their actual profile better`;
 }
 
 /**
