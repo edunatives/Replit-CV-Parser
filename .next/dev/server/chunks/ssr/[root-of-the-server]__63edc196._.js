@@ -2987,7 +2987,15 @@ function cleanAIResponse(responseText) {
     if (cleaned.endsWith("```")) {
         cleaned = cleaned.slice(0, -3);
     }
-    return cleaned.trim();
+    cleaned = cleaned.trim();
+    // Remove control characters except \n, \r, \t (which are valid in JSON strings)
+    cleaned = cleaned.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "");
+    // Fix trailing commas before } or ] (common AI mistake)
+    cleaned = cleaned.replace(/,\s*}/g, "}");
+    cleaned = cleaned.replace(/,\s*]/g, "]");
+    // Fix double commas
+    cleaned = cleaned.replace(/,\s*,/g, ",");
+    return cleaned;
 }
 function repairJSON(jsonStr) {
     let repaired = jsonStr.trim();
@@ -3048,6 +3056,23 @@ function parseAIResponse(responseText) {
         try {
             return JSON.parse(repaired);
         } catch (secondError) {
+            // Try more aggressive cleaning - remove any text before first { or after last }
+            const jsonStart = cleaned.indexOf("{");
+            const jsonEnd = cleaned.lastIndexOf("}");
+            if (jsonStart >= 0 && jsonEnd > jsonStart) {
+                const extracted = cleaned.slice(jsonStart, jsonEnd + 1);
+                const cleanedExtracted = cleanAIResponse(extracted);
+                try {
+                    return JSON.parse(cleanedExtracted);
+                } catch  {
+                    const repairedExtracted = repairJSON(cleanedExtracted);
+                    try {
+                        return JSON.parse(repairedExtracted);
+                    } catch  {
+                    // Fall through to final error
+                    }
+                }
+            }
             throw new Error(`Failed to parse AI response: ${firstError.message}`);
         }
     }
