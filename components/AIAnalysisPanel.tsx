@@ -11,7 +11,8 @@ import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import WorkIcon from "@mui/icons-material/Work";
 import TokenIcon from "@mui/icons-material/Token";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import type { ParsedCV } from "@/types/cv";
+import type { ParsedCV, ForensicAnalysisV211 } from "@/types/cv";
+import { V211AssessmentPanel } from "./V211AssessmentPanel";
 
 interface AIAnalysisPanelProps {
   cv: ParsedCV;
@@ -156,6 +157,8 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
   const [chatMessage, setChatMessage] = useState("");
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [assessment, setAssessment] = useState<CVAssessment | null>(null);
+  const [v211Analysis, setV211Analysis] = useState<ForensicAnalysisV211 | null>(null);
+  const [useV211, setUseV211] = useState(true);
   const [jdMatch, setJdMatch] = useState<JDMatchResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -189,22 +192,29 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatHistory]);
 
-  const runAssessment = async () => {
+  const runAssessment = async (version: "9.3" | "2.11" = "2.11") => {
     setLoading(true);
     setError(null);
     try {
       const response = await fetch("/api/assess", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cv }),
+        body: JSON.stringify({ cv, version }),
       });
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error || "Failed to assess CV");
       }
-      const { assessment: rawAssessment } = await response.json();
-      const normalized = normalizeAssessment(rawAssessment as Record<string, unknown>);
-      setAssessment(normalized);
+      const data = await response.json();
+      
+      if (version === "2.11" && data.analysis) {
+        setV211Analysis(data.analysis as ForensicAnalysisV211);
+        setUseV211(true);
+      } else if (data.assessment) {
+        const normalized = normalizeAssessment(data.assessment as Record<string, unknown>);
+        setAssessment(normalized);
+        setUseV211(false);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to run assessment");
     } finally {
@@ -305,6 +315,38 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
   };
 
   if (activeTrack === "assessment") {
+    // v2.11 Forensic Engine UI
+    if (useV211 && (v211Analysis || loading || error)) {
+      return (
+        <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+          <V211AssessmentPanel
+            analysis={v211Analysis}
+            loading={loading}
+            error={error}
+            candidateName={cv.name}
+            candidateTitle={cv.title}
+            candidateLocation={cv.location}
+            candidateEmail={cv.email}
+          />
+          {v211Analysis && (
+            <Box sx={{ p: 2, borderTop: 1, borderColor: "divider" }}>
+              <Button 
+                variant="outlined" 
+                fullWidth 
+                startIcon={<AutoAwesomeIcon />}
+                onClick={() => runAssessment("2.11")}
+                disabled={loading}
+                data-testid="button-rerun-assessment"
+              >
+                Re-run Analysis (v2.11)
+              </Button>
+            </Box>
+          )}
+        </Box>
+      );
+    }
+    
+    // v9.3 Legacy UI
     return (
       <Box sx={{ p: 3, height: "100%", overflow: "auto" }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 3 }}>
@@ -471,11 +513,11 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
               variant="outlined" 
               fullWidth 
               startIcon={<AutoAwesomeIcon />}
-              onClick={runAssessment}
+              onClick={() => runAssessment("9.3")}
               sx={{ mt: 3 }}
               disabled={loading}
             >
-              Re-run Analysis
+              Re-run Analysis (v9.3)
             </Button>
             
             <Divider sx={{ my: 2 }} />
@@ -584,12 +626,12 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
               variant="contained" 
               fullWidth 
               startIcon={loading ? <CircularProgress size={16} color="inherit" /> : <AutoAwesomeIcon />}
-              onClick={runAssessment}
+              onClick={() => runAssessment("2.11")}
               sx={{ mt: 3 }}
               disabled={loading}
               data-testid="button-run-analysis"
             >
-              {loading ? "Analyzing..." : "Run Full AI Analysis"}
+              {loading ? "Analyzing..." : "Run Full AI Analysis (v2.11)"}
             </Button>
           </>
         )}
