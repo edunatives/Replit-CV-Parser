@@ -137,8 +137,8 @@ export function CVWorkspace({ cv, onBack, onUpdateCV }: CVWorkspaceProps) {
 
         <Box 
           sx={{ 
-            width: "540px",
-            minWidth: "540px",
+            width: "610px",
+            minWidth: "610px",
             display: "flex",
             flexDirection: "column",
             bgcolor: "background.default",
