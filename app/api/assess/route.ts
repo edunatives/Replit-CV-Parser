@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
         model: "gemini-2.5-flash",
         contents: prompt,
         config: {
-          maxOutputTokens: 12000, // v2.11 without HR report
+          maxOutputTokens: 16000, // v2.11 - increased to prevent truncation
         },
       });
 

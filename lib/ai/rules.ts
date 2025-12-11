@@ -880,32 +880,43 @@ export function repairJSON(jsonStr: string): string {
   let repaired = jsonStr.trim();
   
   // Fix unterminated strings by finding the last proper JSON structure
-  // Count quotes to detect unterminated strings (outside of escaped quotes)
+  // Count quotes to detect unterminated strings (handling escaped quotes properly)
   let inString = false;
   let lastValidPos = 0;
+  let lastClosedStringPos = 0;
   let i = 0;
   
   while (i < repaired.length) {
     const char = repaired[i];
-    const prevChar = i > 0 ? repaired[i - 1] : "";
     
-    if (char === '"' && prevChar !== "\\") {
+    // Handle escaped characters inside strings
+    if (inString && char === "\\") {
+      i += 2; // Skip escaped character
+      continue;
+    }
+    
+    if (char === '"') {
       inString = !inString;
       if (!inString) {
+        lastClosedStringPos = i + 1;
         lastValidPos = i + 1;
       }
-    } else if (!inString && (char === "}" || char === "]" || char === ",")) {
+    } else if (!inString && (char === "}" || char === "]" || char === "," || char === ":")) {
       lastValidPos = i + 1;
     }
     i++;
   }
   
-  // If we're still in a string at the end, truncate to last valid position and close
-  if (inString && lastValidPos > 0) {
-    repaired = repaired.slice(0, lastValidPos);
-  } else if (inString) {
-    // Try to close the string by adding a quote
+  // If we're still in a string at the end, truncate to last valid closed string
+  if (inString) {
+    if (lastClosedStringPos > 0) {
+      repaired = repaired.slice(0, lastClosedStringPos);
+    } else if (lastValidPos > 0) {
+      repaired = repaired.slice(0, lastValidPos);
+    }
+    // Remove any dangling incomplete property
     repaired = repaired.replace(/,?\s*"[^"]*$/, "");
+    repaired = repaired.replace(/,?\s*"[^"]*":\s*$/, "");
   }
   
   // Remove trailing incomplete key-value pairs and dangling structures
@@ -913,23 +924,38 @@ export function repairJSON(jsonStr: string): string {
   repaired = repaired.replace(/,?\s*"[^"]*":\s*"[^"]*$/, ""); // key with unterminated string value
   repaired = repaired.replace(/,?\s*"[^"]*$/, ""); // incomplete key
   repaired = repaired.replace(/:\s*$/, ": null"); // dangling colon
+  repaired = repaired.replace(/,\s*$/, ""); // trailing comma
   
-  // Count brackets to detect truncation
-  const openBraces = (repaired.match(/{/g) || []).length;
-  const closeBraces = (repaired.match(/}/g) || []).length;
-  const openBrackets = (repaired.match(/\[/g) || []).length;
-  const closeBrackets = (repaired.match(/]/g) || []).length;
+  // Fix unbalanced brackets - count properly outside strings
+  let braceCount = 0;
+  let bracketCount = 0;
+  inString = false;
+  i = 0;
   
-  // Add missing closing brackets/braces
-  const missingBrackets = openBrackets - closeBrackets;
-  const missingBraces = openBraces - closeBraces;
+  while (i < repaired.length) {
+    const char = repaired[i];
+    if (inString && char === "\\") {
+      i += 2;
+      continue;
+    }
+    if (char === '"') {
+      inString = !inString;
+    } else if (!inString) {
+      if (char === "{") braceCount++;
+      else if (char === "}") braceCount--;
+      else if (char === "[") bracketCount++;
+      else if (char === "]") bracketCount--;
+    }
+    i++;
+  }
   
-  if (missingBrackets > 0 || missingBraces > 0) {
-    // Remove trailing comma if present
+  // Add missing closing brackets/braces in correct order
+  if (bracketCount > 0 || braceCount > 0) {
+    // Remove trailing comma before closing
     repaired = repaired.replace(/,\s*$/, "");
-    // Add missing closures
-    repaired += "]".repeat(Math.max(0, missingBrackets));
-    repaired += "}".repeat(Math.max(0, missingBraces));
+    // Add closures - brackets first (inner), then braces (outer)
+    repaired += "]".repeat(Math.max(0, bracketCount));
+    repaired += "}".repeat(Math.max(0, braceCount));
   }
   
   return repaired;
