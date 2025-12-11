@@ -2730,6 +2730,36 @@ function cleanAIResponse(responseText) {
 }
 function repairJSON(jsonStr) {
     let repaired = jsonStr.trim();
+    // Fix unterminated strings by finding the last proper JSON structure
+    // Count quotes to detect unterminated strings (outside of escaped quotes)
+    let inString = false;
+    let lastValidPos = 0;
+    let i = 0;
+    while(i < repaired.length){
+        const char = repaired[i];
+        const prevChar = i > 0 ? repaired[i - 1] : "";
+        if (char === '"' && prevChar !== "\\") {
+            inString = !inString;
+            if (!inString) {
+                lastValidPos = i + 1;
+            }
+        } else if (!inString && (char === "}" || char === "]" || char === ",")) {
+            lastValidPos = i + 1;
+        }
+        i++;
+    }
+    // If we're still in a string at the end, truncate to last valid position and close
+    if (inString && lastValidPos > 0) {
+        repaired = repaired.slice(0, lastValidPos);
+    } else if (inString) {
+        // Try to close the string by adding a quote
+        repaired = repaired.replace(/,?\s*"[^"]*$/, "");
+    }
+    // Remove trailing incomplete key-value pairs and dangling structures
+    repaired = repaired.replace(/,?\s*"[^"]*":\s*$/, ""); // key with no value
+    repaired = repaired.replace(/,?\s*"[^"]*":\s*"[^"]*$/, ""); // key with unterminated string value
+    repaired = repaired.replace(/,?\s*"[^"]*$/, ""); // incomplete key
+    repaired = repaired.replace(/:\s*$/, ": null"); // dangling colon
     // Count brackets to detect truncation
     const openBraces = (repaired.match(/{/g) || []).length;
     const closeBraces = (repaired.match(/}/g) || []).length;
@@ -4391,6 +4421,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange }) {
                     sx: {
                         color: style.bodyText
                     },
+                    component: "div",
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(EditableField, {
                         value: exp.role,
                         onChange: (v)=>updateExperience(index, "role", v),
@@ -4411,6 +4442,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange }) {
                         color: style.companyColor,
                         fontWeight: 500
                     },
+                    component: "div",
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(EditableField, {
                         value: exp.company,
                         onChange: (v)=>updateExperience(index, "company", v),
@@ -4450,6 +4482,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange }) {
                                 color: style.bodyTextSecondary,
                                 ml: style.showMetaIcons ? -1.5 : 0
                             },
+                            component: "span",
                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(EditableField, {
                                 value: exp.duration,
                                 onChange: (v)=>updateExperience(index, "duration", v),
@@ -4480,6 +4513,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange }) {
                                 color: style.bodyTextSecondary,
                                 ml: style.showMetaIcons ? -1.5 : 0
                             },
+                            component: "span",
                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(EditableField, {
                                 value: exp.location || "",
                                 onChange: (v)=>updateExperience(index, "location", v),
@@ -4584,6 +4618,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange }) {
                     sx: {
                         color: style.bodyText
                     },
+                    component: "div",
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(EditableField, {
                         value: edu.degree,
                         onChange: (v)=>updateEducation(index, "degree", v),
@@ -4611,6 +4646,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange }) {
                             sx: {
                                 color: style.bodyTextSecondary
                             },
+                            component: "span",
                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(EditableField, {
                                 value: edu.institution,
                                 onChange: (v)=>updateEducation(index, "institution", v),
@@ -4630,6 +4666,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange }) {
                             sx: {
                                 color: style.bodyTextSecondary
                             },
+                            component: "span",
                             children: "|"
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
@@ -4641,6 +4678,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange }) {
                             sx: {
                                 color: style.bodyTextSecondary
                             },
+                            component: "span",
                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(EditableField, {
                                 value: edu.year,
                                 onChange: (v)=>updateEducation(index, "year", v),
@@ -5017,7 +5055,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange }) {
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
                     variant: "h4",
-                    component: "h2",
+                    component: "div",
                     sx: {
                         fontFamily: "'Arial', sans-serif",
                         fontWeight: 600,
@@ -5039,6 +5077,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange }) {
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
                     variant: "subtitle1",
+                    component: "div",
                     sx: {
                         color: style.accent,
                         mt: 0.25,

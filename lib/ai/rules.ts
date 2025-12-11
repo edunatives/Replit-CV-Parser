@@ -766,6 +766,41 @@ export function cleanAIResponse(responseText: string): string {
 export function repairJSON(jsonStr: string): string {
   let repaired = jsonStr.trim();
   
+  // Fix unterminated strings by finding the last proper JSON structure
+  // Count quotes to detect unterminated strings (outside of escaped quotes)
+  let inString = false;
+  let lastValidPos = 0;
+  let i = 0;
+  
+  while (i < repaired.length) {
+    const char = repaired[i];
+    const prevChar = i > 0 ? repaired[i - 1] : "";
+    
+    if (char === '"' && prevChar !== "\\") {
+      inString = !inString;
+      if (!inString) {
+        lastValidPos = i + 1;
+      }
+    } else if (!inString && (char === "}" || char === "]" || char === ",")) {
+      lastValidPos = i + 1;
+    }
+    i++;
+  }
+  
+  // If we're still in a string at the end, truncate to last valid position and close
+  if (inString && lastValidPos > 0) {
+    repaired = repaired.slice(0, lastValidPos);
+  } else if (inString) {
+    // Try to close the string by adding a quote
+    repaired = repaired.replace(/,?\s*"[^"]*$/, "");
+  }
+  
+  // Remove trailing incomplete key-value pairs and dangling structures
+  repaired = repaired.replace(/,?\s*"[^"]*":\s*$/, ""); // key with no value
+  repaired = repaired.replace(/,?\s*"[^"]*":\s*"[^"]*$/, ""); // key with unterminated string value
+  repaired = repaired.replace(/,?\s*"[^"]*$/, ""); // incomplete key
+  repaired = repaired.replace(/:\s*$/, ": null"); // dangling colon
+  
   // Count brackets to detect truncation
   const openBraces = (repaired.match(/{/g) || []).length;
   const closeBraces = (repaired.match(/}/g) || []).length;

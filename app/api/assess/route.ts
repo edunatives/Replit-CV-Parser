@@ -11,7 +11,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import type { ParsedCV, ForensicAnalysisV211 } from "@/types/cv";
-import { formatCVSummary, buildAssessmentPrompt, buildV211AssessmentPrompt, cleanAIResponse } from "@/lib/ai/rules";
+import { formatCVSummary, buildAssessmentPrompt, buildV211AssessmentPrompt, parseAIResponse } from "@/lib/ai/rules";
 
 /**
  * Forensic highlight for inline CV annotation (v9.3)
@@ -128,13 +128,28 @@ export async function POST(request: NextRequest) {
         model: "gemini-2.5-flash",
         contents: prompt,
         config: {
-          maxOutputTokens: 8192, // v2.11 needs more tokens for comprehensive output
+          maxOutputTokens: 16384, // v2.11 needs more tokens for comprehensive output
         },
       });
 
       const responseText = response.text?.trim() || "";
-      const jsonText = cleanAIResponse(responseText);
-      const analysis: ForensicAnalysisV211 = JSON.parse(jsonText);
+      
+      if (!responseText) {
+        throw new Error("Empty response from AI for v2.11 assessment");
+      }
+      
+      console.log("v2.11 response length:", responseText.length);
+      console.log("v2.11 response first 500 chars:", responseText.slice(0, 500));
+      console.log("v2.11 response last 500 chars:", responseText.slice(-500));
+      
+      let analysis: ForensicAnalysisV211;
+      try {
+        analysis = parseAIResponse<ForensicAnalysisV211>(responseText);
+      } catch (parseError) {
+        console.error("Parse error details:", (parseError as Error).message);
+        console.error("Response around error position:", responseText.slice(7500, 8000));
+        throw parseError;
+      }
 
       const tokenUsage = {
         promptTokens: response.usageMetadata?.promptTokenCount || 0,
@@ -158,8 +173,12 @@ export async function POST(request: NextRequest) {
     });
 
     const responseText = response.text?.trim() || "";
-    const jsonText = cleanAIResponse(responseText);
-    const assessment = JSON.parse(jsonText);
+    
+    if (!responseText) {
+      throw new Error("Empty response from AI for v9.3 assessment");
+    }
+    
+    const assessment = parseAIResponse<CVAssessment>(responseText);
 
     const tokenUsage = {
       promptTokens: response.usageMetadata?.promptTokenCount || 0,

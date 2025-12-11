@@ -758,14 +758,14 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
         >
           <DeleteIcon fontSize="small" />
         </IconButton>
-        <Typography variant="subtitle1" fontWeight={600} sx={{ color: style.bodyText }}>
+        <Typography variant="subtitle1" fontWeight={600} sx={{ color: style.bodyText }} component="div">
           <EditableField 
             value={exp.role} 
             onChange={(v) => updateExperience(index, "role", v)} 
             placeholder="Job Title"
           />
         </Typography>
-        <Typography variant="body2" sx={{ color: style.companyColor, fontWeight: 500 }}>
+        <Typography variant="body2" sx={{ color: style.companyColor, fontWeight: 500 }} component="div">
           <EditableField 
             value={exp.company} 
             onChange={(v) => updateExperience(index, "company", v)} 
@@ -774,7 +774,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
         </Typography>
         <Box sx={{ display: "flex", gap: 2, alignItems: "center", flexWrap: "wrap", mt: 0.25 }}>
           {style.showMetaIcons && <CalendarMonthIcon sx={{ fontSize: 14, color: style.bodyTextSecondary }} />}
-          <Typography variant="body2" sx={{ color: style.bodyTextSecondary, ml: style.showMetaIcons ? -1.5 : 0 }}>
+          <Typography variant="body2" sx={{ color: style.bodyTextSecondary, ml: style.showMetaIcons ? -1.5 : 0 }} component="span">
             <EditableField 
               value={exp.duration} 
               onChange={(v) => updateExperience(index, "duration", v)} 
@@ -782,7 +782,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
             />
           </Typography>
           {style.showMetaIcons && <LocationOnIcon sx={{ fontSize: 14, color: style.bodyTextSecondary }} />}
-          <Typography variant="body2" sx={{ color: style.bodyTextSecondary, ml: style.showMetaIcons ? -1.5 : 0 }}>
+          <Typography variant="body2" sx={{ color: style.bodyTextSecondary, ml: style.showMetaIcons ? -1.5 : 0 }} component="span">
             <EditableField 
               value={exp.location || ""} 
               onChange={(v) => updateExperience(index, "location", v)} 
@@ -821,7 +821,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
         >
           <DeleteIcon fontSize="small" />
         </IconButton>
-        <Typography variant="subtitle2" fontWeight={600} sx={{ color: style.bodyText }}>
+        <Typography variant="subtitle2" fontWeight={600} sx={{ color: style.bodyText }} component="div">
           <EditableField 
             value={edu.degree} 
             onChange={(v) => updateEducation(index, "degree", v)} 
@@ -829,15 +829,15 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
           />
         </Typography>
         <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap" }}>
-          <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
+          <Typography variant="body2" sx={{ color: style.bodyTextSecondary }} component="span">
             <EditableField 
               value={edu.institution} 
               onChange={(v) => updateEducation(index, "institution", v)} 
               placeholder="Institution"
             />
           </Typography>
-          <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>|</Typography>
-          <Typography variant="body2" sx={{ color: style.bodyTextSecondary }}>
+          <Typography variant="body2" sx={{ color: style.bodyTextSecondary }} component="span">|</Typography>
+          <Typography variant="body2" sx={{ color: style.bodyTextSecondary }} component="span">
             <EditableField 
               value={edu.year} 
               onChange={(v) => updateEducation(index, "year", v)} 
@@ -1029,14 +1029,14 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
       borderBottom: style.borderBottom,
       textAlign: style.headerCentered ? "center" : "left"
     }}>
-      <Typography variant="h4" component="h2" sx={{ 
+      <Typography variant="h4" component="div" sx={{ 
         fontFamily: "'Arial', sans-serif", 
         fontWeight: 600,
         display: style.headerCentered ? "block" : "inline-block"
       }}>
         <EditableField value={cv.name} onChange={(v) => updateField("name", v)} placeholder="Your Name" />
       </Typography>
-      <Typography variant="subtitle1" sx={{ color: style.accent, mt: 0.25, fontWeight: 500 }}>
+      <Typography variant="subtitle1" component="div" sx={{ color: style.accent, mt: 0.25, fontWeight: 500 }}>
         <EditableField value={cv.title} onChange={(v) => updateField("title", v)} placeholder="Your Title" />
       </Typography>
       

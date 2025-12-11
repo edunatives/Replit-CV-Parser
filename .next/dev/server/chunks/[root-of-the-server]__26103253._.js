@@ -50,7 +50,15 @@ module.exports = mod;
 "[project]/lib/db/mongodb.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-__turbopack_context__.s([
+/**
+ * @fileoverview MongoDB Database Connection Module
+ * @description Manages MongoDB connection with connection pooling and graceful fallback.
+ * Uses singleton pattern for connection caching to avoid multiple connections.
+ * Designed to fail gracefully - returns null if connection unavailable.
+ * 
+ * @requires MONGODB_URI - MongoDB connection string (environment variable)
+ * @requires MONGODB_DB - Database name (defaults to 'cv_parser')
+ */ __turbopack_context__.s([
     "connectToDatabase",
     ()=>connectToDatabase,
     "getCollection",
@@ -103,7 +111,14 @@ async function getCollection(collectionName) {
 "[project]/app/api/cvs/route.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-__turbopack_context__.s([
+/**
+ * @fileoverview CV Collection CRUD API
+ * @description Handles retrieval and deletion of stored CVs from MongoDB.
+ * Provides endpoints for listing all CVs and deleting individual CVs.
+ * 
+ * @endpoint GET /api/cvs - List all stored CVs
+ * @endpoint DELETE /api/cvs?id={cvId} - Delete a specific CV
+ */ __turbopack_context__.s([
     "DELETE",
     ()=>DELETE,
     "GET",
