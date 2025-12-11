@@ -11947,7 +11947,8 @@ function CVWorkspace({ cv, onBack, onUpdateCV }) {
                                 cv: cv,
                                 template: template,
                                 onUpdateCV: onUpdateCV,
-                                onTemplateChange: setTemplate
+                                onTemplateChange: setTemplate,
+                                showToolbar: true
                             }, void 0, false, {
                                 fileName: "[project]/components/CVWorkspace.tsx",
                                 lineNumber: 134,

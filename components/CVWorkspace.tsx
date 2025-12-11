@@ -131,7 +131,7 @@ export function CVWorkspace({ cv, onBack, onUpdateCV }: CVWorkspaceProps) {
           }}
         >
           <Box sx={{ flex: 1, overflow: "auto" }}>
-            <CVPreview cv={cv} template={template} onUpdateCV={onUpdateCV} onTemplateChange={setTemplate} />
+            <CVPreview cv={cv} template={template} onUpdateCV={onUpdateCV} onTemplateChange={setTemplate} showToolbar />
           </Box>
         </Box>
 
