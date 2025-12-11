@@ -799,7 +799,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
     maxWidth: "100%",
     bgcolor: style.bodyBg,
     boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
-    mx: "auto",
+    ml: 0,
     position: "relative" as const,
     "@media print": {
       boxShadow: "none",
@@ -920,7 +920,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
     switch (item.type) {
       case "summary":
         return (
-          <Box key="summary" sx={{ mb: isLast ? 0 : 3 }}>
+          <Box key="summary" sx={{ mb: isLast ? 0 : 2 }}>
             <SectionHeader title="Summary" style={style} />
             <Box sx={style.summaryBoxed ? {
               border: "1px solid rgba(27, 79, 114, 0.15)",
@@ -1193,7 +1193,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
     <Box 
       sx={{ 
         py: 2, 
-        px: 2, 
+        px: 1.5, 
         bgcolor: "#e8e8e8",
         "@media print": {
           bgcolor: "transparent",
@@ -1214,7 +1214,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
           bgcolor: "#fff",
           borderRadius: 1,
           maxWidth: A4_WIDTH,
-          mx: "auto",
+          ml: 0,
           "@media print": {
             display: "none",
           },

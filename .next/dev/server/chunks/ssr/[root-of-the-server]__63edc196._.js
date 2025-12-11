@@ -4641,7 +4641,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange }) {
         maxWidth: "100%",
         bgcolor: style.bodyBg,
         boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
-        mx: "auto",
+        ml: 0,
         position: "relative",
         "@media print": {
             boxShadow: "none",
@@ -4983,7 +4983,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange }) {
             case "summary":
                 return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
                     sx: {
-                        mb: isLast ? 0 : 3
+                        mb: isLast ? 0 : 2
                     },
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(SectionHeader, {
@@ -5483,7 +5483,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange }) {
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
         sx: {
             py: 2,
-            px: 2,
+            px: 1.5,
             bgcolor: "#e8e8e8",
             "@media print": {
                 bgcolor: "transparent",
@@ -5504,7 +5504,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange }) {
                     bgcolor: "#fff",
                     borderRadius: 1,
                     maxWidth: A4_WIDTH,
-                    mx: "auto",
+                    ml: 0,
                     "@media print": {
                         display: "none"
                     }
@@ -11124,8 +11124,8 @@ function CVWorkspace({ cv, onBack, onUpdateCV }) {
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
                         sx: {
-                            width: "380px",
-                            minWidth: "380px",
+                            width: "440px",
+                            minWidth: "440px",
                             display: "flex",
                             flexDirection: "column",
                             bgcolor: "background.default"
