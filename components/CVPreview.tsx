@@ -539,9 +539,9 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
   const A4_WIDTH = "210mm";
   const A4_HEIGHT = "297mm";
   const A4_HEIGHT_PX = 1123; // 297mm at 96dpi
-  const HEADER_HEIGHT_PX = 110; // Actual header height (reduced from 140)
+  const HEADER_HEIGHT_PX = 130; // Header height with contact info (increased for accuracy)
   const PAGE_PADDING_PX = 24; // p: 3 = 24px padding
-  const BOTTOM_GUTTER = 24;
+  const BOTTOM_GUTTER = 48; // Increased to prevent overflow
 
   // Page item types for granular pagination
   type PageItem = 
@@ -569,45 +569,47 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
     const LINE_HEIGHT = 20; // More accurate line height
     const CHARS_PER_LINE = 80; // More chars fit per line at body2 font size
 
-    // Height estimation functions - tighter estimates to minimize whitespace
+    // Height estimation functions - more conservative to prevent blank space issues
     const estimateSummaryHeight = (): number => {
       const text = cv.summary || "";
-      const lines = Math.ceil(text.length / CHARS_PER_LINE);
-      return SECTION_HEADER + lines * LINE_HEIGHT + 16;
+      const lines = Math.ceil(text.length / CHARS_PER_LINE) + 1; // Add 1 for safety
+      // Account for boxed summary padding if applicable
+      const boxPadding = style.summaryBoxed ? 32 : 0;
+      return SECTION_HEADER + lines * LINE_HEIGHT + boxPadding + 24;
     };
 
     const estimateExperienceEntryHeight = (exp: typeof cv.experience[0]): number => {
-      const headerHeight = 56; // Title, company, date lines (reduced from 80)
+      const headerHeight = 72; // Title, company, date lines (increased for accuracy)
       const desc = exp.description || "";
       // Count actual newlines for bullet points
-      const bulletLines = (desc.match(/\n/g) || []).length;
+      const bulletLines = (desc.match(/\n/g) || []).length + 1;
       const textLines = Math.ceil(desc.length / CHARS_PER_LINE);
       const lines = Math.max(bulletLines, textLines);
-      return headerHeight + lines * LINE_HEIGHT + 12;
+      return headerHeight + lines * LINE_HEIGHT + 16;
     };
 
     const estimateEducationEntryHeight = (): number => {
-      return 48; // Fixed height per education entry (reduced from 60)
+      return 56; // Fixed height per education entry
     };
 
     const estimateSkillsHeight = (): number => {
       const count = cv.skills?.length || 0;
-      // Compact chips: ~10 skills per row at 24px height per row
-      const rows = Math.ceil(count / 10);
-      return SECTION_HEADER + rows * 26 + 8;
+      // Compact chips: ~8 skills per row at 28px height per row
+      const rows = Math.ceil(count / 8);
+      return SECTION_HEADER + rows * 28 + 16;
     };
 
     const estimateStrengthsHeight = (): number => {
       const count = cv.strengths?.length || 0;
-      const rows = Math.ceil(count / 8);
-      return SECTION_HEADER + rows * 26 + 8;
+      const rows = Math.ceil(count / 6);
+      return SECTION_HEADER + rows * 28 + 16;
     };
 
     const estimateCertificationsHeight = (): number => {
-      // Certifications now displayed as compact inline chips, ~5 per row
+      // Certifications now displayed as compact inline chips, ~4 per row
       const count = cv.certifications?.length || 0;
-      const rows = Math.ceil(count / 5);
-      return SECTION_HEADER + rows * 26 + 8;
+      const rows = Math.ceil(count / 4);
+      return SECTION_HEADER + rows * 28 + 16;
     };
 
     const result: PageData[] = [];
@@ -887,9 +889,9 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
           <Box key="summary" sx={{ mb: isLast ? 0 : 3 }}>
             <SectionHeader title="Summary" style={style} />
             <Box sx={style.summaryBoxed ? {
-              border: `1px solid ${style.accent}20`,
+              border: "1px solid rgba(27, 79, 114, 0.15)",
               borderLeft: `3px solid ${style.accent}`,
-              bgcolor: `${style.accent}08`,
+              bgcolor: "rgba(27, 79, 114, 0.04)",
               p: 2,
               borderRadius: "0 4px 4px 0",
             } : {}}>

@@ -121,12 +121,13 @@ export function CVWorkspace({ cv, onBack, onUpdateCV }: CVWorkspaceProps) {
       <Box sx={{ flex: 1, display: "flex", overflow: "hidden" }}>
         <Box 
           sx={{ 
-            width: "55%", 
+            flex: "1 1 auto",
+            minWidth: 0,
             borderRight: "1px solid",
             borderColor: "divider",
             display: "flex",
             flexDirection: "column",
-            bgcolor: "background.paper",
+            bgcolor: "#e8e8e8",
           }}
         >
           <Box sx={{ flex: 1, overflow: "auto" }}>
@@ -136,7 +137,8 @@ export function CVWorkspace({ cv, onBack, onUpdateCV }: CVWorkspaceProps) {
 
         <Box 
           sx={{ 
-            width: "45%", 
+            width: "380px",
+            minWidth: "380px",
             display: "flex",
             flexDirection: "column",
             bgcolor: "background.default",
