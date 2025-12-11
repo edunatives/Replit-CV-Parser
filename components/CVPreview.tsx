@@ -230,7 +230,7 @@ function EditableField({
           rows={multiline ? rows : 1}
           autoFocus
           fullWidth
-          sx={{ my: 0.5 }}
+          sx={{ my: 0.5, "& .MuiInputBase-input": { fontSize: "0.8rem" } }}
           slotProps={showBulletTool && multiline ? {
             input: {
               startAdornment: (
@@ -861,7 +861,9 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
                 value={cv.summary} 
                 onChange={(v) => updateField("summary", v)} 
                 multiline 
+                rows={6}
                 placeholder="Write a professional summary..."
+                showBulletTool={true}
               />
             </Typography>
           </Box>
