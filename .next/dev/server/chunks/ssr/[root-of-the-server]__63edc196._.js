@@ -2631,8 +2631,8 @@ Extract the following fields:
   - name: Certification name
   - issuer: Issuing organization
   - year: Year obtained
-- skills: Array of technical and soft skills as strings
-- strengths: Array of key professional strengths (e.g., "Strategic Leadership", "Cross-functional Collaboration", "Results-Driven Execution"). Extract 3-5 high-level strengths that summarize the candidate's core value proposition.
+- skills: Array of technical and soft skills as strings. CRITICAL: ONLY extract skills that are EXPLICITLY listed in a dedicated "Skills", "Technical Skills", "Core Competencies", or similar skills section of the CV. DO NOT infer or add skills from job descriptions, responsibilities, or project descriptions. DO NOT add skills that are not explicitly stated by the candidate. If no skills section exists, return an empty array. Only include what the candidate has directly listed as their skills.
+- strengths: Array of key professional strengths (e.g., "Strategic Leadership", "Cross-functional Collaboration", "Results-Driven Execution"). Extract 3-5 high-level strengths ONLY from explicitly stated summary, objective, or strengths sections. DO NOT infer strengths from job descriptions.
 
 If a field is not found in the CV, use an empty string for text fields or an empty array for array fields.
 
