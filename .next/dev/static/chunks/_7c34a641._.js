@@ -802,7 +802,10 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$file$2d$save
     };
 }
 async function exportToPDF(cv, filename, template = "modern-dark") {
-    const style = templateStyles[template];
+    const baseStyle = templateStyles[template];
+    // Apply CV's color scheme override if available
+    const effectiveAccent = cv.colorScheme?.primary || baseStyle.accent;
+    const effectiveSecondary = cv.colorScheme?.secondary || baseStyle.accent;
     const doc = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jspdf$2f$dist$2f$jspdf$2e$es$2e$min$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsPDF"]();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -811,11 +814,12 @@ async function exportToPDF(cv, filename, template = "modern-dark") {
     const maxWidth = pageWidth - marginLeft - marginRight;
     const lineHeight = 6;
     let y = 0;
-    const headerBg = hexToRgb(style.headerBg);
-    const headerText = hexToRgb(style.headerText);
-    const accent = hexToRgb(style.accent);
-    const bodyText = hexToRgb(style.bodyText);
-    const bodyTextSecondary = hexToRgb(style.bodyTextSecondary);
+    const headerBg = hexToRgb(baseStyle.headerBg);
+    const headerText = hexToRgb(baseStyle.headerText);
+    const accent = hexToRgb(effectiveAccent);
+    const secondary = hexToRgb(effectiveSecondary);
+    const bodyText = hexToRgb(baseStyle.bodyText);
+    const bodyTextSecondary = hexToRgb(baseStyle.bodyTextSecondary);
     doc.setFillColor(headerBg.r, headerBg.g, headerBg.b);
     doc.rect(0, 0, pageWidth, 55, "F");
     y = 18;
@@ -824,9 +828,9 @@ async function exportToPDF(cv, filename, template = "modern-dark") {
     doc.setFont("helvetica", "bold");
     doc.text(cv.name || "Name", marginLeft, y);
     if (cv.title) {
-        y += 10;
-        doc.setTextColor(accent.r, accent.g, accent.b);
-        doc.setFontSize(14);
+        y += 8;
+        doc.setTextColor(secondary.r, secondary.g, secondary.b);
+        doc.setFontSize(13);
         doc.setFont("helvetica", "normal");
         doc.text(cv.title, marginLeft, y);
     }
@@ -963,7 +967,11 @@ async function exportToPDF(cv, filename, template = "modern-dark") {
 async function exportToDOCX(cv, filename, template = "modern-dark") {
     const style = templateStyles[template];
     const children = [];
-    const accentHex = style.accent.replace("#", "");
+    // Apply CV's color scheme override if available
+    const effectiveAccent = cv.colorScheme?.primary || style.accent;
+    const effectiveSecondary = cv.colorScheme?.secondary || style.accent;
+    const accentHex = effectiveAccent.replace("#", "");
+    const secondaryHex = effectiveSecondary.replace("#", "");
     const bodyTextHex = style.bodyText.replace("#", "");
     const bodyTextSecondaryHex = style.bodyTextSecondary.replace("#", "");
     children.push(new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Paragraph"]({
@@ -991,13 +999,12 @@ async function exportToDOCX(cv, filename, template = "modern-dark") {
             children: [
                 new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$docx$2f$dist$2f$index$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TextRun"]({
                     text: cv.title,
-                    size: 28,
-                    color: bodyTextSecondaryHex,
-                    italics: true
+                    size: 26,
+                    color: secondaryHex
                 })
             ],
             spacing: {
-                after: 200
+                after: 150
             }
         }));
     }

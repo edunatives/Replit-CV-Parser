@@ -75,7 +75,12 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } {
  * await exportToPDF(cv, "john_doe_resume.pdf", "executive");
  */
 export async function exportToPDF(cv: ParsedCV, filename: string, template: TemplateType = "modern-dark"): Promise<void> {
-  const style = templateStyles[template];
+  const baseStyle = templateStyles[template];
+  
+  // Apply CV's color scheme override if available
+  const effectiveAccent = cv.colorScheme?.primary || baseStyle.accent;
+  const effectiveSecondary = cv.colorScheme?.secondary || baseStyle.accent;
+  
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -85,11 +90,12 @@ export async function exportToPDF(cv: ParsedCV, filename: string, template: Temp
   const lineHeight = 6;
   let y = 0;
 
-  const headerBg = hexToRgb(style.headerBg);
-  const headerText = hexToRgb(style.headerText);
-  const accent = hexToRgb(style.accent);
-  const bodyText = hexToRgb(style.bodyText);
-  const bodyTextSecondary = hexToRgb(style.bodyTextSecondary);
+  const headerBg = hexToRgb(baseStyle.headerBg);
+  const headerText = hexToRgb(baseStyle.headerText);
+  const accent = hexToRgb(effectiveAccent);
+  const secondary = hexToRgb(effectiveSecondary);
+  const bodyText = hexToRgb(baseStyle.bodyText);
+  const bodyTextSecondary = hexToRgb(baseStyle.bodyTextSecondary);
 
   doc.setFillColor(headerBg.r, headerBg.g, headerBg.b);
   doc.rect(0, 0, pageWidth, 55, "F");
@@ -101,9 +107,9 @@ export async function exportToPDF(cv: ParsedCV, filename: string, template: Temp
   doc.text(cv.name || "Name", marginLeft, y);
 
   if (cv.title) {
-    y += 10;
-    doc.setTextColor(accent.r, accent.g, accent.b);
-    doc.setFontSize(14);
+    y += 8;
+    doc.setTextColor(secondary.r, secondary.g, secondary.b);
+    doc.setFontSize(13);
     doc.setFont("helvetica", "normal");
     doc.text(cv.title, marginLeft, y);
   }
@@ -266,7 +272,12 @@ export async function exportToDOCX(cv: ParsedCV, filename: string, template: Tem
   const style = templateStyles[template];
   const children: Paragraph[] = [];
 
-  const accentHex = style.accent.replace("#", "");
+  // Apply CV's color scheme override if available
+  const effectiveAccent = cv.colorScheme?.primary || style.accent;
+  const effectiveSecondary = cv.colorScheme?.secondary || style.accent;
+
+  const accentHex = effectiveAccent.replace("#", "");
+  const secondaryHex = effectiveSecondary.replace("#", "");
   const bodyTextHex = style.bodyText.replace("#", "");
   const bodyTextSecondaryHex = style.bodyTextSecondary.replace("#", "");
 
@@ -293,12 +304,11 @@ export async function exportToDOCX(cv: ParsedCV, filename: string, template: Tem
         children: [
           new TextRun({
             text: cv.title,
-            size: 28,
-            color: bodyTextSecondaryHex,
-            italics: true,
+            size: 26,
+            color: secondaryHex,
           }),
         ],
-        spacing: { after: 200 },
+        spacing: { after: 150 },
       })
     );
   }
