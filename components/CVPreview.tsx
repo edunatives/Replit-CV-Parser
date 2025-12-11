@@ -1098,8 +1098,8 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
   const renderHeader = () => (
     <Box sx={{ 
       bgcolor: style.headerBg, 
-      pt: 2,
-      pb: 0.5,
+      pt: 3,
+      pb: 2,
       px: 3, 
       color: style.headerText, 
       borderBottom: style.borderBottom,
