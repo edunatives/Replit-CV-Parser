@@ -1,6 +1,7 @@
 "use client";
 
-import { Box, Typography, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider } from "@mui/material";
+import { useState } from "react";
+import { Box, Typography, List, ListItem, ListItemButton, ListItemIcon, ListItemText, IconButton, Tooltip } from "@mui/material";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
@@ -13,6 +14,8 @@ import EventOutlinedIcon from "@mui/icons-material/EventOutlined";
 import GroupOutlinedIcon from "@mui/icons-material/GroupOutlined";
 import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
 import PublicOutlinedIcon from "@mui/icons-material/PublicOutlined";
+import MenuIcon from "@mui/icons-material/Menu";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 
 interface SidebarProps {
   activeItem: string;
@@ -41,28 +44,34 @@ const defaultSpacesItems = [
 ];
 
 export function Sidebar({ activeItem, onItemClick }: SidebarProps) {
+  const [collapsed, setCollapsed] = useState(true);
+
+  const EXPANDED_WIDTH = 240;
+  const COLLAPSED_WIDTH = 64;
+
   const renderMenuItem = (item: { id: string; label: string; icon: React.ElementType }) => {
     const Icon = item.icon;
     const isActive = activeItem === item.id;
     
-    return (
-      <ListItem key={item.id} disablePadding sx={{ mb: 0.5 }}>
-        <ListItemButton
-          onClick={() => onItemClick(item.id)}
-          sx={{
-            borderRadius: 2,
-            py: 1,
-            px: 1.5,
-            bgcolor: isActive ? "rgba(79, 70, 229, 0.08)" : "transparent",
-            "&:hover": {
-              bgcolor: isActive ? "rgba(79, 70, 229, 0.12)" : "action.hover",
-            },
-          }}
-          data-testid={`menu-${item.id}`}
-        >
-          <ListItemIcon sx={{ minWidth: 36 }}>
-            <Icon sx={{ color: isActive ? "primary.main" : "text.secondary", fontSize: 22 }} />
-          </ListItemIcon>
+    const button = (
+      <ListItemButton
+        onClick={() => onItemClick(item.id)}
+        sx={{
+          borderRadius: 2,
+          py: 1,
+          px: collapsed ? 1.5 : 1.5,
+          justifyContent: collapsed ? "center" : "flex-start",
+          bgcolor: isActive ? "rgba(79, 70, 229, 0.08)" : "transparent",
+          "&:hover": {
+            bgcolor: isActive ? "rgba(79, 70, 229, 0.12)" : "action.hover",
+          },
+        }}
+        data-testid={`menu-${item.id}`}
+      >
+        <ListItemIcon sx={{ minWidth: collapsed ? 0 : 36, justifyContent: "center" }}>
+          <Icon sx={{ color: isActive ? "primary.main" : "text.secondary", fontSize: 22 }} />
+        </ListItemIcon>
+        {!collapsed && (
           <ListItemText 
             primary={item.label} 
             primaryTypographyProps={{
@@ -71,7 +80,19 @@ export function Sidebar({ activeItem, onItemClick }: SidebarProps) {
               color: isActive ? "primary.main" : "text.primary",
             }}
           />
-        </ListItemButton>
+        )}
+      </ListItemButton>
+    );
+
+    return (
+      <ListItem key={item.id} disablePadding sx={{ mb: 0.5 }}>
+        {collapsed ? (
+          <Tooltip title={item.label} placement="right" arrow>
+            {button}
+          </Tooltip>
+        ) : (
+          button
+        )}
       </ListItem>
     );
   };
@@ -79,8 +100,8 @@ export function Sidebar({ activeItem, onItemClick }: SidebarProps) {
   return (
     <Box
       sx={{
-        width: 240,
-        minWidth: 240,
+        width: collapsed ? COLLAPSED_WIDTH : EXPANDED_WIDTH,
+        minWidth: collapsed ? COLLAPSED_WIDTH : EXPANDED_WIDTH,
         height: "100vh",
         bgcolor: "background.paper",
         borderRight: 1,
@@ -88,50 +109,72 @@ export function Sidebar({ activeItem, onItemClick }: SidebarProps) {
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
+        transition: "width 0.2s ease, min-width 0.2s ease",
       }}
       data-testid="sidebar"
     >
-      <Box sx={{ flex: 1, overflow: "auto", px: 1.5, py: 2 }}>
+      <Box sx={{ 
+        display: "flex", 
+        alignItems: "center", 
+        justifyContent: collapsed ? "center" : "flex-end",
+        p: 1,
+        borderBottom: 1,
+        borderColor: "divider",
+      }}>
+        <IconButton 
+          onClick={() => setCollapsed(!collapsed)} 
+          size="small"
+          data-testid="button-toggle-sidebar"
+        >
+          {collapsed ? <MenuIcon /> : <ChevronLeftIcon />}
+        </IconButton>
+      </Box>
+
+      <Box sx={{ flex: 1, overflow: "auto", px: collapsed ? 0.5 : 1.5, py: 2 }}>
         <List disablePadding>
           {mainMenuItems.map(renderMenuItem)}
         </List>
 
-        <Typography 
-          variant="caption" 
-          sx={{ 
-            display: "block",
-            px: 1.5,
-            pt: 2,
-            pb: 1,
-            color: "text.secondary",
-            fontWeight: 600,
-            textTransform: "uppercase",
-            letterSpacing: 0.5,
-            fontSize: 11,
-          }}
-        >
-          Communication
-        </Typography>
+        {!collapsed && (
+          <Typography 
+            variant="caption" 
+            sx={{ 
+              display: "block",
+              px: 1.5,
+              pt: 2,
+              pb: 1,
+              color: "text.secondary",
+              fontWeight: 600,
+              textTransform: "uppercase",
+              letterSpacing: 0.5,
+              fontSize: 11,
+            }}
+          >
+            Communication
+          </Typography>
+        )}
         <List disablePadding>
           {communicationItems.map(renderMenuItem)}
         </List>
 
-        <Typography 
-          variant="caption" 
-          sx={{ 
-            display: "block",
-            px: 1.5,
-            pt: 2,
-            pb: 1,
-            color: "text.secondary",
-            fontWeight: 600,
-            textTransform: "uppercase",
-            letterSpacing: 0.5,
-            fontSize: 11,
-          }}
-        >
-          Default Spaces
-        </Typography>
+        {!collapsed && (
+          <Typography 
+            variant="caption" 
+            sx={{ 
+              display: "block",
+              px: 1.5,
+              pt: 2,
+              pb: 1,
+              color: "text.secondary",
+              fontWeight: 600,
+              textTransform: "uppercase",
+              letterSpacing: 0.5,
+              fontSize: 11,
+            }}
+          >
+            Default Spaces
+          </Typography>
+        )}
         <List disablePadding>
           {defaultSpacesItems.map(renderMenuItem)}
         </List>

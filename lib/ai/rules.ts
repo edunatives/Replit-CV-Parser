@@ -1195,3 +1195,123 @@ IMPORTANT:
 - Include 5-8 highlights mixing achievements, skills, concerns, and gaps
 - Provide actionable, specific recommendations with point impacts`;
 }
+
+// ============================================================================
+// CV DOCUMENT VALIDATION
+// ============================================================================
+
+/**
+ * CV validation keywords - documents should contain several of these to be considered a CV
+ */
+const CV_KEYWORDS = [
+  // Section headers
+  'experience', 'education', 'skills', 'summary', 'objective', 'profile',
+  'work history', 'employment', 'qualifications', 'certifications', 'training',
+  'professional background', 'career', 'achievements', 'accomplishments',
+  // Contact info patterns
+  'email', 'phone', 'linkedin', 'github', 'portfolio',
+  // Common CV terms
+  'resume', 'curriculum vitae', 'cv', 'responsibilities', 'achievements',
+  'managed', 'developed', 'led', 'implemented', 'created', 'designed',
+  'bachelor', 'master', 'degree', 'university', 'college', 'graduated',
+  'certified', 'license', 'award',
+];
+
+/**
+ * Non-CV document patterns - these indicate the document is NOT a CV
+ */
+const NON_CV_PATTERNS = [
+  /^dear\s+(sir|madam|hiring|manager)/i,  // Cover letter
+  /^\s*invoice\s*(#|number|no\.?)?/i,     // Invoice
+  /^\s*receipt\s*(#|number|no\.?)?/i,     // Receipt  
+  /^\s*contract\s*/i,                      // Contract
+  /^\s*agreement\s*/i,                     // Agreement
+  /^\s*terms\s+(and|&)\s+conditions/i,    // T&C
+  /^\s*privacy\s+policy/i,                // Privacy policy
+  /^\s*chapter\s+\d/i,                    // Book chapter
+  /^\s*table\s+of\s+contents/i,           // Book/report TOC
+  /once upon a time/i,                     // Story
+  /^\s*article\s+\d/i,                    // Legal article
+];
+
+export interface CVValidationResult {
+  isCV: boolean;
+  confidence: number;
+  reason: string;
+}
+
+/**
+ * Validate whether a document appears to be a CV/Resume
+ * Uses keyword matching and pattern detection
+ * 
+ * @param text - Raw text extracted from document
+ * @returns Validation result with confidence score
+ */
+export function validateCVDocument(text: string): CVValidationResult {
+  const lowerText = text.toLowerCase();
+  const textLength = text.length;
+  
+  // Too short to be a CV (less than 200 chars)
+  if (textLength < 200) {
+    return {
+      isCV: false,
+      confidence: 0.9,
+      reason: "Document is too short to be a valid CV/resume. Please upload a complete document."
+    };
+  }
+  
+  // Check for non-CV patterns first
+  for (const pattern of NON_CV_PATTERNS) {
+    if (pattern.test(text)) {
+      return {
+        isCV: false,
+        confidence: 0.85,
+        reason: "This document appears to be a cover letter, contract, or other non-CV document. Please upload your CV/resume instead."
+      };
+    }
+  }
+  
+  // Count CV keywords
+  let keywordCount = 0;
+  const foundKeywords: string[] = [];
+  
+  for (const keyword of CV_KEYWORDS) {
+    if (lowerText.includes(keyword)) {
+      keywordCount++;
+      foundKeywords.push(keyword);
+    }
+  }
+  
+  // Check for email pattern (strong CV indicator)
+  const hasEmail = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(text);
+  
+  // Check for phone pattern
+  const hasPhone = /[\+]?[(]?[0-9]{1,4}[)]?[-\s\./0-9]{6,}/.test(text);
+  
+  // Check for common section patterns
+  const hasSectionHeaders = /\b(experience|education|skills|summary|work\s+history|employment)\s*[:|\n]/i.test(text);
+  
+  // Calculate confidence score
+  const keywordScore = Math.min(keywordCount / 8, 1) * 0.4; // Max 40% from keywords
+  const emailScore = hasEmail ? 0.2 : 0;
+  const phoneScore = hasPhone ? 0.15 : 0;
+  const sectionScore = hasSectionHeaders ? 0.25 : 0;
+  
+  const totalScore = keywordScore + emailScore + phoneScore + sectionScore;
+  
+  // Threshold: at least 0.4 confidence to be considered a CV
+  if (totalScore >= 0.4) {
+    return {
+      isCV: true,
+      confidence: Math.min(totalScore, 1),
+      reason: "Valid CV/resume detected"
+    };
+  }
+  
+  // Low confidence - likely not a CV
+  return {
+    isCV: false,
+    confidence: 1 - totalScore,
+    reason: "This document doesn't appear to be a CV/resume. A CV should include sections like Experience, Education, Skills, and contact information. Please upload a valid CV/resume document."
+  };
+}

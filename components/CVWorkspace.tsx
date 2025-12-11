@@ -21,7 +21,7 @@ interface CVWorkspaceProps {
 type AssessmentTrack = "assessment" | "advisor" | "jd-match";
 
 export function CVWorkspace({ cv, onBack, onUpdateCV }: CVWorkspaceProps) {
-  const [template, setTemplate] = useState<TemplateType>("modern-dark");
+  const [template, setTemplate] = useState<TemplateType>("business");
   const [activeTrack, setActiveTrack] = useState<AssessmentTrack>("assessment");
   const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
 

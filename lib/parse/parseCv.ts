@@ -24,7 +24,7 @@ import {
   validateAndNormalizeCV,
 } from "./normalize";
 import { GoogleGenAI } from "@google/genai";
-import { buildCVParsingPrompt, cleanAIResponse } from "@/lib/ai/rules";
+import { buildCVParsingPrompt, cleanAIResponse, validateCVDocument } from "@/lib/ai/rules";
 
 type PdfParseResult = { text: string; numpages: number };
 
@@ -265,6 +265,12 @@ export async function parseCV(buffer: Buffer, fileName: string, fileId: string):
     }
     
     text = normalizeText(buffer.toString("utf-8"));
+  }
+  
+  // Validate that the document is actually a CV
+  const validationResult = validateCVDocument(text);
+  if (!validationResult.isCV) {
+    throw new Error(validationResult.reason);
   }
   
   // Try Gemini AI extraction first

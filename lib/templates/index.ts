@@ -24,9 +24,10 @@ export interface TemplateStyle {
   bodyTextSecondary: string;
   borderBottom: string;
   headerCentered: boolean;
-  sectionHeaderVariant: "default" | "centeredLines" | "underline";
+  sectionHeaderVariant: "default" | "centeredLines" | "underline" | "leftBorder";
   showMetaIcons: boolean;
   companyColor: string;
+  summaryBoxed?: boolean;
 }
 
 /**
@@ -148,18 +149,19 @@ export const templateRegistry: Record<TemplateType, TemplateStyle> = {
   "business": {
     id: "business",
     name: "Business",
-    description: "Clean professional style with blue accents and underlined sections",
+    description: "Clean professional style with blue accents and left-bordered sections",
     headerBg: "#ffffff",
     accent: "#1b4f72",
     headerText: "#1b4f72",
-    bodyBg: "#f8fafc",
+    bodyBg: "#ffffff",
     bodyText: "#1a1a1a",
     bodyTextSecondary: "#4a4a4a",
     borderBottom: "none",
     headerCentered: false,
-    sectionHeaderVariant: "underline",
+    sectionHeaderVariant: "leftBorder",
     showMetaIcons: true,
     companyColor: "#1b4f72",
+    summaryBoxed: true,
   },
 };
 

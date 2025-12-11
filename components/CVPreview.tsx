@@ -112,6 +112,36 @@ function SectionHeader({
 }) {
   const isUnderline = style.sectionHeaderVariant === "underline";
   const isCenteredLines = style.sectionHeaderVariant === "centeredLines";
+  const isLeftBorder = style.sectionHeaderVariant === "leftBorder";
+  
+  if (isLeftBorder) {
+    return (
+      <Box sx={{ mb: 1.5, mt: 2 }}>
+        <Box sx={{ 
+          display: "flex", 
+          alignItems: "center",
+          borderLeft: `4px solid ${style.accent}`,
+          pl: 1.5,
+        }}>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              color: style.accent, 
+              fontFamily: "'Arial', sans-serif",
+              textTransform: "uppercase",
+              fontWeight: 700,
+              letterSpacing: "0.05em",
+              fontSize: "1rem",
+            }}
+          >
+            {title}
+          </Typography>
+          <Box sx={{ flex: 1 }} />
+          {rightContent}
+        </Box>
+      </Box>
+    );
+  }
   
   return (
     <Box sx={{ mb: 1 }}>
@@ -856,16 +886,24 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
         return (
           <Box key="summary" sx={{ mb: isLast ? 0 : 3 }}>
             <SectionHeader title="Summary" style={style} />
-            <Typography variant="body2" sx={{ color: style.bodyTextSecondary, whiteSpace: "pre-wrap" }} component="div">
-              <EditableField 
-                value={cv.summary} 
-                onChange={(v) => updateField("summary", v)} 
-                multiline 
-                rows={6}
-                placeholder="Write a professional summary..."
-                showBulletTool={true}
-              />
-            </Typography>
+            <Box sx={style.summaryBoxed ? {
+              border: `1px solid ${style.accent}20`,
+              borderLeft: `3px solid ${style.accent}`,
+              bgcolor: `${style.accent}08`,
+              p: 2,
+              borderRadius: "0 4px 4px 0",
+            } : {}}>
+              <Typography variant="body2" sx={{ color: style.bodyText, whiteSpace: "pre-wrap", lineHeight: 1.6 }} component="div">
+                <EditableField 
+                  value={cv.summary} 
+                  onChange={(v) => updateField("summary", v)} 
+                  multiline 
+                  rows={6}
+                  placeholder="Write a professional summary..."
+                  showBulletTool={true}
+                />
+              </Typography>
+            </Box>
           </Box>
         );
 
@@ -1023,7 +1061,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
   const renderHeader = () => (
     <Box sx={{ 
       bgcolor: style.headerBg, 
-      py: 1.5, 
+      py: 2, 
       px: 3, 
       color: style.headerText, 
       borderBottom: style.borderBottom,
@@ -1031,12 +1069,20 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
     }}>
       <Typography variant="h4" component="div" sx={{ 
         fontFamily: "'Arial', sans-serif", 
-        fontWeight: 600,
-        display: style.headerCentered ? "block" : "inline-block"
+        fontWeight: 700,
+        fontSize: "2rem",
+        color: style.headerText,
+        display: style.headerCentered ? "block" : "inline-block",
+        letterSpacing: "0.02em",
       }}>
         <EditableField value={cv.name} onChange={(v) => updateField("name", v)} placeholder="Your Name" />
       </Typography>
-      <Typography variant="subtitle1" component="div" sx={{ color: style.accent, mt: 0.25, fontWeight: 500 }}>
+      <Typography variant="subtitle1" component="div" sx={{ 
+        color: style.accent, 
+        mt: 0.5, 
+        fontWeight: 600,
+        fontSize: "1.1rem",
+      }}>
         <EditableField value={cv.title} onChange={(v) => updateField("title", v)} placeholder="Your Title" />
       </Typography>
       
