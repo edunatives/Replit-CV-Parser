@@ -1,7 +1,6 @@
 "use client";
 
 import { Box, Typography, Paper, Chip, Divider, TextField, IconButton, InputAdornment, Tooltip, Button, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Popover } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import EmailIcon from "@mui/icons-material/Email";
@@ -337,13 +336,6 @@ function EditableField({
       }}
     >
       <span style={{ whiteSpace: multiline ? "pre-wrap" : "normal", display: multiline ? "block" : "inline" }}>{value || placeholder}</span>
-      <EditIcon sx={{ 
-        fontSize: 14, 
-        opacity: 0.5, 
-        position: multiline ? "absolute" : "static",
-        top: multiline ? 4 : undefined,
-        right: multiline ? 4 : undefined,
-      }} />
     </Box>
   );
 }
@@ -421,7 +413,6 @@ function EditableContactField({
     >
       <Icon sx={{ fontSize: 14 }} />
       <Typography variant="body2" sx={{ fontSize: "0.8125rem" }}>{value || placeholder}</Typography>
-      <EditIcon sx={{ fontSize: 11, opacity: 0.5 }} />
     </Box>
   );
 }
