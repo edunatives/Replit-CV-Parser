@@ -1193,7 +1193,8 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
     <Box 
       sx={{ 
         py: 2, 
-        px: 1.5, 
+        pl: "50px",
+        pr: 1.5, 
         bgcolor: "#e8e8e8",
         "@media print": {
           bgcolor: "transparent",
