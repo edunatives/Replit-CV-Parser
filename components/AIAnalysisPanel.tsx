@@ -60,9 +60,55 @@ interface JDParsing {
   nice_to_have_skills: string[];
 }
 
-// v9.3 JDMatchResult with evidence_map
+// v2.2 Experience Factors types
+interface ExperienceFactorIssue {
+  code: string;
+  type: string;
+  message: string;
+  cv_value: string;
+  jd_requirement: string;
+  gap_severity: "minor" | "moderate" | "significant";
+}
+
+interface NatureFitIssue {
+  code: string;
+  type: string;
+  message: string;
+  cv_nature: string;
+  jd_expects: string;
+  transferable: boolean;
+}
+
+interface ExperienceYearsAnalysis {
+  total_years: number;
+  relevant_domain_years: number;
+  recency_score: number;
+  meets_requirement: boolean;
+  student_message: string;
+}
+
+interface ExperienceDepthAnalysis {
+  depth_level: "Entry" | "Developing" | "Proficient" | "Expert";
+  scope_score: number;
+  impact_score: number;
+  complexity_handled: string;
+  student_message: string;
+}
+
+interface JDNature {
+  role_level: string;
+  domain_required: string;
+  industry_preferred: string | null;
+  education_required: string | null;
+  years_required: number | null;
+  work_arrangement: string | null;
+  company_stage: string | null;
+}
+
+// v2.2 JDMatchResult with Experience Factors + Nature Fit
 interface JDMatchResult {
   jd_parsing?: JDParsing;
+  jd_nature?: JDNature;
   matchScore: number;
   verdict?: string;
   summary?: string;
@@ -74,6 +120,22 @@ interface JDMatchResult {
   suggestions: string[];
   keywordOptimizations: string[];
   evidenceMap?: EvidenceMapEntry[];
+  experienceFactors?: {
+    years_analysis: ExperienceYearsAnalysis;
+    depth_analysis: ExperienceDepthAnalysis;
+    issues: ExperienceFactorIssue[];
+  };
+  natureFit?: {
+    overall_fit: "Excellent" | "Good" | "Partial" | "Challenging";
+    fit_score: number;
+    issues: NatureFitIssue[];
+    strengths: string[];
+  };
+  studentSummary?: {
+    headline: string;
+    encouragement: string;
+    quick_wins: string[];
+  };
   tokenUsage: { promptTokens: number; completionTokens: number; totalTokens: number };
 }
 
@@ -104,19 +166,33 @@ function normalizeAssessment(raw: Record<string, unknown>): CVAssessment {
   };
 }
 
-// Normalize JD match response to handle v9.3 structure
+// Normalize JD match response to handle v2.2 structure with Experience Factors
 function normalizeJDMatch(raw: Record<string, unknown>): JDMatchResult {
   const expMatch = (raw.experienceMatch || raw.experience_match || { score: 0, feedback: "" }) as Record<string, unknown>;
   const eduMatch = (raw.educationMatch || raw.education_match || { score: 0, feedback: "" }) as Record<string, unknown>;
   const tokenUsageRaw = (raw.tokenUsage || raw.token_usage || { promptTokens: 0, completionTokens: 0, totalTokens: 0 }) as Record<string, unknown>;
   const jdParsingRaw = (raw.jd_parsing || null) as Record<string, unknown> | null;
+  const jdNatureRaw = (raw.jd_nature || raw.jdNature || null) as Record<string, unknown> | null;
   const evidenceMapRaw = (raw.evidenceMap || raw.evidence_map || []) as Array<Record<string, unknown>>;
+  const expFactorsRaw = (raw.experienceFactors || raw.experience_factors || null) as Record<string, unknown> | null;
+  const natureFitRaw = (raw.natureFit || raw.nature_fit || null) as Record<string, unknown> | null;
+  const studentSumRaw = (raw.studentSummary || raw.student_summary || null) as Record<string, unknown> | null;
+  
   return {
     jd_parsing: jdParsingRaw ? {
       role_title: (jdParsingRaw.role_title ?? "") as string,
       company: (jdParsingRaw.company ?? "") as string,
       mandatory_skills: (jdParsingRaw.mandatory_skills ?? []) as string[],
       nice_to_have_skills: (jdParsingRaw.nice_to_have_skills ?? []) as string[],
+    } : undefined,
+    jd_nature: jdNatureRaw ? {
+      role_level: (jdNatureRaw.role_level ?? "") as string,
+      domain_required: (jdNatureRaw.domain_required ?? "") as string,
+      industry_preferred: (jdNatureRaw.industry_preferred ?? null) as string | null,
+      education_required: (jdNatureRaw.education_required ?? null) as string | null,
+      years_required: (jdNatureRaw.years_required ?? null) as number | null,
+      work_arrangement: (jdNatureRaw.work_arrangement ?? null) as string | null,
+      company_stage: (jdNatureRaw.company_stage ?? null) as string | null,
     } : undefined,
     matchScore: (raw.matchScore ?? raw.match_score ?? 0) as number,
     verdict: (raw.verdict ?? "") as string,
@@ -139,6 +215,51 @@ function normalizeJDMatch(raw: Record<string, unknown>): JDMatchResult {
       cv_evidence: (e.cv_evidence ?? "") as string,
       status: (e.status ?? "Missing") as "Match" | "Weak" | "Missing",
     })),
+    // v2.2 Experience Factors
+    experienceFactors: expFactorsRaw ? {
+      years_analysis: {
+        total_years: ((expFactorsRaw.years_analysis as Record<string, unknown>)?.total_years ?? 0) as number,
+        relevant_domain_years: ((expFactorsRaw.years_analysis as Record<string, unknown>)?.relevant_domain_years ?? 0) as number,
+        recency_score: ((expFactorsRaw.years_analysis as Record<string, unknown>)?.recency_score ?? 0) as number,
+        meets_requirement: ((expFactorsRaw.years_analysis as Record<string, unknown>)?.meets_requirement ?? false) as boolean,
+        student_message: ((expFactorsRaw.years_analysis as Record<string, unknown>)?.student_message ?? "") as string,
+      },
+      depth_analysis: {
+        depth_level: ((expFactorsRaw.depth_analysis as Record<string, unknown>)?.depth_level ?? "Entry") as "Entry" | "Developing" | "Proficient" | "Expert",
+        scope_score: ((expFactorsRaw.depth_analysis as Record<string, unknown>)?.scope_score ?? 0) as number,
+        impact_score: ((expFactorsRaw.depth_analysis as Record<string, unknown>)?.impact_score ?? 0) as number,
+        complexity_handled: ((expFactorsRaw.depth_analysis as Record<string, unknown>)?.complexity_handled ?? "") as string,
+        student_message: ((expFactorsRaw.depth_analysis as Record<string, unknown>)?.student_message ?? "") as string,
+      },
+      issues: ((expFactorsRaw.issues ?? []) as Array<Record<string, unknown>>).map((issue) => ({
+        code: (issue.code ?? "") as string,
+        type: (issue.type ?? "") as string,
+        message: (issue.message ?? "") as string,
+        cv_value: (issue.cv_value ?? "") as string,
+        jd_requirement: (issue.jd_requirement ?? "") as string,
+        gap_severity: (issue.gap_severity ?? "minor") as "minor" | "moderate" | "significant",
+      })),
+    } : undefined,
+    // v2.2 Nature Fit
+    natureFit: natureFitRaw ? {
+      overall_fit: (natureFitRaw.overall_fit ?? "Partial") as "Excellent" | "Good" | "Partial" | "Challenging",
+      fit_score: (natureFitRaw.fit_score ?? 0) as number,
+      issues: ((natureFitRaw.issues ?? []) as Array<Record<string, unknown>>).map((issue) => ({
+        code: (issue.code ?? "") as string,
+        type: (issue.type ?? "") as string,
+        message: (issue.message ?? "") as string,
+        cv_nature: (issue.cv_nature ?? "") as string,
+        jd_expects: (issue.jd_expects ?? "") as string,
+        transferable: (issue.transferable ?? false) as boolean,
+      })),
+      strengths: (natureFitRaw.strengths ?? []) as string[],
+    } : undefined,
+    // v2.2 Student Summary
+    studentSummary: studentSumRaw ? {
+      headline: (studentSumRaw.headline ?? "") as string,
+      encouragement: (studentSumRaw.encouragement ?? "") as string,
+      quick_wins: (studentSumRaw.quick_wins ?? []) as string[],
+    } : undefined,
     tokenUsage: normalizeTokenUsage(tokenUsageRaw),
   };
 }
@@ -903,6 +1024,208 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
               <LinearProgress variant="determinate" value={jdMatch.educationMatch.score} color="secondary" sx={{ height: 8, borderRadius: 1, mb: 1 }} />
               <Typography variant="body2" color="text.secondary">{jdMatch.educationMatch.feedback}</Typography>
             </Box>
+
+            {/* v2.2 Student Summary */}
+            {jdMatch.studentSummary && (
+              <Card sx={{ mb: 3, bgcolor: "primary.50", border: 1, borderColor: "primary.200" }}>
+                <CardContent sx={{ py: 2 }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "primary.main", mb: 1 }}>
+                    {jdMatch.studentSummary.headline}
+                  </Typography>
+                  <Typography variant="body2" sx={{ mb: 2, color: "text.secondary" }}>
+                    {jdMatch.studentSummary.encouragement}
+                  </Typography>
+                  {jdMatch.studentSummary.quick_wins.length > 0 && (
+                    <>
+                      <Typography variant="caption" sx={{ fontWeight: 600, color: "primary.main" }}>
+                        Quick Wins:
+                      </Typography>
+                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mt: 0.5 }}>
+                        {jdMatch.studentSummary.quick_wins.map((win, i) => (
+                          <Chip key={i} label={win} size="small" variant="outlined" color="primary" sx={{ fontSize: "0.7rem" }} />
+                        ))}
+                      </Box>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* v2.2 Experience Factors */}
+            {jdMatch.experienceFactors && (
+              <Card sx={{ mb: 3 }}>
+                <CardContent sx={{ py: 2 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
+                    <WorkIcon sx={{ fontSize: 18, color: "primary.main" }} />
+                    Experience Analysis
+                  </Typography>
+                  
+                  {/* Years Analysis */}
+                  <Box sx={{ mb: 2, p: 1.5, bgcolor: "grey.50", borderRadius: 1 }}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        Years: {jdMatch.experienceFactors.years_analysis.total_years} total / {jdMatch.experienceFactors.years_analysis.relevant_domain_years} relevant
+                      </Typography>
+                      <Chip 
+                        label={jdMatch.experienceFactors.years_analysis.meets_requirement ? "Meets Req" : "Building"} 
+                        size="small" 
+                        color={jdMatch.experienceFactors.years_analysis.meets_requirement ? "success" : "info"}
+                        sx={{ fontSize: "0.65rem", height: 20 }}
+                      />
+                    </Box>
+                    <Typography variant="caption" color="text.secondary">
+                      {jdMatch.experienceFactors.years_analysis.student_message}
+                    </Typography>
+                  </Box>
+
+                  {/* Depth Analysis */}
+                  <Box sx={{ mb: 2, p: 1.5, bgcolor: "grey.50", borderRadius: 1 }}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        Depth Level: {jdMatch.experienceFactors.depth_analysis.depth_level}
+                      </Typography>
+                      <Box sx={{ display: "flex", gap: 0.5 }}>
+                        <Chip label={`Scope: ${jdMatch.experienceFactors.depth_analysis.scope_score}`} size="small" sx={{ fontSize: "0.6rem", height: 18 }} />
+                        <Chip label={`Impact: ${jdMatch.experienceFactors.depth_analysis.impact_score}`} size="small" sx={{ fontSize: "0.6rem", height: 18 }} />
+                      </Box>
+                    </Box>
+                    <Typography variant="caption" color="text.secondary">
+                      {jdMatch.experienceFactors.depth_analysis.student_message}
+                    </Typography>
+                  </Box>
+
+                  {/* Experience Factor Issues (H1-H9) */}
+                  {jdMatch.experienceFactors.issues.length > 0 && (
+                    <Box>
+                      <Typography variant="caption" sx={{ fontWeight: 600, color: "text.secondary", mb: 1, display: "block" }}>
+                        Growth Areas:
+                      </Typography>
+                      {jdMatch.experienceFactors.issues.map((issue, i) => (
+                        <Box 
+                          key={i} 
+                          sx={{ 
+                            mb: 1, 
+                            p: 1, 
+                            borderRadius: 1,
+                            bgcolor: issue.gap_severity === "significant" ? "warning.50" : issue.gap_severity === "moderate" ? "info.50" : "grey.50",
+                            borderLeft: 3,
+                            borderColor: issue.gap_severity === "significant" ? "warning.main" : issue.gap_severity === "moderate" ? "info.main" : "grey.400"
+                          }}
+                        >
+                          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5 }}>
+                            <Chip label={issue.code} size="small" sx={{ fontSize: "0.6rem", height: 18, fontWeight: 700 }} />
+                            <Chip 
+                              label={issue.gap_severity} 
+                              size="small" 
+                              color={issue.gap_severity === "significant" ? "warning" : issue.gap_severity === "moderate" ? "info" : "default"}
+                              sx={{ fontSize: "0.55rem", height: 16 }}
+                            />
+                          </Box>
+                          <Typography variant="body2" sx={{ fontWeight: 500, mb: 0.5 }}>
+                            {issue.message}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            You have: {issue.cv_value} | Role needs: {issue.jd_requirement}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* v2.2 Nature Fit */}
+            {jdMatch.natureFit && (
+              <Card sx={{ mb: 3 }}>
+                <CardContent sx={{ py: 2 }}>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                      Profile Fit
+                    </Typography>
+                    <Chip 
+                      label={`${jdMatch.natureFit.overall_fit} (${jdMatch.natureFit.fit_score}%)`}
+                      size="small"
+                      color={jdMatch.natureFit.overall_fit === "Excellent" ? "success" : jdMatch.natureFit.overall_fit === "Good" ? "primary" : jdMatch.natureFit.overall_fit === "Partial" ? "warning" : "default"}
+                      sx={{ fontWeight: 600 }}
+                    />
+                  </Box>
+
+                  {/* Nature Fit Strengths */}
+                  {jdMatch.natureFit.strengths.length > 0 && (
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="caption" sx={{ fontWeight: 600, color: "success.main", mb: 0.5, display: "block" }}>
+                        Your Strengths for This Role:
+                      </Typography>
+                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                        {jdMatch.natureFit.strengths.map((str, i) => (
+                          <Chip key={i} label={str} size="small" color="success" variant="outlined" sx={{ fontSize: "0.7rem" }} />
+                        ))}
+                      </Box>
+                    </Box>
+                  )}
+
+                  {/* Nature Fit Issues (G1-G9) */}
+                  {jdMatch.natureFit.issues.length > 0 && (
+                    <Box>
+                      <Typography variant="caption" sx={{ fontWeight: 600, color: "text.secondary", mb: 1, display: "block" }}>
+                        Alignment Notes:
+                      </Typography>
+                      {jdMatch.natureFit.issues.map((issue, i) => (
+                        <Box 
+                          key={i} 
+                          sx={{ 
+                            mb: 1, 
+                            p: 1, 
+                            borderRadius: 1,
+                            bgcolor: issue.transferable ? "success.50" : "grey.50",
+                            borderLeft: 3,
+                            borderColor: issue.transferable ? "success.main" : "grey.400"
+                          }}
+                        >
+                          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5 }}>
+                            <Chip label={issue.code} size="small" sx={{ fontSize: "0.6rem", height: 18, fontWeight: 700 }} />
+                            {issue.transferable && (
+                              <Chip label="Transferable" size="small" color="success" sx={{ fontSize: "0.55rem", height: 16 }} />
+                            )}
+                          </Box>
+                          <Typography variant="body2" sx={{ fontWeight: 500, mb: 0.5 }}>
+                            {issue.message}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            Your background: {issue.cv_nature} | Role expects: {issue.jd_expects}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* JD Nature (Role Requirements) */}
+            {jdMatch.jd_nature && (
+              <Card sx={{ mb: 3, bgcolor: "grey.50" }}>
+                <CardContent sx={{ py: 1.5 }}>
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: "text.secondary", mb: 1, display: "block" }}>
+                    Role Requirements:
+                  </Typography>
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                    <Chip label={jdMatch.jd_nature.role_level} size="small" variant="outlined" sx={{ fontSize: "0.65rem" }} />
+                    <Chip label={jdMatch.jd_nature.domain_required} size="small" variant="outlined" sx={{ fontSize: "0.65rem" }} />
+                    {jdMatch.jd_nature.years_required && (
+                      <Chip label={`${jdMatch.jd_nature.years_required}+ years`} size="small" variant="outlined" sx={{ fontSize: "0.65rem" }} />
+                    )}
+                    {jdMatch.jd_nature.work_arrangement && (
+                      <Chip label={jdMatch.jd_nature.work_arrangement} size="small" variant="outlined" sx={{ fontSize: "0.65rem" }} />
+                    )}
+                    {jdMatch.jd_nature.company_stage && (
+                      <Chip label={jdMatch.jd_nature.company_stage} size="small" variant="outlined" sx={{ fontSize: "0.65rem" }} />
+                    )}
+                  </Box>
+                </CardContent>
+              </Card>
+            )}
 
             <Typography variant="subtitle2" sx={{ fontWeight: 600, mt: 3, mb: 1, color: "success.main" }}>
               Matched Skills ({jdMatch.matchedSkills.length})

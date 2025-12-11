@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **JD Match v2.2 - Experience Factors + Nature Fit** (Student View Only):
+  - **Experience Factors (H1-H9)**: Years analysis, depth analysis, and growth areas with encouraging student messages
+    - Years: total_years, relevant_domain_years, recency_score, meets_requirement, student_message
+    - Depth: depth_level (Entry/Developing/Proficient/Expert), scope_score, impact_score, complexity_handled
+    - Issue codes: H1 (Years Gap), H2 (Domain Gap), H3 (Industry Gap), H4 (Recency), H5 (Scope), H6 (Complexity), H7 (Impact), H8 (Progression), H9 (Depth/Breadth)
+  - **Nature Fit (G1-G9)**: Profile alignment with transferable value highlighting
+    - overall_fit (Excellent/Good/Partial/Challenging), fit_score, strengths array
+    - Issue codes: G1-G9 for education, domain, industry, work style, career path mismatches
+  - **JD Nature Parsing**: role_level, domain_required, years_required, work_arrangement, company_stage
+  - **Student Summary**: headline, encouragement message, quick_wins array
+  - Token-optimized prompt with student-friendly messaging throughout
+  - Security reuses existing: containsInjectionAttempt(), sanitizeAIInput(), TOKEN_LIMITS
 - **Entry-Level Pagination**: CVPreview now splits large sections at individual entry boundaries:
   - PageItem types: `experience-header`, `experience-entry`, `education-header`, `education-entry`, `summary`, `skills`, `strengths`, `certifications`
   - Each entry has its own height estimate (80px base + description lines x 24px for experience)
