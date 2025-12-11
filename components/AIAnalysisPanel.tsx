@@ -1198,7 +1198,7 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                     {jdMatch.transformation_effort.honest_assessment}
                   </Typography>
-                  {jdMatch.transformation_effort.gap_breakdown.length > 0 && (
+                  {jdMatch.transformation_effort.gap_breakdown && jdMatch.transformation_effort.gap_breakdown.length > 0 && (
                     <>
                       <Typography variant="caption" sx={{ fontWeight: 600, color: "text.secondary", mb: 1, display: "block" }}>
                         Gap Breakdown:
@@ -1243,7 +1243,7 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
                                jdMatch.risk_assessment.candidate_risk.level === "Moderate" ? "warning" : "error"}
                         sx={{ fontWeight: 600, mb: 1 }}
                       />
-                      {jdMatch.risk_assessment.candidate_risk.factors.slice(0, 2).map((f, i) => (
+                      {jdMatch.risk_assessment.candidate_risk.factors?.slice(0, 2).map((f, i) => (
                         <Typography key={i} variant="caption" sx={{ display: "block", color: "text.secondary" }}>
                           {f.factor}: {f.detail}
                         </Typography>
@@ -1261,7 +1261,7 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
                                jdMatch.risk_assessment.employer_risk.level === "Moderate" ? "warning" : "error"}
                         sx={{ fontWeight: 600, mb: 1 }}
                       />
-                      {jdMatch.risk_assessment.employer_risk.factors.slice(0, 2).map((f, i) => (
+                      {jdMatch.risk_assessment.employer_risk.factors?.slice(0, 2).map((f, i) => (
                         <Typography key={i} variant="caption" sx={{ display: "block", color: "text.secondary" }}>
                           {f.factor}: {f.detail}
                         </Typography>
@@ -1318,7 +1318,7 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
                     </Box>
                   )}
 
-                  {jdMatch.student_guidance.quick_wins.length > 0 && (
+                  {jdMatch.student_guidance.quick_wins && jdMatch.student_guidance.quick_wins.length > 0 && (
                     <>
                       <Typography variant="caption" sx={{ fontWeight: 600, color: "success.main", mb: 0.5, display: "block" }}>
                         Quick Wins:
