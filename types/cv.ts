@@ -27,6 +27,22 @@ export interface TokenUsage {
   totalTokens: number;
 }
 
+export interface ColorScheme {
+  id: string;
+  name: string;
+  primary: string;    // For name, section headers
+  secondary: string;  // For subtitle, company names
+}
+
+export const COLOR_SCHEME_PRESETS: ColorScheme[] = [
+  { id: "navy-blue", name: "Navy Blue", primary: "#1b4f72", secondary: "#2874a6" },
+  { id: "dark-slate", name: "Dark Slate", primary: "#1a1a2e", secondary: "#4a4a6a" },
+  { id: "forest-green", name: "Forest Green", primary: "#1e5631", secondary: "#2e7d32" },
+  { id: "burgundy", name: "Burgundy", primary: "#6b1c23", secondary: "#922b3e" },
+  { id: "charcoal", name: "Charcoal", primary: "#2d3436", secondary: "#636e72" },
+  { id: "royal-purple", name: "Royal Purple", primary: "#4a148c", secondary: "#7b1fa2" },
+];
+
 export type CVSection = "summary" | "experience" | "education" | "skills" | "certifications" | "strengths";
 
 export const DEFAULT_SECTION_ORDER: CVSection[] = ["summary", "experience", "education", "skills", "certifications", "strengths"];
@@ -48,6 +64,7 @@ export interface ParsedCV {
   skills: string[];
   strengths?: string[];
   sectionOrder?: CVSection[];
+  colorScheme?: ColorScheme;
   originalFilename?: string;
   mimeType?: string;
   size?: number;

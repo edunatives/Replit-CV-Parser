@@ -532,7 +532,21 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
     onUpdateCV({ ...cv, certifications: [...(cv.certifications || []), newCert] });
   };
 
-  const style = getTemplateStyle(template);
+  const baseStyle = getTemplateStyle(template);
+  
+  // Merge CV colorScheme with template defaults
+  const effectiveColors = {
+    primary: cv.colorScheme?.primary || baseStyle.accent,
+    secondary: cv.colorScheme?.secondary || baseStyle.companyColor,
+  };
+  
+  // Create merged style with effective colors
+  const style = {
+    ...baseStyle,
+    accent: effectiveColors.primary,
+    headerText: baseStyle.headerBg === "#ffffff" ? effectiveColors.primary : baseStyle.headerText,
+    companyColor: effectiveColors.secondary,
+  };
 
   const showGitHub = isDeveloperRole(cv.title || "", cv.summary || "");
 
@@ -1072,18 +1086,20 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
       <Typography variant="h4" component="div" sx={{ 
         fontFamily: "'Arial', sans-serif", 
         fontWeight: 700,
-        fontSize: "2rem",
+        fontSize: "1.85rem",
         color: style.headerText,
         display: style.headerCentered ? "block" : "inline-block",
-        letterSpacing: "0.02em",
+        letterSpacing: "0.01em",
+        lineHeight: 1.1,
       }}>
         <EditableField value={cv.name} onChange={(v) => updateField("name", v)} placeholder="Your Name" />
       </Typography>
       <Typography variant="subtitle1" component="div" sx={{ 
-        color: style.accent, 
-        mt: 0.5, 
-        fontWeight: 600,
-        fontSize: "1.1rem",
+        color: effectiveColors.secondary, 
+        mt: 0.25, 
+        fontWeight: 500,
+        fontSize: "1rem",
+        lineHeight: 1.2,
       }}>
         <EditableField value={cv.title} onChange={(v) => updateField("title", v)} placeholder="Your Title" />
       </Typography>
