@@ -14,18 +14,16 @@ Preferred communication style: Simple, everyday language.
   - Name font increased to 2.25rem, weight 800, uppercase for stronger presence
   - Added "Classic Underline" template matching industry-standard CV format (underlined section headers, no boxed summary)
   - Added two new color schemes: "Black & Light Blue" and "Black & Purple"
-- **JD Match v2.2 - Experience Factors + Nature Fit** (Student View Only):
-  - **Experience Factors (H1-H9)**: Years analysis, depth analysis, and growth areas with encouraging student messages
-    - Years: total_years, relevant_domain_years, recency_score, meets_requirement, student_message
-    - Depth: depth_level (Entry/Developing/Proficient/Expert), scope_score, impact_score, complexity_handled
-    - Issue codes: H1 (Years Gap), H2 (Domain Gap), H3 (Industry Gap), H4 (Recency), H5 (Scope), H6 (Complexity), H7 (Impact), H8 (Progression), H9 (Depth/Breadth)
-  - **Nature Fit (G1-G9)**: Profile alignment with transferable value highlighting
-    - overall_fit (Excellent/Good/Partial/Challenging), fit_score, strengths array
-    - Issue codes: G1-G9 for education, domain, industry, work style, career path mismatches
-  - **JD Nature Parsing**: role_level, domain_required, years_required, work_arrangement, company_stage
-  - **Student Summary**: headline, encouragement message, quick_wins array
-  - Token-optimized prompt with student-friendly messaging throughout
-  - Security reuses existing: containsInjectionAttempt(), sanitizeAIInput(), TOKEN_LIMITS
+- **JD Match v2.2 - Honest-First Three-Score System**:
+  - **Three-Score Summary**: Raw Compatibility (0-100 with A-F grade) + Transformation Effort Index (TEI 1-5) + Risk Assessment (Low/Moderate/High/Critical)
+  - **Hard Gates**: Missing >50% Tier 1 skills caps at 50, Domain years <50% caps at 55, Seniority gap >2 levels caps at 45, Education hard requirement not met caps at 40
+  - **Component Scores**: Must-Have Skills (25%), Domain Experience (20%), Depth/Scope (15%), Nature Fit (15%), Total Experience (10%), Should-Have Skills (10%), Nice-to-Have (5%)
+  - **Transformation Effort**: TEI score (1-5) with timeline, honest assessment text, and gap breakdown (area, points deducted, fixable by CV or real gap)
+  - **Dual Risk Assessment**: Candidate risk (burnout, skill gaps, career derailment) + Employer risk (performance issues, turnover, training costs)
+  - **Honest Verdict**: headline, reality_check, should_apply recommendation, success_probability, better_fit_roles suggestions
+  - **Student Guidance**: if_dream_role path, if_practical alternative, quick_wins array, long_term_path (6-12 months)
+  - **UI Components**: Three-score dark card with visual breakdown, progress bars with color coding, chip-based skill gaps, transformation timeline, dual risk panels
+  - Security preserved: containsInjectionAttempt(), sanitizeAIInput(), TOKEN_LIMITS
 - **Entry-Level Pagination**: CVPreview now splits large sections at individual entry boundaries:
   - PageItem types: `experience-header`, `experience-entry`, `education-header`, `education-entry`, `summary`, `skills`, `strengths`, `certifications`
   - Each entry has its own height estimate (80px base + description lines x 24px for experience)
