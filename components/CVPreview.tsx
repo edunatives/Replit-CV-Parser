@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Typography, Paper, Chip, Divider, TextField, IconButton, InputAdornment, Tooltip, Button, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from "@mui/material";
+import { Box, Typography, Paper, Chip, Divider, TextField, IconButton, InputAdornment, Tooltip, Button, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Popover } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
@@ -14,9 +14,10 @@ import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
-import type { ParsedCV, TemplateType, CVSection } from "@/types/cv";
+import PaletteIcon from "@mui/icons-material/Palette";
+import type { ParsedCV, TemplateType, CVSection, ColorScheme } from "@/types/cv";
 import { SectionRearrangeModal } from "./SectionRearrangeModal";
-import { DEFAULT_SECTION_ORDER } from "@/types/cv";
+import { DEFAULT_SECTION_ORDER, COLOR_SCHEME_PRESETS } from "@/types/cv";
 import { useState, useRef, useMemo } from "react";
 import { isDeveloperRole } from "@/lib/ai/rules";
 import { getTemplateStyle, getTemplateOptions } from "@/lib/templates";
@@ -428,6 +429,9 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
   const templateOptions = getTemplateOptions();
   const sectionOrder = cv.sectionOrder || DEFAULT_SECTION_ORDER;
   const [rearrangeModalOpen, setRearrangeModalOpen] = useState(false);
+  const [colorAnchorEl, setColorAnchorEl] = useState<HTMLElement | null>(null);
+  const [customPrimary, setCustomPrimary] = useState(cv.colorScheme?.primary || "#1b4f72");
+  const [customSecondary, setCustomSecondary] = useState(cv.colorScheme?.secondary || "#2874a6");
 
   const updateField = (field: keyof ParsedCV, value: string | string[]) => {
     onUpdateCV({ ...cv, [field]: value });
@@ -435,6 +439,22 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
 
   const applySectionOrder = (newOrder: CVSection[]) => {
     onUpdateCV({ ...cv, sectionOrder: newOrder });
+  };
+
+  const applyColorScheme = (scheme: ColorScheme) => {
+    onUpdateCV({ ...cv, colorScheme: scheme });
+    setColorAnchorEl(null);
+  };
+
+  const applyCustomColors = () => {
+    const customScheme: ColorScheme = {
+      id: "custom",
+      name: "Custom",
+      primary: customPrimary,
+      secondary: customSecondary,
+    };
+    onUpdateCV({ ...cv, colorScheme: customScheme });
+    setColorAnchorEl(null);
   };
 
   const updateExperience = (index: number, field: string, value: string) => {
@@ -1220,6 +1240,104 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
           >
             Rearrange Sections
           </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<PaletteIcon />}
+            onClick={(e) => setColorAnchorEl(e.currentTarget)}
+            sx={{ 
+              textTransform: "none",
+            }}
+            data-testid="button-color-scheme"
+          >
+            Colors
+          </Button>
+          <Popover
+            open={Boolean(colorAnchorEl)}
+            anchorEl={colorAnchorEl}
+            onClose={() => setColorAnchorEl(null)}
+            anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+            transformOrigin={{ vertical: "top", horizontal: "left" }}
+          >
+            <Box sx={{ p: 2, width: 280 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1.5 }}>
+                Color Scheme
+              </Typography>
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
+                {COLOR_SCHEME_PRESETS.map((scheme) => (
+                  <Tooltip key={scheme.id} title={scheme.name}>
+                    <Box
+                      onClick={() => applyColorScheme(scheme)}
+                      sx={{
+                        width: 40,
+                        height: 28,
+                        borderRadius: 1,
+                        cursor: "pointer",
+                        display: "flex",
+                        overflow: "hidden",
+                        border: cv.colorScheme?.id === scheme.id ? "2px solid #000" : "1px solid #ddd",
+                        "&:hover": { opacity: 0.8 },
+                      }}
+                      data-testid={`color-preset-${scheme.id}`}
+                    >
+                      <Box sx={{ flex: 1, bgcolor: scheme.primary }} />
+                      <Box sx={{ flex: 1, bgcolor: scheme.secondary }} />
+                    </Box>
+                  </Tooltip>
+                ))}
+              </Box>
+              <Divider sx={{ my: 1.5 }} />
+              <Typography variant="caption" sx={{ fontWeight: 600, color: "text.secondary", display: "block", mb: 1 }}>
+                Custom Colors
+              </Typography>
+              <Box sx={{ display: "flex", gap: 2, mb: 1.5 }}>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "0.7rem" }}>
+                    Primary (Name/Headers)
+                  </Typography>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.5 }}>
+                    <input
+                      type="color"
+                      value={customPrimary}
+                      onChange={(e) => setCustomPrimary(e.target.value)}
+                      style={{ width: 32, height: 24, cursor: "pointer", border: "1px solid #ccc", borderRadius: 4 }}
+                      data-testid="input-custom-primary"
+                    />
+                    <Typography variant="caption" sx={{ fontFamily: "monospace", fontSize: "0.7rem" }}>
+                      {customPrimary}
+                    </Typography>
+                  </Box>
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="caption" sx={{ color: "text.secondary", fontSize: "0.7rem" }}>
+                    Secondary (Subtitle)
+                  </Typography>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 0.5 }}>
+                    <input
+                      type="color"
+                      value={customSecondary}
+                      onChange={(e) => setCustomSecondary(e.target.value)}
+                      style={{ width: 32, height: 24, cursor: "pointer", border: "1px solid #ccc", borderRadius: 4 }}
+                      data-testid="input-custom-secondary"
+                    />
+                    <Typography variant="caption" sx={{ fontFamily: "monospace", fontSize: "0.7rem" }}>
+                      {customSecondary}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+              <Button
+                variant="contained"
+                size="small"
+                fullWidth
+                onClick={applyCustomColors}
+                sx={{ textTransform: "none", mt: 1 }}
+                data-testid="button-apply-custom-colors"
+              >
+                Apply Custom Colors
+              </Button>
+            </Box>
+          </Popover>
           {onTemplateChange && (
             <FormControl size="small" sx={{ minWidth: 130 }}>
               <InputLabel id="cv-template-label" sx={{ fontSize: "0.8rem" }}>Template</InputLabel>
