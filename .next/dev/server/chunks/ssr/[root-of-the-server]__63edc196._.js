@@ -4463,52 +4463,52 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
     const A4_WIDTH = "210mm";
     const A4_HEIGHT = "297mm";
     const A4_HEIGHT_PX = 1123; // 297mm at 96dpi
-    const HEADER_HEIGHT_PX = 130; // Header height with contact info (increased for accuracy)
+    const HEADER_HEIGHT_PX = 90; // Actual header height with contact info (measured more accurately)
     const PAGE_PADDING_PX = 24; // p: 3 = 24px padding
-    const BOTTOM_GUTTER = 12; // Minimal gutter to maximize content space
+    const BOTTOM_GUTTER = 8; // Minimal gutter to maximize content space
     // Calculate page assignments with entry-level splitting
     const pages = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useMemo"])(()=>{
         const AVAILABLE_FIRST = A4_HEIGHT_PX - HEADER_HEIGHT_PX - PAGE_PADDING_PX * 2 - BOTTOM_GUTTER;
         const AVAILABLE_SUBSEQUENT = A4_HEIGHT_PX - PAGE_PADDING_PX * 2 - BOTTOM_GUTTER - 32; // 32 for PageBadge
-        const SECTION_HEADER = 36; // Reduced from 48 - actual header with margin
-        const LINE_HEIGHT = 20; // More accurate line height
-        const CHARS_PER_LINE = 80; // More chars fit per line at body2 font size
+        const SECTION_HEADER = 32; // Tighter header estimate
+        const LINE_HEIGHT = 18; // Tighter line height for body2 text
+        const CHARS_PER_LINE = 95; // More chars fit per line at A4 width with padding
         // Height estimation functions - tighter estimates to minimize white space
         const estimateSummaryHeight = ()=>{
             const text = cv.summary || "";
             const lines = Math.ceil(text.length / CHARS_PER_LINE);
             // Account for boxed summary padding if applicable
-            const boxPadding = style.summaryBoxed ? 24 : 0;
-            return SECTION_HEADER + lines * LINE_HEIGHT + boxPadding + 8;
+            const boxPadding = style.summaryBoxed ? 20 : 0;
+            return SECTION_HEADER + lines * LINE_HEIGHT + boxPadding + 4;
         };
         const estimateExperienceEntryHeight = (exp)=>{
-            const headerHeight = 64; // Title, company, date lines - tighter
+            const headerHeight = 52; // Title, company, date lines - tighter
             const desc = exp.description || "";
             // Count actual newlines for bullet points
             const bulletLines = (desc.match(/\n/g) || []).length + 1;
             const textLines = Math.ceil(desc.length / CHARS_PER_LINE);
-            const lines = Math.max(bulletLines, textLines);
-            return headerHeight + lines * LINE_HEIGHT + 8;
+            const lines = Math.min(bulletLines, textLines); // Use smaller estimate
+            return headerHeight + lines * LINE_HEIGHT + 4;
         };
         const estimateEducationEntryHeight = ()=>{
-            return 56; // Fixed height per education entry
+            return 44; // Tighter education entry height
         };
         const estimateSkillsHeight = ()=>{
             const count = cv.skills?.length || 0;
-            // Compact chips: ~8 skills per row at 28px height per row
-            const rows = Math.ceil(count / 8);
-            return SECTION_HEADER + rows * 28 + 16;
+            // Compact chips: ~10 skills per row at 26px height per row
+            const rows = Math.ceil(count / 10);
+            return SECTION_HEADER + rows * 26 + 8;
         };
         const estimateStrengthsHeight = ()=>{
             const count = cv.strengths?.length || 0;
-            const rows = Math.ceil(count / 6);
-            return SECTION_HEADER + rows * 28 + 16;
+            const rows = Math.ceil(count / 8);
+            return SECTION_HEADER + rows * 26 + 8;
         };
         const estimateCertificationsHeight = ()=>{
-            // Certifications now displayed as compact inline chips, ~4 per row
+            // Certifications now displayed as compact inline chips, ~5 per row
             const count = cv.certifications?.length || 0;
-            const rows = Math.ceil(count / 4);
-            return SECTION_HEADER + rows * 28 + 16;
+            const rows = Math.ceil(count / 5);
+            return SECTION_HEADER + rows * 26 + 8;
         };
         const result = [];
         let currentItems = [];
