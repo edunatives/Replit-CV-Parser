@@ -100,6 +100,7 @@ interface CVPreviewProps {
   template: TemplateType;
   onUpdateCV: (cv: ParsedCV) => void;
   onTemplateChange?: (template: TemplateType) => void;
+  showToolbar?: boolean;
 }
 
 function SectionHeader({ 
@@ -425,7 +426,7 @@ function EditableContactField({
   );
 }
 
-export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPreviewProps) {
+export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = true }: CVPreviewProps) {
   const templateOptions = getTemplateOptions();
   const sectionOrder = cv.sectionOrder || DEFAULT_SECTION_ORDER;
   const [rearrangeModalOpen, setRearrangeModalOpen] = useState(false);
@@ -1193,36 +1194,34 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
   return (
     <Box 
       sx={{ 
-        py: 2, 
-        pl: "50px",
-        pr: 1.5, 
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
         bgcolor: "#e8e8e8",
         "@media print": {
           bgcolor: "transparent",
-          padding: 0,
         },
       }}
     >
-      <Paper
-        elevation={1}
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 2,
-          px: 2,
-          py: 1,
-          mb: 2,
-          bgcolor: "#fff",
-          borderRadius: 1,
-          maxWidth: A4_WIDTH,
-          ml: 0,
-          "@media print": {
-            display: "none",
-          },
-        }}
-        data-testid="cv-toolbar"
-      >
+      {showToolbar && (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 2,
+            px: 2,
+            py: 1,
+            bgcolor: "#fff",
+            borderBottom: "1px solid",
+            borderColor: "divider",
+            minHeight: 48,
+            "@media print": {
+              display: "none",
+            },
+          }}
+          data-testid="cv-toolbar"
+        >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "text.primary" }}>
             CV Preview
@@ -1365,40 +1364,53 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange }: CVPrev
             </FormControl>
           )}
         </Box>
-      </Paper>
+      </Box>
+      )}
 
-      {pages.map((page, pageIdx) => (
-        <Paper 
-          key={page.pageNumber}
-          elevation={3} 
-          sx={{ 
-            ...a4PageStyle, 
-            overflow: "visible",
-            mb: pageIdx < pages.length - 1 ? 3 : 0,
-          }} 
-          data-testid={pageIdx === 0 ? "cv-preview" : `cv-page-${page.pageNumber}`}
-        >
-          {page.isFirstPage ? (
-            <>
-              {renderHeader()}
-              <Box sx={{ p: 3, color: style.bodyText, pb: `${BOTTOM_GUTTER}px` }}>
-                {page.items.map((item, idx) => 
-                  renderItem(item, idx === page.items.length - 1, page.items)
-                )}
-              </Box>
-            </>
-          ) : (
-            <>
-              <PageBadge pageNumber={page.pageNumber} totalPages={totalPages} />
-              <Box sx={{ p: 3, color: style.bodyText, pb: `${BOTTOM_GUTTER}px` }}>
-                {page.items.map((item, idx) => 
-                  renderItem(item, idx === page.items.length - 1, page.items)
-                )}
-              </Box>
-            </>
-          )}
-        </Paper>
-      ))}
+      <Box sx={{ 
+        flex: 1, 
+        overflow: "auto", 
+        py: 2, 
+        pl: "50px", 
+        pr: 1.5,
+        "@media print": {
+          overflow: "visible",
+          padding: 0,
+        },
+      }}>
+        {pages.map((page, pageIdx) => (
+          <Paper 
+            key={page.pageNumber}
+            elevation={3} 
+            sx={{ 
+              ...a4PageStyle, 
+              overflow: "visible",
+              mb: pageIdx < pages.length - 1 ? 3 : 0,
+            }} 
+            data-testid={pageIdx === 0 ? "cv-preview" : `cv-page-${page.pageNumber}`}
+          >
+            {page.isFirstPage ? (
+              <>
+                {renderHeader()}
+                <Box sx={{ p: 3, color: style.bodyText, pb: `${BOTTOM_GUTTER}px` }}>
+                  {page.items.map((item, idx) => 
+                    renderItem(item, idx === page.items.length - 1, page.items)
+                  )}
+                </Box>
+              </>
+            ) : (
+              <>
+                <PageBadge pageNumber={page.pageNumber} totalPages={totalPages} />
+                <Box sx={{ p: 3, color: style.bodyText, pb: `${BOTTOM_GUTTER}px` }}>
+                  {page.items.map((item, idx) => 
+                    renderItem(item, idx === page.items.length - 1, page.items)
+                  )}
+                </Box>
+              </>
+            )}
+          </Paper>
+        ))}
+      </Box>
       
       <SectionRearrangeModal
         open={rearrangeModalOpen}
