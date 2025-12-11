@@ -13,6 +13,7 @@ import TokenIcon from "@mui/icons-material/Token";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import type { ParsedCV, ForensicAnalysisV211 } from "@/types/cv";
 import { V211AssessmentPanel } from "./V211AssessmentPanel";
+import { JDMatchPanel } from "./JDMatchPanel";
 
 interface AIAnalysisPanelProps {
   cv: ParsedCV;
@@ -131,13 +132,52 @@ interface RiskAssessment {
   };
 }
 
+// v2.2 Better Fit Role with score
+interface BetterFitRole {
+  role: string;
+  fit_score: number;
+  reason: string;
+}
+
 // v2.2 Honest Verdict
 interface HonestVerdict {
   headline: string;
   reality_check: string;
   should_apply: string;
   success_probability: string;
-  better_fit_roles: string[];
+  better_fit_roles: BetterFitRole[];
+}
+
+// v2.2 Strengths Reality Check
+interface StrengthRealityCheck {
+  strength: string;
+  reality: string;
+  helps: string;
+  doesnt_help: string;
+}
+
+// v2.2 Critical Gap
+interface CriticalGap {
+  area: string;
+  severity: "critical" | "high" | "moderate";
+  you_have: string;
+  jd_requires: string;
+  match_percent: number;
+  fixable_by_cv: boolean;
+  what_would_help: string;
+}
+
+// v2.2 Real Options
+interface RealOptions {
+  apply_if: string[];
+  dont_apply_if: string[];
+  bottom_line: {
+    your_profile: string;
+    target_role: string;
+    reality: string;
+    option_a: { title: string; action: string };
+    option_b: { title: string; action: string };
+  };
 }
 
 // v2.2 Student Guidance
@@ -155,6 +195,9 @@ interface JDMatchResult {
   transformation_effort?: TransformationEffort;
   risk_assessment?: RiskAssessment;
   honest_verdict?: HonestVerdict;
+  strengths_reality_check?: StrengthRealityCheck[];
+  critical_gaps?: CriticalGap[];
+  real_options?: RealOptions;
   student_guidance?: StudentGuidance;
   evidence_map?: EvidenceMapEntry[];
   tokenUsage: { promptTokens: number; completionTokens: number; totalTokens: number };
@@ -275,7 +318,42 @@ function normalizeJDMatch(raw: Record<string, unknown>): JDMatchResult {
       reality_check: (verdictRaw.reality_check ?? "") as string,
       should_apply: (verdictRaw.should_apply ?? "") as string,
       success_probability: (verdictRaw.success_probability ?? "") as string,
-      better_fit_roles: (verdictRaw.better_fit_roles ?? []) as string[],
+      better_fit_roles: ((verdictRaw.better_fit_roles ?? []) as Array<Record<string, unknown> | string>).map(r => {
+        if (typeof r === "string") return { role: r, fit_score: 75, reason: "" };
+        return { role: (r.role ?? "") as string, fit_score: (r.fit_score ?? 75) as number, reason: (r.reason ?? "") as string };
+      }),
+    } : undefined,
+    strengths_reality_check: ((raw.strengths_reality_check ?? []) as Array<Record<string, unknown>>).map(s => ({
+      strength: (s.strength ?? "") as string,
+      reality: (s.reality ?? "") as string,
+      helps: (s.helps ?? "") as string,
+      doesnt_help: (s.doesnt_help ?? "") as string,
+    })),
+    critical_gaps: ((raw.critical_gaps ?? []) as Array<Record<string, unknown>>).map(g => ({
+      area: (g.area ?? "") as string,
+      severity: (g.severity ?? "moderate") as "critical" | "high" | "moderate",
+      you_have: (g.you_have ?? "") as string,
+      jd_requires: (g.jd_requires ?? "") as string,
+      match_percent: (g.match_percent ?? 0) as number,
+      fixable_by_cv: (g.fixable_by_cv ?? false) as boolean,
+      what_would_help: (g.what_would_help ?? "") as string,
+    })),
+    real_options: (raw.real_options as Record<string, unknown>) ? {
+      apply_if: ((raw.real_options as Record<string, unknown>).apply_if ?? []) as string[],
+      dont_apply_if: ((raw.real_options as Record<string, unknown>).dont_apply_if ?? []) as string[],
+      bottom_line: {
+        your_profile: (((raw.real_options as Record<string, unknown>).bottom_line as Record<string, unknown>)?.your_profile ?? "") as string,
+        target_role: (((raw.real_options as Record<string, unknown>).bottom_line as Record<string, unknown>)?.target_role ?? "") as string,
+        reality: (((raw.real_options as Record<string, unknown>).bottom_line as Record<string, unknown>)?.reality ?? "") as string,
+        option_a: {
+          title: ((((raw.real_options as Record<string, unknown>).bottom_line as Record<string, unknown>)?.option_a as Record<string, unknown>)?.title ?? "") as string,
+          action: ((((raw.real_options as Record<string, unknown>).bottom_line as Record<string, unknown>)?.option_a as Record<string, unknown>)?.action ?? "") as string,
+        },
+        option_b: {
+          title: ((((raw.real_options as Record<string, unknown>).bottom_line as Record<string, unknown>)?.option_b as Record<string, unknown>)?.title ?? "") as string,
+          action: ((((raw.real_options as Record<string, unknown>).bottom_line as Record<string, unknown>)?.option_b as Record<string, unknown>)?.action ?? "") as string,
+        },
+      },
     } : undefined,
     student_guidance: guidanceRaw ? {
       if_dream_role: (guidanceRaw.if_dream_role ?? "") as string,
@@ -1013,441 +1091,21 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
         )}
 
         {jdMatch && (
-          <>
-            {/* THREE-SCORE SUMMARY CARD */}
-            <Card sx={{ mb: 2, bgcolor: "grey.900", color: "white" }}>
-              <CardContent sx={{ py: 2 }}>
-                <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1 }}>
-                  <Chip
-                    icon={<TokenIcon sx={{ fontSize: 14 }} />}
-                    label={`${jdMatch.tokenUsage.totalTokens} tokens`}
-                    size="small"
-                    sx={{ bgcolor: "rgba(255,255,255,0.2)", color: "white" }}
-                  />
-                </Box>
-                
-                {/* Three Score Grid */}
-                <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 2, textAlign: "center" }}>
-                  {/* Raw Fit */}
-                  <Box>
-                    <Typography variant="caption" sx={{ opacity: 0.7 }}>RAW FIT</Typography>
-                    <Typography variant="h3" sx={{ fontWeight: 700 }}>
-                      {jdMatch.raw_compatibility?.score ?? 0}
-                    </Typography>
-                    <Chip 
-                      label={jdMatch.raw_compatibility?.grade ?? "F"} 
-                      size="small" 
-                      sx={{ 
-                        bgcolor: (jdMatch.raw_compatibility?.score ?? 0) >= 70 ? "success.main" : 
-                                 (jdMatch.raw_compatibility?.score ?? 0) >= 50 ? "warning.main" : "error.main",
-                        color: "white",
-                        fontWeight: 700,
-                        mt: 0.5
-                      }} 
-                    />
-                    <Typography variant="caption" sx={{ display: "block", mt: 0.5, opacity: 0.8 }}>
-                      {jdMatch.raw_compatibility?.label}
-                    </Typography>
-                  </Box>
-                  
-                  {/* TEI */}
-                  <Box>
-                    <Typography variant="caption" sx={{ opacity: 0.7 }}>EFFORT NEEDED</Typography>
-                    <Typography variant="h3" sx={{ fontWeight: 700 }}>
-                      {jdMatch.transformation_effort?.tei_score ?? 1} / 5
-                    </Typography>
-                    <Typography variant="caption" sx={{ display: "block", fontWeight: 600 }}>
-                      {jdMatch.transformation_effort?.tei_label}
-                    </Typography>
-                    <Typography variant="caption" sx={{ display: "block", opacity: 0.7 }}>
-                      {jdMatch.transformation_effort?.timeline}
-                    </Typography>
-                  </Box>
-                  
-                  {/* Risk */}
-                  <Box>
-                    <Typography variant="caption" sx={{ opacity: 0.7 }}>RISK LEVEL</Typography>
-                    <Typography variant="h3" sx={{ fontWeight: 700 }}>
-                      {jdMatch.risk_assessment?.candidate_risk.score ?? 0}
-                    </Typography>
-                    <Chip 
-                      label={jdMatch.risk_assessment?.candidate_risk.level ?? "Low"} 
-                      size="small" 
-                      sx={{ 
-                        bgcolor: jdMatch.risk_assessment?.candidate_risk.level === "Low" ? "success.main" :
-                                 jdMatch.risk_assessment?.candidate_risk.level === "Moderate" ? "warning.main" :
-                                 jdMatch.risk_assessment?.candidate_risk.level === "High" ? "error.main" : "error.dark",
-                        color: "white",
-                        fontWeight: 700,
-                        mt: 0.5
-                      }} 
-                    />
-                  </Box>
-                </Box>
-
-                {/* Hard Gate Warning */}
-                {jdMatch.raw_compatibility?.hard_gate_applied && (
-                  <Box sx={{ mt: 2, p: 1, bgcolor: "error.dark", borderRadius: 1 }}>
-                    <Typography variant="caption" sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                      <WarningIcon sx={{ fontSize: 14 }} />
-                      Hard Gate Applied: {jdMatch.raw_compatibility.hard_gate_applied}
-                      {jdMatch.raw_compatibility.uncapped_score !== jdMatch.raw_compatibility.score && (
-                        <span> (Original: {jdMatch.raw_compatibility.uncapped_score}%)</span>
-                      )}
-                    </Typography>
-                  </Box>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* JD Parsing Info */}
-            {jdMatch.jd_parsing && (
-              <Card sx={{ mb: 2, bgcolor: "grey.50" }}>
-                <CardContent sx={{ py: 1.5 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
-                    {jdMatch.jd_parsing.role_title}
-                    {jdMatch.jd_parsing.company && ` at ${jdMatch.jd_parsing.company}`}
-                  </Typography>
-                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                    {jdMatch.jd_parsing.seniority_level && (
-                      <Chip label={jdMatch.jd_parsing.seniority_level} size="small" variant="outlined" sx={{ fontSize: "0.65rem" }} />
-                    )}
-                    {jdMatch.jd_parsing.years_required && (
-                      <Chip label={`${jdMatch.jd_parsing.years_required}+ years`} size="small" variant="outlined" sx={{ fontSize: "0.65rem" }} />
-                    )}
-                    {jdMatch.jd_parsing.education_required && (
-                      <Chip label={jdMatch.jd_parsing.education_required} size="small" variant="outlined" sx={{ fontSize: "0.65rem" }} />
-                    )}
-                  </Box>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* HONEST VERDICT */}
-            {jdMatch.honest_verdict && (
-              <Card sx={{ mb: 2, border: 2, borderColor: 
-                jdMatch.honest_verdict.should_apply?.includes("Yes - strong") ? "success.main" :
-                jdMatch.honest_verdict.should_apply?.includes("Yes - with") ? "info.main" :
-                jdMatch.honest_verdict.should_apply?.includes("Maybe") ? "warning.main" : "error.main"
-              }}>
-                <CardContent sx={{ py: 2 }}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
-                    {jdMatch.honest_verdict.headline}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    {jdMatch.honest_verdict.reality_check}
-                  </Typography>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>Should Apply:</Typography>
-                    <Chip 
-                      label={jdMatch.honest_verdict.should_apply}
-                      size="small"
-                      color={
-                        jdMatch.honest_verdict.should_apply?.includes("Yes - strong") ? "success" :
-                        jdMatch.honest_verdict.should_apply?.includes("Yes - with") ? "info" :
-                        jdMatch.honest_verdict.should_apply?.includes("Maybe") ? "warning" : "error"
-                      }
-                      sx={{ fontWeight: 600 }}
-                    />
-                  </Box>
-                  <Typography variant="caption" color="text.secondary">
-                    Success Probability: {jdMatch.honest_verdict.success_probability}
-                  </Typography>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* COMPONENT SCORES BREAKDOWN */}
-            {jdMatch.raw_compatibility?.component_scores && (
-              <Card sx={{ mb: 2 }}>
-                <CardContent sx={{ py: 2 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2 }}>
-                    Compatibility Breakdown
-                  </Typography>
-                  {[
-                    { key: "must_have_skills", label: "Must-Have Skills", weight: 25 },
-                    { key: "domain_experience", label: "Domain Experience", weight: 20 },
-                    { key: "depth_scope", label: "Depth/Scope", weight: 15 },
-                    { key: "nature_fit", label: "Nature Fit", weight: 15 },
-                    { key: "total_experience", label: "Total Experience", weight: 10 },
-                    { key: "should_have_skills", label: "Should-Have Skills", weight: 10 },
-                    { key: "nice_to_have_skills", label: "Nice-to-Have", weight: 5 },
-                  ].map(({ key, label, weight }) => {
-                    const comp = jdMatch.raw_compatibility?.component_scores[key as keyof typeof jdMatch.raw_compatibility.component_scores];
-                    const score = comp?.score ?? 0;
-                    return (
-                      <Box key={key} sx={{ mb: 1.5 }}>
-                        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
-                          <Typography variant="caption" sx={{ fontWeight: 500 }}>
-                            {label} ({weight}%)
-                          </Typography>
-                          <Typography variant="caption" sx={{ fontWeight: 600, color: getScoreColor(score) }}>
-                            {score}%
-                          </Typography>
-                        </Box>
-                        <LinearProgress 
-                          variant="determinate" 
-                          value={score} 
-                          sx={{ 
-                            height: 6, 
-                            borderRadius: 1,
-                            bgcolor: "grey.200",
-                            "& .MuiLinearProgress-bar": {
-                              bgcolor: getScoreColor(score)
-                            }
-                          }} 
-                        />
-                        {comp?.missing && comp.missing.length > 0 && (
-                          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mt: 0.5 }}>
-                            {comp.missing.slice(0, 3).map((m, i) => (
-                              <Chip key={i} label={m} size="small" color="error" variant="outlined" sx={{ fontSize: "0.6rem", height: 18 }} />
-                            ))}
-                          </Box>
-                        )}
-                      </Box>
-                    );
-                  })}
-                </CardContent>
-              </Card>
-            )}
-
-            {/* TRANSFORMATION EFFORT */}
-            {jdMatch.transformation_effort && (
-              <Card sx={{ mb: 2 }}>
-                <CardContent sx={{ py: 2 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
-                    Transformation Effort
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    {jdMatch.transformation_effort.honest_assessment}
-                  </Typography>
-                  {jdMatch.transformation_effort.gap_breakdown && jdMatch.transformation_effort.gap_breakdown.length > 0 && (
-                    <>
-                      <Typography variant="caption" sx={{ fontWeight: 600, color: "text.secondary", mb: 1, display: "block" }}>
-                        Gap Breakdown:
-                      </Typography>
-                      {jdMatch.transformation_effort.gap_breakdown.map((gap, i) => (
-                        <Box key={i} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5 }}>
-                          <Typography variant="caption">{gap.area}</Typography>
-                          <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
-                            <Typography variant="caption" sx={{ fontWeight: 600 }}>-{gap.points} pts</Typography>
-                            <Chip 
-                              label={gap.fixable_by_cv ? "CV Fix" : "Real Gap"} 
-                              size="small" 
-                              color={gap.fixable_by_cv ? "info" : "warning"}
-                              sx={{ fontSize: "0.55rem", height: 16 }}
-                            />
-                          </Box>
-                        </Box>
-                      ))}
-                    </>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-
-            {/* RISK ASSESSMENT */}
-            {jdMatch.risk_assessment && (
-              <Card sx={{ mb: 2 }}>
-                <CardContent sx={{ py: 2 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2 }}>
-                    Risk Assessment
-                  </Typography>
-                  <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
-                    {/* Candidate Risk */}
-                    <Box sx={{ p: 1.5, bgcolor: "grey.50", borderRadius: 1 }}>
-                      <Typography variant="caption" sx={{ fontWeight: 600, display: "block", mb: 1 }}>
-                        Your Risk
-                      </Typography>
-                      <Chip 
-                        label={`${jdMatch.risk_assessment.candidate_risk.level} (${jdMatch.risk_assessment.candidate_risk.score})`}
-                        size="small"
-                        color={jdMatch.risk_assessment.candidate_risk.level === "Low" ? "success" : 
-                               jdMatch.risk_assessment.candidate_risk.level === "Moderate" ? "warning" : "error"}
-                        sx={{ fontWeight: 600, mb: 1 }}
-                      />
-                      {jdMatch.risk_assessment.candidate_risk.factors?.slice(0, 2).map((f, i) => (
-                        <Typography key={i} variant="caption" sx={{ display: "block", color: "text.secondary" }}>
-                          {f.factor}: {f.detail}
-                        </Typography>
-                      ))}
-                    </Box>
-                    {/* Employer Risk */}
-                    <Box sx={{ p: 1.5, bgcolor: "grey.50", borderRadius: 1 }}>
-                      <Typography variant="caption" sx={{ fontWeight: 600, display: "block", mb: 1 }}>
-                        Employer Risk
-                      </Typography>
-                      <Chip 
-                        label={`${jdMatch.risk_assessment.employer_risk.level} (${jdMatch.risk_assessment.employer_risk.score})`}
-                        size="small"
-                        color={jdMatch.risk_assessment.employer_risk.level === "Low" ? "success" : 
-                               jdMatch.risk_assessment.employer_risk.level === "Moderate" ? "warning" : "error"}
-                        sx={{ fontWeight: 600, mb: 1 }}
-                      />
-                      {jdMatch.risk_assessment.employer_risk.factors?.slice(0, 2).map((f, i) => (
-                        <Typography key={i} variant="caption" sx={{ display: "block", color: "text.secondary" }}>
-                          {f.factor}: {f.detail}
-                        </Typography>
-                      ))}
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* BETTER FIT ROLES */}
-            {jdMatch.honest_verdict?.better_fit_roles && jdMatch.honest_verdict.better_fit_roles.length > 0 && (
-              <Card sx={{ mb: 2, bgcolor: "info.50", border: 1, borderColor: "info.200" }}>
-                <CardContent sx={{ py: 2 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: "info.main" }}>
-                    Better Fit Roles for You
-                  </Typography>
-                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                    {jdMatch.honest_verdict.better_fit_roles.map((role, i) => (
-                      <Chip key={i} label={role} size="small" color="info" variant="outlined" sx={{ fontWeight: 500 }} />
-                    ))}
-                  </Box>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* STUDENT GUIDANCE */}
-            {jdMatch.student_guidance && (
-              <Card sx={{ mb: 2 }}>
-                <CardContent sx={{ py: 2 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2 }}>
-                    Your Next Steps
-                  </Typography>
-                  
-                  {jdMatch.student_guidance.if_dream_role && (
-                    <Box sx={{ mb: 2, p: 1.5, bgcolor: "primary.50", borderRadius: 1 }}>
-                      <Typography variant="caption" sx={{ fontWeight: 600, color: "primary.main" }}>
-                        If This Is Your Dream Role:
-                      </Typography>
-                      <Typography variant="body2" sx={{ mt: 0.5 }}>
-                        {jdMatch.student_guidance.if_dream_role}
-                      </Typography>
-                    </Box>
-                  )}
-                  
-                  {jdMatch.student_guidance.if_practical && (
-                    <Box sx={{ mb: 2, p: 1.5, bgcolor: "grey.50", borderRadius: 1 }}>
-                      <Typography variant="caption" sx={{ fontWeight: 600, color: "text.secondary" }}>
-                        For Higher Success Probability:
-                      </Typography>
-                      <Typography variant="body2" sx={{ mt: 0.5 }}>
-                        {jdMatch.student_guidance.if_practical}
-                      </Typography>
-                    </Box>
-                  )}
-
-                  {jdMatch.student_guidance.quick_wins && jdMatch.student_guidance.quick_wins.length > 0 && (
-                    <>
-                      <Typography variant="caption" sx={{ fontWeight: 600, color: "success.main", mb: 0.5, display: "block" }}>
-                        Quick Wins:
-                      </Typography>
-                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 2 }}>
-                        {jdMatch.student_guidance.quick_wins.map((win, i) => (
-                          <Chip key={i} label={win} size="small" color="success" variant="outlined" sx={{ fontSize: "0.7rem" }} />
-                        ))}
-                      </Box>
-                    </>
-                  )}
-
-                  {jdMatch.student_guidance.long_term_path && (
-                    <Box sx={{ p: 1.5, bgcolor: "warning.50", borderRadius: 1 }}>
-                      <Typography variant="caption" sx={{ fontWeight: 600, color: "warning.main" }}>
-                        Long-Term Path (6-12 months):
-                      </Typography>
-                      <Typography variant="body2" sx={{ mt: 0.5 }}>
-                        {jdMatch.student_guidance.long_term_path}
-                      </Typography>
-                    </Box>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-
-            {/* SKILLS BREAKDOWN */}
-            {jdMatch.raw_compatibility?.component_scores.must_have_skills && (
-              <>
-                {jdMatch.raw_compatibility.component_scores.must_have_skills.matched && 
-                 jdMatch.raw_compatibility.component_scores.must_have_skills.matched.length > 0 && (
-                  <>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 600, mt: 2, mb: 1, color: "success.main" }}>
-                      Matched Skills ({jdMatch.raw_compatibility.component_scores.must_have_skills.matched.length})
-                    </Typography>
-                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 2 }}>
-                      {jdMatch.raw_compatibility.component_scores.must_have_skills.matched.map((skill, index) => (
-                        <Chip key={index} label={skill} size="small" color="success" variant="outlined" />
-                      ))}
-                    </Box>
-                  </>
-                )}
-
-                {jdMatch.raw_compatibility.component_scores.must_have_skills.missing && 
-                 jdMatch.raw_compatibility.component_scores.must_have_skills.missing.length > 0 && (
-                  <>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 600, mt: 2, mb: 1, color: "error.main" }}>
-                      Missing Must-Have Skills ({jdMatch.raw_compatibility.component_scores.must_have_skills.missing.length})
-                    </Typography>
-                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 2 }}>
-                      {jdMatch.raw_compatibility.component_scores.must_have_skills.missing.map((skill, index) => (
-                        <Chip key={index} label={skill} size="small" color="error" variant="outlined" />
-                      ))}
-                    </Box>
-                  </>
-                )}
-              </>
-            )}
-
-            {/* EVIDENCE MAP */}
-            {jdMatch.evidence_map && jdMatch.evidence_map.length > 0 && (
-              <>
-                <Typography variant="subtitle2" sx={{ fontWeight: 600, mt: 3, mb: 1, color: "text.secondary" }}>
-                  Evidence Map
-                </Typography>
-                {jdMatch.evidence_map.map((entry, index) => (
-                  <Card 
-                    key={index} 
-                    sx={{ 
-                      mb: 1, 
-                      borderLeft: 4,
-                      borderColor: entry.status === "Match" ? "success.main" : entry.status === "Weak" ? "warning.main" : "error.main"
-                    }}
-                  >
-                    <CardContent sx={{ py: 1, px: 2 }}>
-                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5, gap: 1 }}>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          {entry.jd_requirement}
-                        </Typography>
-                        <Box sx={{ display: "flex", gap: 0.5, flexShrink: 0 }}>
-                          <Chip 
-                            label={entry.status} 
-                            size="small" 
-                            color={entry.status === "Match" ? "success" : entry.status === "Weak" ? "warning" : "error"}
-                            sx={{ fontSize: "0.65rem", height: 20 }}
-                          />
-                          {entry.gap_severity && entry.gap_severity !== "none" && (
-                            <Chip 
-                              label={entry.gap_severity} 
-                              size="small" 
-                              variant="outlined"
-                              color={entry.gap_severity === "critical" ? "error" : entry.gap_severity === "moderate" ? "warning" : "default"}
-                              sx={{ fontSize: "0.55rem", height: 18 }}
-                            />
-                          )}
-                        </Box>
-                      </Box>
-                      <Typography variant="caption" color="text.secondary">
-                        {entry.cv_evidence}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                ))}
-              </>
-            )}
-          </>
+          <JDMatchPanel 
+            data={{
+              jd_parsing: jdMatch.jd_parsing,
+              raw_compatibility: jdMatch.raw_compatibility,
+              transformation_effort: jdMatch.transformation_effort,
+              risk_assessment: jdMatch.risk_assessment,
+              honest_verdict: jdMatch.honest_verdict,
+              strengths_reality_check: jdMatch.strengths_reality_check,
+              critical_gaps: jdMatch.critical_gaps,
+              real_options: jdMatch.real_options,
+              student_guidance: jdMatch.student_guidance,
+              tokenUsage: jdMatch.tokenUsage,
+            }}
+            candidateName={cv.name}
+          />
         )}
       </Box>
     );

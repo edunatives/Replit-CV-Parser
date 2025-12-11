@@ -748,7 +748,28 @@ ${sanitizedJD}
     "reality_check": "<2-3 sentences of honest truth about this application>",
     "should_apply": "<Yes - strong fit|Yes - with strategy|Maybe - stretch role|Probably not|No - wrong role>",
     "success_probability": "<percentage estimate>",
-    "better_fit_roles": ["<alternative role 1>", "<alternative role 2>", "<alternative role 3>"]
+    "better_fit_roles": [
+      {"role": "<alternative role 1>", "fit_score": <70-95>, "reason": "<why this fits better>"},
+      {"role": "<alternative role 2>", "fit_score": <70-95>, "reason": "<why this fits better>"},
+      {"role": "<alternative role 3>", "fit_score": <70-95>, "reason": "<why this fits better>"}
+    ]
+  },
+  "strengths_reality_check": [
+    {"strength": "<candidate strength>", "reality": "<honest assessment>", "helps": "<how it helps>", "doesnt_help": "<why it doesn't fully translate>"}
+  ],
+  "critical_gaps": [
+    {"area": "<gap area>", "severity": "<critical|high|moderate>", "you_have": "<what CV shows>", "jd_requires": "<what JD needs>", "match_percent": <0-100>, "fixable_by_cv": <true|false>, "what_would_help": "<real solution>"}
+  ],
+  "real_options": {
+    "apply_if": ["<condition when applying makes sense>"],
+    "dont_apply_if": ["<condition when they should not apply>"],
+    "bottom_line": {
+      "your_profile": "<honest description of who they are>",
+      "target_role": "<what role they're applying for>",
+      "reality": "<honest assessment of the gap>",
+      "option_a": {"title": "<high-probability option>", "action": "<what to do>"},
+      "option_b": {"title": "<long-term pivot option>", "action": "<what to do>"}
+    }
   },
   "student_guidance": {
     "if_dream_role": "<advice if this is their dream pivot>",

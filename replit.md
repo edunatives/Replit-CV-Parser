@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **JD Match v2.2 Tabbed UI Overhaul**:
+  - Created dedicated `JDMatchPanel.tsx` component with dark theme and 5-tab interface
+  - **Honest Assessment Tab**: Score breakdown with weighted contributions (x0.25, x0.20, etc.), status chips (exceeds/strong/good/mismatch/critical), missing skills display, strengths reality check section
+  - **Critical Gaps Tab**: Real gaps that cannot be fixed by CV changes, severity indicators, you_have vs jd_requires comparison, match percentages, "what would actually help" suggestions
+  - **Risk Analysis Tab**: Dual risk panel (Your Risk + Employer Risk), progress bars with color coding, factor breakdowns with detail explanations
+  - **Better Fits Tab**: Alternative roles with fit scores and reasons, comparison to current application score
+  - **Real Options Tab**: Apply if / Don't apply if conditions, quick wins list, bottom line with two strategic options (Option A/B)
+  - Three-score header: Raw Fit (0-100 with grade), Effort Needed (TEI 1-5 with visual bars), Risk Level (0-100 with level chip)
+  - Verdict banner with headline, reality check, and success probability
+  - New interfaces: BetterFitRole (with fit_score, reason), StrengthRealityCheck, CriticalGap, RealOptions (with bottom_line structure)
 - **CV Styling Improvements**:
   - Name font increased to 2.25rem, weight 800, uppercase for stronger presence
   - Added "Classic Underline" template matching industry-standard CV format (underlined section headers, no boxed summary)
