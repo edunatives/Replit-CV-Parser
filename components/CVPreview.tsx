@@ -118,7 +118,7 @@ function SectionHeader({
   
   if (isLeftBorder) {
     return (
-      <Box sx={{ mb: 1.5, mt: 2 }}>
+      <Box sx={{ mb: 1.5, mt: 0.5 }}>
         <Box sx={{ 
           display: "flex", 
           alignItems: "center",
@@ -146,7 +146,7 @@ function SectionHeader({
   }
   
   return (
-    <Box sx={{ mb: 1 }}>
+    <Box sx={{ mb: 1, mt: 0.5 }}>
       <Box sx={{ display: "flex", alignItems: "center" }}>
         {isCenteredLines && <Box sx={{ flex: 1, height: "1px", bgcolor: style.accent }} />}
         <Typography 
@@ -1098,7 +1098,8 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
   const renderHeader = () => (
     <Box sx={{ 
       bgcolor: style.headerBg, 
-      py: 2, 
+      pt: 2,
+      pb: 0.5,
       px: 3, 
       color: style.headerText, 
       borderBottom: style.borderBottom,
@@ -1118,9 +1119,9 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
       </Typography>
       <Typography variant="subtitle1" component="div" sx={{ 
         color: effectiveColors.secondary, 
-        mt: 0.25, 
+        mt: -0.5, 
         fontWeight: 500,
-        fontSize: "1rem",
+        fontSize: "0.875rem",
         lineHeight: 1.2,
       }}>
         <EditableField value={cv.title} onChange={(v) => updateField("title", v)} placeholder="Your Title" />
@@ -1130,7 +1131,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
         display: "flex", 
         flexWrap: "wrap", 
         gap: 1.5, 
-        mt: 1,
+        mt: 0.25,
         justifyContent: style.headerCentered ? "center" : "flex-start"
       }}>
         <EditableContactField
