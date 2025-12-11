@@ -351,11 +351,16 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cv, version }),
       });
+      
+      const contentType = response.headers.get("content-type");
+      if (!contentType?.includes("application/json")) {
+        throw new Error("Server error: received non-JSON response");
+      }
+      
+      const data = await response.json();
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.error || "Failed to assess CV");
       }
-      const data = await response.json();
       
       if (version === "2.11" && data.analysis) {
         setV211Analysis(data.analysis as ForensicAnalysisV211);
@@ -382,11 +387,17 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cv }),
       });
+      
+      const contentType = response.headers.get("content-type");
+      if (!contentType?.includes("application/json")) {
+        throw new Error("Server error: received non-JSON response");
+      }
+      
+      const data = await response.json();
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.error || "Failed to compare prompts");
       }
-      const { comparison } = await response.json();
+      const { comparison } = data;
       setPromptComparison({
         oldPrompt: {
           label: comparison.oldPrompt.label,
@@ -420,11 +431,17 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cv, message: chatMessage, history: chatHistory }),
       });
+      
+      const contentType = response.headers.get("content-type");
+      if (!contentType?.includes("application/json")) {
+        throw new Error("Server error: received non-JSON response");
+      }
+      
+      const data = await response.json();
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.error || "Failed to get advice");
       }
-      const { response: aiResponse } = await response.json();
+      const { response: aiResponse } = data;
       setChatHistory(prev => [...prev, { role: "assistant", content: aiResponse }]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to get advice");
@@ -444,11 +461,17 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cv, jobDescription: jdText }),
       });
+      
+      const contentType = response.headers.get("content-type");
+      if (!contentType?.includes("application/json")) {
+        throw new Error("Server error: received non-JSON response");
+      }
+      
+      const data = await response.json();
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.error || "Failed to analyze match");
       }
-      const { match: rawMatch } = await response.json();
+      const { match: rawMatch } = data;
       const normalized = normalizeJDMatch(rawMatch as Record<string, unknown>);
       setJdMatch(normalized);
     } catch (err) {
