@@ -165,6 +165,74 @@ export interface JDMatchResult {
 }
 
 // ============================================================================
+// JD MATCH v2.2 - EXPERIENCE FACTORS + NATURE FIT (Student View)
+// ============================================================================
+
+export interface ExperienceFactorIssue {
+  code: string; // H1-H9
+  type: string;
+  message: string; // Student-friendly encouraging message
+  cv_value: string;
+  jd_requirement: string;
+  gap_severity: "minor" | "moderate" | "significant";
+}
+
+export interface NatureFitIssue {
+  code: string; // G1-G9
+  type: string;
+  message: string; // Student-friendly encouraging message
+  cv_nature: string;
+  jd_expects: string;
+  transferable: boolean;
+}
+
+export interface ExperienceYearsAnalysis {
+  total_years: number;
+  relevant_domain_years: number;
+  recency_score: number; // 0-100
+  meets_requirement: boolean;
+  student_message: string;
+}
+
+export interface ExperienceDepthAnalysis {
+  depth_level: "Entry" | "Developing" | "Proficient" | "Expert";
+  scope_score: number; // 0-100
+  impact_score: number; // 0-100
+  complexity_handled: string;
+  student_message: string;
+}
+
+export interface JDNature {
+  role_level: "Junior" | "Mid" | "Senior" | "Lead" | "Staff" | "Principal" | "Director" | "VP" | "C-Level";
+  domain_required: string;
+  industry_preferred: string | null;
+  education_required: string | null;
+  years_required: number | null;
+  work_arrangement: "Remote" | "On-site" | "Hybrid" | "Flexible" | null;
+  company_stage: "Startup" | "Growth" | "Enterprise" | null;
+}
+
+export interface EnhancedJDMatchResult extends JDMatchResult {
+  jd_nature?: JDNature;
+  experience_factors?: {
+    years_analysis: ExperienceYearsAnalysis;
+    depth_analysis: ExperienceDepthAnalysis;
+    issues: ExperienceFactorIssue[];
+  };
+  nature_fit?: {
+    overall_fit: "Excellent" | "Good" | "Partial" | "Challenging";
+    fit_score: number;
+    issues: NatureFitIssue[];
+    strengths: string[];
+  };
+  student_summary?: {
+    headline: string;
+    encouragement: string;
+    quick_wins: string[];
+  };
+}
+
+// ============================================================================
 // FORENSIC ENGINE v2.11 TYPES
 // ============================================================================
 

@@ -598,7 +598,8 @@ export const JD_MATCH_WEIGHTS = {
 } as const;
 
 /**
- * Build prompt for JD matching analysis (v9.3)
+ * Build prompt for JD matching analysis (v2.2 - Experience Factors + Nature Fit)
+ * Token-optimized with student-friendly messaging
  * @param cvSummary - Formatted CV summary text
  * @param jobDescription - Job description text
  * @returns Complete prompt for AI JD matching
@@ -611,90 +612,122 @@ export function buildJDMatchPrompt(cvSummary: string, jobDescription: string): s
     throw new Error("Security: Suspicious content detected in job description");
   }
   
-  return `You are the EduNatives Recruitment Match Engine.
-
-Act as an ATS (Applicant Tracking System) and Senior Recruiter to determine the fit.
+  return `You are EduNatives JD Match Engine v2.2. Analyze CV-to-JD fit with Experience Factors.
 
 --- INPUTS ---
-CANDIDATE CV:
+CV:
 """
 ${cvSummary}
 """
 
-JOB DESCRIPTION:
+JD:
 """
 ${sanitizedJD}
 """
 
---- SCORING RUBRIC (Strict) ---
-Calculate 'overall_match_score' based on these ranges:
-- 85-100: Excellent Match
-- 70-84: Good Match
-- 55-69: Partial Match
-- Below 55: Limited Match
+--- SCORING ---
+Weights: Skills ${JD_MATCH_WEIGHTS.hardSkills}%, Experience ${JD_MATCH_WEIGHTS.experience}%, Responsibilities ${JD_MATCH_WEIGHTS.responsibilities}%, Soft ${JD_MATCH_WEIGHTS.softSkills}%, Education ${JD_MATCH_WEIGHTS.education}%
+Verdict: 85+="Excellent Match", 70-84="Good Match", 55-69="Partial Match", <55="Limited Match"
 
-Weights: Hard Skills (${JD_MATCH_WEIGHTS.hardSkills}%), Experience (${JD_MATCH_WEIGHTS.experience}%), Responsibilities (${JD_MATCH_WEIGHTS.responsibilities}%), Soft Skills (${JD_MATCH_WEIGHTS.softSkills}%), Education (${JD_MATCH_WEIGHTS.education}%).
-
---- OUTPUT SCHEMA ---
-Return ONLY a valid JSON object:
+--- OUTPUT (JSON only) ---
 {
   "jd_parsing": {
-    "role_title": "<extracted job title>",
-    "company": "<company name if mentioned>",
-    "mandatory_skills": ["<required skill 1>", "<skill 2>", ...],
-    "nice_to_have_skills": ["<preferred skill 1>", "<skill 2>", ...]
+    "role_title": "<title>",
+    "company": "<company or null>",
+    "mandatory_skills": ["skill1", "skill2"],
+    "nice_to_have_skills": ["skill1"]
+  },
+  "jd_nature": {
+    "role_level": "<Junior|Mid|Senior|Lead|Staff|Principal|Director|VP|C-Level>",
+    "domain_required": "<primary domain>",
+    "industry_preferred": "<industry or null>",
+    "education_required": "<degree or null>",
+    "years_required": <number or null>,
+    "work_arrangement": "<Remote|On-site|Hybrid|Flexible or null>",
+    "company_stage": "<Startup|Growth|Enterprise or null>"
   },
   "match_analysis": {
-    "overall_match_score": <number 0-100>,
-    "verdict": "<Excellent Match / Good Match / Partial Match / Limited Match>",
-    "summary": "<2-3 sentences explaining the fit>",
-    "matched_skills": ["<skill from CV that matches>", ...],
-    "missing_skills": ["<required skill not in CV>", ...],
-    "experience_match": {
-        "score": <0-100>,
-        "feedback": "<specific feedback about experience alignment>"
+    "overall_match_score": <0-100>,
+    "verdict": "<verdict>",
+    "summary": "<2-3 sentences>",
+    "matched_skills": ["skill1"],
+    "missing_skills": ["skill1"],
+    "experience_match": {"score": <0-100>, "feedback": "<feedback>"},
+    "education_match": {"score": <0-100>, "feedback": "<feedback>"},
+    "keyword_optimizations": ["keyword1", "keyword2"],
+    "suggestions": ["action1", "action2", "action3"]
+  },
+  "experience_factors": {
+    "years_analysis": {
+      "total_years": <number>,
+      "relevant_domain_years": <number>,
+      "recency_score": <0-100>,
+      "meets_requirement": <true|false>,
+      "student_message": "<encouraging message about experience level>"
     },
-    "education_match": {
-        "score": <0-100>,
-        "feedback": "<specific feedback about education requirements>"
+    "depth_analysis": {
+      "depth_level": "<Entry|Developing|Proficient|Expert>",
+      "scope_score": <0-100>,
+      "impact_score": <0-100>,
+      "complexity_handled": "<description of complexity>",
+      "student_message": "<encouraging message about depth>"
     },
-    "keyword_optimizations": [
-        "<keyword from JD to add to CV for ATS>",
-        "<keyword 2>",
-        "<keyword 3>"
-    ],
-    "suggestions": [
-        "<actionable advice 1>",
-        "<advice 2>",
-        "<advice 3>"
+    "issues": [
+      {
+        "code": "<H1-H9>",
+        "type": "<issue type>",
+        "message": "<ENCOURAGING student-friendly message, NOT critical>",
+        "cv_value": "<what CV shows>",
+        "jd_requirement": "<what JD wants>",
+        "gap_severity": "<minor|moderate|significant>"
+      }
     ]
   },
+  "nature_fit": {
+    "overall_fit": "<Excellent|Good|Partial|Challenging>",
+    "fit_score": <0-100>,
+    "issues": [
+      {
+        "code": "<G1-G9>",
+        "type": "<mismatch type>",
+        "message": "<ENCOURAGING message highlighting transferable value>",
+        "cv_nature": "<what CV shows>",
+        "jd_expects": "<what JD expects>",
+        "transferable": <true|false>
+      }
+    ],
+    "strengths": ["<strength that aligns well>"]
+  },
+  "student_summary": {
+    "headline": "<one-line positive summary>",
+    "encouragement": "<2 sentences of genuine encouragement>",
+    "quick_wins": ["<immediate action 1>", "<action 2>", "<action 3>"]
+  },
   "evidence_map": [
-    {
-      "jd_requirement": "<e.g., '5+ years React'>",
-      "cv_evidence": "<e.g., 'Senior Frontend Dev 2018-2023'>",
-      "status": "Match"
-    },
-    {
-      "jd_requirement": "<requirement from JD>",
-      "cv_evidence": "<partial evidence or 'Not found'>",
-      "status": "Weak"
-    },
-    {
-      "jd_requirement": "<missing requirement>",
-      "cv_evidence": "Not found in CV",
-      "status": "Missing"
-    }
+    {"jd_requirement": "<req>", "cv_evidence": "<evidence>", "status": "<Match|Weak|Missing>"}
   ]
 }
 
-IMPORTANT:
-- Return ONLY valid JSON, no markdown, no code blocks
-- Parse the JD to extract mandatory vs nice-to-have skills
-- Build evidence_map with at least 5 key requirement-to-evidence mappings
-- Be specific about which skills match and which are missing
-- Consider both hard skills and soft skills
-- Provide actionable suggestions for improving the match`;
+EXPERIENCE FACTOR CODES (H1-H9 - use encouraging student messages):
+H1: Total Years Gap - "You're building valuable experience! Quality over quantity."
+H2: Domain Years Gap - "Adjacent experience transfers well. Highlight relevant projects."
+H3: Industry Years Gap - "Cross-industry perspective brings fresh ideas!"
+H4: Recency Gap - "Re-engage with current practices. Recent projects help."
+H5: Scope Gap - "Growing scope shows trajectory. Emphasize largest impact."
+H6: Complexity Gap - "Complex challenges await! Show readiness with growth examples."
+H7: Impact Gap - "Quantify achievements more. Numbers tell your story."
+H8: Progression Gap - "Non-linear paths bring diverse perspectives!"
+H9: Depth/Breadth Mismatch - "Your focused expertise brings value!"
+
+NATURE FIT CODES (G1-G9 - highlight transferable value):
+G1: Education Field - G2: Education Level - G3: Domain - G4: Industry
+G5: Work Style - G6: Career Path - G7: Seniority - G8: Background Type - G9: Career Changer
+
+CRITICAL:
+- Return ONLY valid JSON, no markdown
+- Be ENCOURAGING in all student messages - focus on transferable value
+- Limit evidence_map to top 5 requirements
+- Issues arrays: max 3 most relevant items each`;
 }
 
 /**
