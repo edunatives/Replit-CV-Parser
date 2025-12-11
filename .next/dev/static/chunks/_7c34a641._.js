@@ -6769,7 +6769,8 @@ function V211AssessmentPanel({ analysis, loading, error, candidateName, candidat
         sx: {
             display: "flex",
             flexDirection: "column",
-            height: "100%",
+            flex: 1,
+            minHeight: 0,
             overflow: "hidden"
         },
         "data-testid": "v211-assessment-panel",

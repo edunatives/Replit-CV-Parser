@@ -142,7 +142,7 @@ export function V211AssessmentPanel({
   const hrRec = reports?.hr_view?.executive_summary;
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }} data-testid="v211-assessment-panel">
+    <Box sx={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, overflow: "hidden" }} data-testid="v211-assessment-panel">
       {/* Header Section */}
       <Box sx={{ px: 2, py: 1.5, borderBottom: 1, borderColor: "divider" }}>
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 1 }}>
