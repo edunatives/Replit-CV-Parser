@@ -1250,19 +1250,6 @@ Return ONLY valid JSON matching this structure:
         "long_term": {"actions": ["String"], "projected_gain": Number}
       },
       "encouragement": "String (positive closing message)"
-    },
-    "hr_view": {
-      "executive_summary": {
-        "candidate_name": "String",
-        "target_role": "String",
-        "overall_assessment": "String",
-        "recommendation": "Strong Recommend|Recommend|Consider|Do Not Recommend",
-        "confidence": Number (0-1)
-      },
-      "scores": {"raw_score": Number, "risk_score": Number, "validation_rate": "String", "integrity_rating": "String", "nature_fit_score": Number},
-      "risk_summary": {"critical_flags": ["String"], "high_flags": ["String"], "medium_flags": ["String"], "low_flags": ["String"], "nature_flags": ["String"]},
-      "verification_suggestions": [{"area": "String", "question": "String", "why": "String"}],
-      "hiring_notes": "String"
     }
   },
   "recommended_rewrites": [{"type": "remove|evidence|add|reword", "location": "String", "original": "String", "suggested": "String", "impact": "String", "related_codes": ["String"]}]

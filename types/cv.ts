@@ -514,7 +514,7 @@ export interface ForensicAnalysisV211 {
   ui_output: UIOutput;
   reports: {
     student_view: StudentView;
-    hr_view: HRView;
+    hr_view?: HRView;
   };
   recommended_rewrites: RecommendedRewrite[];
 }
