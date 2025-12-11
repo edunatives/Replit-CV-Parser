@@ -1,0 +1,1133 @@
+{
+  "edunatives_cv_analysis": {
+    "version": "2.11",
+    "analysis_date": "2024-12-11T14:30:00Z",
+    
+    "input": {
+      "cv_filename": "AHMED_BAHGAT-_Digital_Transformantion_Expert-_Senior_Enterprise_Architect_v6.pdf",
+      "jd_provided": false,
+      "jd_title": null
+    },
+    
+    "analysis_metadata": {
+      "cv_name": "Ahmed Bahgat",
+      "analysis_date": "2024-12-11T14:30:00Z",
+      "engine_version": "2.11",
+      "professional_age_years": 27,
+      "inferred_seniority": "Executive/Principal"
+    },
+
+    "parsed_cv": {
+      "metadata": {
+        "filename": "AHMED_BAHGAT-_Digital_Transformantion_Expert-_Senior_Enterprise_Architect_v6.pdf",
+        "parse_date": "2024-12-11T14:30:00Z",
+        "parse_confidence": 0.92,
+        "parsing_notes": [
+          "PDF format, 5 pages",
+          "Some typos detected: 'Transformantion', 'reducd', 'maontenance', 'licese', 'Microsot'",
+          "Dense achievement-focused format",
+          "Two-column layout in competencies section may affect ATS"
+        ]
+      },
+      
+      "contact": {
+        "name": "Ahmed Bahgat",
+        "email": "aahmedbahgatt@gmail.com",
+        "phone": "+966509576615",
+        "location": "Saudi Arabia",
+        "linkedin": null,
+        "github": null,
+        "portfolio": null,
+        "other_links": []
+      },
+      
+      "summary": "Digital transformation leader with 20+ years architecting and delivering technology innovation for tier-1 telecom operators across the Gulf region. Dual expertise in enterprise architecture and program execution—designing complex, multi-million-dollar transformation strategies and driving them to successful completion. Core strengths in Enterprise Architecture, mega-scale program delivery, IT Operating Model optimization, and emerging technology integration (AIOps, AI/ML, Cloud).",
+      
+      "experience": [
+        {
+          "title": "Principal Enterprise Architect - Service Assurance and Observability",
+          "company": "Saudi Telecom Company (STC)",
+          "location": "Riyadh, Saudi Arabia",
+          "start_date": "2020",
+          "end_date": "Present",
+          "duration_months": 59,
+          "employment_type": "full-time",
+          "bullets": [
+            "Enterprise Architect, Technical PMO and Advisor to Management for engagements under IT Operations Management and end-end Service assurance domains",
+            "Managing architecture blueprints and annual operating budgets for 20 technology streams across enterprise",
+            "Owned complete RFP lifecycle for service management portfolio including Enterprise Monitoring, IT Assets, ITSM, Operations Dashboards",
+            "Developed enterprise architecture artifacts and governance framework for all service management projects and strategy aligned with stc Raqami Digital Transformation objectives",
+            "Led technology acquisition projects from benchmarking, cost/benefit analysis, gap analysis and target roadmap to rfp release and awarding, ending with delivery and benefits realization",
+            "Project Delivery Governance and Benefits Realization Management, Managing stc cross functional teams and, direct/govern vendors' strategies and Project management Approach and Deliverables",
+            "Manage Programs Schedules, budgets, escalations and overall implementation roadmap and reporting to stc Technology architecture and PMO teams the strategic deliverables KPIs"
+          ]
+        },
+        {
+          "title": "Service Management & Enterprise Transformation Lead",
+          "company": "Saudi Telecom Company (STC)",
+          "location": "Riyadh, Saudi Arabia",
+          "start_date": "2015",
+          "end_date": "2019",
+          "duration_months": 48,
+          "employment_type": "full-time",
+          "bullets": [
+            "Demand SPOC for all stc Enterprise ITSM and Monitoring and Asset Management projects managing budget with yearly budget exceeding 15M SAR",
+            "Contributed to strategy, architecture, and governance of STC's IT Asset Management initiatives",
+            "Responsible for RFP cycle for related streams, technology assessments and cost-benefit analyses to ensure optimal transformation investments",
+            "Led technology evaluations for major platform consolidations (ServiceNow/BMC Remedy) and the adoption of emerging technologies",
+            "Served as Product Owner for critical transformation deliverables, including unified NOC Monitoring and Service Monitoring modernization",
+            "Achieved 15% year-over-year reduction in software licensing through IT Asset Governance program",
+            "Centralized observability platform & consolidating 5+ legacy monitoring tools, resulting in 20M SAR in savings",
+            "Custom built 7M SAR, Real-time order monitoring infrastructure (Flink, Kafka, Apache Hadoop, ELK dashboards featuring ML-based anomaly detection)",
+            "Enterprise SIEM solution to manage assets across IT and Network sectors, covering 25,000 security assets",
+            "Implemented Service Management Office in collaboration with BMC resulting in 40% improvement in successful infrastructure changes in first year"
+          ]
+        },
+        {
+          "title": "End-End Solution Architect / Business Consultant",
+          "company": "Alcatel-Lucent",
+          "location": "Middle East & Africa",
+          "start_date": "2010",
+          "end_date": "2014",
+          "duration_months": 48,
+          "employment_type": "full-time",
+          "bullets": [
+            "MEA Regional Lead for OSS transformation solutions, responsible for opportunity qualification, strategy planning, solution architecture coordination for big projects across MEA Region",
+            "Provided strategic technology advisory to C-level executives related to emerging technologies such as Cloudband and HLN, developing comprehensive technology transformation roadmaps",
+            "Led cross-functional teams through RFP response cycles for tier-1 operators (Etisalat, Du, Vodafone, MTN)",
+            "Design of target operating models for Managed services solutions for Du UAE CNMS exceeding 60M USD for IT Service Operations Center",
+            "Technical Program Management for complete end-end managed services transformation projects for Du UAE CNMS, Bharti Airtel Africa, and Reliance Wireless India",
+            "Developed OSS transformation blueprint for UK Rail aligned with eTOM & TAM frameworks"
+          ]
+        },
+        {
+          "title": "Solution Architecture Manager",
+          "company": "HP Delivery Partner - Fingerprint Consultancy",
+          "location": "Egypt & Saudi Arabia",
+          "start_date": "2008",
+          "end_date": "2010",
+          "duration_months": 24,
+          "employment_type": "full-time",
+          "bullets": [
+            "Technical Delivery Management for Mega Scale Project of 10M QR ITSM Transformation at Ooredoo",
+            "HP BTO projects for telecoms: Etisalat Pakistan (ufone), and Tunisie Telecom in (ITSM, Asset Management and ITOM)",
+            "Tunisie Telecom: Designed NOC processes and KPIs with HP ITSM deployment",
+            "Etisalat Pakistan: Delivered $8M ITSM transformation across regional operations",
+            "Led transformation initiatives across MEA, Pakistan, and Far East markets"
+          ]
+        },
+        {
+          "title": "Presales Lead",
+          "company": "Premium Cisco Partner - BMB",
+          "location": "Egypt",
+          "start_date": "2005",
+          "end_date": "2007",
+          "duration_months": 24,
+          "employment_type": "full-time",
+          "bullets": [
+            "Pre-sales lead who designed competitive Cisco enterprise solutions in Network, IP Telephony, Security, and Datacenter for customers in government, telecom and financial sectors"
+          ]
+        },
+        {
+          "title": "IT Consultant",
+          "company": "USAID - Pal-Tech",
+          "location": "Cairo",
+          "start_date": "2002",
+          "end_date": "2005",
+          "duration_months": 36,
+          "employment_type": "full-time",
+          "bullets": [
+            "Managed technical aspects of a datacenter implementation for country wide edtech project 'IT in Schools' with 10M$ budget"
+          ]
+        },
+        {
+          "title": "Systems Integration Engineer",
+          "company": "Premium Microsoft Partner - ATG",
+          "location": "Egypt",
+          "start_date": "1997",
+          "end_date": "2002",
+          "duration_months": 60,
+          "employment_type": "full-time",
+          "bullets": [
+            "Designed and Delivered Active Directory and Exchange implementations for enterprise customers"
+          ]
+        }
+      ],
+      
+      "projects": [],
+      
+      "education": [
+        {
+          "degree": "B.Sc.",
+          "field": "Information Systems Management",
+          "institution": "Sadat Academy for Management Sciences",
+          "location": null,
+          "start_date": null,
+          "end_date": "1996",
+          "gpa": null,
+          "honors": []
+        }
+      ],
+      
+      "skills": {
+        "as_listed": [
+          "C-Level Technology Advisory",
+          "Investment Strategy & Business Cases",
+          "Vendor Strategy & Management",
+          "Risk Assessment & Mitigation",
+          "Performance Optimization & Cost Reduction",
+          "Enterprise Transformation Strategy",
+          "Business Process Reengineering",
+          "Technology Roadmap Design",
+          "Digital Operating Model Design",
+          "Legacy Modernization Architecture",
+          "Change Management Strategy",
+          "Transformation Program Management",
+          "Benefits Realization Management",
+          "Organizational Design & Capability Development",
+          "End-to-End Solution Architecture",
+          "Technology Portfolio Optimization",
+          "Cloud Transformation Strategy",
+          "AIOps & AI (Agentic AI, RAG projects)",
+          "Observability and Service Management Solutions",
+          "Data & Analytics Architecture"
+        ],
+        "by_category": {
+          "Strategic Advisory": ["C-Level Technology Advisory", "Investment Strategy & Business Cases", "Vendor Strategy & Management", "Risk Assessment & Mitigation", "Performance Optimization & Cost Reduction"],
+          "Strategy & Architecture": ["Enterprise Transformation Strategy", "Business Process Reengineering", "Technology Roadmap Design", "Digital Operating Model Design", "Legacy Modernization Architecture"],
+          "Leadership & Governance": ["Change Management Strategy", "Transformation Program Management", "Benefits Realization Management", "Organizational Design & Capability Development"],
+          "Solution Design": ["End-to-End Solution Architecture", "Technology Portfolio Optimization", "Cloud Transformation Strategy", "AIOps & AI", "Observability and Service Management", "Data & Analytics Architecture"]
+        }
+      },
+      
+      "certifications": [
+        {"name": "TOGAF 9.1 Certified Architect", "issuer": "The Open Group", "date": null},
+        {"name": "IT4IT Foundation", "issuer": "The Open Group", "date": null},
+        {"name": "CGEIT - Certified in Governance of Enterprise IT", "issuer": "ISACA", "date": null},
+        {"name": "CISA - Certified Information Systems Auditor", "issuer": "ISACA", "date": null},
+        {"name": "COBIT Auditor", "issuer": "ISACA", "date": null},
+        {"name": "ITIL v3 Foundation", "issuer": "AXELOS", "date": null},
+        {"name": "Lean IT Kaizen Certified", "issuer": null, "date": null},
+        {"name": "TMForum Business Process Framework", "issuer": "TMForum", "date": null},
+        {"name": "Business Architecture Guild Member", "issuer": "Business Architecture Guild", "date": null}
+      ],
+      
+      "languages": [],
+      
+      "calculated": {
+        "professional_age_years": 27,
+        "first_role_date": "1997",
+        "total_roles": 7,
+        "total_projects": 0,
+        "career_gaps": []
+      }
+    },
+
+    "cv_nature": {
+      "education_nature": {
+        "field": "IT/CS",
+        "field_specific": "Information Systems Management",
+        "level": "Bachelors",
+        "technical_degree": true,
+        "stem_degree": true,
+        "relevance_to_career": "Direct"
+      },
+      "domain_nature": {
+        "primary_domain": "Infrastructure",
+        "secondary_domains": ["Software Dev", "Security", "Product"],
+        "specialization": "Enterprise Architecture / IT Operations / Service Management",
+        "domain_depth": "Specialist"
+      },
+      "industry_nature": {
+        "current_industry": "Tech/Telecom",
+        "industry_history": ["Telecom", "Consulting", "Government", "Finance"],
+        "industry_depth": "Multi-Industry"
+      },
+      "work_style_nature": {
+        "employment_pattern": "Full-time Only",
+        "work_arrangement": "On-site",
+        "company_size_history": "Enterprise",
+        "geographic_pattern": "International"
+      },
+      "career_path_nature": {
+        "trajectory": "Linear Progression",
+        "stability": "Stable (2+ years avg)",
+        "gaps_present": false,
+        "career_stage": "Executive",
+        "is_career_changer": false,
+        "pivot_from": null,
+        "pivot_to": null
+      },
+      "candidate_profile": {
+        "type": "Industry Veteran",
+        "learning_style": "Certification-Based",
+        "risk_profile": "Low Risk"
+      }
+    },
+
+    "category_scores": {
+      "A_ats_structure": {
+        "score": 78,
+        "grade": "B",
+        "issues": [
+          {
+            "code": "A4",
+            "type": "Contact Information Issue",
+            "detail": "Missing LinkedIn profile URL - expected for senior executive level",
+            "severity": "medium",
+            "location": "Contact section"
+          },
+          {
+            "code": "A8",
+            "type": "Formatting Risk",
+            "detail": "Two-column layout in Core Competencies section may cause ATS parsing issues",
+            "severity": "medium",
+            "location": "Core Competencies section"
+          },
+          {
+            "code": "A9",
+            "type": "Length Issue",
+            "detail": "5 pages exceeds recommended 2-3 pages even for executive level; some consolidation recommended",
+            "severity": "low",
+            "location": "Overall document"
+          },
+          {
+            "code": "A3",
+            "type": "Header Not Clear",
+            "detail": "Multiple typos in document: 'Transformantion', 'reducd', 'maontenance', 'licese', 'Microsot', 'steerwardship'",
+            "severity": "high",
+            "location": "Throughout document"
+          }
+        ]
+      },
+      
+      "B_content_realism": {
+        "score": 92,
+        "grade": "A",
+        "issues": [
+          {
+            "code": "B6",
+            "type": "Ambiguous Claims",
+            "detail": "'Pioneered AIOpS Business order monitoring solution' - pioneered is strong but supported by technical detail (Flink, Kafka, ML-based anomaly detection)",
+            "severity": "low",
+            "evidence": "Technical implementation details provided"
+          }
+        ]
+      },
+      
+      "C_skill_validation": {
+        "score": 88,
+        "grade": "A-",
+        "validation_rate": "85%",
+        "skills": {
+          "validated": [
+            {
+              "skill": "Enterprise Architecture",
+              "level": 5,
+              "raw_level": 5,
+              "evidence": ["TOGAF certified", "Built EA practice from ground up at STC", "Managing architecture blueprints for 20 technology streams", "Developed enterprise architecture artifacts and governance framework"],
+              "penalty": null,
+              "cap_applied": false
+            },
+            {
+              "skill": "Program Management",
+              "level": 5,
+              "raw_level": 5,
+              "evidence": ["Managed 20M SAR Remedy ITSM consolidation program", "Technical Program Management for Du UAE CNMS (60M USD)", "10M QR ITSM Transformation at Ooredoo", "Managing stc cross functional teams"],
+              "penalty": null,
+              "cap_applied": false
+            },
+            {
+              "skill": "ITSM/Service Management",
+              "level": 5,
+              "raw_level": 5,
+              "evidence": ["Service Management Office setup with BMC", "ITIL v3 certified", "Multiple ITSM transformation projects (ServiceNow, BMC Remedy)", "Product Owner for unified NOC Monitoring"],
+              "penalty": null,
+              "cap_applied": false
+            },
+            {
+              "skill": "IT Operations/Observability",
+              "level": 5,
+              "raw_level": 5,
+              "evidence": ["Unified 25+ legacy tools into single observability platform", "Opentext ITOM suite implementation (8M SAR)", "Enterprise Monitoring portfolio ownership", "EMC SAS unified monitoring consolidation"],
+              "penalty": null,
+              "cap_applied": false
+            },
+            {
+              "skill": "Cost Optimization",
+              "level": 5,
+              "raw_level": 5,
+              "evidence": ["30M SAR reduction in maintenance costs", "20M SAR savings from tool consolidation", "10M SAR license renewal reduction", "30% first-year OPEX reduction"],
+              "penalty": null,
+              "cap_applied": false
+            },
+            {
+              "skill": "Vendor Management",
+              "level": 5,
+              "raw_level": 5,
+              "evidence": ["Owned complete RFP lifecycle", "Direct/govern vendors' strategies", "Led technology evaluations for platform consolidations", "RFP response cycles for tier-1 operators"],
+              "penalty": null,
+              "cap_applied": false
+            },
+            {
+              "skill": "AIOps/AI",
+              "level": 3,
+              "raw_level": 3,
+              "evidence": ["Pioneered AIOpS Business order monitoring reducing MTTR by 60%", "ML-based anomaly detection implementation", "Mentions Agentic AI, RAG projects in competencies"],
+              "penalty": null,
+              "cap_applied": false
+            },
+            {
+              "skill": "Cloud Transformation",
+              "level": 3,
+              "raw_level": 3,
+              "evidence": ["Cloud Transformation Strategy listed", "Cloudband advisory at Alcatel-Lucent", "Limited specific cloud project details"],
+              "penalty": null,
+              "cap_applied": false
+            },
+            {
+              "skill": "Security/SIEM",
+              "level": 4,
+              "raw_level": 4,
+              "evidence": ["Enterprise SIEM solution covering 25,000 security assets", "CISA certified", "Security solutions in Cisco presales"],
+              "penalty": null,
+              "cap_applied": false
+            },
+            {
+              "skill": "Business Process Reengineering",
+              "level": 4,
+              "raw_level": 4,
+              "evidence": ["Led business process automation with BCG and KPMG", "Operating Model Design achieving 30% OPEX reduction", "NOC process re-engineering at multiple operators"],
+              "penalty": null,
+              "cap_applied": false
+            },
+            {
+              "skill": "Data Architecture",
+              "level": 3,
+              "raw_level": 3,
+              "evidence": ["Flink, Kafka, Apache Hadoop, ELK implementation", "Data & Analytics Architecture listed", "Order analytics implementation"],
+              "penalty": null,
+              "cap_applied": false
+            }
+          ],
+          "implied": [
+            {
+              "skill": "Blockchain",
+              "level": 2,
+              "reason": "Pioneered blockchain POC for STC Pay - proof of concept only, limited depth"
+            },
+            {
+              "skill": "RPA",
+              "level": 2,
+              "reason": "Built RPA automation practice with 40% efficiency gains - practice setup mentioned but limited technical depth"
+            }
+          ],
+          "ghost": [
+            "Agentic AI",
+            "RAG projects"
+          ]
+        },
+        "issues": [
+          {
+            "code": "C1",
+            "type": "Skill Not Demonstrated",
+            "skill": "Agentic AI",
+            "detail": "Listed in Core Competencies but no project or implementation evidence in experience",
+            "severity": "medium"
+          },
+          {
+            "code": "C1",
+            "type": "Skill Not Demonstrated",
+            "skill": "RAG projects",
+            "detail": "Listed in Core Competencies but no project or implementation evidence in experience",
+            "severity": "medium"
+          }
+        ]
+      },
+      
+      "D_strengths_discovery": {
+        "score": 95,
+        "strengths": [
+          {
+            "code": "D1",
+            "type": "Clear Project Evidence",
+            "detail": "Exceptional documentation of major transformation programs with budgets, outcomes, and client names",
+            "evidence": "Du UAE CNMS (60M USD), Ooredoo ITSM (10M QR), STC programs (20M+ SAR each)"
+          },
+          {
+            "code": "D3",
+            "type": "Quantified Achievements",
+            "detail": "Outstanding pattern of quantified business outcomes throughout CV",
+            "evidence": "30M SAR cost reduction, 60% MTTR reduction, 40% process efficiency, 30% OPEX reduction, 15% YoY license savings, 20M SAR consolidation savings (multiple instances)"
+          },
+          {
+            "code": "D4",
+            "type": "Architectural Thinking",
+            "detail": "Deep evidence of enterprise-level architectural thinking and system design",
+            "evidence": "Built EA practice from ground up, developed governance frameworks, technology roadmaps for 20+ streams, eTOM & TAM framework alignment"
+          },
+          {
+            "code": "D6",
+            "type": "Performance Optimization",
+            "detail": "Strong focus on operational efficiency and cost optimization",
+            "evidence": "Multiple tool consolidation projects, license optimization programs, OPEX reduction initiatives"
+          },
+          {
+            "code": "D7",
+            "type": "Team Collaboration",
+            "detail": "Evidence of cross-functional leadership and stakeholder management",
+            "evidence": "Worked with BCG, KPMG, BMC; managed cross-functional teams; C-level advisory; vendor governance"
+          },
+          {
+            "code": "D8",
+            "type": "Learning Mindset",
+            "detail": "Continuous professional development through certifications",
+            "evidence": "9 professional certifications including TOGAF, CGEIT, CISA, ITIL, COBIT"
+          }
+        ]
+      },
+      
+      "E_tone_clarity": {
+        "score": 72,
+        "grade": "B-",
+        "metrics": {
+          "avg_bullet_length_words": 22,
+          "technical_density": "high",
+          "repeated_words": [
+            {"word": "transformation", "count": 15},
+            {"word": "management", "count": 18},
+            {"word": "enterprise", "count": 12},
+            {"word": "monitoring", "count": 10}
+          ],
+          "readability": "moderate"
+        },
+        "issues": [
+          {
+            "code": "E2",
+            "type": "Too Technical for Level",
+            "detail": "Very dense with acronyms and technical jargon; executive summary could be more accessible",
+            "severity": "low"
+          },
+          {
+            "code": "E4",
+            "type": "Bullets Too Long",
+            "detail": "Some bullets in Key Transformation Achievements section are 3+ lines",
+            "severity": "low"
+          },
+          {
+            "code": "E6",
+            "type": "Repetitive Language",
+            "detail": "'transformation' used 15 times, 'management' used 18 times - consider varying vocabulary",
+            "severity": "low"
+          }
+        ]
+      },
+      
+      "F_timeline_professional_age": {
+        "score": 95,
+        "grade": "A",
+        "assessment": {
+          "professional_age_years": 27,
+          "first_role": "Systems Integration Engineer at ATG",
+          "first_role_date": "1997",
+          "total_roles": 7,
+          "claimed_level": "Principal Enterprise Architect",
+          "inferred_level": "Executive/Principal",
+          "level_match": true,
+          "scope_indicators": {
+            "owns_features": {"present": true, "evidence": "Owned complete RFP lifecycle for service management portfolio"},
+            "independent_execution": {"present": true, "evidence": "MEA Regional Lead, Enterprise Architect with autonomous portfolio"},
+            "owns_systems": {"present": true, "evidence": "Managing architecture blueprints for 20 technology streams across enterprise"},
+            "cross_team_influence": {"present": true, "evidence": "Managing stc cross functional teams, worked with BCG/KPMG, vendor governance"},
+            "mentorship": {"present": true, "evidence": "Built EA practice from ground up, organizational design & capability development"}
+          }
+        },
+        "gaps": [],
+        "issues": []
+      },
+      
+      "G_nature_classification": {
+        "score": 98,
+        "notes": [
+          {
+            "code": "G9",
+            "type": "Career Progression Note",
+            "detail": "Exemplary linear progression from Systems Engineer to Principal Enterprise Architect over 27 years",
+            "is_issue": false,
+            "severity": "info"
+          }
+        ],
+        "standalone_assessment": {
+          "education_career_alignment": "Aligned",
+          "career_coherence": "High",
+          "background_risk_level": "Low"
+        }
+      }
+    },
+    
+    "overall_scores": {
+      "raw_score": 88,
+      "student_adjusted_score": 90,
+      "hr_risk_score": 12,
+      "grade": "A-"
+    },
+    
+    "taxonomy": {
+      "level_1": "Technology & Engineering",
+      "level_2": "Enterprise Architecture",
+      "level_3": "Principal Enterprise Architect",
+      "level_4_specialization": {
+        "primary_stack": ["TOGAF", "ITIL", "BMC Remedy", "ServiceNow", "OpenText ITOM"],
+        "secondary_stack": ["Kafka", "Flink", "Hadoop", "ELK", "SIEM"],
+        "domains": ["Telecom OSS/BSS", "IT Operations", "Service Assurance", "Observability", "Digital Transformation"]
+      }
+    },
+    
+    "integrity_summary": {
+      "title_inflation": false,
+      "jargon_inflation": {
+        "triggered": false,
+        "verb": null,
+        "count": 0,
+        "penalty": null
+      },
+      "ghost_skills_count": 2,
+      "proficiency_cap_applied": false,
+      "overall_integrity": "high"
+    },
+
+    "ui_output": {
+      "overallScore": 88,
+      "level": "Strong",
+      "inflation": false,
+      "verdict": "Exceptional enterprise architect with 27 years of validated transformation experience and outstanding quantified achievements. Minor issues: typos and 2 unsubstantiated AI skills.",
+      
+      "sections": [
+        {
+          "name": "ATS Structure",
+          "code": "A",
+          "score": 78,
+          "status": "good",
+          "summary": "Solid structure but has typos, missing LinkedIn, and 5 pages is lengthy"
+        },
+        {
+          "name": "Content Realism",
+          "code": "B",
+          "score": 92,
+          "status": "good",
+          "summary": "Excellent - claims well-supported with budgets, metrics, and client names"
+        },
+        {
+          "name": "Skills Validation",
+          "code": "C",
+          "score": 88,
+          "status": "good",
+          "summary": "85% validation rate, 11 validated skills at L3-L5, 2 ghost skills (Agentic AI, RAG)"
+        },
+        {
+          "name": "Strengths",
+          "code": "D",
+          "score": 95,
+          "status": "good",
+          "summary": "Outstanding quantified achievements, architectural depth, certifications"
+        },
+        {
+          "name": "Tone & Clarity",
+          "code": "E",
+          "score": 72,
+          "status": "good",
+          "summary": "Dense technical content, some repetitive language, bullets could be shorter"
+        },
+        {
+          "name": "Timeline",
+          "code": "F",
+          "score": 95,
+          "status": "good",
+          "summary": "27 years progressive experience, no gaps, perfect seniority alignment"
+        },
+        {
+          "name": "Nature Fit",
+          "code": "G",
+          "score": 98,
+          "status": "good",
+          "summary": "Aligned IS degree, linear progression, industry veteran, low risk"
+        }
+      ],
+      
+      "strengths": [
+        {
+          "code": "D3",
+          "icon": "check",
+          "text": "Outstanding quantified achievements: 30M SAR cost reduction, 60% MTTR improvement, 40% process efficiency gains, 20M+ SAR savings across multiple consolidation projects"
+        },
+        {
+          "code": "D1",
+          "icon": "check",
+          "text": "Exceptional project documentation with specific budgets (60M USD Du, 20M SAR Remedy, 10M QR Ooredoo) and named clients (STC, Du, Etisalat, Vodafone, MTN)"
+        },
+        {
+          "code": "D4",
+          "icon": "check",
+          "text": "Deep enterprise architecture expertise: Built EA practice from ground up, TOGAF certified, manages 20 technology streams"
+        },
+        {
+          "code": "D8",
+          "icon": "check",
+          "text": "Strong certification portfolio: 9 professional certifications including TOGAF, CGEIT, CISA, ITIL, COBIT demonstrating continuous learning"
+        },
+        {
+          "code": "D7",
+          "icon": "check",
+          "text": "Proven C-level engagement: Strategic advisory to executives, worked with BCG/KPMG, vendor governance across tier-1 operators"
+        },
+        {
+          "code": "D6",
+          "icon": "check",
+          "text": "Cost optimization track record: Consistent pattern of delivering savings through consolidation, license optimization, and operational efficiency"
+        }
+      ],
+      
+      "weaknesses": [
+        {
+          "code": "A3",
+          "icon": "x",
+          "severity": "high",
+          "text": "Multiple typos throughout document: 'Transformantion', 'reducd', 'maontenance', 'licese', 'Microsot', 'steerwardship' - unprofessional for executive level"
+        },
+        {
+          "code": "C1",
+          "icon": "x",
+          "severity": "medium",
+          "text": "Ghost skills: 'Agentic AI' and 'RAG projects' listed in competencies but no evidence in experience section"
+        },
+        {
+          "code": "A4",
+          "icon": "x",
+          "severity": "medium",
+          "text": "Missing LinkedIn profile URL - expected for senior executive networking and validation"
+        },
+        {
+          "code": "A8",
+          "icon": "x",
+          "severity": "medium",
+          "text": "Two-column layout in Core Competencies section may cause ATS parsing issues"
+        },
+        {
+          "code": "A9",
+          "icon": "x",
+          "severity": "low",
+          "text": "Document length (5 pages) exceeds recommended 2-3 pages even for executive level"
+        },
+        {
+          "code": "E6",
+          "icon": "x",
+          "severity": "low",
+          "text": "Repetitive language: 'transformation' (15x), 'management' (18x) - consider varying vocabulary"
+        }
+      ],
+      
+      "recommendations": [
+        {
+          "priority": "high",
+          "icon": "lightbulb",
+          "text": "Fix all typos immediately - 'Transformantion', 'reducd', 'maontenance', 'licese', 'Microsot', 'steerwardship'",
+          "impact": "+5 pts"
+        },
+        {
+          "priority": "high",
+          "icon": "lightbulb",
+          "text": "Either add evidence for Agentic AI/RAG projects OR remove from competencies to avoid ghost skill flags",
+          "impact": "+3 pts"
+        },
+        {
+          "priority": "medium",
+          "icon": "lightbulb",
+          "text": "Add LinkedIn profile URL to contact section for executive networking and profile validation",
+          "impact": "+2 pts"
+        },
+        {
+          "priority": "medium",
+          "icon": "lightbulb",
+          "text": "Convert Core Competencies to single-column format for better ATS compatibility",
+          "impact": "+2 pts"
+        },
+        {
+          "priority": "low",
+          "icon": "lightbulb",
+          "text": "Consider condensing to 3-4 pages by consolidating older roles (pre-2010) into brief summary",
+          "impact": "+1 pt"
+        },
+        {
+          "priority": "low",
+          "icon": "lightbulb",
+          "text": "Vary vocabulary - replace some instances of 'transformation' with 'modernization', 'evolution', 'initiative'",
+          "impact": "+1 pt"
+        }
+      ],
+      
+      "highlights": [
+        {
+          "type": "achievement",
+          "color": "green",
+          "text": "30M SAR reduction in maintenance costs through application portfolio governance for 500 business applications",
+          "source": "Cost Optimization Initiatives"
+        },
+        {
+          "type": "achievement",
+          "color": "green",
+          "text": "60% MTTR reduction through pioneered AIOps Business order monitoring solution",
+          "source": "Transformation Leadership"
+        },
+        {
+          "type": "achievement",
+          "color": "green",
+          "text": "60M USD IT component for Du UAE Managed Services NOC operations solution",
+          "source": "Alcatel-Lucent achievements"
+        },
+        {
+          "type": "achievement",
+          "color": "green",
+          "text": "40% improvement in successful infrastructure changes through Service Management Office",
+          "source": "STC 2015-2019"
+        },
+        {
+          "type": "skill",
+          "color": "blue",
+          "text": "Enterprise Architecture (L5), Program Management (L5), ITSM (L5), Observability (L5), Cost Optimization (L5)",
+          "source": "Validated skills with evidence"
+        },
+        {
+          "type": "concern",
+          "color": "yellow",
+          "text": "AIOps & AI (Agentic AI, RAG projects)",
+          "source": "Core Competencies",
+          "note": "Agentic AI and RAG listed but no project evidence"
+        },
+        {
+          "type": "gap",
+          "color": "red",
+          "text": "Agentic AI, RAG projects",
+          "source": "Ghost skills - listed but no evidence in experience"
+        },
+        {
+          "type": "education",
+          "color": "purple",
+          "text": "B.Sc. Information Systems Management (1996) + 9 certifications (TOGAF, CGEIT, CISA, ITIL, COBIT, etc.)",
+          "source": "Education & Certifications"
+        }
+      ],
+      
+      "quickStats": {
+        "professionalYears": 27,
+        "validatedSkills": 11,
+        "ghostSkills": 2,
+        "validationRate": 85,
+        "quantificationRate": 75,
+        "issueCount": {
+          "critical": 0,
+          "high": 1,
+          "medium": 3,
+          "low": 3
+        }
+      }
+    },
+
+    "reports": {
+      "student_view": {
+        "headline": "Exceptional Enterprise Architecture Leader",
+        "overall_score": {
+          "score": 90,
+          "grade": "A-",
+          "message": "Outstanding CV! Your 27 years of progressive experience and quantified achievements make this a highly competitive profile. Just a few polish items to address."
+        },
+        
+        "your_strengths": [
+          {
+            "title": "Quantification Master",
+            "detail": "Your CV is packed with specific numbers: 30M SAR, 60% MTTR reduction, 40% efficiency gains. This is exactly what hiring managers want to see!",
+            "icon": "trophy"
+          },
+          {
+            "title": "Project Portfolio Excellence",
+            "detail": "The breadth of named clients (STC, Du, Etisalat, Vodafone) and specific budgets (60M USD, 20M SAR) provides exceptional credibility",
+            "icon": "star"
+          },
+          {
+            "title": "Certification Foundation",
+            "detail": "9 professional certifications including TOGAF, CGEIT, and CISA demonstrate continuous learning and industry recognition",
+            "icon": "sparkle"
+          },
+          {
+            "title": "Executive Presence",
+            "detail": "Clear evidence of C-level advisory, working with BCG/KPMG, and managing cross-functional transformation programs",
+            "icon": "rocket"
+          }
+        ],
+        
+        "your_background": {
+          "summary": "Your Information Systems degree combined with 27 years of progressive telecom transformation experience positions you perfectly for senior enterprise architecture roles",
+          "unique_value": "Rare combination of deep technical architecture expertise AND program execution capability - you don't just design, you deliver",
+          "growth_areas": ["Consider adding more detail on emerging AI/ML implementations", "LinkedIn presence would enhance professional visibility"]
+        },
+        
+        "quick_wins": [
+          {
+            "action": "Fix all typos (Transformantion, reducd, maontenance, licese, Microsot)",
+            "impact": "Removes unprofessional impression",
+            "time": "15 minutes",
+            "priority": "do_first"
+          },
+          {
+            "action": "Add LinkedIn URL to contact section",
+            "impact": "Enables recruiter validation and networking",
+            "time": "2 minutes",
+            "priority": "do_first"
+          },
+          {
+            "action": "Either add Agentic AI/RAG project details OR remove from competencies",
+            "impact": "Eliminates ghost skill concern",
+            "time": "10 minutes",
+            "priority": "do_soon"
+          }
+        ],
+        
+        "category_feedback": {
+          "ats_structure": {
+            "score": 78,
+            "summary": "Good structure overall, but some formatting could be improved for ATS systems",
+            "tips": ["Convert two-column competencies to single column", "Consider condensing to 3-4 pages"]
+          },
+          "content_quality": {
+            "score": 92,
+            "summary": "Excellent! Your claims are well-supported with specific evidence",
+            "tips": ["Fix typos to match the quality of your content"]
+          },
+          "skills_showcase": {
+            "score": 88,
+            "summary": "Strong validation rate with clear evidence for most skills",
+            "validated_skills": ["Enterprise Architecture", "Program Management", "ITSM", "Observability", "Cost Optimization"],
+            "skills_to_evidence": ["Agentic AI", "RAG projects"]
+          },
+          "communication": {
+            "score": 72,
+            "summary": "Professional tone, though some sections are quite dense",
+            "tips": ["Vary vocabulary (transformation used 15 times)", "Shorten some bullet points"]
+          },
+          "career_story": {
+            "score": 95,
+            "summary": "Perfect progression from engineer to executive over 27 years",
+            "tips": ["This is a strength - no changes needed"]
+          },
+          "background_fit": {
+            "score": 98,
+            "summary": "Ideal background for enterprise architecture roles in telecom/tech",
+            "opportunities": ["Consider emphasizing AI/ML capabilities for future-focused roles"]
+          }
+        },
+        
+        "improvement_roadmap": {
+          "this_week": {
+            "actions": ["Fix all typos", "Add LinkedIn URL", "Address ghost skills"],
+            "projected_gain": 8
+          },
+          "this_month": {
+            "actions": ["Reformat to single-column", "Condense to 3-4 pages", "Vary vocabulary"],
+            "projected_gain": 4
+          },
+          "long_term": {
+            "actions": ["Add AI/ML project evidence if pursuing digital-first roles"],
+            "projected_gain": 3
+          }
+        },
+        
+        "encouragement": "This is a remarkably strong CV that clearly communicates 27 years of impactful transformation work. The quantified achievements and named clients provide exceptional credibility. Just fix those typos and you'll have a truly polished executive-level CV!"
+      },
+
+      "hr_view": {
+        "executive_summary": {
+          "candidate_name": "Ahmed Bahgat",
+          "target_role": "Principal/Chief Enterprise Architect",
+          "overall_assessment": "Highly qualified enterprise architecture leader with 27 years of validated transformation experience across tier-1 telecom operators. Strong quantified track record of delivering multi-million dollar programs. Low hiring risk.",
+          "recommendation": "Recommend",
+          "confidence": 0.92
+        },
+        
+        "scores": {
+          "raw_score": 88,
+          "risk_score": 12,
+          "validation_rate": "85%",
+          "integrity_rating": "High",
+          "nature_fit_score": 98
+        },
+        
+        "nature_fit_assessment": {
+          "overall_fit": "Strong Fit",
+          "education_match": {
+            "cv_has": "B.Sc. Information Systems Management",
+            "role_expects": "Technical degree preferred",
+            "verdict": "Match",
+            "risk": "low"
+          },
+          "domain_match": {
+            "cv_has": "Enterprise Architecture / IT Operations / Telecom OSS",
+            "role_expects": "Enterprise Architecture",
+            "verdict": "Match",
+            "risk": "low"
+          },
+          "career_path_assessment": {
+            "trajectory": "Linear Progression",
+            "is_career_changer": false,
+            "stability": "Stable (2+ years avg tenure)",
+            "risk": "low"
+          },
+          "verification_suggestions": ["Verify AI/ML capabilities if role requires emerging tech focus", "Confirm budget ownership levels in reference checks"]
+        },
+        
+        "risk_summary": {
+          "critical_flags": [],
+          "high_flags": ["A3: Multiple typos in document - minor professionalism concern"],
+          "medium_flags": [
+            "C1: Ghost skills - Agentic AI and RAG projects listed without evidence",
+            "A4: Missing LinkedIn profile",
+            "A8: Two-column layout may cause ATS issues"
+          ],
+          "low_flags": [
+            "A9: 5 pages exceeds typical length",
+            "E6: Repetitive vocabulary"
+          ],
+          "nature_flags": []
+        },
+        
+        "category_assessment": {
+          "A_ats_structure": {
+            "score": 78,
+            "flags": [
+              {"code": "A3", "detail": "Multiple typos: Transformantion, reducd, maontenance, licese, Microsot"},
+              {"code": "A4", "detail": "Missing LinkedIn profile URL"},
+              {"code": "A8", "detail": "Two-column competencies layout"}
+            ],
+            "pass": true
+          },
+          "B_content_realism": {
+            "score": 92,
+            "flags": [],
+            "integrity_concerns": []
+          },
+          "C_skill_validation": {
+            "score": 88,
+            "validation_rate": "85%",
+            "verified_skills": [
+              {"skill": "Enterprise Architecture", "level": 5, "evidence": "TOGAF certified, built EA practice, 20 technology streams"},
+              {"skill": "Program Management", "level": 5, "evidence": "60M USD, 20M SAR, 10M QR programs delivered"},
+              {"skill": "ITSM", "level": 5, "evidence": "Multiple ITSM transformations, ITIL certified"},
+              {"skill": "Cost Optimization", "level": 5, "evidence": "30M SAR, 20M SAR savings documented"}
+            ],
+            "unverified_skills": [],
+            "ghost_skills": ["Agentic AI", "RAG projects"]
+          },
+          "D_strengths": {
+            "positives": [
+              {"type": "Quantification", "detail": "Outstanding track record of quantified achievements"},
+              {"type": "Client Portfolio", "detail": "Named tier-1 clients across MEA region"},
+              {"type": "Certifications", "detail": "9 relevant professional certifications"}
+            ]
+          },
+          "E_tone_clarity": {
+            "score": 72,
+            "concerns": ["Dense technical content", "Repetitive vocabulary"]
+          },
+          "F_timeline": {
+            "score": 95,
+            "professional_age": "27 years",
+            "seniority_assessment": "Executive/Principal level - appropriate for experience",
+            "gaps": []
+          },
+          "G_nature_fit": {
+            "score": 98,
+            "flags": [],
+            "mitigating_factors": ["Aligned education", "Linear progression", "Industry veteran"]
+          }
+        },
+        
+        "verification_suggestions": [
+          {
+            "area": "AI/ML Capabilities",
+            "question": "Can you describe specific Agentic AI or RAG projects you've implemented?",
+            "why": "Listed in competencies but no evidence in experience section"
+          },
+          {
+            "area": "Budget Ownership",
+            "question": "What was your direct P&L responsibility vs. advisory role on the larger programs?",
+            "why": "Clarify ownership level on 60M USD and similar scale programs"
+          },
+          {
+            "area": "Recent Technical Currency",
+            "question": "How do you stay current with emerging technologies in your field?",
+            "why": "Ensure continued relevance given 27-year career"
+          }
+        ],
+        
+        "hiring_notes": "Strong candidate for Principal/Chief Enterprise Architect roles. Exceptional track record of transformation delivery with quantified business outcomes. Minor concerns are cosmetic (typos) and skill list accuracy (AI claims). Recommend interview to verify AI/ML depth if role requires emerging tech focus. Low risk hire for enterprise architecture leadership."
+      }
+    },
+
+    "recommended_rewrites": [
+      {
+        "type": "remove",
+        "location": "Document title",
+        "original": "Digital Transformantion Expert",
+        "suggested": "Digital Transformation Expert",
+        "impact": "Fixes typo in title",
+        "related_codes": ["A3"]
+      },
+      {
+        "type": "remove",
+        "location": "Cost Optimization section",
+        "original": "reducd maontenance costs",
+        "suggested": "reduced maintenance costs",
+        "impact": "Fixes typos",
+        "related_codes": ["A3"]
+      },
+      {
+        "type": "remove",
+        "location": "Cost Optimization section",
+        "original": "licese reneals",
+        "suggested": "license renewals",
+        "impact": "Fixes typos",
+        "related_codes": ["A3"]
+      },
+      {
+        "type": "remove",
+        "location": "Cost Optimization section",
+        "original": "Microsot licenses",
+        "suggested": "Microsoft licenses",
+        "impact": "Fixes typo",
+        "related_codes": ["A3"]
+      },
+      {
+        "type": "remove",
+        "location": "Operational Excellence section",
+        "original": "Technical project steerwardship",
+        "suggested": "Technical project stewardship",
+        "impact": "Fixes typo",
+        "related_codes": ["A3"]
+      },
+      {
+        "type": "evidence",
+        "location": "Core Competencies",
+        "original": "AIOps & AI (Agentic AI, RAG projects)",
+        "suggested": "AIOps & AI (ML-based anomaly detection, predictive analytics) - OR remove Agentic AI/RAG if no evidence",
+        "impact": "Removes ghost skill flag",
+        "related_codes": ["C1", "B5"]
+      },
+      {
+        "type": "evidence",
+        "location": "Contact section",
+        "original": "Saudi Arabia | +966509576615 | aahmedbahgatt@gmail.com",
+        "suggested": "Saudi Arabia | +966509576615 | aahmedbahgatt@gmail.com | linkedin.com/in/ahmedbahgat",
+        "impact": "Adds expected LinkedIn presence for executive",
+        "related_codes": ["A4"]
+      }
+    ]
+  }
+}
