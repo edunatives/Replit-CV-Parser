@@ -10,12 +10,38 @@ interface LineEditorProps {
   placeholder?: string;
 }
 
+// Helper to normalize bullet separators to newlines for display
+function normalizeToLines(text: string): string[] {
+  if (!text) return [];
+  
+  // First, split by existing newlines
+  let normalized = text;
+  
+  // Convert common bullet patterns to newlines:
+  // " - " (space-dash-space) at start of bullets
+  // ". - " (period-space-dash-space) sentence ending followed by bullet
+  normalized = normalized.replace(/\.\s+-\s+/g, ".\n- ");
+  normalized = normalized.replace(/([^-\n])\s+-\s+/g, "$1\n- ");
+  
+  // Also handle "• " bullet points that are not on their own lines
+  normalized = normalized.replace(/\.\s+•\s+/g, ".\n• ");
+  normalized = normalized.replace(/([^•\n])\s+•\s+/g, "$1\n• ");
+  
+  const lines = normalized.split("\n");
+  return lines;
+}
+
+// Helper to convert lines back to the original format with proper separators
+function linesToText(lines: string[]): string {
+  return lines.join("\n");
+}
+
 export function LineEditor({ value, onChange, textStyle, placeholder }: LineEditorProps) {
-  const lines = value ? value.split("\n") : [];
+  const lines = normalizeToLines(value);
 
   const handleDeleteLine = (indexToDelete: number) => {
     const newLines = lines.filter((_, idx) => idx !== indexToDelete);
-    onChange(newLines.join("\n"));
+    onChange(linesToText(newLines));
   };
 
   if (lines.length === 0 || (lines.length === 1 && !lines[0].trim())) {

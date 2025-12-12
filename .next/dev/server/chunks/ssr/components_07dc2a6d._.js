@@ -1506,11 +1506,31 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$ico
 ;
 ;
 ;
+// Helper to normalize bullet separators to newlines for display
+function normalizeToLines(text) {
+    if (!text) return [];
+    // First, split by existing newlines
+    let normalized = text;
+    // Convert common bullet patterns to newlines:
+    // " - " (space-dash-space) at start of bullets
+    // ". - " (period-space-dash-space) sentence ending followed by bullet
+    normalized = normalized.replace(/\.\s+-\s+/g, ".\n- ");
+    normalized = normalized.replace(/([^-\n])\s+-\s+/g, "$1\n- ");
+    // Also handle "• " bullet points that are not on their own lines
+    normalized = normalized.replace(/\.\s+•\s+/g, ".\n• ");
+    normalized = normalized.replace(/([^•\n])\s+•\s+/g, "$1\n• ");
+    const lines = normalized.split("\n");
+    return lines;
+}
+// Helper to convert lines back to the original format with proper separators
+function linesToText(lines) {
+    return lines.join("\n");
+}
 function LineEditor({ value, onChange, textStyle, placeholder }) {
-    const lines = value ? value.split("\n") : [];
+    const lines = normalizeToLines(value);
     const handleDeleteLine = (indexToDelete)=>{
         const newLines = lines.filter((_, idx)=>idx !== indexToDelete);
-        onChange(newLines.join("\n"));
+        onChange(linesToText(newLines));
     };
     if (lines.length === 0 || lines.length === 1 && !lines[0].trim()) {
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1523,7 +1543,7 @@ function LineEditor({ value, onChange, textStyle, placeholder }) {
             children: placeholder || "(No content)"
         }, void 0, false, {
             fileName: "[project]/components/LineEditor.tsx",
-            lineNumber: 23,
+            lineNumber: 49,
             columnNumber: 7
         }, this);
     }
@@ -1557,7 +1577,7 @@ function LineEditor({ value, onChange, textStyle, placeholder }) {
                         children: line || "\u00A0"
                     }, void 0, false, {
                         fileName: "[project]/components/LineEditor.tsx",
-                        lineNumber: 53,
+                        lineNumber: 79,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Tooltip$2f$Tooltip$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Tooltip$3e$__["Tooltip"], {
@@ -1592,28 +1612,28 @@ function LineEditor({ value, onChange, textStyle, placeholder }) {
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/components/LineEditor.tsx",
-                                lineNumber: 89,
+                                lineNumber: 115,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/LineEditor.tsx",
-                            lineNumber: 65,
+                            lineNumber: 91,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/LineEditor.tsx",
-                        lineNumber: 64,
+                        lineNumber: 90,
                         columnNumber: 11
                     }, this)
                 ]
             }, index, true, {
                 fileName: "[project]/components/LineEditor.tsx",
-                lineNumber: 39,
+                lineNumber: 65,
                 columnNumber: 9
             }, this))
     }, void 0, false, {
         fileName: "[project]/components/LineEditor.tsx",
-        lineNumber: 37,
+        lineNumber: 63,
         columnNumber: 5
     }, this);
 }
