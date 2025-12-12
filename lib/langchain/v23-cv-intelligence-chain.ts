@@ -296,16 +296,166 @@ function transformToStandard(raw: unknown, audience: AudienceType): StandardOutp
 function transformToFull(raw: unknown, audience: AudienceType): FullOutput {
   const data = (raw || {}) as Record<string, unknown>;
   
-  return {
+  const cvAnalysisRaw = (getPath(data, "cvAnalysis", "cv_analysis") || {}) as Record<string, unknown>;
+  const studentAnalysisRaw = (getPath(data, "studentAnalysis", "student_analysis") || {}) as Record<string, unknown>;
+  const hrAnalysisRaw = (getPath(data, "hrAnalysis", "hr_analysis") || {}) as Record<string, unknown>;
+  
+  const metadataRaw = (cvAnalysisRaw.metadata || {}) as Record<string, unknown>;
+  const experienceRaw = (cvAnalysisRaw.experience || {}) as Record<string, unknown>;
+  const skillsRaw = (cvAnalysisRaw.skills || {}) as Record<string, unknown>;
+  const bulletAnalysisRaw = (cvAnalysisRaw.bulletAnalysis || cvAnalysisRaw.bullet_analysis || {}) as Record<string, unknown>;
+  const summaryRaw = (cvAnalysisRaw.professionalSummary || cvAnalysisRaw.professional_summary || {}) as Record<string, unknown>;
+  const educationRaw = (cvAnalysisRaw.education || {}) as Record<string, unknown>;
+  const expFactorsRaw = (cvAnalysisRaw.experienceFactors || cvAnalysisRaw.experience_factors || {}) as Record<string, unknown>;
+  
+  const overallScore = safeNum(studentAnalysisRaw.overallCvQuality || hrAnalysisRaw.overallScore || bulletAnalysisRaw.averageScore, 0);
+  
+  const cvAnalysis: FullOutput["cvAnalysis"] = {
+    metadata: {
+      candidateName: safeStr(metadataRaw.candidateName || metadataRaw.candidate_name, "Unknown"),
+      email: metadataRaw.email as string || null,
+      phone: metadataRaw.phone as string || null,
+      location: metadataRaw.location as string || null,
+      linkedin: metadataRaw.linkedin as string || null,
+      documentStats: {
+        pages: safeNum((metadataRaw.documentStats as Record<string, unknown>)?.pages, 1),
+        wordCount: safeNum((metadataRaw.documentStats as Record<string, unknown>)?.wordCount || (metadataRaw.documentStats as Record<string, unknown>)?.word_count, 0),
+        bulletCount: safeNum((metadataRaw.documentStats as Record<string, unknown>)?.bulletCount || (metadataRaw.documentStats as Record<string, unknown>)?.bullet_count, 0),
+      },
+    },
+    professionalSummary: {
+      text: safeStr(summaryRaw.text, ""),
+      yearsMentioned: safeNum(summaryRaw.yearsMentioned || summaryRaw.years_mentioned, 0) || null,
+      keyThemes: safeArr(summaryRaw.keyThemes || summaryRaw.key_themes).map(String),
+      qualityScore: safeNum(summaryRaw.qualityScore || summaryRaw.quality_score, 50),
+      issues: safeArr(summaryRaw.issues).map((i: unknown) => {
+        const issue = i as Record<string, unknown>;
+        return { code: safeStr(issue.code, "A1"), issue: safeStr(issue.issue, ""), severity: (issue.severity || "medium") as "info" | "low" | "medium" | "high" | "critical", count: safeNum(issue.count, 1), fix: safeStr(issue.fix) };
+      }),
+    },
+    experience: {
+      totalYears: safeNum(experienceRaw.totalYears || experienceRaw.total_years, 0),
+      roles: safeArr(experienceRaw.roles).map((r: unknown) => {
+        const role = r as Record<string, unknown>;
+        const bullets = safeArr(role.bullets);
+        return {
+          title: safeStr(role.title, ""),
+          company: safeStr(role.company, ""),
+          location: role.location as string || null,
+          startDate: safeStr(role.startDate || role.start_date, ""),
+          endDate: safeStr(role.endDate || role.end_date, "Present"),
+          durationMonths: safeNum(role.durationMonths || role.duration_months, 12),
+          seniorityLevel: (role.seniorityLevel || role.seniority_level || "Mid") as FullOutput["cvAnalysis"]["experience"]["roles"][0]["seniorityLevel"],
+          bullets: bullets.map((b: unknown, idx: number) => {
+            const bullet = (typeof b === "string" ? { text: b } : b) as Record<string, unknown>;
+            const av = (bullet.actionVerb || bullet.action_verb || {}) as Record<string, unknown>;
+            const q = (bullet.quantification || {}) as Record<string, unknown>;
+            const res = (bullet.result || {}) as Record<string, unknown>;
+            return {
+              text: safeStr(bullet.text, ""),
+              index: safeNum(bullet.index, idx),
+              score: safeNum(bullet.score, 50),
+              actionVerb: { word: av.word as string || null, strength: (av.strength || "moderate") as "strong" | "moderate" | "weak" | "none", score: safeNum(av.score, 50) },
+              quantification: { hasQuantification: !!q.hasQuantification, type: q.type as string || null, score: safeNum(q.score, 50) },
+              result: { hasResult: !!res.hasResult, type: (res.type || "missing") as "quantified" | "implied" | "missing", score: safeNum(res.score, 30) },
+              issues: safeArr(bullet.issues).map((i: unknown) => ({ code: safeStr((i as Record<string, unknown>).code, "A10"), issue: safeStr((i as Record<string, unknown>).issue, "") })),
+              rewrite: bullet.rewrite ? { suggested: safeStr((bullet.rewrite as Record<string, unknown>).suggested, ""), projectedScore: safeNum((bullet.rewrite as Record<string, unknown>).projectedScore, 70) } : undefined,
+            };
+          }),
+          bulletSummary: { count: bullets.length, averageScore: safeNum((role.bulletSummary as Record<string, unknown>)?.averageScore, 50), excellent: safeNum((role.bulletSummary as Record<string, unknown>)?.excellent, 0), poor: safeNum((role.bulletSummary as Record<string, unknown>)?.poor, 0) },
+        };
+      }),
+      progression: {
+        pattern: ((experienceRaw.progression as Record<string, unknown>)?.pattern || "Steady") as "Stagnant" | "Slow" | "Steady" | "Accelerated" | "Exceptional",
+        isHealthy: !!(experienceRaw.progression as Record<string, unknown>)?.isHealthy,
+        assessment: safeStr((experienceRaw.progression as Record<string, unknown>)?.assessment, "Career progression appears steady"),
+      },
+      gaps: safeArr(experienceRaw.gaps).map((g: unknown) => {
+        const gap = g as Record<string, unknown>;
+        return { start: safeStr(gap.start, ""), end: safeStr(gap.end, ""), durationMonths: safeNum(gap.durationMonths || gap.duration_months, 0), explained: !!gap.explained };
+      }),
+    },
+    skills: {
+      validated: safeArr(skillsRaw.validated).map((s: unknown) => {
+        const skill = s as Record<string, unknown>;
+        return { skill: safeStr(skill.skill, ""), evidence: safeStr(skill.evidence, ""), proficiency: safeNum(skill.proficiency, 70) };
+      }),
+      implied: safeArr(skillsRaw.implied).map((s: unknown) => {
+        const skill = s as Record<string, unknown>;
+        return { skill: safeStr(skill.skill, ""), source: safeStr(skill.source, "") };
+      }),
+      ghost: safeArr(skillsRaw.ghost).map((s: unknown) => {
+        const skill = s as Record<string, unknown>;
+        return { skill: safeStr(skill.skill, ""), reason: safeStr(skill.reason, "Not validated") };
+      }),
+      validationRate: safeNum(skillsRaw.validationRate || skillsRaw.validation_rate, 70),
+    },
+    education: {
+      degrees: safeArr(educationRaw.degrees).map((d: unknown) => {
+        const deg = d as Record<string, unknown>;
+        return { degree: safeStr(deg.degree, ""), field: safeStr(deg.field, ""), institution: safeStr(deg.institution, ""), year: deg.year as number || null };
+      }),
+      certifications: safeArr(educationRaw.certifications).map((c: unknown) => {
+        const cert = c as Record<string, unknown>;
+        return { name: safeStr(cert.name, ""), issuer: safeStr(cert.issuer, ""), year: cert.year as number || null, status: (cert.status || "Unknown") as "Active" | "Expired" | "Unknown", relevance: (cert.relevance || "Medium") as "High" | "Medium" | "Low" };
+      }),
+    },
+    experienceFactors: {
+      h1TotalYears: { years: safeNum((expFactorsRaw.h1TotalYears as Record<string, unknown>)?.years, 0), score: safeNum((expFactorsRaw.h1TotalYears as Record<string, unknown>)?.score, 50), assessment: safeStr((expFactorsRaw.h1TotalYears as Record<string, unknown>)?.assessment, "") },
+      h2DomainYears: safeArr(expFactorsRaw.h2DomainYears).map((d: unknown) => {
+        const domain = d as Record<string, unknown>;
+        return { domain: safeStr(domain.domain, ""), years: safeNum(domain.years, 0), isPrimary: !!domain.isPrimary, score: safeNum(domain.score, 50) };
+      }),
+      h3IndustryYears: safeArr(expFactorsRaw.h3IndustryYears).map((i: unknown) => ({ industry: safeStr((i as Record<string, unknown>).industry, ""), years: safeNum((i as Record<string, unknown>).years, 0) })),
+      h4Recency: { recentRelevance: ((expFactorsRaw.h4Recency as Record<string, unknown>)?.recentRelevance || "Recent") as "Current" | "Recent" | "Dated", score: safeNum((expFactorsRaw.h4Recency as Record<string, unknown>)?.score, 70) },
+      h5Scope: { level: safeStr((expFactorsRaw.h5Scope as Record<string, unknown>)?.level, ""), evidence: safeArr((expFactorsRaw.h5Scope as Record<string, unknown>)?.evidence).map(String), score: safeNum((expFactorsRaw.h5Scope as Record<string, unknown>)?.score, 50) },
+      h6Complexity: { level: safeStr((expFactorsRaw.h6Complexity as Record<string, unknown>)?.level, ""), evidence: safeArr((expFactorsRaw.h6Complexity as Record<string, unknown>)?.evidence).map(String), score: safeNum((expFactorsRaw.h6Complexity as Record<string, unknown>)?.score, 50) },
+      h7Impact: { quantifiedCount: safeNum((expFactorsRaw.h7Impact as Record<string, unknown>)?.quantifiedCount, 0), totalValue: safeStr((expFactorsRaw.h7Impact as Record<string, unknown>)?.totalValue, ""), score: safeNum((expFactorsRaw.h7Impact as Record<string, unknown>)?.score, 50) },
+      h8Progression: { pattern: safeStr((expFactorsRaw.h8Progression as Record<string, unknown>)?.pattern, ""), trajectory: safeStr((expFactorsRaw.h8Progression as Record<string, unknown>)?.trajectory, ""), score: safeNum((expFactorsRaw.h8Progression as Record<string, unknown>)?.score, 50) },
+      h9Specialization: { type: safeStr((expFactorsRaw.h9Specialization as Record<string, unknown>)?.type, ""), primaryArea: safeStr((expFactorsRaw.h9Specialization as Record<string, unknown>)?.primaryArea, ""), score: safeNum((expFactorsRaw.h9Specialization as Record<string, unknown>)?.score, 50) },
+    },
+    bulletAnalysis: {
+      totalBullets: safeNum(bulletAnalysisRaw.totalBullets || bulletAnalysisRaw.total_bullets, 0),
+      averageScore: safeNum(bulletAnalysisRaw.averageScore || bulletAnalysisRaw.average_score, 50),
+      distribution: {
+        excellent: safeNum((bulletAnalysisRaw.distribution as Record<string, unknown>)?.excellent, 0),
+        good: safeNum((bulletAnalysisRaw.distribution as Record<string, unknown>)?.good, 0),
+        fair: safeNum((bulletAnalysisRaw.distribution as Record<string, unknown>)?.fair, 0),
+        poor: safeNum((bulletAnalysisRaw.distribution as Record<string, unknown>)?.poor, 0),
+      },
+      codeScores: {
+        A10: safeNum((bulletAnalysisRaw.codeScores as Record<string, unknown>)?.A10, 50),
+        A11: safeNum((bulletAnalysisRaw.codeScores as Record<string, unknown>)?.A11, 50),
+        A12: safeNum((bulletAnalysisRaw.codeScores as Record<string, unknown>)?.A12, 50),
+        A13: safeNum((bulletAnalysisRaw.codeScores as Record<string, unknown>)?.A13, 50),
+      },
+      rewritePriorities: safeArr(bulletAnalysisRaw.rewritePriorities || bulletAnalysisRaw.rewrite_priorities).map((r: unknown) => {
+        const rewrite = r as Record<string, unknown>;
+        return { roleIndex: safeNum(rewrite.roleIndex || rewrite.role_index, 0), bulletIndex: safeNum(rewrite.bulletIndex || rewrite.bullet_index, 0), currentText: safeStr(rewrite.currentText || rewrite.current_text, ""), currentScore: safeNum(rewrite.currentScore || rewrite.current_score, 30), suggestedRewrite: safeStr(rewrite.suggestedRewrite || rewrite.suggested_rewrite, ""), projectedScore: safeNum(rewrite.projectedScore || rewrite.projected_score, 70) };
+      }),
+    },
+    issuesDetected: safeArr(cvAnalysisRaw.issuesDetected || cvAnalysisRaw.issues_detected).map((i: unknown) => {
+      const issue = i as Record<string, unknown>;
+      return { code: safeStr(issue.code, "A1"), issue: safeStr(issue.issue, ""), severity: (issue.severity || "medium") as "info" | "low" | "medium" | "high" | "critical", count: safeNum(issue.count, 1), fix: safeStr(issue.fix) };
+    }),
+    strengthsDetected: safeArr(cvAnalysisRaw.strengthsDetected || cvAnalysisRaw.strengths_detected).map((s: unknown) => {
+      const strength = s as Record<string, unknown>;
+      return { code: safeStr(strength.code, "D1"), strength: safeStr(strength.strength, "") };
+    }),
+  };
+  
+  const output: FullOutput = {
     version: "2.3",
     mode: "FULL",
     audience,
     generatedAt: new Date().toISOString(),
-    cvAnalysis: (getPath(data, "cvAnalysis", "cv_analysis") || {}) as FullOutput["cvAnalysis"],
+    cvAnalysis,
     jdAnalysis: getPath(data, "jdAnalysis", "jd_analysis") as FullOutput["jdAnalysis"],
-    studentAnalysis: audience === "STUDENT" ? getPath(data, "studentAnalysis", "student_analysis") as FullOutput["studentAnalysis"] : undefined,
-    hrAnalysis: audience === "HR" ? getPath(data, "hrAnalysis", "hr_analysis") as FullOutput["hrAnalysis"] : undefined,
+    studentAnalysis: audience === "STUDENT" ? studentAnalysisRaw as FullOutput["studentAnalysis"] : undefined,
+    hrAnalysis: audience === "HR" ? hrAnalysisRaw as FullOutput["hrAnalysis"] : undefined,
   };
+  
+  return output;
 }
 
 export function transformOutput(raw: unknown, mode: OutputMode, audience: AudienceType): AnalysisOutput {

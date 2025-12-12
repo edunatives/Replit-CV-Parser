@@ -154,13 +154,33 @@ function HeaderSection({ data, meta, candidateName, candidateTitle }: {
   candidateName?: string;
   candidateTitle?: string;
 }) {
-  const scores = "scores" in data ? data.scores : null;
-  const overall = scores?.overall ?? 0;
-  const grade = scores?.grade ?? "N/A";
-  const verdict = "verdict" in data ? data.verdict : "";
-  const hasJd = "hasJd" in data ? data.hasJd : !!("jdSummary" in data && data.jdSummary);
-  const rawCompat = scores?.rawCompatibility;
-  const tei = scores?.tei;
+  let overall = 0;
+  let grade = "N/A";
+  let rawCompat: number | null | undefined = null;
+  let tei: number | null | undefined = null;
+  let verdict = "";
+  let hasJd = false;
+
+  if (isLiteOutput(data) || isStandardOutput(data)) {
+    const scores = data.scores;
+    overall = scores?.overall ?? 0;
+    grade = scores?.grade ?? "N/A";
+    rawCompat = scores?.rawCompatibility;
+    tei = scores?.tei;
+    verdict = data.verdict || "";
+    hasJd = isLiteOutput(data) ? data.hasJd : !!data.jdSummary;
+  } else if (isFullOutput(data)) {
+    const bulletAvg = data.cvAnalysis?.bulletAnalysis?.averageScore ?? 0;
+    const summaryQuality = data.cvAnalysis?.professionalSummary?.qualityScore ?? 50;
+    const validationRate = data.cvAnalysis?.skills?.validationRate ?? 70;
+    overall = Math.round((bulletAvg * 0.4 + summaryQuality * 0.3 + validationRate * 0.3));
+    if (data.studentAnalysis?.overallCvQuality) {
+      overall = data.studentAnalysis.overallCvQuality;
+    }
+    grade = overall >= 90 ? "A" : overall >= 85 ? "A-" : overall >= 80 ? "B+" : overall >= 70 ? "B" : overall >= 65 ? "B-" : overall >= 60 ? "C+" : overall >= 50 ? "C" : overall >= 40 ? "D" : "F";
+    verdict = data.studentAnalysis?.honestAssessment || data.hrAnalysis?.riskAssessment?.summary || "";
+    hasJd = !!data.jdAnalysis;
+  }
   
   const displayName = candidateName || (isLiteOutput(data) ? data.candidate : "") || 
     (isStandardOutput(data) ? data.cvSummary?.candidateName : "") ||
