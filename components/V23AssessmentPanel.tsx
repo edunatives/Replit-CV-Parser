@@ -392,6 +392,13 @@ function OverviewTab({ data }: { data: LiteOutput | StandardOutput | FullOutput 
               </Box>
             </CardContent>
           </Card>
+          <Alert 
+            severity="info" 
+            sx={{ mt: 1.5, fontSize: "0.75rem" }}
+            data-testid="alert-standard-mode-info"
+          >
+            This score uses summary-level analysis. For detailed per-bullet scoring and comprehensive improvement recommendations, switch to <strong>FULL</strong> mode.
+          </Alert>
         </Grid>
 
         {data.alternativeRoles && data.alternativeRoles.length > 0 && (
