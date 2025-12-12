@@ -291,13 +291,11 @@ export function transformToForensicV211(assessment: CVAssessment, filename: stri
     evidence: [],
   }));
 
-  const uiWeaknesses = assessment.weaknesses.map((w) => ({
+  const uiWeaknesses = assessment.weaknesses.map((w, i) => ({
+    code: "W" + (i + 1).toString().padStart(2, "0"),
+    icon: "error",
     severity: "medium" as const,
-    code: "W" + Math.random().toString(36).substring(2, 5).toUpperCase(),
-    title: w.split(":")[0] || w.substring(0, 30),
-    detail: w,
-    fix: "Address this issue to improve your CV score",
-    impact: "-5 points",
+    text: w,
   }));
 
   const uiRecommendations = assessment.recommendations.map((rec) => ({
