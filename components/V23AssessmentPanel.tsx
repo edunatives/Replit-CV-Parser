@@ -388,6 +388,7 @@ function OverviewTab({ data }: { data: LiteOutput | StandardOutput | FullOutput 
 
 function StrengthsTab({ data }: { data: LiteOutput | StandardOutput | FullOutput }) {
   const strengths: Strength[] = isLiteOutput(data) ? (data.topStrengths || []) : 
+    isStandardOutput(data) ? (data.topStrengths || []) :
     isFullOutput(data) ? (data.cvAnalysis?.strengthsDetected || []) : [];
 
   if (strengths.length === 0) {
@@ -423,6 +424,7 @@ function StrengthsTab({ data }: { data: LiteOutput | StandardOutput | FullOutput
 
 function IssuesTab({ data }: { data: LiteOutput | StandardOutput | FullOutput }) {
   const issues: Issue[] = isLiteOutput(data) ? (data.topIssues || []) : 
+    isStandardOutput(data) ? (data.topIssues || []) :
     isFullOutput(data) ? (data.cvAnalysis?.issuesDetected || []) : [];
 
   if (issues.length === 0) {

@@ -391,7 +391,10 @@ ${jd ? "- jdSummary: {jobTitle, company, seniorityLevel, mustHaveSkills[], niceT
 ${jd ? "- skillMatch: {tier1/2/3 {matched, total, score}, missingCritical[], ghostSkills[]}" : ""}
 ${jd ? "- experienceMatch: {totalYearsMatch, domainYearsMatch, domainGap, scopeMatch}" : ""}
 - bulletHealth: {totalBullets, averageScore, distribution{excellent,good,fair,poor}, topIssue, topFix}
-- improvements: {critical[], high[], medium[], scorePotential{current, afterCritical, afterAll, ceiling}}
+- topIssues: [{code, issue, severity, count, fix}] (top 5 issues detected A1-H9)
+- topStrengths: [{code, strength}] (top 5 strengths D1-D8)
+- improvements: {critical[], high[], medium[]} where each item is {code, priority, action, impact, effort}
+- improvements.scorePotential: {current, afterCritical, afterAll, ceiling}
 - verdict: "<assessment summary>"
 ${audience === "STUDENT" ? "- alternativeRoles: [{role, fitScore, reason}]\n- nextSteps: {immediate[], thisWeek[], beforeApplication[]}\n- encouragement" : "- riskLevel, hireRecommendation\n- verificationItems: [{item, priority, reason}]\n- interviewQuestions: [{question, probing, redFlag}]"}`;
   } else {

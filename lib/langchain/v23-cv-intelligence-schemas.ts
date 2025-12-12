@@ -167,6 +167,9 @@ export const StandardOutputSchema = z.object({
   skillMatch: SkillMatchSchema.optional(),
   experienceMatch: ExperienceMatchSchema.optional(),
   bulletHealth: BulletHealthSchema,
+  
+  topIssues: z.array(IssueSchema).optional(),
+  topStrengths: z.array(StrengthSchema).optional(),
   improvements: ImprovementsSchema,
   
   verdict: z.string(),
