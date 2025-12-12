@@ -54,9 +54,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "CV data is required" }, { status: 400 });
     }
 
-    const apiKey = process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json({ error: "AI service not configured" }, { status: 500 });
+    const userApiKey = process.env.GOOGLE_API_KEY;
+    const replitApiKey = process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
+    if (!userApiKey && !replitApiKey) {
+      return NextResponse.json({ error: "AI service not configured (GOOGLE_API_KEY or AI_INTEGRATIONS_GEMINI_API_KEY required)" }, { status: 500 });
     }
 
     const cvSummary = formatCVSummary(cv);

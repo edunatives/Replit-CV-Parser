@@ -25,6 +25,7 @@ import {
 } from "./normalize";
 import { GoogleGenAI } from "@google/genai";
 import { buildCVParsingPrompt, cleanAIResponse, validateCVDocument } from "@/lib/ai/rules";
+import { parseCVWithLangChain } from "@/lib/langchain/cv-parser";
 
 type PdfParseResult = { text: string; numpages: number };
 
@@ -99,57 +100,62 @@ interface GeminiExtractionResult {
 }
 
 /**
- * Extract structured CV data using Gemini 2.5 Flash AI
- * Sends CV text to Gemini for intelligent parsing and returns structured JSON
+ * Extract structured CV data using LangChain-style Zod-validated parsing
+ * Uses the LangChain module for reliable structured output with validation
  * 
  * @internal
  * @param {string} text - Raw text extracted from CV document
  * @returns {Promise<GeminiExtractionResult | null>} Parsed data with token usage, or null if AI unavailable
  */
 async function extractWithGemini(text: string): Promise<GeminiExtractionResult | null> {
-  const apiKey = process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
-  const baseUrl = process.env.AI_INTEGRATIONS_GEMINI_BASE_URL;
+  const userApiKey = process.env.GOOGLE_API_KEY;
+  const replitApiKey = process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
   
-  if (!apiKey) {
-    console.log("Gemini API key not available, falling back to regex extraction");
+  if (!userApiKey && !replitApiKey) {
+    console.log("No Gemini API key available, falling back to regex extraction");
     return null;
   }
 
   try {
-    const ai = new GoogleGenAI({
-      apiKey,
-      httpOptions: {
-        apiVersion: "",
-        baseUrl: baseUrl,
-      },
-    });
-
-    const prompt = buildCVParsingPrompt(text);
-
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-    });
-
-    const responseText = response.text?.trim() || "";
+    console.log("Using LangChain-style Zod-validated CV parsing");
+    const result = await parseCVWithLangChain(text);
     
-    // Extract token usage from response metadata
-    const usageMetadata = response.usageMetadata;
-    const tokenUsage: TokenUsage = {
-      promptTokens: usageMetadata?.promptTokenCount || 0,
-      completionTokens: usageMetadata?.candidatesTokenCount || 0,
-      totalTokens: usageMetadata?.totalTokenCount || 0,
+    console.log(`LangChain CV parsing - Token usage: Prompt: ${result.tokenUsage.promptTokens}, Completion: ${result.tokenUsage.completionTokens}, Total: ${result.tokenUsage.totalTokens}`);
+    
+    const data: GeminiCVResponse = {
+      name: result.data.name,
+      title: result.data.title,
+      email: result.data.email,
+      phone: result.data.phone,
+      location: result.data.location,
+      website: result.data.website,
+      linkedin: result.data.linkedin,
+      github: result.data.github,
+      summary: result.data.summary,
+      experience: result.data.experience.map(exp => ({
+        company: exp.company,
+        role: exp.role,
+        duration: exp.duration,
+        description: exp.description,
+      })),
+      education: result.data.education.map(edu => ({
+        institution: edu.institution,
+        degree: edu.degree,
+        year: edu.year,
+      })),
+      certifications: result.data.certifications.map(cert => ({
+        name: cert.name,
+        issuer: cert.issuer,
+        year: cert.year,
+      })),
+      skills: result.data.skills,
+      strengths: result.data.strengths,
     };
     
-    console.log(`Gemini token usage - Prompt: ${tokenUsage.promptTokens}, Completion: ${tokenUsage.completionTokens}, Total: ${tokenUsage.totalTokens}`);
-    
-    // Clean up response - remove markdown code blocks if present
-    const jsonText = cleanAIResponse(responseText);
-    const parsed = JSON.parse(jsonText) as GeminiCVResponse;
-    console.log("Gemini extraction successful");
-    return { data: parsed, tokenUsage };
+    console.log("LangChain CV extraction successful");
+    return { data, tokenUsage: result.tokenUsage };
   } catch (error) {
-    console.error("Gemini extraction error:", error);
+    console.error("LangChain CV extraction error:", error);
     return null;
   }
 }
