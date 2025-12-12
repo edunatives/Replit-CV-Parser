@@ -42,8 +42,8 @@ export interface ChainConfig {
 }
 
 const DEFAULT_CONFIG: Required<ChainConfig> = {
-  provider: "gemini",
-  model: "gemini-2.5-flash",
+  provider: "openai",
+  model: "gpt-4o",
   temperature: 0.2,
   maxOutputTokens: 16000,
   maxRetries: 3,
