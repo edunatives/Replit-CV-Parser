@@ -17,17 +17,18 @@ Preferred communication style: Simple, everyday language.
 
 ### Backend Architecture
 - **Framework**: Next.js API Routes for core functionalities.
-- **CV Parsing**: Implemented using `mammoth` (DOCX), `pdf-parse` (PDF), and AI-powered extraction via Gemini 2.5 Flash for intelligent, structured data extraction. Regex-based fallbacks are in place for key fields.
+- **CV Parsing**: Implemented using `mammoth` (DOCX), `pdf-parse` (PDF), and LangChain-style Zod-validated AI extraction via Gemini 2.5 Flash. Regex-based fallbacks are in place for key fields.
 - **API Endpoints**:
-    - `/api/parse`: Single CV parsing.
+    - `/api/parse`: Single CV parsing (uses LangChain module with Zod validation).
     - `/api/parse/batch`: Batch CV parsing.
     - `/api/cvs`: CV CRUD operations.
-    - `/api/assess`: AI-powered CV assessment (scores, strengths, weaknesses).
-    - `/api/assess/langchain`: LangChain-based assessment with reliable structured output.
-    - `/api/jd-match/langchain`: LangChain-based JD matching with v2.2 three-score system.
+    - `/api/assess/langchain`: LangChain-based CV assessment with Zod-validated structured output (primary endpoint).
+    - `/api/jd-match/langchain`: LangChain-based JD matching with v2.2 three-score system (primary endpoint).
     - `/api/advisor`: AI career advisor chat.
-    - `/api/jd-match`: Job description match analysis.
-- **AI-Powered Features**: Utilizes Gemini 2.5 Flash for structured JSON extraction and sophisticated assessment, JD matching, and advisory capabilities.
+    - `/api/assess`: Legacy CV assessment endpoint.
+    - `/api/jd-match`: Legacy JD match endpoint.
+- **AI-Powered Features**: All AI operations now use LangChain.js with Zod schemas for consistent, type-safe structured output. Gemini 2.5 Flash powers intelligent extraction, assessment, JD matching, and advisory capabilities.
+- **API Key Priority**: GOOGLE_API_KEY (user's direct key) takes precedence over AI_INTEGRATIONS_GEMINI_API_KEY (Replit integration fallback). All LangChain modules support both.
 - **API Documentation**: Interactive Swagger UI at `/api-docs` with an OpenAPI 3.0 specification.
 - **NestJS Backend (Optional)**: An alternative NestJS backend is provided for future expansion, supporting advanced features like job queues, real-time processing, and microservices.
 
