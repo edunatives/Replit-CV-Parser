@@ -424,10 +424,10 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/assess/langchain", {
+      const response = await fetch("/api/assess", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cv }),
+        body: JSON.stringify({ cv, version }),
       });
       
       const contentType = response.headers.get("content-type");
@@ -440,7 +440,10 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
         throw new Error(data.error || "Failed to assess CV");
       }
       
-      if (data.assessment) {
+      if (version === "2.11" && data.analysis) {
+        setV211Analysis(data.analysis as ForensicAnalysisV211);
+        setUseV211(true);
+      } else if (data.assessment) {
         const normalized = normalizeAssessment(data.assessment as Record<string, unknown>);
         setAssessment(normalized);
         setUseV211(false);
@@ -531,7 +534,7 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/jd-match/langchain", {
+      const response = await fetch("/api/jd-match", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cv, jobDescription: jdText }),
