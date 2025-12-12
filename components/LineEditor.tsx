@@ -14,21 +14,41 @@ interface LineEditorProps {
 function normalizeToLines(text: string): string[] {
   if (!text) return [];
   
-  // First, split by existing newlines
   let normalized = text;
   
-  // Convert common bullet patterns to newlines:
-  // " - " (space-dash-space) at start of bullets
-  // ". - " (period-space-dash-space) sentence ending followed by bullet
-  normalized = normalized.replace(/\.\s+-\s+/g, ".\n- ");
-  normalized = normalized.replace(/([^-\n])\s+-\s+/g, "$1\n- ");
+  // Extended dash pattern: hyphen (-), en-dash (–), em-dash (—), minus (−), non-breaking hyphen (‑)
+  // Using character class with all common dash-like characters
+  const dashChars = "\\-\\–\\—\\−\\‑";
   
-  // Also handle "• " bullet points that are not on their own lines
-  normalized = normalized.replace(/\.\s+•\s+/g, ".\n• ");
-  normalized = normalized.replace(/([^•\n])\s+•\s+/g, "$1\n• ");
+  // Pattern 1: ". - " or ". – " (period, optional space(s), any dash, space) -> new bullet line
+  // Using a more permissive regex
+  normalized = normalized.replace(new RegExp(`\\.\\s*[${dashChars}]\\s+`, "g"), ".\n- ");
+  
+  // Pattern 2: ", - " (comma, optional space(s), any dash, space) -> new bullet line  
+  normalized = normalized.replace(new RegExp(`,\\s*[${dashChars}]\\s+`, "g"), ",\n- ");
+  
+  // Pattern 3: Text ending with letter/digit followed by " - " -> new bullet line
+  normalized = normalized.replace(new RegExp(`([a-zA-Z0-9])\\s+[${dashChars}]\\s+`, "g"), "$1\n- ");
+  
+  // Pattern 4: Handle "• " bullet points that are inline
+  normalized = normalized.replace(/\.\s*•\s*/g, ".\n• ");
+  normalized = normalized.replace(/([a-zA-Z0-9])\s+•\s*/g, "$1\n• ");
+  
+  // Pattern 5: Handle numbered bullets like ". 1. " or ". 1) "
+  normalized = normalized.replace(/\.\s+(\d+[.)]\s+)/g, ".\n$1");
+  
+  // Pattern 6: If no explicit bullet markers found, try splitting long text on sentences
+  // Only do this if the text is long (likely multiple bullet points) and has no newlines yet
+  if (!normalized.includes("\n") && normalized.length > 200) {
+    // Look for patterns like sentence end followed by capital letter start
+    // This handles "...delivery. Implemented..." type text
+    normalized = normalized.replace(/\.\s+([A-Z])/g, ".\n$1");
+  }
   
   const lines = normalized.split("\n");
-  return lines;
+  
+  // Filter out empty lines and trim whitespace
+  return lines.map(line => line.trim()).filter(line => line.length > 0);
 }
 
 // Helper to convert lines back to the original format with proper separators

@@ -1541,18 +1541,32 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$ico
 // Helper to normalize bullet separators to newlines for display
 function normalizeToLines(text) {
     if (!text) return [];
-    // First, split by existing newlines
     let normalized = text;
-    // Convert common bullet patterns to newlines:
-    // " - " (space-dash-space) at start of bullets
-    // ". - " (period-space-dash-space) sentence ending followed by bullet
-    normalized = normalized.replace(/\.\s+-\s+/g, ".\n- ");
-    normalized = normalized.replace(/([^-\n])\s+-\s+/g, "$1\n- ");
-    // Also handle "• " bullet points that are not on their own lines
-    normalized = normalized.replace(/\.\s+•\s+/g, ".\n• ");
-    normalized = normalized.replace(/([^•\n])\s+•\s+/g, "$1\n• ");
+    // Extended dash pattern: hyphen (-), en-dash (–), em-dash (—), minus (−), non-breaking hyphen (‑)
+    // Using character class with all common dash-like characters
+    const dashChars = "\\-\\–\\—\\−\\‑";
+    // Pattern 1: ". - " or ". – " (period, optional space(s), any dash, space) -> new bullet line
+    // Using a more permissive regex
+    normalized = normalized.replace(new RegExp(`\\.\\s*[${dashChars}]\\s+`, "g"), ".\n- ");
+    // Pattern 2: ", - " (comma, optional space(s), any dash, space) -> new bullet line  
+    normalized = normalized.replace(new RegExp(`,\\s*[${dashChars}]\\s+`, "g"), ",\n- ");
+    // Pattern 3: Text ending with letter/digit followed by " - " -> new bullet line
+    normalized = normalized.replace(new RegExp(`([a-zA-Z0-9])\\s+[${dashChars}]\\s+`, "g"), "$1\n- ");
+    // Pattern 4: Handle "• " bullet points that are inline
+    normalized = normalized.replace(/\.\s*•\s*/g, ".\n• ");
+    normalized = normalized.replace(/([a-zA-Z0-9])\s+•\s*/g, "$1\n• ");
+    // Pattern 5: Handle numbered bullets like ". 1. " or ". 1) "
+    normalized = normalized.replace(/\.\s+(\d+[.)]\s+)/g, ".\n$1");
+    // Pattern 6: If no explicit bullet markers found, try splitting long text on sentences
+    // Only do this if the text is long (likely multiple bullet points) and has no newlines yet
+    if (!normalized.includes("\n") && normalized.length > 200) {
+        // Look for patterns like sentence end followed by capital letter start
+        // This handles "...delivery. Implemented..." type text
+        normalized = normalized.replace(/\.\s+([A-Z])/g, ".\n$1");
+    }
     const lines = normalized.split("\n");
-    return lines;
+    // Filter out empty lines and trim whitespace
+    return lines.map((line)=>line.trim()).filter((line)=>line.length > 0);
 }
 // Helper to convert lines back to the original format with proper separators
 function linesToText(lines) {
@@ -1575,7 +1589,7 @@ function LineEditor({ value, onChange, textStyle, placeholder }) {
             children: placeholder || "(No content)"
         }, void 0, false, {
             fileName: "[project]/components/LineEditor.tsx",
-            lineNumber: 49,
+            lineNumber: 69,
             columnNumber: 7
         }, this);
     }
@@ -1609,7 +1623,7 @@ function LineEditor({ value, onChange, textStyle, placeholder }) {
                         children: line || "\u00A0"
                     }, void 0, false, {
                         fileName: "[project]/components/LineEditor.tsx",
-                        lineNumber: 79,
+                        lineNumber: 99,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Tooltip$2f$Tooltip$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Tooltip$3e$__["Tooltip"], {
@@ -1644,28 +1658,28 @@ function LineEditor({ value, onChange, textStyle, placeholder }) {
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/components/LineEditor.tsx",
-                                lineNumber: 115,
+                                lineNumber: 135,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/LineEditor.tsx",
-                            lineNumber: 91,
+                            lineNumber: 111,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/LineEditor.tsx",
-                        lineNumber: 90,
+                        lineNumber: 110,
                         columnNumber: 11
                     }, this)
                 ]
             }, index, true, {
                 fileName: "[project]/components/LineEditor.tsx",
-                lineNumber: 65,
+                lineNumber: 85,
                 columnNumber: 9
             }, this))
     }, void 0, false, {
         fileName: "[project]/components/LineEditor.tsx",
-        lineNumber: 63,
+        lineNumber: 83,
         columnNumber: 5
     }, this);
 }
