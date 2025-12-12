@@ -1,0 +1,784 @@
+{
+  "cv_intelligence_report": {
+    "version": "2.3",
+    "generated_at": "2024-12-11T15:30:00Z",
+    "analysis_type": "STUDENT_CV_REVIEW",
+    "mode": "CV_ONLY_NO_JD",
+
+    "cv_analysis": {
+      "metadata": {
+        "candidate_name": "Ahmed Bahgat",
+        "contact": {
+          "email": "aahmedbahgatt@gmail.com",
+          "phone": "+966509576615",
+          "location": "Saudi Arabia",
+          "linkedin": "Not provided"
+        },
+        "document_stats": {
+          "pages": 3,
+          "word_count": 1150,
+          "bullet_count": 42
+        }
+      },
+
+      "professional_summary": {
+        "text": "An accomplished digital transformation leader and seasoned Enterprise [Architect] with 20+ years transforming technology landscapes for leading telecom operators and Fortune 500 enterprises, delivering $70M+ in quantifiable business value...",
+        "years_mentioned": 20,
+        "key_themes": [
+          "Digital Transformation",
+          "Enterprise Architecture",
+          "Telecom Industry",
+          "Cost Optimization",
+          "Service Management"
+        ],
+        "title_claimed": "Digital Transformation & Enterprise Architecture Leader",
+        "quality_score": 82,
+        "issues": [
+          {
+            "code": "E5",
+            "issue": "Missing word - 'seasoned Enterprise' should be 'seasoned Enterprise Architect'",
+            "severity": "medium"
+          }
+        ]
+      },
+
+      "experience": {
+        "total_years": 27,
+        "calculation_method": "1997 to 2024 with minor overlaps adjusted",
+        "career_span": "1997-Present",
+        "roles": [
+          {
+            "title": "Principal Enterprise Architect - Service Assurance and Observability",
+            "company": "Saudi Telecom Company (STC)",
+            "location": "Riyadh, Saudi Arabia",
+            "start_date": "2020-01",
+            "end_date": "Present",
+            "duration_months": 59,
+            "seniority_level": "Principal/Lead",
+            "bullet_count": 6,
+            "bullet_analysis": {
+              "average_score": 71,
+              "issues": ["2 bullets missing quantified results", "1 bullet too long"]
+            }
+          },
+          {
+            "title": "Principal Consultant",
+            "company": "HP Delivery Partner - Fingerprint Consultancy",
+            "location": "Saudi Arabia",
+            "start_date": "2013-01",
+            "end_date": "2014-12",
+            "duration_months": 24,
+            "seniority_level": "Principal",
+            "bullet_count": 2,
+            "bullet_analysis": {
+              "average_score": 58,
+              "issues": ["Both bullets lack quantified outcomes"]
+            }
+          },
+          {
+            "title": "End-End Solution Architect / Business Consultant",
+            "company": "Alcatel-Lucent",
+            "location": "Middle East & Africa",
+            "start_date": "2010-01",
+            "end_date": "2013-12",
+            "duration_months": 48,
+            "seniority_level": "Senior",
+            "bullet_count": 4,
+            "bullet_analysis": {
+              "average_score": 78,
+              "issues": ["Good quantification on Du project ($60M)"]
+            }
+          },
+          {
+            "title": "Solution Architecture Manager",
+            "company": "HP Delivery Partner - Fingerprint Consultancy",
+            "location": "Egypt & Saudi Arabia",
+            "start_date": "2008-01",
+            "end_date": "2010-12",
+            "duration_months": 36,
+            "seniority_level": "Manager",
+            "bullet_count": 5,
+            "bullet_analysis": {
+              "average_score": 75,
+              "issues": ["Good mix of projects with budgets"]
+            }
+          },
+          {
+            "title": "Presales Lead",
+            "company": "BMB (Premium Cisco Partner)",
+            "location": "Egypt",
+            "start_date": "2005-01",
+            "end_date": "2007-12",
+            "duration_months": 36,
+            "seniority_level": "Lead",
+            "bullet_count": 1,
+            "bullet_analysis": {
+              "average_score": 62,
+              "issues": ["Single bullet, could expand"]
+            }
+          },
+          {
+            "title": "IT Consultant",
+            "company": "USAID - Pal-Tech",
+            "location": "Cairo",
+            "start_date": "2002-01",
+            "end_date": "2005-12",
+            "duration_months": 48,
+            "seniority_level": "Mid",
+            "bullet_count": 1,
+            "bullet_analysis": {
+              "average_score": 72,
+              "issues": ["Has budget ($10M), good"]
+            }
+          },
+          {
+            "title": "Systems Integration Engineer",
+            "company": "ATG (Premium Microsoft Partner)",
+            "location": "Egypt",
+            "start_date": "1997-01",
+            "end_date": "2002-12",
+            "duration_months": 72,
+            "seniority_level": "Entry/Mid",
+            "bullet_count": 1,
+            "bullet_analysis": {
+              "average_score": 55,
+              "issues": ["Generic, no quantification"]
+            }
+          }
+        ],
+        "career_progression": "Steady Linear Growth",
+        "progression_health": "STRONG",
+        "gaps": []
+      },
+
+      "skills": {
+        "extracted": [
+          {
+            "skill": "Enterprise Architecture",
+            "category": "Domain",
+            "evidence_level": "Validated",
+            "proficiency": 5,
+            "recency": "Current",
+            "evidence": ["Current role title", "TOGAF certified", "EA practice establishment"]
+          },
+          {
+            "skill": "Digital Transformation",
+            "category": "Domain",
+            "evidence_level": "Validated",
+            "proficiency": 5,
+            "recency": "Current",
+            "evidence": ["Title", "Multiple transformation projects", "$70M+ value delivered"]
+          },
+          {
+            "skill": "ITSM / Service Management",
+            "category": "Domain",
+            "evidence_level": "Validated",
+            "proficiency": 5,
+            "recency": "Current",
+            "evidence": ["Service Management Office setup", "ITIL certified", "Remedy implementations"]
+          },
+          {
+            "skill": "IT Operations Management (ITOM)",
+            "category": "Domain",
+            "evidence_level": "Validated",
+            "proficiency": 5,
+            "recency": "Current",
+            "evidence": ["Current role focus", "AIOps implementation", "Monitoring solutions"]
+          },
+          {
+            "skill": "Cost Optimization",
+            "category": "Business",
+            "evidence_level": "Validated",
+            "proficiency": 5,
+            "recency": "Current",
+            "evidence": ["30M SAR apps", "20M SAR observability", "10M SAR licenses"]
+          },
+          {
+            "skill": "Solution Architecture",
+            "category": "Technical",
+            "evidence_level": "Validated",
+            "proficiency": 5,
+            "recency": "Current",
+            "evidence": ["Multiple architect roles", "End-to-end solution design"]
+          },
+          {
+            "skill": "Program/Project Management",
+            "category": "Management",
+            "evidence_level": "Validated",
+            "proficiency": 4,
+            "recency": "Current",
+            "evidence": ["20M SAR program management", "Multi-stream coordination"]
+          },
+          {
+            "skill": "AIOps",
+            "category": "Technical",
+            "evidence_level": "Validated",
+            "proficiency": 3,
+            "recency": "Current",
+            "evidence": ["Pioneered AIOps solution", "60% MTTR reduction"]
+          },
+          {
+            "skill": "Blockchain",
+            "category": "Technical",
+            "evidence_level": "Implied",
+            "proficiency": 2,
+            "recency": "Current",
+            "evidence": ["POC only for STC Pay"]
+          },
+          {
+            "skill": "RPA",
+            "category": "Technical",
+            "evidence_level": "Validated",
+            "proficiency": 3,
+            "recency": "Current",
+            "evidence": ["Built RPA practice", "40% execution time reduction"]
+          },
+          {
+            "skill": "Presales / Business Development",
+            "category": "Business",
+            "evidence_level": "Validated",
+            "proficiency": 4,
+            "recency": "Dated",
+            "evidence": ["Presales Lead role", "RFP ownership"]
+          },
+          {
+            "skill": "Telecom OSS/BSS",
+            "category": "Domain",
+            "evidence_level": "Validated",
+            "proficiency": 5,
+            "recency": "Current",
+            "evidence": ["Multiple telecom projects", "eTOM/TAM frameworks"]
+          }
+        ],
+        "validation_summary": {
+          "total_skills": 12,
+          "validated": 10,
+          "implied": 1,
+          "ghost": 1,
+          "validation_rate": 0.83
+        },
+        "ghost_skills": [
+          {
+            "skill": "AI/ML mentioned in summary",
+            "issue": "No specific AI/ML project evidence beyond AIOps"
+          }
+        ]
+      },
+
+      "education": {
+        "degrees": [
+          {
+            "degree": "B.Sc.",
+            "field": "Information Systems Management",
+            "institution": "Sadat Academy for Management Sciences",
+            "year": 1996,
+            "verification_needed": false
+          }
+        ],
+        "certifications": [
+          {
+            "name": "TOGAF 9.1 Certified Architect",
+            "issuer": "The Open Group",
+            "status": "Active",
+            "relevance": "High"
+          },
+          {
+            "name": "CGEIT - Certified in Governance of Enterprise IT",
+            "issuer": "ISACA",
+            "status": "Active",
+            "relevance": "High"
+          },
+          {
+            "name": "CISA - Certified Information Systems Auditor",
+            "issuer": "ISACA",
+            "status": "Active",
+            "relevance": "Medium"
+          },
+          {
+            "name": "IT4IT Foundation",
+            "issuer": "The Open Group",
+            "status": "Active",
+            "relevance": "High"
+          },
+          {
+            "name": "COBIT Auditor",
+            "issuer": "ISACA",
+            "status": "Active",
+            "relevance": "Medium"
+          },
+          {
+            "name": "ITIL v3 Foundation",
+            "issuer": "AXELOS",
+            "status": "Active",
+            "relevance": "High"
+          },
+          {
+            "name": "Lean IT Kaizen Certified",
+            "issuer": "Various",
+            "status": "Active",
+            "relevance": "Medium"
+          },
+          {
+            "name": "TMForum Business Process Framework",
+            "issuer": "TM Forum",
+            "status": "Active",
+            "relevance": "High"
+          }
+        ],
+        "certification_strength": "EXCELLENT - 8 relevant certifications"
+      },
+
+      "experience_factors": {
+        "h1_total_years": {
+          "years": 27,
+          "score": 100,
+          "assessment": "Exceptional depth of experience"
+        },
+        "h2_domain_breakdown": [
+          {"domain": "Enterprise Architecture", "years": 12, "score": 95},
+          {"domain": "Solution Architecture", "years": 8, "score": 90},
+          {"domain": "ITSM/Service Management", "years": 15, "score": 95},
+          {"domain": "IT Operations/Monitoring", "years": 10, "score": 90},
+          {"domain": "Presales/Consulting", "years": 10, "score": 85},
+          {"domain": "Telecom OSS", "years": 12, "score": 90}
+        ],
+        "h3_industry_breakdown": [
+          {"industry": "Telecommunications", "years": 20, "primary": true},
+          {"industry": "Financial Services", "years": 3},
+          {"industry": "Government/Public Sector", "years": 4}
+        ],
+        "h5_scope": {
+          "level": "Enterprise",
+          "evidence": ["20 technology streams", "500 applications portfolio", "Enterprise-wide strategies"],
+          "score": 95
+        },
+        "h6_complexity": {
+          "level": "Highly Complex",
+          "evidence": ["Multi-million dollar programs", "Cross-domain integration", "Transformation initiatives"],
+          "score": 90
+        },
+        "h7_impact": {
+          "level": "Strategic",
+          "quantified_achievements": 18,
+          "total_achievements": 42,
+          "quantification_rate": 0.43,
+          "total_value_documented": "$70M+ / 100M+ SAR",
+          "score": 85
+        },
+        "h8_progression": {
+          "pattern": "Steady",
+          "trajectory": "Engineer → Consultant → Architect → Principal Architect",
+          "assessment": "Healthy linear progression with increasing scope",
+          "score": 88
+        },
+        "h9_specialization": {
+          "type": "T-Shaped",
+          "primary_depth": "Enterprise Architecture / Service Management",
+          "secondary_breadth": ["Telecom OSS", "IT Operations", "Digital Transformation"],
+          "score": 90
+        }
+      },
+
+      "bullet_analysis": {
+        "total_bullets": 42,
+        "average_score": 68,
+        "distribution": {
+          "excellent": 6,
+          "good": 14,
+          "fair": 15,
+          "poor": 7
+        },
+        "issues_summary": {
+          "missing_results": 15,
+          "no_action_verb": 4,
+          "too_long": 3,
+          "too_short": 2,
+          "weak_verbs": 5,
+          "typos_grammar": 8
+        },
+        "code_scores": {
+          "A10_bullet_length": 75,
+          "A11_bullet_density": 70,
+          "A12_bullet_structure": 62,
+          "A13_bullet_consistency": 68
+        },
+        "top_issues": [
+          {
+            "issue": "Typos and grammar errors",
+            "count": 8,
+            "examples": [
+              "unifcation → unification",
+              "reducd → reduced",
+              "maontenance → maintenance",
+              "overnance → governance",
+              "licese reneals → license renewals",
+              "reducting → reducing",
+              "steerwardship → stewardship",
+              "Proram → Program"
+            ],
+            "severity": "high",
+            "fix_effort": "30 minutes"
+          },
+          {
+            "issue": "Missing quantified results",
+            "count": 15,
+            "severity": "medium",
+            "fix_effort": "2-3 hours"
+          },
+          {
+            "issue": "No action verb start",
+            "count": 4,
+            "examples": [
+              "SPOC for Applications GD...",
+              "NOC Monitoring dashboard...",
+              "Service Management Office, setup..."
+            ],
+            "severity": "medium",
+            "fix_effort": "30 minutes"
+          }
+        ],
+        "excellent_bullets": [
+          {
+            "text": "Pioneered AIOpS Business order monitoring solution reducting MTTR by 60%",
+            "score": 88,
+            "why": "Strong verb 'Pioneered', quantified result (60%)"
+          },
+          {
+            "text": "Unified 25+ legacy tools into single observability platform saving 20M SAR",
+            "score": 92,
+            "why": "Strong verb, scale (25+), cost savings quantified"
+          },
+          {
+            "text": "Managed application portfolio governance initiative for 500 business applications, realizing consolidation...30M SAR",
+            "score": 85,
+            "why": "Scale (500 apps), major cost impact"
+          }
+        ],
+        "poor_bullets_needing_rewrite": [
+          {
+            "text": "SPOC for Applications GD in the Dev-Sec-Ops model",
+            "score": 42,
+            "issues": ["No action verb", "Too short", "No context/result"]
+          },
+          {
+            "text": "Saudi Post: Conducted IT maturity assessment and developed multi-year improvement roadmap",
+            "score": 55,
+            "issues": ["No quantified outcome", "Generic"]
+          },
+          {
+            "text": "Samba Bank: Capacity Management solution",
+            "score": 35,
+            "issues": ["No verb", "No detail", "Fragment"]
+          }
+        ]
+      },
+
+      "issues_detected": [
+        {
+          "code": "E5",
+          "type": "Spelling/Grammar",
+          "severity": "high",
+          "count": 8,
+          "detail": "Multiple typos throughout document",
+          "impact": "Damages professionalism, ATS may mismatch keywords",
+          "fix": "Proofread entire document"
+        },
+        {
+          "code": "A12",
+          "type": "Bullet Structure",
+          "severity": "medium",
+          "count": 15,
+          "detail": "Many bullets lack quantified results",
+          "impact": "Weakens achievement perception"
+        },
+        {
+          "code": "A1",
+          "type": "Contact Info",
+          "severity": "low",
+          "count": 1,
+          "detail": "LinkedIn profile not included",
+          "impact": "Minor - recruiters often check LinkedIn"
+        },
+        {
+          "code": "E1",
+          "type": "Missing Word",
+          "severity": "medium",
+          "count": 1,
+          "detail": "Summary: 'seasoned Enterprise' missing 'Architect'",
+          "impact": "Incomplete sentence"
+        },
+        {
+          "code": "A13",
+          "type": "Bullet Consistency",
+          "severity": "low",
+          "detail": "Mixed bullet styles in KEY ACHIEVEMENTS section",
+          "impact": "Visual inconsistency"
+        }
+      ],
+
+      "strengths_detected": [
+        {
+          "code": "D1",
+          "type": "Quantified Achievements",
+          "count": 18,
+          "detail": "Strong quantification with $70M+ total, multiple SAR figures",
+          "examples": ["30M SAR", "20M SAR", "10M SAR", "60% MTTR", "$60M Du project"]
+        },
+        {
+          "code": "D2",
+          "type": "Leadership Evidence",
+          "count": 8,
+          "detail": "Clear leadership across programs, teams, and initiatives",
+          "examples": ["Managing 20 technology streams", "Cross-domain architects", "Program management"]
+        },
+        {
+          "code": "D4",
+          "type": "Business Impact",
+          "count": 12,
+          "detail": "Strong connection between technical work and business outcomes"
+        },
+        {
+          "code": "D5",
+          "type": "Growth Trajectory",
+          "detail": "Clear 27-year progression from Engineer to Principal Architect"
+        },
+        {
+          "code": "D6",
+          "type": "Unique Value",
+          "detail": "Rare combination: Presales + Architecture + Delivery experience"
+        },
+        {
+          "code": "D7",
+          "type": "Industry Recognition",
+          "detail": "8 relevant certifications including TOGAF, CGEIT, CISA"
+        },
+        {
+          "code": "D8",
+          "type": "Cross-functional",
+          "detail": "Experience spans EA, ITSM, Telecom OSS, Operations, Consulting"
+        }
+      ]
+    },
+
+    "student_analysis": {
+      "overall_cv_quality": {
+        "score": 76,
+        "grade": "B+",
+        "label": "Strong CV with Fixable Issues",
+        "summary": "This is a strong CV showcasing 27 years of impressive enterprise technology experience with $70M+ documented impact. The content is excellent but presentation issues (typos, missing quantification on some bullets) are holding it back. With 2-4 hours of focused editing, this could be an A-grade CV."
+      },
+
+      "honest_assessment": {
+        "what_works_well": [
+          "Exceptional quantified achievements ($70M+, 30M SAR, 20M SAR savings)",
+          "Clear career progression from engineer to principal architect",
+          "Strong certification portfolio (TOGAF, CGEIT, CISA, ITIL)",
+          "Diverse client experience (STC, Du, Vodafone, Fortune 500)",
+          "Good mix of technical depth and business impact",
+          "Unique presales + delivery combination adds value"
+        ],
+        "what_needs_work": [
+          "8 typos/grammar errors - MUST fix before any application",
+          "15 bullets missing quantified results - add numbers where possible",
+          "4 bullets don't start with action verbs",
+          "LinkedIn profile missing",
+          "Some older role descriptions too thin",
+          "KEY ACHIEVEMENTS section formatting inconsistent"
+        ],
+        "market_positioning": {
+          "current_level": "Principal/Director",
+          "target_level": "VP/C-Level ready",
+          "strongest_markets": [
+            "Telecom operators (MENA region)",
+            "Large enterprises needing EA leadership",
+            "Digital transformation consultancies",
+            "Tech companies with IT operations focus"
+          ],
+          "estimated_salary_range": {
+            "saudi_arabia": "800K - 1.2M SAR",
+            "uae": "70K - 100K AED/month",
+            "note": "Based on Principal EA / Director level in telecom"
+          }
+        }
+      },
+
+      "improvements": {
+        "critical": [
+          {
+            "priority": 1,
+            "action": "Fix all 8 typos and grammar errors",
+            "impact": "Professionalism + ATS matching",
+            "effort": "30 minutes",
+            "before_after": [
+              {"before": "unifcation", "after": "unification"},
+              {"before": "reducd maontenance", "after": "reduced maintenance"},
+              {"before": "overnance", "after": "governance"},
+              {"before": "licese reneals", "after": "license renewals"},
+              {"before": "reducting", "after": "reducing"},
+              {"before": "steerwardship", "after": "stewardship"},
+              {"before": "Proram", "after": "Program"},
+              {"before": "seasoned Enterprise with", "after": "seasoned Enterprise Architect with"}
+            ]
+          }
+        ],
+        "high": [
+          {
+            "priority": 2,
+            "action": "Add quantified results to 15 bullets missing outcomes",
+            "impact": "+10-15 points on bullet scores",
+            "effort": "2-3 hours",
+            "examples": [
+              {
+                "before": "Developed enterprise architecture artifacts and governance framework for all service management projects",
+                "after": "Developed enterprise architecture governance framework adopted across 20+ technology streams, reducing project approval time by 35%"
+              },
+              {
+                "before": "Saudi Post: Conducted IT maturity assessment and developed multi-year improvement roadmap",
+                "after": "Saudi Post: Conducted IT maturity assessment revealing 40+ gaps, delivered 3-year roadmap with projected 25% efficiency gains"
+              }
+            ]
+          },
+          {
+            "priority": 3,
+            "action": "Fix 4 bullets without action verbs",
+            "impact": "Stronger bullet openings",
+            "effort": "15 minutes",
+            "examples": [
+              {
+                "before": "SPOC for Applications GD in the Dev-Sec-Ops model",
+                "after": "Served as single point of contact for Applications GD, driving Dev-Sec-Ops adoption across 50+ development teams"
+              },
+              {
+                "before": "Samba Bank: Capacity Management solution",
+                "after": "Designed and delivered Capacity Management solution for Samba Bank, optimizing infrastructure utilization by 30%"
+              }
+            ]
+          }
+        ],
+        "medium": [
+          {
+            "priority": 4,
+            "action": "Add LinkedIn profile URL",
+            "impact": "Recruiter convenience",
+            "effort": "5 minutes"
+          },
+          {
+            "priority": 5,
+            "action": "Standardize bullet formatting in KEY ACHIEVEMENTS",
+            "impact": "Visual consistency",
+            "effort": "15 minutes"
+          },
+          {
+            "priority": 6,
+            "action": "Expand thin older role descriptions",
+            "impact": "Better story for early career",
+            "effort": "30 minutes"
+          }
+        ],
+        "score_potential": {
+          "current": 76,
+          "after_critical_fixes": 82,
+          "after_all_fixes": 88,
+          "ceiling": 92,
+          "note": "The content is excellent - fixes are mostly presentation"
+        }
+      },
+
+      "role_fit_analysis": {
+        "best_fit_roles": [
+          {
+            "role": "Chief Enterprise Architect",
+            "fit_score": 92,
+            "why": "Direct match to 12+ years EA experience, TOGAF certified, enterprise scope"
+          },
+          {
+            "role": "VP of IT Operations / Service Management",
+            "fit_score": 90,
+            "why": "Strong ITSM background, Service Management Office setup, ITIL certified"
+          },
+          {
+            "role": "Director of Digital Transformation",
+            "fit_score": 88,
+            "why": "$70M+ transformation value, end-to-end delivery experience"
+          },
+          {
+            "role": "Principal Consultant - EA/IT Strategy",
+            "fit_score": 90,
+            "why": "Consulting background + architecture depth + presales experience"
+          },
+          {
+            "role": "CTO / CIO (Mid-size company)",
+            "fit_score": 82,
+            "why": "Broad technical leadership, but may need more P&L/board experience"
+          }
+        ],
+        "stretch_roles": [
+          {
+            "role": "Head of R&D / Innovation",
+            "fit_score": 55,
+            "gap": "Different domain - optimization focus vs innovation focus",
+            "bridge": "AIOps and Blockchain POC show innovation capability"
+          },
+          {
+            "role": "Chief Digital Officer",
+            "fit_score": 65,
+            "gap": "Would need more customer-facing digital experience",
+            "bridge": "Strong on internal transformation, less on customer digital"
+          }
+        ]
+      },
+
+      "industry_specific_advice": {
+        "telecom": {
+          "fit": "EXCELLENT",
+          "keywords_present": ["OSS", "BSS", "eTOM", "TAM", "NOC", "Service Assurance"],
+          "tip": "Lead with telecom experience for telecom roles"
+        },
+        "banking_finance": {
+          "fit": "GOOD",
+          "keywords_to_add": ["Regulatory compliance", "Core banking", "Risk management"],
+          "tip": "Highlight Samba Bank and governance experience"
+        },
+        "consulting": {
+          "fit": "EXCELLENT",
+          "keywords_present": ["Advisory", "Transformation", "Roadmap", "Assessment"],
+          "tip": "Emphasize client-facing delivery and methodology development"
+        },
+        "technology": {
+          "fit": "GOOD",
+          "keywords_to_add": ["Product development", "Agile at scale", "Platform engineering"],
+          "tip": "Frame operational excellence in modern tech terms"
+        }
+      },
+
+      "next_steps": {
+        "immediate": [
+          "Fix 8 typos TODAY - this is critical",
+          "Add LinkedIn URL",
+          "Run through Grammarly or similar tool"
+        ],
+        "this_week": [
+          "Add quantified results to 15 weak bullets",
+          "Fix action verb issues on 4 bullets",
+          "Standardize formatting"
+        ],
+        "before_next_application": [
+          "Tailor KEY ACHIEVEMENTS section to target role",
+          "Ensure keywords match job description",
+          "Prepare 2-3 versions for different role types"
+        ]
+      },
+
+      "encouragement": {
+        "message": "Ahmed, you have an impressive 27-year career with genuinely strong achievements. The $70M+ in documented business value, enterprise-scale transformation experience, and excellent certification portfolio make you a competitive candidate for senior architecture and IT leadership roles. The issues in this CV are all fixable presentation problems - the substance is excellent. Invest 3-4 hours in the fixes above and you'll have a very strong CV.",
+        "competitive_advantages": [
+          "Rare presales → architecture → delivery combination",
+          "Quantified results that most candidates lack",
+          "8 relevant certifications showing commitment to profession",
+          "Major brand experience (STC, Alcatel-Lucent, HP, Du, Vodafone)",
+          "Regional expertise (MENA) highly valued locally"
+        ]
+      }
+    }
+  }
+}
