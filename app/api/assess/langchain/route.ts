@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     }
 
     const availableProviders = getAvailableProviders();
-    const selectedProvider = provider || (availableProviders.includes("gemini") ? "gemini" : availableProviders[0]);
+    const selectedProvider = provider || (availableProviders.includes("openai") ? "openai" : availableProviders[0]);
     
     if (!selectedProvider || availableProviders.length === 0) {
       return NextResponse.json({ 
