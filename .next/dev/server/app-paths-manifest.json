@@ -1,4 +1,3 @@
 {
-  "/api/assess/langchain/route": "app/api/assess/langchain/route.js",
   "/page": "app/page.js"
 }

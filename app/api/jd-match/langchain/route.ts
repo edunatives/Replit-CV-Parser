@@ -94,7 +94,6 @@ export async function POST(request: NextRequest) {
       audience,
       provider: modelConfig.provider,
       model: modelConfig.model,
-      temperature: modelConfig.temperature,
     });
     
     const rawCompat = result.data && "scores" in result.data ? result.data.scores.rawCompatibility : "N/A";
