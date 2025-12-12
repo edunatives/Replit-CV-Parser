@@ -2113,6 +2113,23 @@ const templateRegistry = {
         showMetaIcons: true,
         companyColor: "#2874a6",
         summaryBoxed: false
+    },
+    "typical": {
+        id: "typical",
+        name: "Typical",
+        description: "Clean professional style with green accents and uppercase section headers",
+        headerBg: "#ffffff",
+        accent: "#1a1a1a",
+        headerText: "#1a1a1a",
+        bodyBg: "#ffffff",
+        bodyText: "#1a1a1a",
+        bodyTextSecondary: "#4a4a4a",
+        borderBottom: "none",
+        headerCentered: false,
+        sectionHeaderVariant: "default",
+        showMetaIcons: false,
+        companyColor: "#22c55e",
+        summaryBoxed: false
     }
 };
 function getTemplateStyle(template) {
