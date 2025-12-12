@@ -446,32 +446,33 @@ function transformToFull(raw: unknown, audience: AudienceType): FullOutput {
       h9Specialization: { type: safeStr((expFactorsRaw.h9Specialization as Record<string, unknown>)?.type, ""), primaryArea: safeStr((expFactorsRaw.h9Specialization as Record<string, unknown>)?.primaryArea, ""), score: safeNum((expFactorsRaw.h9Specialization as Record<string, unknown>)?.score, 50) },
     },
     bulletAnalysis: (() => {
-      // Collect all bullet scores from experienceRaw (raw data) to compute distribution
-      const allBulletScores: number[] = [];
+      // Sum distribution counts from each role's bulletSummary (AI provides aggregates per role)
+      let sumExcellent = 0, sumGood = 0, sumFair = 0, sumPoor = 0;
       safeArr(experienceRaw.roles).forEach((r: unknown) => {
         const role = r as Record<string, unknown>;
-        safeArr(role.bullets).forEach((b: unknown) => {
-          const bullet = (typeof b === "string" ? { score: 50 } : b) as Record<string, unknown>;
-          allBulletScores.push(safeNum(bullet.score, 50));
-        });
+        const bs = (role.bulletSummary || role.bullet_summary || {}) as Record<string, unknown>;
+        sumExcellent += safeNum(bs.excellent, 0);
+        sumGood += safeNum(bs.good, 0);
+        sumFair += safeNum(bs.fair, 0);
+        sumPoor += safeNum(bs.poor, 0);
       });
       
-      // Compute distribution from bullet scores
+      // Distribution computed from role summaries
       const computedDistribution = {
-        excellent: allBulletScores.filter(s => s >= 80).length,
-        good: allBulletScores.filter(s => s >= 60 && s < 80).length,
-        fair: allBulletScores.filter(s => s >= 40 && s < 60).length,
-        poor: allBulletScores.filter(s => s < 40).length,
+        excellent: sumExcellent,
+        good: sumGood,
+        fair: sumFair,
+        poor: sumPoor,
       };
+      const computedTotal = sumExcellent + sumGood + sumFair + sumPoor;
       
-      // Use computed values if AI didn't provide them
-      const totalBullets = safeNum(bulletAnalysisRaw.totalBullets || bulletAnalysisRaw.total_bullets, allBulletScores.length);
-      const avgFromAI = safeNum(bulletAnalysisRaw.averageScore || bulletAnalysisRaw.average_score, 0);
-      const avgFromComputed = allBulletScores.length > 0 ? Math.round(allBulletScores.reduce((a, b) => a + b, 0) / allBulletScores.length) : 50;
-      const averageScore = Math.min(100, avgFromAI > 0 ? avgFromAI : avgFromComputed);
+      // Use AI values if provided, otherwise computed
+      const totalBullets = safeNum(bulletAnalysisRaw.totalBullets || bulletAnalysisRaw.total_bullets, computedTotal > 0 ? computedTotal : 0);
+      const averageScore = Math.min(100, safeNum(bulletAnalysisRaw.averageScore || bulletAnalysisRaw.average_score, 50));
       
       const aiDistribution = bulletAnalysisRaw.distribution as Record<string, unknown> | undefined;
       const hasAIDistribution = aiDistribution && (safeNum(aiDistribution.excellent, 0) + safeNum(aiDistribution.good, 0) + safeNum(aiDistribution.fair, 0) + safeNum(aiDistribution.poor, 0)) > 0;
+      const hasComputedDistribution = computedTotal > 0;
       
       return {
         totalBullets,
@@ -481,8 +482,13 @@ function transformToFull(raw: unknown, audience: AudienceType): FullOutput {
           good: safeNum(aiDistribution!.good, 0),
           fair: safeNum(aiDistribution!.fair, 0),
           poor: safeNum(aiDistribution!.poor, 0),
-        } : computedDistribution,
-      codeScores: {
+        } : hasComputedDistribution ? computedDistribution : {
+          excellent: 0,
+          good: 0,
+          fair: 0,
+          poor: 0,
+        },
+        codeScores: {
         A10: safeNum((bulletAnalysisRaw.codeScores as Record<string, unknown>)?.A10, 50),
         A11: safeNum((bulletAnalysisRaw.codeScores as Record<string, unknown>)?.A11, 50),
         A12: safeNum((bulletAnalysisRaw.codeScores as Record<string, unknown>)?.A12, 50),
