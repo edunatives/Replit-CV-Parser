@@ -568,7 +568,7 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
     // v2.3 CV Intelligence Engine UI
     if (useV23 && (v23Analysis || loading || error)) {
       return (
-        <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+        <Box sx={{ height: "100%", display: "flex", flexDirection: "column", overflow: "auto" }}>
           <V23AssessmentPanel
             analysis={v23Analysis}
             loading={loading}
@@ -577,7 +577,7 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
             candidateTitle={cv.title}
           />
           {v23Analysis && (
-            <Box sx={{ p: 2, borderTop: 1, borderColor: "divider" }}>
+            <Box sx={{ p: 2, mt: 2 }}>
               <Box sx={{ display: "flex", gap: 1, mb: 1.5, alignItems: "center", flexWrap: "wrap" }}>
                 <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>Depth:</Typography>
                 <ToggleButtonGroup
