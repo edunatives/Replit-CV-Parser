@@ -815,6 +815,17 @@ function ActionsTab({ data }: { data: LiteOutput | StandardOutput | FullOutput }
 function BulletsTab({ data }: { data: StandardOutput | FullOutput }) {
   let bulletHealth = null;
   let rewritePriorities: Array<{ currentText: string; suggestedRewrite: string; currentScore: number; projectedScore: number }> = [];
+  let allBullets: Array<{
+    roleTitle: string;
+    company: string;
+    text: string;
+    score: number;
+    actionVerb: { word: string | null; strength: string; score: number };
+    quantification: { hasQuantification: boolean; type: string | null; score: number };
+    result: { hasResult: boolean; type: string; score: number };
+    issues: Array<{ code: string; issue: string }>;
+    rewrite?: { suggested: string; projectedScore: number };
+  }> = [];
   
   if (isStandardOutput(data) && data.bulletHealth) {
     bulletHealth = data.bulletHealth;
@@ -824,10 +835,31 @@ function BulletsTab({ data }: { data: StandardOutput | FullOutput }) {
       totalBullets: ba.totalBullets,
       averageScore: Math.min(100, ba.averageScore),
       distribution: ba.distribution,
-      topIssue: "See rewrite priorities below",
+      topIssue: "See detailed analysis below",
       topFix: "Focus on bullets with lowest scores",
     };
     rewritePriorities = ba.rewritePriorities || [];
+    
+    // Extract all bullets from experience roles for FULL mode
+    if (data.cvAnalysis?.experience?.roles) {
+      data.cvAnalysis.experience.roles.forEach((role) => {
+        if (role.bullets && Array.isArray(role.bullets)) {
+          role.bullets.forEach((bullet) => {
+            allBullets.push({
+              roleTitle: role.title,
+              company: role.company,
+              text: bullet.text,
+              score: bullet.score,
+              actionVerb: bullet.actionVerb,
+              quantification: bullet.quantification,
+              result: bullet.result,
+              issues: bullet.issues || [],
+              rewrite: bullet.rewrite,
+            });
+          });
+        }
+      });
+    }
   }
 
   if (!bulletHealth) {
@@ -837,6 +869,15 @@ function BulletsTab({ data }: { data: StandardOutput | FullOutput }) {
       </Box>
     );
   }
+
+  const getVerbStrengthColor = (strength: string) => {
+    switch (strength) {
+      case "strong": return "#22c55e";
+      case "moderate": return "#eab308";
+      case "weak": return "#f97316";
+      default: return "#ef4444";
+    }
+  };
 
   return (
     <Box>
@@ -902,7 +943,90 @@ function BulletsTab({ data }: { data: StandardOutput | FullOutput }) {
         </Card>
       )}
 
-      {rewritePriorities.length > 0 && (
+      {/* FULL MODE: Show each bullet with detailed LLM feedback */}
+      {isFullOutput(data) && allBullets.length > 0 && (
+        <Box sx={{ mt: 3 }}>
+          <Typography variant="subtitle2" sx={{ mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
+            Detailed Bullet Feedback ({allBullets.length} bullets)
+          </Typography>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {allBullets.map((bullet, idx) => (
+              <Card key={idx} elevation={0} sx={{ bgcolor: "#f8fafc", border: "1px solid #e2e8f0" }} data-testid={`bullet-feedback-${idx}`}>
+                <CardContent sx={{ py: 1.5 }}>
+                  {/* Header: Role info and score */}
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1.5 }}>
+                    <Box>
+                      <Typography variant="caption" color="text.secondary">{bullet.roleTitle} at {bullet.company}</Typography>
+                    </Box>
+                    <Chip 
+                      label={`Score: ${bullet.score}`} 
+                      size="small" 
+                      sx={{ bgcolor: getScoreColor(bullet.score), color: "white", fontWeight: 600 }} 
+                    />
+                  </Box>
+                  
+                  {/* Original bullet text */}
+                  <Typography variant="body2" sx={{ mb: 1.5, fontStyle: "italic", color: "#475569" }}>
+                    "{bullet.text}"
+                  </Typography>
+                  
+                  {/* Analysis breakdown */}
+                  <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 1.5 }}>
+                    <Chip 
+                      label={`Verb: ${bullet.actionVerb.word || "none"} (${bullet.actionVerb.strength})`}
+                      size="small"
+                      variant="outlined"
+                      sx={{ borderColor: getVerbStrengthColor(bullet.actionVerb.strength), color: getVerbStrengthColor(bullet.actionVerb.strength) }}
+                    />
+                    <Chip 
+                      label={bullet.quantification.hasQuantification ? `Quantified: ${bullet.quantification.type}` : "No quantification"}
+                      size="small"
+                      variant="outlined"
+                      sx={{ borderColor: bullet.quantification.hasQuantification ? "#22c55e" : "#ef4444", color: bullet.quantification.hasQuantification ? "#22c55e" : "#ef4444" }}
+                    />
+                    <Chip 
+                      label={`Result: ${bullet.result.type}`}
+                      size="small"
+                      variant="outlined"
+                      sx={{ borderColor: bullet.result.hasResult ? "#22c55e" : "#ef4444", color: bullet.result.hasResult ? "#22c55e" : "#ef4444" }}
+                    />
+                  </Box>
+                  
+                  {/* Issues detected */}
+                  {bullet.issues.length > 0 && (
+                    <Box sx={{ mb: 1.5 }}>
+                      <Typography variant="caption" fontWeight={600} color="error.main">Issues:</Typography>
+                      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, mt: 0.5 }}>
+                        {bullet.issues.map((issue, i) => (
+                          <Typography key={i} variant="caption" color="text.secondary">
+                            <span style={{ fontWeight: 600 }}>[{issue.code}]</span> {issue.issue}
+                          </Typography>
+                        ))}
+                      </Box>
+                    </Box>
+                  )}
+                  
+                  {/* Suggested rewrite */}
+                  {bullet.rewrite && (
+                    <Box sx={{ bgcolor: "#ecfdf5", p: 1.5, borderRadius: 1, border: "1px solid #a7f3d0" }}>
+                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5 }}>
+                        <Typography variant="caption" fontWeight={600} color="success.main">Suggested Rewrite:</Typography>
+                        <Typography variant="caption" fontWeight={600} color="success.main">
+                          {"→"} Score: {bullet.rewrite.projectedScore}
+                        </Typography>
+                      </Box>
+                      <Typography variant="body2">{bullet.rewrite.suggested}</Typography>
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
+        </Box>
+      )}
+
+      {/* Priority rewrites for FULL mode (kept as fallback/summary) */}
+      {rewritePriorities.length > 0 && allBullets.length === 0 && (
         <Box sx={{ mt: 3 }}>
           <Typography variant="subtitle2" sx={{ mb: 2 }}>Priority Rewrites ({rewritePriorities.length})</Typography>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
