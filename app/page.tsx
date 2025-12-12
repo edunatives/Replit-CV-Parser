@@ -75,12 +75,13 @@ export default function Home() {
         throw new Error(errorData.error || "Failed to parse CV");
       }
 
-      const { cv } = await response.json();
+      const { cv, tokenUsage } = await response.json();
 
       setCvs((prev) => [cv, ...prev]);
       setSelectedCV(cv);
       setView("workspace");
-      showSnackbar("CV parsed successfully!", "success");
+      const tokens = tokenUsage?.totalTokens || cv.tokenUsage?.totalTokens || 0;
+      showSnackbar(`CV parsed successfully!${tokens > 0 ? ` (${tokens} tokens)` : ""}`, "success");
     } catch (error) {
       console.error("Error parsing CV:", error);
       showSnackbar(`Error parsing CV: ${error}`, "error");

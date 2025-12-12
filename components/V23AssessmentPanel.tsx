@@ -179,6 +179,9 @@ function HeaderSection({ data, meta, candidateName, candidateTitle }: {
             </Typography>
             <Typography variant="caption" color="text.disabled">
               Engine v{data.version} | Mode: {data.mode} | Audience: {meta.audience}
+              {meta.tokensUsed && (meta.tokensUsed.input > 0 || meta.tokensUsed.output > 0) && (
+                <> | {meta.tokensUsed.input + meta.tokensUsed.output} tokens</>
+              )}
             </Typography>
           </Box>
           <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 1, flexWrap: "wrap" }}>

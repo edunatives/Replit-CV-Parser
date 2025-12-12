@@ -91,7 +91,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ cv, rawText });
+    const tokenUsage = cv.tokenUsage || { promptTokens: 0, completionTokens: 0, totalTokens: 0 };
+
+    return NextResponse.json({ cv, rawText, tokenUsage });
   } catch (error) {
     console.error("Error parsing CV:", error);
     return NextResponse.json({ error: "Failed to parse CV" }, { status: 500 });
