@@ -1585,18 +1585,24 @@ function repairAndParseJSON(text) {
 class LangChainAssessor {
     ai;
     constructor(){
-        const apiKey = process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
+        const userApiKey = process.env.GOOGLE_API_KEY;
+        const replitApiKey = process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
         const baseUrl = process.env.AI_INTEGRATIONS_GEMINI_BASE_URL;
-        if (!apiKey) {
-            throw new Error("AI_INTEGRATIONS_GEMINI_API_KEY not configured");
+        if (userApiKey) {
+            this.ai = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$google$2f$genai$2f$dist$2f$node$2f$index$2e$mjs__$5b$app$2d$route$5d$__$28$ecmascript$29$__["GoogleGenAI"]({
+                apiKey: userApiKey
+            });
+        } else if (replitApiKey) {
+            this.ai = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$google$2f$genai$2f$dist$2f$node$2f$index$2e$mjs__$5b$app$2d$route$5d$__$28$ecmascript$29$__["GoogleGenAI"]({
+                apiKey: replitApiKey,
+                httpOptions: {
+                    apiVersion: "",
+                    baseUrl: baseUrl || undefined
+                }
+            });
+        } else {
+            throw new Error("No Gemini API key configured (GOOGLE_API_KEY or AI_INTEGRATIONS_GEMINI_API_KEY)");
         }
-        this.ai = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$google$2f$genai$2f$dist$2f$node$2f$index$2e$mjs__$5b$app$2d$route$5d$__$28$ecmascript$29$__["GoogleGenAI"]({
-            apiKey,
-            httpOptions: {
-                apiVersion: "",
-                baseUrl: baseUrl || undefined
-            }
-        });
     }
     /**
    * Assess a CV using structured output with Zod validation
