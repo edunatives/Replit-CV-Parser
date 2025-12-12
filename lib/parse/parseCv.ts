@@ -241,27 +241,34 @@ function extractNameFallback(text: string): string {
  * @throws {Error} PDF text extraction fails with insufficient content (<50 chars)
  */
 export async function parseCV(buffer: Buffer, fileName: string, fileId: string): Promise<{ cv: ParsedCV; rawText: string }> {
+  const totalStart = Date.now();
+  const timings: Record<string, number> = {};
   let text = "";
   
   const extension = fileName.toLowerCase().split(".").pop();
   
   try {
+    const extractStart = Date.now();
     if (extension === "pdf") {
-      console.log(`Parsing PDF: ${fileName}, size: ${buffer.length}`);
+      console.log(`[TIMING] Parsing PDF: ${fileName}, size: ${buffer.length}`);
       const data = await parsePdfBuffer(buffer);
       text = normalizeText(data.text);
-      console.log(`PDF parsed: ${text.length} chars, ${data.numpages} pages`);
+      timings.pdfExtraction = Date.now() - extractStart;
+      console.log(`[TIMING] PDF extraction: ${timings.pdfExtraction}ms, ${text.length} chars, ${data.numpages} pages`);
       
       if (text.length < 50) {
         throw new Error(`PDF text extraction returned insufficient content (${text.length} chars)`);
       }
     } else if (extension === "docx" || extension === "doc") {
-      console.log(`Parsing Word: ${fileName}, size: ${buffer.length}`);
+      console.log(`[TIMING] Parsing Word: ${fileName}, size: ${buffer.length}`);
       text = normalizeText(await parseDocxBuffer(buffer));
-      console.log(`Word parsed: ${text.length} chars`);
+      timings.docxExtraction = Date.now() - extractStart;
+      console.log(`[TIMING] Word extraction: ${timings.docxExtraction}ms, ${text.length} chars`);
     } else {
-      console.log(`Parsing text: ${fileName}`);
+      console.log(`[TIMING] Parsing text: ${fileName}`);
       text = normalizeText(buffer.toString("utf-8"));
+      timings.textExtraction = Date.now() - extractStart;
+      console.log(`[TIMING] Text extraction: ${timings.textExtraction}ms`);
     }
   } catch (error) {
     console.error(`Parse error for ${fileName}:`, error);
@@ -273,14 +280,20 @@ export async function parseCV(buffer: Buffer, fileName: string, fileId: string):
     text = normalizeText(buffer.toString("utf-8"));
   }
   
-  // Validate that the document is actually a CV
+  const validationStart = Date.now();
   const validationResult = validateCVDocument(text);
+  timings.validation = Date.now() - validationStart;
+  console.log(`[TIMING] CV validation: ${timings.validation}ms`);
+  
   if (!validationResult.isCV) {
     throw new Error(validationResult.reason);
   }
   
-  // Try Gemini AI extraction first
+  const aiStart = Date.now();
+  console.log(`[TIMING] Starting AI extraction...`);
   const geminiResult = await extractWithGemini(text);
+  timings.aiExtraction = Date.now() - aiStart;
+  console.log(`[TIMING] AI extraction: ${timings.aiExtraction}ms`);
   
   let rawCv: ParsedCV;
   let tokenUsage: TokenUsage | undefined;
@@ -354,7 +367,12 @@ export async function parseCV(buffer: Buffer, fileName: string, fileId: string):
     };
   }
   
+  const normalizeStart = Date.now();
   const cv = validateAndNormalizeCV(rawCv);
+  timings.normalization = Date.now() - normalizeStart;
+  
+  timings.total = Date.now() - totalStart;
+  console.log(`[TIMING] CV Parse Complete - Total: ${timings.total}ms | Breakdown: extraction=${timings.pdfExtraction || timings.docxExtraction || timings.textExtraction || 0}ms, validation=${timings.validation}ms, AI=${timings.aiExtraction}ms, normalize=${timings.normalization}ms`);
   
   return { cv, rawText: text };
 }

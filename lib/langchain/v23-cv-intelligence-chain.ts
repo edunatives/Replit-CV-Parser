@@ -608,13 +608,21 @@ export class CvIntelligenceChain {
     audience?: AudienceType;
   }): Promise<AnalysisResponse> {
     const startTime = Date.now();
+    const timings: Record<string, number> = {};
     const { cvContent, jdContent, outputMode = "STANDARD", audience = "STUDENT" } = request;
+    
+    console.log(`[TIMING] Assessment starting - mode: ${outputMode}, audience: ${audience}, cvLength: ${cvContent.length} chars`);
     
     try {
       const result = await withRetry(async () => {
+        const promptStart = Date.now();
         const systemPrompt = buildSystemPrompt();
         const userPrompt = buildUserPrompt(cvContent, jdContent, outputMode, audience);
+        timings.promptBuild = Date.now() - promptStart;
+        console.log(`[TIMING] Prompt build: ${timings.promptBuild}ms, total prompt length: ${(systemPrompt + userPrompt).length} chars`);
         
+        const apiStart = Date.now();
+        console.log(`[TIMING] Calling Gemini API...`);
         const response = await this.ai.models.generateContent({
           model: this.config.model,
           contents: `${systemPrompt}\n\n${userPrompt}`,
@@ -623,12 +631,21 @@ export class CvIntelligenceChain {
             temperature: this.config.temperature,
           },
         });
+        const apiDuration = Date.now() - apiStart;
+        console.log(`[TIMING] Gemini API response: ${apiDuration}ms, input tokens: ${response.usageMetadata?.promptTokenCount || 0}, output tokens: ${response.usageMetadata?.candidatesTokenCount || 0}`);
         
         const text = response.text?.trim() || "";
         if (!text) throw new Error("Empty response from AI");
         
+        const parseStart = Date.now();
         const parsed = repairAndParseJSON(text);
+        const parseDuration = Date.now() - parseStart;
+        console.log(`[TIMING] JSON parsing: ${parseDuration}ms, response length: ${text.length} chars`);
+        
+        const transformStart = Date.now();
         const transformed = transformOutput(parsed, outputMode, audience);
+        const transformDuration = Date.now() - transformStart;
+        console.log(`[TIMING] Transform output: ${transformDuration}ms`);
         
         return {
           data: transformed,
@@ -636,14 +653,18 @@ export class CvIntelligenceChain {
             input: response.usageMetadata?.promptTokenCount || 0,
             output: response.usageMetadata?.candidatesTokenCount || 0,
           },
+          timings: { promptBuild: timings.promptBuild, apiCall: apiDuration, jsonParse: parseDuration, transform: transformDuration },
         };
       }, this.config.maxRetries, this.config.retryDelayMs);
+      
+      const totalDuration = Date.now() - startTime;
+      console.log(`[TIMING] Assessment Complete - Total: ${totalDuration}ms | Breakdown: prompt=${result.timings?.promptBuild || 0}ms, API=${result.timings?.apiCall || 0}ms, parse=${result.timings?.jsonParse || 0}ms, transform=${result.timings?.transform || 0}ms`);
       
       return {
         success: true,
         data: result.data,
         meta: {
-          processingTimeMs: Date.now() - startTime,
+          processingTimeMs: totalDuration,
           tokensUsed: result.tokens,
           modelUsed: this.config.model,
           outputMode,

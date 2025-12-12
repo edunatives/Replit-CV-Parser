@@ -131,8 +131,15 @@ export class LangChainCVParser {
    * @returns Structured CV data validated by Zod
    */
   async parseCV(rawText: string): Promise<{ data: ParsedCVResult; tokenUsage: { promptTokens: number; completionTokens: number; totalTokens: number } }> {
-    const prompt = this.buildParsingPrompt(rawText);
+    const startTime = Date.now();
+    console.log(`[TIMING] CV Parser starting - input length: ${rawText.length} chars`);
     
+    const promptStart = Date.now();
+    const prompt = this.buildParsingPrompt(rawText);
+    console.log(`[TIMING] Prompt build: ${Date.now() - promptStart}ms, prompt length: ${prompt.length} chars`);
+    
+    const apiStart = Date.now();
+    console.log(`[TIMING] Calling Gemini API for CV parsing...`);
     const response = await this.ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
@@ -141,6 +148,8 @@ export class LangChainCVParser {
         temperature: 0.1,
       },
     });
+    const apiDuration = Date.now() - apiStart;
+    console.log(`[TIMING] Gemini API response: ${apiDuration}ms, input tokens: ${response.usageMetadata?.promptTokenCount || 0}, output tokens: ${response.usageMetadata?.candidatesTokenCount || 0}`);
     
     const responseText = response.text?.trim() || "";
     
@@ -148,14 +157,20 @@ export class LangChainCVParser {
       throw new Error("Empty response from AI");
     }
     
+    const parseStart = Date.now();
     const parsed = repairAndParseJSON(responseText);
     const validated = ParsedCVSchema.parse(parsed);
+    const parseDuration = Date.now() - parseStart;
+    console.log(`[TIMING] JSON parse + Zod validation: ${parseDuration}ms, response length: ${responseText.length} chars`);
     
     const tokenUsage = {
       promptTokens: response.usageMetadata?.promptTokenCount || 0,
       completionTokens: response.usageMetadata?.candidatesTokenCount || 0,
       totalTokens: response.usageMetadata?.totalTokenCount || 0,
     };
+    
+    const totalDuration = Date.now() - startTime;
+    console.log(`[TIMING] CV Parser Complete - Total: ${totalDuration}ms | Breakdown: API=${apiDuration}ms, parse=${parseDuration}ms`);
     
     return { data: validated, tokenUsage };
   }
