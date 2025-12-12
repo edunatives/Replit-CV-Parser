@@ -227,6 +227,23 @@ function transformToStandard(raw: unknown, audience: AudienceType): StandardOutp
       topIssue: safeStr(bullet.topIssue || bullet.top_issue, "None identified"),
       topFix: safeStr(bullet.topFix || bullet.top_fix, lite.nextAction),
     },
+    topIssues: safeArr(getPath(data, "topIssues", "top_issues")).map((i: unknown) => {
+      const issue = i as Record<string, unknown>;
+      return {
+        code: safeStr(issue.code, "A1"),
+        issue: safeStr(issue.issue),
+        severity: (issue.severity || "medium") as "info" | "low" | "medium" | "high" | "critical",
+        count: safeNum(issue.count, 1),
+        fix: issue.fix as string | undefined,
+      };
+    }),
+    topStrengths: safeArr(getPath(data, "topStrengths", "top_strengths")).map((s: unknown) => {
+      const str = s as Record<string, unknown>;
+      return {
+        code: safeStr(str.code, "D1"),
+        strength: safeStr(str.strength),
+      };
+    }),
     improvements: {
       critical: safeArr(impr.critical).map((i: unknown) => typeof i === "string" ? { code: "A1", priority: "critical" as const, action: i, impact: "High", effort: "Medium" } : i as { code: string; priority: "critical" | "high" | "medium" | "low"; action: string; impact: string; effort: string }),
       high: safeArr(impr.high).map((i: unknown) => typeof i === "string" ? { code: "A1", priority: "high" as const, action: i, impact: "Medium", effort: "Medium" } : i as { code: string; priority: "critical" | "high" | "medium" | "low"; action: string; impact: string; effort: string }),

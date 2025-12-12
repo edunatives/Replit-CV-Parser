@@ -578,6 +578,29 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
           />
           {v23Analysis && (
             <Box sx={{ p: 2, borderTop: 1, borderColor: "divider" }}>
+              <Box sx={{ display: "flex", gap: 1, mb: 1.5, alignItems: "center", flexWrap: "wrap" }}>
+                <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>Depth:</Typography>
+                <ToggleButtonGroup
+                  value={outputMode}
+                  exclusive
+                  onChange={(_, value) => value && setOutputMode(value as OutputMode)}
+                  size="small"
+                  data-testid="toggle-output-mode-rerun"
+                >
+                  <ToggleButton value="LITE" sx={{ py: 0.5, px: 1.5 }}>
+                    <FlashOnIcon sx={{ fontSize: 14, mr: 0.5 }} />
+                    Lite
+                  </ToggleButton>
+                  <ToggleButton value="STANDARD" sx={{ py: 0.5, px: 1.5 }}>
+                    <BalanceIcon sx={{ fontSize: 14, mr: 0.5 }} />
+                    Standard
+                  </ToggleButton>
+                  <ToggleButton value="FULL" sx={{ py: 0.5, px: 1.5 }}>
+                    <AllInclusiveIcon sx={{ fontSize: 14, mr: 0.5 }} />
+                    Full
+                  </ToggleButton>
+                </ToggleButtonGroup>
+              </Box>
               <Button 
                 variant="outlined" 
                 fullWidth 
@@ -586,7 +609,7 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
                 disabled={loading}
                 data-testid="button-rerun-assessment"
               >
-                Re-run Analysis (v2.3)
+                Re-run {outputMode} Analysis (v2.3)
               </Button>
             </Box>
           )}
@@ -870,16 +893,59 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
               <Typography variant="body2">Skills ({cv.skills?.length || 0})</Typography>
             </Box>
 
+            <Box sx={{ mt: 3, mb: 2 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: "text.secondary" }}>
+                Analysis Depth
+              </Typography>
+              <ToggleButtonGroup
+                value={outputMode}
+                exclusive
+                onChange={(_, value) => value && setOutputMode(value as OutputMode)}
+                size="small"
+                fullWidth
+                data-testid="toggle-output-mode"
+              >
+                <ToggleButton value="LITE" data-testid="button-mode-lite">
+                  <Tooltip title="Quick assessment (~800 tokens, fastest)">
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                      <FlashOnIcon sx={{ fontSize: 16 }} />
+                      <span>Lite</span>
+                    </Box>
+                  </Tooltip>
+                </ToggleButton>
+                <ToggleButton value="STANDARD" data-testid="button-mode-standard">
+                  <Tooltip title="Balanced depth (~2.5k tokens, recommended)">
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                      <BalanceIcon sx={{ fontSize: 16 }} />
+                      <span>Standard</span>
+                    </Box>
+                  </Tooltip>
+                </ToggleButton>
+                <ToggleButton value="FULL" data-testid="button-mode-full">
+                  <Tooltip title="Comprehensive analysis (~5k tokens, detailed)">
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                      <AllInclusiveIcon sx={{ fontSize: 16 }} />
+                      <span>Full</span>
+                    </Box>
+                  </Tooltip>
+                </ToggleButton>
+              </ToggleButtonGroup>
+              <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.5 }}>
+                {outputMode === "LITE" && "Quick overview with top issues and strengths"}
+                {outputMode === "STANDARD" && "Detailed analysis with bullet health and improvements"}
+                {outputMode === "FULL" && "Comprehensive deep-dive with bullet-by-bullet analysis"}
+              </Typography>
+            </Box>
+
             <Button 
               variant="contained" 
               fullWidth 
               startIcon={loading ? <CircularProgress size={16} color="inherit" /> : <AutoAwesomeIcon />}
               onClick={() => runAssessment()}
-              sx={{ mt: 3 }}
               disabled={loading}
               data-testid="button-run-analysis"
             >
-              {loading ? "Analyzing..." : "Run Full AI Analysis (v2.3)"}
+              {loading ? "Analyzing..." : `Run ${outputMode} Analysis (v2.3)`}
             </Button>
           </>
         )}
