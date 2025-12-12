@@ -816,21 +816,21 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
         >
           <DeleteIcon fontSize="small" />
         </IconButton>
-        <Typography variant="subtitle1" fontWeight={600} sx={{ color: style.bodyText, lineHeight: 1.3 }} component="div">
+        <Typography variant="subtitle1" fontWeight={600} sx={{ color: style.bodyText, lineHeight: 1.2 }} component="div">
           <EditableField 
             value={exp.role} 
             onChange={(v) => updateExperience(index, "role", v)} 
             placeholder="Job Title"
           />
         </Typography>
-        <Typography variant="body2" sx={{ color: style.companyColor, fontWeight: 700, lineHeight: 1.3, mt: 0.125 }} component="div">
+        <Typography variant="body2" sx={{ color: style.companyColor, fontWeight: 700, lineHeight: 1.2, mt: 0 }} component="div">
           <EditableField 
             value={exp.company} 
             onChange={(v) => updateExperience(index, "company", v)} 
             placeholder="Company Name"
           />
         </Typography>
-        <Box sx={{ display: "flex", gap: 1.5, alignItems: "center", flexWrap: "wrap", mt: 0.125 }}>
+        <Box sx={{ display: "flex", gap: 1.5, alignItems: "center", flexWrap: "wrap", mt: 0 }}>
           {style.showMetaIcons && <CalendarMonthIcon sx={{ fontSize: 12, color: style.bodyTextSecondary }} />}
           <Typography variant="caption" sx={{ color: style.bodyTextSecondary, ml: style.showMetaIcons ? -1 : 0, fontSize: "0.75rem" }} component="span">
             <EditableField 

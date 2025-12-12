@@ -1243,7 +1243,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                     fontWeight: 600,
                     sx: {
                         color: style.bodyText,
-                        lineHeight: 1.3
+                        lineHeight: 1.2
                     },
                     component: "div",
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(EditableField, {
@@ -1265,8 +1265,8 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                     sx: {
                         color: style.companyColor,
                         fontWeight: 700,
-                        lineHeight: 1.3,
-                        mt: 0.125
+                        lineHeight: 1.2,
+                        mt: 0
                     },
                     component: "div",
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(EditableField, {
@@ -1289,7 +1289,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                         gap: 1.5,
                         alignItems: "center",
                         flexWrap: "wrap",
-                        mt: 0.125
+                        mt: 0
                     },
                     children: [
                         style.showMetaIcons && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$CalendarMonth$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
