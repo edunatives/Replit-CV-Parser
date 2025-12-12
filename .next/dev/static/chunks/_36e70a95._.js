@@ -181,13 +181,13 @@ async function exportToPDF(cv, filename, template = "modern-dark") {
     if (linkParts.length > 0) {
         doc.text(linkParts.join("  |  "), marginLeft, y);
     }
-    y = 65;
+    y = 58;
     const addSection = (title)=>{
         if (y > pageHeight - 30) {
             doc.addPage();
             y = 20;
         }
-        y += 8;
+        y += 4;
         doc.setTextColor(accent.r, accent.g, accent.b);
         doc.setFontSize(13);
         doc.setFont("helvetica", "bold");
@@ -369,7 +369,7 @@ async function exportToDOCX(cv, filename, template = "modern-dark") {
                 })
             ],
             spacing: {
-                after: 300
+                after: 150
             }
         }));
     }
@@ -384,8 +384,8 @@ async function exportToDOCX(cv, filename, template = "modern-dark") {
                 })
             ],
             spacing: {
-                before: 400,
-                after: 150
+                before: 200,
+                after: 100
             },
             border: {
                 bottom: {

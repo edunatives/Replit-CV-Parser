@@ -136,14 +136,14 @@ export async function exportToPDF(cv: ParsedCV, filename: string, template: Temp
     doc.text(linkParts.join("  |  "), marginLeft, y);
   }
 
-  y = 65;
+  y = 58;
 
   const addSection = (title: string) => {
     if (y > pageHeight - 30) {
       doc.addPage();
       y = 20;
     }
-    y += 8;
+    y += 4;
     doc.setTextColor(accent.r, accent.g, accent.b);
     doc.setFontSize(13);
     doc.setFont("helvetica", "bold");
@@ -336,7 +336,7 @@ export async function exportToDOCX(cv: ParsedCV, filename: string, template: Tem
     children.push(
       new Paragraph({
         children: [new TextRun({ text: linkParts.join("  |  "), size: 18, color: bodyTextSecondaryHex })],
-        spacing: { after: 300 },
+        spacing: { after: 150 },
       })
     );
   }
@@ -352,7 +352,7 @@ export async function exportToDOCX(cv: ParsedCV, filename: string, template: Tem
             color: accentHex,
           }),
         ],
-        spacing: { before: 400, after: 150 },
+        spacing: { before: 200, after: 100 },
         border: {
           bottom: { style: BorderStyle.SINGLE, size: 6, color: accentHex },
         },
