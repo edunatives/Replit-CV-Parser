@@ -170,14 +170,15 @@ function HeaderSection({ data, meta, candidateName, candidateTitle }: {
     verdict = data.verdict || "";
     hasJd = isLiteOutput(data) ? data.hasJd : !!data.jdSummary;
   } else if (isFullOutput(data)) {
-    const bulletAvg = data.cvAnalysis?.bulletAnalysis?.averageScore ?? 0;
-    const summaryQuality = data.cvAnalysis?.professionalSummary?.qualityScore ?? 50;
-    const validationRate = data.cvAnalysis?.skills?.validationRate ?? 70;
-    overall = Math.round((bulletAvg * 0.4 + summaryQuality * 0.3 + validationRate * 0.3));
+    const bulletAvg = Math.min(100, data.cvAnalysis?.bulletAnalysis?.averageScore ?? 0);
+    const summaryQuality = Math.min(100, data.cvAnalysis?.professionalSummary?.qualityScore ?? 50);
+    const validationRate = Math.min(100, data.cvAnalysis?.skills?.validationRate ?? 70);
+    overall = Math.min(100, Math.round((bulletAvg * 0.4 + summaryQuality * 0.3 + validationRate * 0.3)));
     let extractedGrade = false;
     if (data.studentAnalysis?.overallCvQuality) {
       const quality = data.studentAnalysis.overallCvQuality;
-      overall = typeof quality === "number" ? quality : (quality as { score?: number }).score ?? overall;
+      const rawScore = typeof quality === "number" ? quality : (quality as { score?: number }).score ?? overall;
+      overall = Math.min(100, Math.max(0, rawScore)); // Clamp to 0-100
       if (typeof quality === "object" && quality && "grade" in quality) {
         grade = (quality as { grade?: string }).grade ?? grade;
         extractedGrade = true;
