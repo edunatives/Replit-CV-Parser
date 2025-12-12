@@ -1,35 +1,63 @@
 /**
  * @fileoverview LangChain-based JD Match Module
  * @description Uses LangChain.js with Google Gemini and Zod for structured JD matching output.
- * Implements v2.2 honest-first three-score system with reliable JSON parsing.
+ * Aligned with EnhancedJDMatchResult interface from types/cv.ts for compatibility.
  */
 
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { z } from "zod";
 
 // ============================================================================
-// ZOD SCHEMAS FOR JD MATCH v2.2
+// ZOD SCHEMAS - Aligned with types/cv.ts
 // ============================================================================
 
 /**
- * JD Parsing Schema - Extracted job requirements
+ * JD Parsing Schema - matches JDParsing interface
  */
 export const JDParsingSchema = z.object({
   role_title: z.string().describe("The job title from the JD"),
   company: z.string().describe("Company name if mentioned"),
   mandatory_skills: z.array(z.string()).describe("Must-have skills from the JD"),
   nice_to_have_skills: z.array(z.string()).describe("Nice-to-have skills from the JD"),
-  years_required: z.number().nullable().describe("Years of experience required"),
-  education_required: z.string().nullable().describe("Education requirement if specified"),
 });
 
 /**
- * JD Nature Schema - Role characteristics
+ * Evidence Map Entry Schema - matches EvidenceMapEntry interface
+ */
+export const EvidenceMapEntrySchema = z.object({
+  jd_requirement: z.string().describe("The JD requirement"),
+  cv_evidence: z.string().describe("Evidence from CV"),
+  status: z.enum(["Match", "Weak", "Missing"]).describe("Match status"),
+});
+
+/**
+ * Match Analysis Schema - matches MatchAnalysis interface
+ */
+export const MatchAnalysisSchema = z.object({
+  overall_match_score: z.number().min(0).max(100).describe("Overall match score 0-100"),
+  verdict: z.enum(["Excellent Match", "Good Match", "Partial Match", "Limited Match"]).describe("Match verdict"),
+  summary: z.string().describe("Summary of the match"),
+  matched_skills: z.array(z.string()).describe("Skills that match"),
+  missing_skills: z.array(z.string()).describe("Skills missing from CV"),
+  experience_match: z.object({
+    score: z.number().min(0).max(100).describe("Experience match score"),
+    feedback: z.string().describe("Experience feedback"),
+  }),
+  education_match: z.object({
+    score: z.number().min(0).max(100).describe("Education match score"),
+    feedback: z.string().describe("Education feedback"),
+  }),
+  keyword_optimizations: z.array(z.string()).describe("Keywords to add to CV"),
+  suggestions: z.array(z.string()).describe("Improvement suggestions"),
+});
+
+/**
+ * JD Nature Schema - matches JDNature interface
  */
 export const JDNatureSchema = z.object({
   role_level: z.enum(["Junior", "Mid", "Senior", "Lead", "Staff", "Principal", "Director", "VP", "C-Level"]).describe("Seniority level"),
-  domain_required: z.string().describe("Primary domain/field required"),
-  industry_preferred: z.string().nullable().describe("Preferred industry if specified"),
+  domain_required: z.string().describe("Primary domain required"),
+  industry_preferred: z.string().nullable().describe("Preferred industry"),
   education_required: z.string().nullable().describe("Education requirement"),
   years_required: z.number().nullable().describe("Years of experience required"),
   work_arrangement: z.enum(["Remote", "On-site", "Hybrid", "Flexible"]).nullable().describe("Work arrangement"),
@@ -37,152 +65,82 @@ export const JDNatureSchema = z.object({
 });
 
 /**
- * Component Score Schema - Individual scoring component
+ * Experience Factor Issue Schema - matches ExperienceFactorIssue interface
  */
-export const ComponentScoreSchema = z.object({
-  component: z.string().describe("Component name"),
-  raw_score: z.number().min(0).max(100).describe("Raw score 0-100"),
-  weight: z.number().describe("Weight multiplier (e.g., 0.25)"),
-  weighted_contribution: z.number().describe("Score * weight"),
-  status: z.enum(["exceeds", "strong", "good", "mismatch", "critical"]).describe("Status level"),
-  feedback: z.string().describe("Specific feedback"),
+export const ExperienceFactorIssueSchema = z.object({
+  code: z.string().describe("Issue code (H1-H9)"),
+  type: z.string().describe("Issue type"),
+  message: z.string().describe("Student-friendly message"),
+  cv_value: z.string().describe("What the CV shows"),
+  jd_requirement: z.string().describe("What the JD requires"),
+  gap_severity: z.enum(["minor", "moderate", "significant"]).describe("Gap severity"),
 });
 
 /**
- * Transformation Gap Schema
+ * Experience Years Analysis Schema - matches ExperienceYearsAnalysis interface
  */
-export const TransformationGapSchema = z.object({
-  area: z.string().describe("Gap area"),
-  points_deducted: z.number().describe("Points deducted for this gap"),
-  fixable_by_cv: z.boolean().describe("Can be fixed by CV changes"),
-  what_would_help: z.string().describe("What would actually help"),
+export const ExperienceYearsAnalysisSchema = z.object({
+  total_years: z.number().describe("Total years of experience"),
+  relevant_domain_years: z.number().describe("Relevant domain years"),
+  recency_score: z.number().min(0).max(100).describe("Recency score 0-100"),
+  meets_requirement: z.boolean().describe("Meets years requirement"),
+  student_message: z.string().describe("Student-friendly message"),
 });
 
 /**
- * Transformation Effort Schema - TEI score
+ * Experience Depth Analysis Schema - matches ExperienceDepthAnalysis interface
  */
-export const TransformationEffortSchema = z.object({
-  tei_score: z.number().min(1).max(5).describe("Transformation Effort Index 1-5"),
-  tei_label: z.enum(["Minimal", "Low", "Moderate", "High", "Extensive"]).describe("TEI label"),
-  timeline: z.string().describe("Estimated timeline to close gaps"),
-  honest_assessment: z.string().describe("Honest assessment of transformation needed"),
-  gap_breakdown: z.array(TransformationGapSchema).describe("Breakdown of gaps"),
+export const ExperienceDepthAnalysisSchema = z.object({
+  depth_level: z.enum(["Entry", "Developing", "Proficient", "Expert"]).describe("Depth level"),
+  scope_score: z.number().min(0).max(100).describe("Scope score 0-100"),
+  impact_score: z.number().min(0).max(100).describe("Impact score 0-100"),
+  complexity_handled: z.string().describe("Complexity level handled"),
+  student_message: z.string().describe("Student-friendly message"),
 });
 
 /**
- * Risk Factor Schema
+ * Nature Fit Issue Schema - matches NatureFitIssue interface
  */
-export const RiskFactorSchema = z.object({
-  factor: z.string().describe("Risk factor name"),
-  score: z.number().min(0).max(100).describe("Risk score 0-100"),
-  detail: z.string().describe("Detailed explanation"),
+export const NatureFitIssueSchema = z.object({
+  code: z.string().describe("Issue code (G1-G9)"),
+  type: z.string().describe("Issue type"),
+  message: z.string().describe("Student-friendly message"),
+  cv_nature: z.string().describe("CV nature"),
+  jd_expects: z.string().describe("JD expectation"),
+  transferable: z.boolean().describe("Is transferable"),
 });
 
 /**
- * Risk Assessment Schema - Dual risk view
+ * Full Enhanced JD Match Result Schema - matches EnhancedJDMatchResult interface
  */
-export const RiskAssessmentSchema = z.object({
-  candidate_risk: z.object({
-    score: z.number().min(0).max(100).describe("Overall candidate risk score"),
-    level: z.enum(["Low", "Moderate", "High", "Critical"]).describe("Risk level"),
-    factors: z.array(RiskFactorSchema).describe("Individual risk factors"),
-  }),
-  employer_risk: z.object({
-    score: z.number().min(0).max(100).describe("Overall employer risk score"),
-    level: z.enum(["Low", "Moderate", "High", "Critical"]).describe("Risk level"),
-    factors: z.array(RiskFactorSchema).describe("Individual risk factors"),
-  }),
-});
-
-/**
- * Better Fit Role Schema
- */
-export const BetterFitRoleSchema = z.object({
-  role: z.string().describe("Alternative role title"),
-  fit_score: z.number().min(0).max(100).describe("Fit score for this role"),
-  reason: z.string().describe("Why this role is a better fit"),
-});
-
-/**
- * Critical Gap Schema
- */
-export const CriticalGapSchema = z.object({
-  gap: z.string().describe("The gap description"),
-  severity: z.enum(["minor", "moderate", "significant", "critical"]).describe("Gap severity"),
-  you_have: z.string().describe("What the candidate has"),
-  jd_requires: z.string().describe("What the JD requires"),
-  fixable_by_cv: z.boolean().describe("Can be fixed by CV changes"),
-  what_would_help: z.string().describe("What would actually help"),
-});
-
-/**
- * Honest Verdict Schema
- */
-export const HonestVerdictSchema = z.object({
-  headline: z.string().describe("One-line honest verdict"),
-  reality_check: z.string().describe("Honest reality check message"),
-  should_apply: z.boolean().describe("Whether candidate should apply"),
-  success_probability: z.string().describe("Estimated success probability"),
-});
-
-/**
- * Student Guidance Schema
- */
-export const StudentGuidanceSchema = z.object({
-  if_dream_role: z.string().describe("Advice if this is their dream role"),
-  if_practical: z.string().describe("Practical alternative advice"),
-  quick_wins: z.array(z.string()).describe("Quick improvements they can make"),
-  long_term_path: z.string().describe("6-12 month improvement strategy"),
-});
-
-/**
- * Real Options Schema
- */
-export const RealOptionsSchema = z.object({
-  apply_if: z.array(z.string()).describe("Conditions under which to apply"),
-  dont_apply_if: z.array(z.string()).describe("Conditions under which not to apply"),
-  bottom_line: z.object({
-    recommendation: z.string().describe("Bottom line recommendation"),
-    option_a: z.string().describe("First strategic option"),
-    option_b: z.string().describe("Second strategic option"),
-  }),
-});
-
-/**
- * Full JD Match Result Schema (v2.2)
- */
-export const JDMatchResultSchema = z.object({
+export const EnhancedJDMatchResultSchema = z.object({
   jd_parsing: JDParsingSchema,
-  jd_nature: JDNatureSchema,
+  match_analysis: MatchAnalysisSchema,
+  evidence_map: z.array(EvidenceMapEntrySchema).describe("Evidence mapping"),
   
-  raw_compatibility_score: z.number().min(0).max(100).describe("Raw compatibility score 0-100"),
-  raw_compatibility_grade: z.enum(["A", "B", "C", "D", "F"]).describe("Letter grade"),
+  jd_nature: JDNatureSchema.optional().describe("JD nature analysis"),
   
-  component_scores: z.array(ComponentScoreSchema).describe("Individual component scores"),
+  experience_factors: z.object({
+    years_analysis: ExperienceYearsAnalysisSchema,
+    depth_analysis: ExperienceDepthAnalysisSchema,
+    issues: z.array(ExperienceFactorIssueSchema),
+  }).optional().describe("Experience factors analysis"),
   
-  matched_skills: z.array(z.string()).describe("Skills that match the JD"),
-  missing_skills: z.array(z.string()).describe("Skills missing from CV"),
+  nature_fit: z.object({
+    overall_fit: z.enum(["Excellent", "Good", "Partial", "Challenging"]).describe("Overall fit"),
+    fit_score: z.number().min(0).max(100).describe("Fit score 0-100"),
+    issues: z.array(NatureFitIssueSchema),
+    strengths: z.array(z.string()).describe("Identified strengths"),
+  }).optional().describe("Nature fit analysis"),
   
-  transformation_effort: TransformationEffortSchema,
-  risk_assessment: RiskAssessmentSchema,
-  
-  critical_gaps: z.array(CriticalGapSchema).describe("Critical gaps that cannot be fixed by CV"),
-  
-  honest_verdict: HonestVerdictSchema,
-  
-  better_fit_roles: z.array(BetterFitRoleSchema).describe("Alternative roles that might be better fits"),
-  
-  strengths_reality_check: z.array(z.object({
-    strength: z.string(),
-    reality: z.string(),
-    transferable: z.boolean(),
-  })).describe("Strengths with reality check"),
-  
-  student_guidance: StudentGuidanceSchema,
-  real_options: RealOptionsSchema,
+  student_summary: z.object({
+    headline: z.string().describe("One-line summary"),
+    encouragement: z.string().describe("Encouraging message"),
+    quick_wins: z.array(z.string()).describe("Quick improvements"),
+  }).optional().describe("Student-friendly summary"),
 });
 
-export type JDMatchResult = z.infer<typeof JDMatchResultSchema>;
+export type EnhancedJDMatchResult = z.infer<typeof EnhancedJDMatchResultSchema>;
 
 // ============================================================================
 // LANGCHAIN JD MATCHER CLASS
@@ -219,10 +177,10 @@ export class LangChainJDMatcher {
    * Match a CV against a job description using LangChain with structured output
    * @param cvSummary - Formatted CV text summary
    * @param jobDescription - The job description text
-   * @returns Structured JD match result
+   * @returns Structured JD match result compatible with EnhancedJDMatchResult
    */
-  async matchJD(cvSummary: string, jobDescription: string): Promise<JDMatchResult> {
-    const structuredModel = this.model.withStructuredOutput(JDMatchResultSchema, {
+  async matchJD(cvSummary: string, jobDescription: string): Promise<EnhancedJDMatchResult> {
+    const structuredModel = this.model.withStructuredOutput(EnhancedJDMatchResultSchema, {
       name: "jd_match_analysis",
     });
     
@@ -237,7 +195,7 @@ export class LangChainJDMatcher {
    * Build the JD match prompt
    */
   private buildMatchPrompt(cvSummary: string, jobDescription: string): string {
-    return `You are an Honest JD Match Analyst v2.2. Analyze this CV against the job description with brutal honesty.
+    return `You are an expert JD Match Analyst. Analyze this CV against the job description thoroughly.
 
 JOB DESCRIPTION:
 ${jobDescription}
@@ -245,44 +203,45 @@ ${jobDescription}
 CV CONTENT:
 ${cvSummary}
 
-THREE-SCORE SYSTEM:
-1. Raw Compatibility Score (0-100): Honest assessment of current fit
-   - A (85-100): Exceptional match
-   - B (70-84): Strong match
-   - C (55-69): Partial match
-   - D (40-54): Weak match
-   - F (0-39): Poor match
+ANALYSIS REQUIREMENTS:
 
-2. Transformation Effort Index (TEI 1-5):
-   - 1: Minimal - Ready now
-   - 2: Low - Minor CV tweaks
-   - 3: Moderate - Some skill building needed
-   - 4: High - Significant gaps to close
-   - 5: Extensive - Major career pivot required
+1. JD PARSING: Extract role_title, company, mandatory_skills, nice_to_have_skills
 
-3. Risk Level: Assess both candidate and employer risk
+2. MATCH ANALYSIS: 
+   - overall_match_score (0-100): Honest assessment
+   - verdict: "Excellent Match" (85+), "Good Match" (70-84), "Partial Match" (55-69), "Limited Match" (<55)
+   - matched_skills: Skills from CV that match JD
+   - missing_skills: Required skills not in CV
+   - experience_match: Score and feedback
+   - education_match: Score and feedback
+   - keyword_optimizations: Keywords to add
+   - suggestions: Improvement tips
 
-COMPONENT WEIGHTS:
-- Must-Have Skills: 25%
-- Domain Experience: 20%
-- Depth/Scope: 15%
-- Nature Fit: 15%
-- Total Experience: 10%
-- Should-Have Skills: 10%
-- Nice-to-Have: 5%
+3. EVIDENCE MAP: For each JD requirement, provide cv_evidence and status (Match/Weak/Missing)
 
-HARD GATES (apply score caps):
-- Missing >50% Tier 1 skills: Cap at 50
-- Domain years <50% required: Cap at 55
-- Seniority gap >2 levels: Cap at 45
-- Education hard requirement not met: Cap at 40
+4. JD NATURE: Analyze role_level, domain_required, industry_preferred, education_required, years_required, work_arrangement, company_stage
+
+5. EXPERIENCE FACTORS:
+   - years_analysis: total_years, relevant_domain_years, recency_score, meets_requirement, student_message
+   - depth_analysis: depth_level, scope_score, impact_score, complexity_handled, student_message
+   - issues: List experience gaps with codes H1-H9
+
+6. NATURE FIT:
+   - overall_fit: Excellent/Good/Partial/Challenging
+   - fit_score: 0-100
+   - issues: List nature fit gaps with codes G1-G9
+   - strengths: What makes this candidate strong
+
+7. STUDENT SUMMARY:
+   - headline: One-line encouraging summary
+   - encouragement: Supportive message
+   - quick_wins: 3-5 easy improvements
 
 RULES:
-1. Be brutally honest - don't inflate to be nice
-2. Identify REAL gaps, not just CV wording issues
-3. Distinguish between fixable (CV changes) and real gaps (need actual experience)
-4. Suggest better-fit roles if this isn't a good match
-5. Provide actionable guidance for the candidate
+- Be honest but encouraging
+- Skills must only come from explicit Skills sections in the CV
+- Provide specific, actionable feedback
+- Use student-friendly language in messages
 
 Provide your structured analysis following the exact schema provided.`;
   }
@@ -306,7 +265,7 @@ export function getMatcher(): LangChainJDMatcher {
 export async function matchJDWithLangChain(
   cvSummary: string, 
   jobDescription: string
-): Promise<JDMatchResult> {
+): Promise<EnhancedJDMatchResult> {
   const matcher = getMatcher();
   return matcher.matchJD(cvSummary, jobDescription);
 }

@@ -24,6 +24,7 @@ Preferred communication style: Simple, everyday language.
     - `/api/cvs`: CV CRUD operations.
     - `/api/assess`: AI-powered CV assessment (scores, strengths, weaknesses).
     - `/api/assess/langchain`: LangChain-based assessment with reliable structured output.
+    - `/api/jd-match/langchain`: LangChain-based JD matching with v2.2 three-score system.
     - `/api/advisor`: AI career advisor chat.
     - `/api/jd-match`: Job description match analysis.
 - **AI-Powered Features**: Utilizes Gemini 2.5 Flash for structured JSON extraction and sophisticated assessment, JD matching, and advisory capabilities.

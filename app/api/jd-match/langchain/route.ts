@@ -11,7 +11,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { ParsedCV } from "@/types/cv";
 import { formatCVForJDMatch } from "@/lib/ai/rules";
-import { matchJDWithLangChain, type JDMatchResult } from "@/lib/langchain/jd-matcher";
+import { matchJDWithLangChain, type EnhancedJDMatchResult } from "@/lib/langchain/jd-matcher";
 
 /**
  * Format CV data for JD matching
@@ -26,7 +26,7 @@ function formatCVSummaryForMatch(cv: ParsedCV): string {
   if (cv.experience && cv.experience.length > 0) {
     sections.push("EXPERIENCE:");
     cv.experience.forEach((exp, i) => {
-      sections.push(`${i + 1}. ${exp.title} at ${exp.company} (${exp.duration || "N/A"})`);
+      sections.push(`${i + 1}. ${exp.role} at ${exp.company} (${exp.duration || "N/A"})`);
       if (exp.description) sections.push(`   ${exp.description}`);
     });
   }
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
     
     const match = await matchJDWithLangChain(cvSummary, jobDescription);
     
-    console.log("LangChain JD match complete, score:", match.raw_compatibility_score);
+    console.log("LangChain JD match complete, score:", match.match_analysis.overall_match_score);
 
     return NextResponse.json({ 
       match,
