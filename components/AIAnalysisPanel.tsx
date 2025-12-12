@@ -11,9 +11,10 @@ import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import WorkIcon from "@mui/icons-material/Work";
 import TokenIcon from "@mui/icons-material/Token";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import type { ParsedCV, ForensicAnalysisV211 } from "@/types/cv";
-import { V211AssessmentPanel } from "./V211AssessmentPanel";
+import type { ParsedCV } from "@/types/cv";
+import { V23AssessmentPanel } from "./V23AssessmentPanel";
 import { JDMatchPanel } from "./JDMatchPanel";
+import type { AnalysisResponse } from "@/lib/langchain/v23-cv-intelligence-schemas";
 
 interface AIAnalysisPanelProps {
   cv: ParsedCV;
@@ -385,9 +386,10 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
   const [chatMessage, setChatMessage] = useState("");
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
   const [assessment, setAssessment] = useState<CVAssessment | null>(null);
-  const [v211Analysis, setV211Analysis] = useState<ForensicAnalysisV211 | null>(null);
-  const [useV211, setUseV211] = useState(true);
+  const [v23Analysis, setV23Analysis] = useState<AnalysisResponse | null>(null);
+  const [useV23, setUseV23] = useState(true);
   const [jdMatch, setJdMatch] = useState<JDMatchResult | null>(null);
+  const [v23JdMatch, setV23JdMatch] = useState<AnalysisResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [promptComparison, setPromptComparison] = useState<{
@@ -420,14 +422,14 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatHistory]);
 
-  const runAssessment = async (version: "9.3" | "2.11" = "2.11") => {
+  const runAssessment = async () => {
     setLoading(true);
     setError(null);
     try {
       const response = await fetch("/api/assess/langchain", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cv }),
+        body: JSON.stringify({ cv, outputMode: "STANDARD", audience: "STUDENT" }),
       });
       
       const contentType = response.headers.get("content-type");
@@ -435,19 +437,13 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
         throw new Error("Server error: received non-JSON response");
       }
       
-      const data = await response.json();
-      if (!response.ok) {
+      const data = await response.json() as AnalysisResponse;
+      if (!response.ok || !data.success) {
         throw new Error(data.error || "Failed to assess CV");
       }
       
-      if (data.analysis) {
-        setV211Analysis(data.analysis as ForensicAnalysisV211);
-        setUseV211(true);
-      } else if (data.assessment) {
-        const normalized = normalizeAssessment(data.assessment as Record<string, unknown>);
-        setAssessment(normalized);
-        setUseV211(false);
-      }
+      setV23Analysis(data);
+      setUseV23(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to run assessment");
     } finally {
@@ -537,7 +533,7 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
       const response = await fetch("/api/jd-match/langchain", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cv, jobDescription: jdText }),
+        body: JSON.stringify({ cv, jobDescription: jdText, outputMode: "STANDARD", audience: "STUDENT" }),
       });
       
       const contentType = response.headers.get("content-type");
@@ -545,13 +541,12 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
         throw new Error("Server error: received non-JSON response");
       }
       
-      const data = await response.json();
-      if (!response.ok) {
+      const data = await response.json() as AnalysisResponse;
+      if (!response.ok || !data.success) {
         throw new Error(data.error || "Failed to analyze match");
       }
-      const { match: rawMatch } = data;
-      const normalized = normalizeJDMatch(rawMatch as Record<string, unknown>);
-      setJdMatch(normalized);
+      
+      setV23JdMatch(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to analyze job match");
     } finally {
@@ -566,30 +561,28 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
   };
 
   if (activeTrack === "assessment") {
-    // v2.11 Forensic Engine UI
-    if (useV211 && (v211Analysis || loading || error)) {
+    // v2.3 CV Intelligence Engine UI
+    if (useV23 && (v23Analysis || loading || error)) {
       return (
         <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
-          <V211AssessmentPanel
-            analysis={v211Analysis}
+          <V23AssessmentPanel
+            analysis={v23Analysis}
             loading={loading}
             error={error}
             candidateName={cv.name}
             candidateTitle={cv.title}
-            candidateLocation={cv.location}
-            candidateEmail={cv.email}
           />
-          {v211Analysis && (
+          {v23Analysis && (
             <Box sx={{ p: 2, borderTop: 1, borderColor: "divider" }}>
               <Button 
                 variant="outlined" 
                 fullWidth 
                 startIcon={<AutoAwesomeIcon />}
-                onClick={() => runAssessment("2.11")}
+                onClick={() => runAssessment()}
                 disabled={loading}
                 data-testid="button-rerun-assessment"
               >
-                Re-run Analysis (v2.11)
+                Re-run Analysis (v2.3)
               </Button>
             </Box>
           )}
@@ -764,11 +757,11 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
               variant="outlined" 
               fullWidth 
               startIcon={<AutoAwesomeIcon />}
-              onClick={() => runAssessment("9.3")}
+              onClick={() => runAssessment()}
               sx={{ mt: 3 }}
               disabled={loading}
             >
-              Re-run Analysis (v9.3)
+              Re-run Analysis (v2.3)
             </Button>
             
             <Divider sx={{ my: 2 }} />
@@ -877,12 +870,12 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
               variant="contained" 
               fullWidth 
               startIcon={loading ? <CircularProgress size={16} color="inherit" /> : <AutoAwesomeIcon />}
-              onClick={() => runAssessment("2.11")}
+              onClick={() => runAssessment()}
               sx={{ mt: 3 }}
               disabled={loading}
               data-testid="button-run-analysis"
             >
-              {loading ? "Analyzing..." : "Run Full AI Analysis (v2.11)"}
+              {loading ? "Analyzing..." : "Run Full AI Analysis (v2.3)"}
             </Button>
           </>
         )}
