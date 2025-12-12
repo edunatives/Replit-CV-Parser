@@ -7,6 +7,11 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { z } from "zod";
 
+// LangSmith tracing is automatically enabled via environment variables:
+// LANGSMITH_TRACING=true
+// LANGSMITH_API_KEY=<your-key>
+// LANGSMITH_PROJECT=cv-intelligence-parser
+
 // ============================================================================
 // ZOD SCHEMAS - Aligned with types/cv.ts
 // ============================================================================

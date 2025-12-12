@@ -44,3 +44,9 @@ waitForPort = 5000
 
 [agent]
 integrations = ["javascript_openai_ai_integrations:1.0.0", "javascript_gemini_ai_integrations:1.0.0"]
+
+[userenv]
+
+[userenv.shared]
+LANGSMITH_TRACING = "true"
+LANGSMITH_PROJECT = "cv-intelligence-parser"
