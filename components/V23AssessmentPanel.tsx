@@ -418,7 +418,177 @@ function OverviewTab({ data }: { data: LiteOutput | StandardOutput | FullOutput 
     );
   }
 
-  return <Typography color="text.secondary">Full output view coming soon</Typography>;
+  if (isFullOutput(data)) {
+    const cvAnalysis = data.cvAnalysis;
+    const bulletAnalysis = cvAnalysis?.bulletAnalysis;
+    const studentAnalysis = data.studentAnalysis;
+    const hrAnalysis = data.hrAnalysis;
+    
+    return (
+      <Grid container spacing={2}>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Typography variant="subtitle2" sx={{ mb: 1.5, display: "flex", alignItems: "center", gap: 1 }}>
+            <WorkIcon sx={{ fontSize: 18 }} /> CV Summary
+          </Typography>
+          <Card elevation={0} sx={{ bgcolor: "#f8fafc" }}>
+            <CardContent>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography variant="body2" color="text.secondary">Candidate</Typography>
+                  <Typography variant="body2" fontWeight={500}>{cvAnalysis?.metadata?.candidateName || "N/A"}</Typography>
+                </Box>
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography variant="body2" color="text.secondary">Total Years</Typography>
+                  <Typography variant="body2" fontWeight={500}>{cvAnalysis?.experience?.totalYears || 0}</Typography>
+                </Box>
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography variant="body2" color="text.secondary">Roles Analyzed</Typography>
+                  <Typography variant="body2" fontWeight={500}>{cvAnalysis?.experience?.roles?.length || 0}</Typography>
+                </Box>
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography variant="body2" color="text.secondary">Certifications</Typography>
+                  <Typography variant="body2" fontWeight={500}>{cvAnalysis?.education?.certifications?.length || 0}</Typography>
+                </Box>
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography variant="body2" color="text.secondary">Progression</Typography>
+                  <Typography variant="body2" fontWeight={500}>{cvAnalysis?.experience?.progression?.pattern || "N/A"}</Typography>
+                </Box>
+              </Box>
+              {cvAnalysis?.skills?.validated && cvAnalysis.skills.validated.length > 0 && (
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="caption" color="text.secondary">Validated Skills ({cvAnalysis.skills.validated.length})</Typography>
+                  <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap", mt: 0.5 }}>
+                    {cvAnalysis.skills.validated.slice(0, 8).map((skill, i) => (
+                      <Chip key={i} label={skill.skill} size="small" sx={{ fontSize: "0.7rem" }} />
+                    ))}
+                    {cvAnalysis.skills.validated.length > 8 && (
+                      <Chip label={`+${cvAnalysis.skills.validated.length - 8}`} size="small" variant="outlined" sx={{ fontSize: "0.7rem" }} />
+                    )}
+                  </Box>
+                </Box>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+        
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Typography variant="subtitle2" sx={{ mb: 1.5, display: "flex", alignItems: "center", gap: 1 }}>
+            <AutoAwesomeIcon sx={{ fontSize: 18 }} /> Bullet Health
+          </Typography>
+          <Card elevation={0} sx={{ bgcolor: "#f8fafc" }}>
+            <CardContent>
+              {bulletAnalysis ? (
+                <>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+                    <Typography variant="body2" color="text.secondary">Average Score</Typography>
+                    <Typography variant="body2" fontWeight={600} sx={{ color: getScoreColor(bulletAnalysis.averageScore) }}>
+                      {Math.min(100, bulletAnalysis.averageScore)}
+                    </Typography>
+                  </Box>
+                  <LinearProgress 
+                    variant="determinate" 
+                    value={Math.min(100, bulletAnalysis.averageScore)} 
+                    sx={{ height: 8, borderRadius: 4, bgcolor: "#e2e8f0", mb: 2,
+                      "& .MuiLinearProgress-bar": { bgcolor: getScoreColor(bulletAnalysis.averageScore), borderRadius: 4 }
+                    }} 
+                  />
+                  <Grid container spacing={1}>
+                    <Grid size={3}>
+                      <Paper sx={{ p: 1, textAlign: "center", bgcolor: "#dcfce7" }} elevation={0}>
+                        <Typography variant="h6" fontWeight={600} color="success.main">{bulletAnalysis.distribution?.excellent || 0}</Typography>
+                        <Typography variant="caption" color="text.secondary">Excellent</Typography>
+                      </Paper>
+                    </Grid>
+                    <Grid size={3}>
+                      <Paper sx={{ p: 1, textAlign: "center", bgcolor: "#fef9c3" }} elevation={0}>
+                        <Typography variant="h6" fontWeight={600} sx={{ color: "#ca8a04" }}>{bulletAnalysis.distribution?.good || 0}</Typography>
+                        <Typography variant="caption" color="text.secondary">Good</Typography>
+                      </Paper>
+                    </Grid>
+                    <Grid size={3}>
+                      <Paper sx={{ p: 1, textAlign: "center", bgcolor: "#fed7aa" }} elevation={0}>
+                        <Typography variant="h6" fontWeight={600} sx={{ color: "#ea580c" }}>{bulletAnalysis.distribution?.fair || 0}</Typography>
+                        <Typography variant="caption" color="text.secondary">Fair</Typography>
+                      </Paper>
+                    </Grid>
+                    <Grid size={3}>
+                      <Paper sx={{ p: 1, textAlign: "center", bgcolor: "#fecaca" }} elevation={0}>
+                        <Typography variant="h6" fontWeight={600} color="error.main">{bulletAnalysis.distribution?.poor || 0}</Typography>
+                        <Typography variant="caption" color="text.secondary">Poor</Typography>
+                      </Paper>
+                    </Grid>
+                  </Grid>
+                  <Box sx={{ mt: 2 }}>
+                    <Typography variant="body2" color="text.secondary">Total Bullets: {bulletAnalysis.totalBullets}</Typography>
+                  </Box>
+                </>
+              ) : (
+                <Typography variant="body2" color="text.secondary">Bullet analysis not available</Typography>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {studentAnalysis?.alternatives?.betterFitRoles && studentAnalysis.alternatives.betterFitRoles.length > 0 && (
+          <Grid size={12}>
+            <Typography variant="subtitle2" sx={{ mb: 1.5, display: "flex", alignItems: "center", gap: 1 }}>
+              <RocketLaunchIcon sx={{ fontSize: 18 }} /> Alternative Roles
+            </Typography>
+            <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+              {studentAnalysis.alternatives.betterFitRoles.map((role, i) => (
+                <Card key={i} elevation={0} sx={{ flex: "1 1 200px", bgcolor: "#f0fdf4" }}>
+                  <CardContent sx={{ py: 1.5 }}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <Typography variant="body2" fontWeight={600}>{role.role}</Typography>
+                      <Chip label={`${role.fitScore}%`} size="small" sx={{ bgcolor: getScoreColor(role.fitScore), color: "white" }} />
+                    </Box>
+                    <Typography variant="caption" color="text.secondary">{role.reason}</Typography>
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
+          </Grid>
+        )}
+
+        {hrAnalysis?.decisionSupport && (
+          <Grid size={12}>
+            <Typography variant="subtitle2" sx={{ mb: 1.5, display: "flex", alignItems: "center", gap: 1 }}>
+              <SchoolIcon sx={{ fontSize: 18 }} /> HR Decision Support
+            </Typography>
+            <Card elevation={0} sx={{ bgcolor: "#f8fafc" }}>
+              <CardContent>
+                <Box sx={{ display: "flex", gap: 2, alignItems: "center", flexWrap: "wrap" }}>
+                  <Chip 
+                    label={hrAnalysis.decisionSupport.recommendation} 
+                    sx={{ 
+                      bgcolor: hrAnalysis.decisionSupport.recommendation.includes("NO") ? "#fecaca" : 
+                               hrAnalysis.decisionSupport.recommendation.includes("CONDITIONAL") ? "#fef9c3" : "#dcfce7",
+                      fontWeight: 600
+                    }} 
+                  />
+                  <Typography variant="body2" color="text.secondary">
+                    Confidence: {hrAnalysis.decisionSupport.confidence}%
+                  </Typography>
+                </Box>
+                {hrAnalysis.decisionSupport.conditions.length > 0 && (
+                  <Box sx={{ mt: 1 }}>
+                    <Typography variant="caption" color="text.secondary">Conditions:</Typography>
+                    <ul style={{ margin: "4px 0", paddingLeft: 16 }}>
+                      {hrAnalysis.decisionSupport.conditions.map((c, i) => (
+                        <li key={i}><Typography variant="caption">{c}</Typography></li>
+                      ))}
+                    </ul>
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
+      </Grid>
+    );
+  }
+
+  return <Typography color="text.secondary">No overview data available</Typography>;
 }
 
 function StrengthsTab({ data }: { data: LiteOutput | StandardOutput | FullOutput }) {
@@ -509,10 +679,20 @@ function IssuesTab({ data }: { data: LiteOutput | StandardOutput | FullOutput })
 }
 
 function ActionsTab({ data }: { data: LiteOutput | StandardOutput | FullOutput }) {
-  const improvements: { critical: Improvement[]; high: Improvement[]; medium: Improvement[] } = 
-    isStandardOutput(data) && data.improvements ? data.improvements : { critical: [], high: [], medium: [] };
-  const scorePotential = isStandardOutput(data) && data.improvements ? data.improvements.scorePotential : null;
-  const nextSteps = isStandardOutput(data) ? data.nextSteps : null;
+  let improvements: { critical: Improvement[]; high: Improvement[]; medium: Improvement[] } = { critical: [], high: [], medium: [] };
+  let scorePotential = null;
+  let nextSteps = null;
+  
+  if (isStandardOutput(data) && data.improvements) {
+    improvements = data.improvements;
+    scorePotential = data.improvements.scorePotential;
+    nextSteps = data.nextSteps;
+  } else if (isFullOutput(data) && data.studentAnalysis?.improvements) {
+    improvements = data.studentAnalysis.improvements;
+    scorePotential = data.studentAnalysis.improvements.scorePotential;
+    nextSteps = data.studentAnalysis.nextSteps;
+  }
+  
   const nextAction = isLiteOutput(data) ? data.nextAction : null;
 
   const allImprovements = [
@@ -626,7 +806,22 @@ function ActionsTab({ data }: { data: LiteOutput | StandardOutput | FullOutput }
 }
 
 function BulletsTab({ data }: { data: StandardOutput | FullOutput }) {
-  const bulletHealth = isStandardOutput(data) && data.bulletHealth ? data.bulletHealth : null;
+  let bulletHealth = null;
+  let rewritePriorities: Array<{ currentText: string; suggestedRewrite: string; currentScore: number; projectedScore: number }> = [];
+  
+  if (isStandardOutput(data) && data.bulletHealth) {
+    bulletHealth = data.bulletHealth;
+  } else if (isFullOutput(data) && data.cvAnalysis?.bulletAnalysis) {
+    const ba = data.cvAnalysis.bulletAnalysis;
+    bulletHealth = {
+      totalBullets: ba.totalBullets,
+      averageScore: Math.min(100, ba.averageScore),
+      distribution: ba.distribution,
+      topIssue: "See rewrite priorities below",
+      topFix: "Focus on bullets with lowest scores",
+    };
+    rewritePriorities = ba.rewritePriorities || [];
+  }
 
   if (!bulletHealth) {
     return (
@@ -660,14 +855,71 @@ function BulletsTab({ data }: { data: StandardOutput | FullOutput }) {
         </Grid>
       </Grid>
 
-      <Card sx={{ mt: 2 }} elevation={0}>
-        <CardContent>
-          <Typography variant="subtitle2" sx={{ mb: 1 }}>Top Issue</Typography>
-          <Typography variant="body2" color="text.secondary">{bulletHealth.topIssue}</Typography>
-          <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>Recommended Fix</Typography>
-          <Typography variant="body2">{bulletHealth.topFix}</Typography>
-        </CardContent>
-      </Card>
+      {bulletHealth.distribution && (
+        <Grid container spacing={1} sx={{ mt: 2 }}>
+          <Grid size={3}>
+            <Paper sx={{ p: 1, textAlign: "center", bgcolor: "#dcfce7" }} elevation={0}>
+              <Typography variant="h6" fontWeight={600} color="success.main">{bulletHealth.distribution.excellent}</Typography>
+              <Typography variant="caption" color="text.secondary">Excellent</Typography>
+            </Paper>
+          </Grid>
+          <Grid size={3}>
+            <Paper sx={{ p: 1, textAlign: "center", bgcolor: "#fef9c3" }} elevation={0}>
+              <Typography variant="h6" fontWeight={600} sx={{ color: "#ca8a04" }}>{bulletHealth.distribution.good}</Typography>
+              <Typography variant="caption" color="text.secondary">Good</Typography>
+            </Paper>
+          </Grid>
+          <Grid size={3}>
+            <Paper sx={{ p: 1, textAlign: "center", bgcolor: "#fed7aa" }} elevation={0}>
+              <Typography variant="h6" fontWeight={600} sx={{ color: "#ea580c" }}>{bulletHealth.distribution.fair}</Typography>
+              <Typography variant="caption" color="text.secondary">Fair</Typography>
+            </Paper>
+          </Grid>
+          <Grid size={3}>
+            <Paper sx={{ p: 1, textAlign: "center", bgcolor: "#fecaca" }} elevation={0}>
+              <Typography variant="h6" fontWeight={600} color="error.main">{bulletHealth.distribution.poor}</Typography>
+              <Typography variant="caption" color="text.secondary">Poor</Typography>
+            </Paper>
+          </Grid>
+        </Grid>
+      )}
+
+      {isStandardOutput(data) && (
+        <Card sx={{ mt: 2 }} elevation={0}>
+          <CardContent>
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>Top Issue</Typography>
+            <Typography variant="body2" color="text.secondary">{bulletHealth.topIssue}</Typography>
+            <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>Recommended Fix</Typography>
+            <Typography variant="body2">{bulletHealth.topFix}</Typography>
+          </CardContent>
+        </Card>
+      )}
+
+      {rewritePriorities.length > 0 && (
+        <Box sx={{ mt: 3 }}>
+          <Typography variant="subtitle2" sx={{ mb: 2 }}>Priority Rewrites ({rewritePriorities.length})</Typography>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {rewritePriorities.slice(0, 5).map((item, idx) => (
+              <Card key={idx} elevation={0} sx={{ bgcolor: "#f8fafc" }}>
+                <CardContent sx={{ py: 1.5 }}>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                    <Chip label={`Score: ${item.currentScore}`} size="small" sx={{ bgcolor: getScoreColor(item.currentScore), color: "white" }} />
+                    <Typography variant="caption" color="success.main" fontWeight={600}>
+                      {"→"} {item.projectedScore}
+                    </Typography>
+                  </Box>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1, textDecoration: "line-through" }}>
+                    {item.currentText}
+                  </Typography>
+                  <Typography variant="body2" fontWeight={500}>
+                    {item.suggestedRewrite}
+                  </Typography>
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
+        </Box>
+      )}
     </Box>
   );
 }
