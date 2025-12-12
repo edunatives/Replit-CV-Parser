@@ -40,17 +40,18 @@ export function Dashboard({ cvs, onUploadNew, onSelectCV, onDeleteCV, onDuplicat
 
   return (
     <Box sx={{ p: 4, maxWidth: 1400, mx: "auto" }}>
-      <Typography variant="h4" sx={{ mb: 4, fontWeight: 600 }}>
+      <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
         My Resumes
       </Typography>
 
-      <Typography variant="h6" sx={{ mb: 2, fontWeight: 500 }}>
+      <Typography variant="subtitle1" sx={{ mb: 1.5, fontWeight: 500 }}>
         Upload your resume
       </Typography>
       
       <Card 
         sx={{ 
           mb: 4, 
+          maxWidth: "50%",
           border: "2px dashed",
           borderColor: "primary.light",
           bgcolor: "rgba(47, 84, 235, 0.04)",
