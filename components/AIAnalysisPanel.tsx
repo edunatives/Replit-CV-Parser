@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Box, Typography, Card, CardContent, Chip, LinearProgress, TextField, Button, IconButton, Divider, CircularProgress, Alert } from "@mui/material";
+import { Box, Typography, Card, CardContent, Chip, LinearProgress, TextField, Button, IconButton, Divider, CircularProgress, Alert, ToggleButtonGroup, ToggleButton, Tooltip } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 import WarningIcon from "@mui/icons-material/Warning";
@@ -11,10 +11,13 @@ import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import WorkIcon from "@mui/icons-material/Work";
 import TokenIcon from "@mui/icons-material/Token";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import FlashOnIcon from "@mui/icons-material/FlashOn";
+import BalanceIcon from "@mui/icons-material/Balance";
+import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
 import type { ParsedCV } from "@/types/cv";
 import { V23AssessmentPanel } from "./V23AssessmentPanel";
 import { JDMatchPanel } from "./JDMatchPanel";
-import type { AnalysisResponse } from "@/lib/langchain/v23-cv-intelligence-schemas";
+import type { AnalysisResponse, OutputMode } from "@/lib/langchain/v23-cv-intelligence-schemas";
 
 interface AIAnalysisPanelProps {
   cv: ParsedCV;
@@ -388,6 +391,7 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
   const [assessment, setAssessment] = useState<CVAssessment | null>(null);
   const [v23Analysis, setV23Analysis] = useState<AnalysisResponse | null>(null);
   const [useV23, setUseV23] = useState(true);
+  const [outputMode, setOutputMode] = useState<OutputMode>("STANDARD");
   const [jdMatch, setJdMatch] = useState<JDMatchResult | null>(null);
   const [v23JdMatch, setV23JdMatch] = useState<AnalysisResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -429,7 +433,7 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
       const response = await fetch("/api/assess/langchain", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cv, outputMode: "STANDARD", audience: "STUDENT" }),
+        body: JSON.stringify({ cv, outputMode, audience: "STUDENT" }),
       });
       
       const contentType = response.headers.get("content-type");
@@ -533,7 +537,7 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
       const response = await fetch("/api/jd-match/langchain", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cv, jobDescription: jdText, outputMode: "STANDARD", audience: "STUDENT" }),
+        body: JSON.stringify({ cv, jobDescription: jdText, outputMode, audience: "STUDENT" }),
       });
       
       const contentType = response.headers.get("content-type");
