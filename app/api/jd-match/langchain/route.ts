@@ -10,6 +10,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { ParsedCV } from "@/types/cv";
 import { analyzeCV, type OutputMode, type AudienceType } from "@/lib/langchain/v23-cv-intelligence-chain";
+import { getEffectiveModelConfig } from "@/lib/langchain/model-config";
 
 function formatCVText(cv: ParsedCV): string {
   const sections: string[] = [];
@@ -72,23 +73,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Job description is required" }, { status: 400 });
     }
 
-    const userApiKey = process.env.GOOGLE_API_KEY;
-    const replitApiKey = process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
-    if (!userApiKey && !replitApiKey) {
+    // Get model config for JD matching (defaults to OpenAI)
+    let modelConfig;
+    try {
+      modelConfig = getEffectiveModelConfig("jd_match");
+    } catch (err) {
       return NextResponse.json({ 
-        error: "AI service not configured (GOOGLE_API_KEY or AI_INTEGRATIONS_GEMINI_API_KEY required)" 
+        error: err instanceof Error ? err.message : "AI service not configured" 
       }, { status: 500 });
     }
 
     const cvText = cv.rawText || formatCVText(cv);
     const filename = cv.originalFilename || "cv.pdf";
     
-    console.log(`[v2.3] JD Match starting for: ${filename}, mode: ${outputMode}, audience: ${audience}`);
+    console.log(`[v2.3] JD Match starting for: ${filename}, mode: ${outputMode}, audience: ${audience}, provider: ${modelConfig.provider}`);
     
     const result = await analyzeCV(cvText, {
       jdContent: jobDescription,
       outputMode,
       audience,
+      provider: modelConfig.provider,
+      model: modelConfig.model,
+      temperature: modelConfig.temperature,
     });
     
     const rawCompat = result.data && "scores" in result.data ? result.data.scores.rawCompatibility : "N/A";
