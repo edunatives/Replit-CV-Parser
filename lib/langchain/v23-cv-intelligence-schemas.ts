@@ -239,6 +239,8 @@ export const RoleSchema = z.object({
     count: z.number(),
     averageScore: z.number(),
     excellent: z.number(),
+    good: z.number(),
+    fair: z.number(),
     poor: z.number(),
   }),
 });

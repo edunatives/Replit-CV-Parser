@@ -393,7 +393,14 @@ function transformToFull(raw: unknown, audience: AudienceType): FullOutput {
               rewrite: bullet.rewrite ? { suggested: safeStr((bullet.rewrite as Record<string, unknown>).suggested, ""), projectedScore: safeNum((bullet.rewrite as Record<string, unknown>).projectedScore, 70) } : undefined,
             };
           }),
-          bulletSummary: { count: bullets.length, averageScore: safeNum((role.bulletSummary as Record<string, unknown>)?.averageScore, 50), excellent: safeNum((role.bulletSummary as Record<string, unknown>)?.excellent, 0), poor: safeNum((role.bulletSummary as Record<string, unknown>)?.poor, 0) },
+          bulletSummary: { 
+            count: bullets.length, 
+            averageScore: safeNum((role.bulletSummary as Record<string, unknown>)?.averageScore, 50), 
+            excellent: safeNum((role.bulletSummary as Record<string, unknown>)?.excellent, 0), 
+            good: safeNum((role.bulletSummary as Record<string, unknown>)?.good, 0),
+            fair: safeNum((role.bulletSummary as Record<string, unknown>)?.fair, 0),
+            poor: safeNum((role.bulletSummary as Record<string, unknown>)?.poor, 0) 
+          },
         };
       }),
       progression: {
@@ -446,7 +453,7 @@ function transformToFull(raw: unknown, audience: AudienceType): FullOutput {
       h9Specialization: { type: safeStr((expFactorsRaw.h9Specialization as Record<string, unknown>)?.type, ""), primaryArea: safeStr((expFactorsRaw.h9Specialization as Record<string, unknown>)?.primaryArea, ""), score: safeNum((expFactorsRaw.h9Specialization as Record<string, unknown>)?.score, 50) },
     },
     bulletAnalysis: (() => {
-      // Sum distribution counts from each role's bulletSummary (AI provides aggregates per role)
+      // Strategy 1: Sum from each role's bulletSummary (AI provides aggregates per role)
       let sumExcellent = 0, sumGood = 0, sumFair = 0, sumPoor = 0;
       safeArr(experienceRaw.roles).forEach((r: unknown) => {
         const role = r as Record<string, unknown>;
@@ -457,14 +464,37 @@ function transformToFull(raw: unknown, audience: AudienceType): FullOutput {
         sumPoor += safeNum(bs.poor, 0);
       });
       
-      // Distribution computed from role summaries
-      const computedDistribution = {
+      // Strategy 2: Count from individual bullet scores (excellent>=80, good>=60, fair>=40, poor<40)
+      let scoreExcellent = 0, scoreGood = 0, scoreFair = 0, scorePoor = 0;
+      safeArr(experienceRaw.roles).forEach((r: unknown) => {
+        const role = r as Record<string, unknown>;
+        safeArr(role.bullets).forEach((b: unknown) => {
+          const bullet = (typeof b === "string" ? { score: 50 } : b) as Record<string, unknown>;
+          const score = safeNum(bullet.score, 50);
+          if (score >= 80) scoreExcellent++;
+          else if (score >= 60) scoreGood++;
+          else if (score >= 40) scoreFair++;
+          else scorePoor++;
+        });
+      });
+      
+      // Use bulletSummary counts if available, otherwise use score-based counts
+      const summaryTotal = sumExcellent + sumGood + sumFair + sumPoor;
+      const scoreTotal = scoreExcellent + scoreGood + scoreFair + scorePoor;
+      
+      const computedDistribution = summaryTotal > 0 ? {
         excellent: sumExcellent,
         good: sumGood,
         fair: sumFair,
         poor: sumPoor,
-      };
-      const computedTotal = sumExcellent + sumGood + sumFair + sumPoor;
+      } : scoreTotal > 0 ? {
+        excellent: scoreExcellent,
+        good: scoreGood,
+        fair: scoreFair,
+        poor: scorePoor,
+      } : { excellent: 0, good: 0, fair: 0, poor: 0 };
+      
+      const computedTotal = summaryTotal > 0 ? summaryTotal : scoreTotal;
       
       // Use AI values if provided, otherwise computed
       const totalBullets = safeNum(bulletAnalysisRaw.totalBullets || bulletAnalysisRaw.total_bullets, computedTotal > 0 ? computedTotal : 0);

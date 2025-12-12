@@ -381,6 +381,8 @@ const RoleSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$
         count: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].number(),
         averageScore: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].number(),
         excellent: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].number(),
+        good: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].number(),
+        fair: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].number(),
         poor: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].number()
     })
 });
@@ -1065,8 +1067,8 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$langchain$2f$llm$2d$p
 ;
 ;
 const DEFAULT_CONFIG = {
-    provider: "gemini",
-    model: "gemini-2.5-flash",
+    provider: "openai",
+    model: "gpt-4o",
     temperature: 0.2,
     maxOutputTokens: 16000,
     maxRetries: 3,
@@ -1451,6 +1453,8 @@ function transformToFull(raw, audience) {
                         count: bullets.length,
                         averageScore: safeNum(role.bulletSummary?.averageScore, 50),
                         excellent: safeNum(role.bulletSummary?.excellent, 0),
+                        good: safeNum(role.bulletSummary?.good, 0),
+                        fair: safeNum(role.bulletSummary?.fair, 0),
                         poor: safeNum(role.bulletSummary?.poor, 0)
                     }
                 };
@@ -1565,33 +1569,91 @@ function transformToFull(raw, audience) {
                 score: safeNum(expFactorsRaw.h9Specialization?.score, 50)
             }
         },
-        bulletAnalysis: {
-            totalBullets: safeNum(bulletAnalysisRaw.totalBullets || bulletAnalysisRaw.total_bullets, 0),
-            averageScore: Math.min(100, safeNum(bulletAnalysisRaw.averageScore || bulletAnalysisRaw.average_score, 50)),
-            distribution: {
-                excellent: safeNum(bulletAnalysisRaw.distribution?.excellent, 0),
-                good: safeNum(bulletAnalysisRaw.distribution?.good, 0),
-                fair: safeNum(bulletAnalysisRaw.distribution?.fair, 0),
-                poor: safeNum(bulletAnalysisRaw.distribution?.poor, 0)
-            },
-            codeScores: {
-                A10: safeNum(bulletAnalysisRaw.codeScores?.A10, 50),
-                A11: safeNum(bulletAnalysisRaw.codeScores?.A11, 50),
-                A12: safeNum(bulletAnalysisRaw.codeScores?.A12, 50),
-                A13: safeNum(bulletAnalysisRaw.codeScores?.A13, 50)
-            },
-            rewritePriorities: safeArr(bulletAnalysisRaw.rewritePriorities || bulletAnalysisRaw.rewrite_priorities).map((r)=>{
-                const rewrite = r;
-                return {
-                    roleIndex: safeNum(rewrite.roleIndex || rewrite.role_index, 0),
-                    bulletIndex: safeNum(rewrite.bulletIndex || rewrite.bullet_index, 0),
-                    currentText: safeStr(rewrite.currentText || rewrite.current_text, ""),
-                    currentScore: safeNum(rewrite.currentScore || rewrite.current_score, 30),
-                    suggestedRewrite: safeStr(rewrite.suggestedRewrite || rewrite.suggested_rewrite, ""),
-                    projectedScore: safeNum(rewrite.projectedScore || rewrite.projected_score, 70)
-                };
-            })
-        },
+        bulletAnalysis: (()=>{
+            // Strategy 1: Sum from each role's bulletSummary (AI provides aggregates per role)
+            let sumExcellent = 0, sumGood = 0, sumFair = 0, sumPoor = 0;
+            safeArr(experienceRaw.roles).forEach((r)=>{
+                const role = r;
+                const bs = role.bulletSummary || role.bullet_summary || {};
+                sumExcellent += safeNum(bs.excellent, 0);
+                sumGood += safeNum(bs.good, 0);
+                sumFair += safeNum(bs.fair, 0);
+                sumPoor += safeNum(bs.poor, 0);
+            });
+            // Strategy 2: Count from individual bullet scores (excellent>=80, good>=60, fair>=40, poor<40)
+            let scoreExcellent = 0, scoreGood = 0, scoreFair = 0, scorePoor = 0;
+            safeArr(experienceRaw.roles).forEach((r)=>{
+                const role = r;
+                safeArr(role.bullets).forEach((b)=>{
+                    const bullet = typeof b === "string" ? {
+                        score: 50
+                    } : b;
+                    const score = safeNum(bullet.score, 50);
+                    if (score >= 80) scoreExcellent++;
+                    else if (score >= 60) scoreGood++;
+                    else if (score >= 40) scoreFair++;
+                    else scorePoor++;
+                });
+            });
+            // Use bulletSummary counts if available, otherwise use score-based counts
+            const summaryTotal = sumExcellent + sumGood + sumFair + sumPoor;
+            const scoreTotal = scoreExcellent + scoreGood + scoreFair + scorePoor;
+            const computedDistribution = summaryTotal > 0 ? {
+                excellent: sumExcellent,
+                good: sumGood,
+                fair: sumFair,
+                poor: sumPoor
+            } : scoreTotal > 0 ? {
+                excellent: scoreExcellent,
+                good: scoreGood,
+                fair: scoreFair,
+                poor: scorePoor
+            } : {
+                excellent: 0,
+                good: 0,
+                fair: 0,
+                poor: 0
+            };
+            const computedTotal = summaryTotal > 0 ? summaryTotal : scoreTotal;
+            // Use AI values if provided, otherwise computed
+            const totalBullets = safeNum(bulletAnalysisRaw.totalBullets || bulletAnalysisRaw.total_bullets, computedTotal > 0 ? computedTotal : 0);
+            const averageScore = Math.min(100, safeNum(bulletAnalysisRaw.averageScore || bulletAnalysisRaw.average_score, 50));
+            const aiDistribution = bulletAnalysisRaw.distribution;
+            const hasAIDistribution = aiDistribution && safeNum(aiDistribution.excellent, 0) + safeNum(aiDistribution.good, 0) + safeNum(aiDistribution.fair, 0) + safeNum(aiDistribution.poor, 0) > 0;
+            const hasComputedDistribution = computedTotal > 0;
+            return {
+                totalBullets,
+                averageScore,
+                distribution: hasAIDistribution ? {
+                    excellent: safeNum(aiDistribution.excellent, 0),
+                    good: safeNum(aiDistribution.good, 0),
+                    fair: safeNum(aiDistribution.fair, 0),
+                    poor: safeNum(aiDistribution.poor, 0)
+                } : hasComputedDistribution ? computedDistribution : {
+                    excellent: 0,
+                    good: 0,
+                    fair: 0,
+                    poor: 0
+                },
+                codeScores: {
+                    A10: safeNum(bulletAnalysisRaw.codeScores?.A10, 50),
+                    A11: safeNum(bulletAnalysisRaw.codeScores?.A11, 50),
+                    A12: safeNum(bulletAnalysisRaw.codeScores?.A12, 50),
+                    A13: safeNum(bulletAnalysisRaw.codeScores?.A13, 50)
+                },
+                rewritePriorities: safeArr(bulletAnalysisRaw.rewritePriorities || bulletAnalysisRaw.rewrite_priorities).map((r)=>{
+                    const rewrite = r;
+                    return {
+                        roleIndex: safeNum(rewrite.roleIndex || rewrite.role_index, 0),
+                        bulletIndex: safeNum(rewrite.bulletIndex || rewrite.bullet_index, 0),
+                        currentText: safeStr(rewrite.currentText || rewrite.current_text, ""),
+                        currentScore: safeNum(rewrite.currentScore || rewrite.current_score, 30),
+                        suggestedRewrite: safeStr(rewrite.suggestedRewrite || rewrite.suggested_rewrite, ""),
+                        projectedScore: safeNum(rewrite.projectedScore || rewrite.projected_score, 70)
+                    };
+                })
+            };
+        })(),
         issuesDetected: safeArr(cvAnalysisRaw.issuesDetected || cvAnalysisRaw.issues_detected).map((i)=>{
             const issue = i;
             return {
@@ -1836,12 +1898,12 @@ ${jd ? "- experienceMatch: {totalYearsMatch, domainYearsMatch, domainGap, scopeM
 ${audience === "STUDENT" ? "- alternativeRoles: [{role, fitScore, reason}]\n- nextSteps: {immediate[], thisWeek[], beforeApplication[]}\n- encouragement" : "- riskLevel, hireRecommendation\n- verificationItems: [{item, priority, reason}]\n- interviewQuestions: [{question, probing, redFlag}]"}`;
     } else {
         prompt += `Return ~5000 tokens comprehensive JSON with:
-- cvAnalysis: {metadata, professionalSummary, experience{totalYears, roles[], progression, gaps[]}, skills{validated[], implied[], ghost[], validationRate}, education, experienceFactors{h1-h9}, bulletAnalysis{totalBullets, averageScore, distribution, codeScores, rewritePriorities[]}, issuesDetected[], strengthsDetected[]}
+- cvAnalysis: {metadata, professionalSummary, experience{totalYears, roles[], progression, gaps[]}, skills{validated[], implied[], ghost[], validationRate}, education, experienceFactors{h1-h9}, bulletAnalysis{totalBullets, averageScore, distribution, codeScores, rewritePriorities[]}, issuesDetected[{code, issue, severity, count, fix}], strengthsDetected[{code, strength}]}
 ${jd ? "- jdAnalysis: {metadata, requirements{tier1/2/3Skills[], minimumYears, education, certifications[]}, hardGates[], jdNature}" : ""}
 ${audience === "STUDENT" ? `- studentAnalysis: {
   overallCvQuality: {score: <0-100>, grade: "<A|A-|B+|B|B-|C+|C|D|F>", label: "<e.g. Strong Candidate>", summary: "<brief assessment>"},
   honestAssessment: {rawCompatibility: {score, analysis}, transformationEffort: {level: 1-5, timeline, description}, candidateRisk: {score, factors[]}, successProbability: "<assessment>"},
-  improvements: {critical[], high[], medium[], scorePotential: {current, afterCritical, afterAll, ceiling}},
+  improvements: {critical[], high[], medium[], scorePotential: {current, afterCritical, afterAll, ceiling}} where each item in critical/high/medium is {code, priority, action, impact, effort},
   bulletImprovements: [{original, rewritten, scoreGain, issuesFixed[]}],
   gapStrategy: {fixable: [{gap, solution, timeline}], unfixable: [{gap, mitigation}]},
   alternatives: {betterFitRoles: [{role, fitScore, reason}], steppingStones: [{role, gap, timeline}]},
@@ -2104,7 +2166,7 @@ async function POST(request) {
             });
         }
         const availableProviders = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$langchain$2f$llm$2d$providers$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getAvailableProviders"])();
-        const selectedProvider = provider || (availableProviders.includes("gemini") ? "gemini" : availableProviders[0]);
+        const selectedProvider = provider || (availableProviders.includes("openai") ? "openai" : availableProviders[0]);
         if (!selectedProvider || availableProviders.length === 0) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
                 error: "No AI service configured. Please configure GOOGLE_API_KEY (Gemini) or AI_INTEGRATIONS_OPENAI_API_KEY (OpenAI)."
