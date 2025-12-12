@@ -455,6 +455,8 @@ export const AnalysisOutputSchema = z.discriminatedUnion("mode", [
   FullOutputSchema,
 ]);
 
+export const ProviderTypeEnum = z.enum(["gemini", "openai"]);
+
 export const AnalysisResponseSchema = z.object({
   success: z.boolean(),
   error: z.string().optional(),
@@ -463,6 +465,7 @@ export const AnalysisResponseSchema = z.object({
     processingTimeMs: z.number(),
     tokensUsed: z.object({ input: z.number(), output: z.number() }),
     modelUsed: z.string(),
+    provider: ProviderTypeEnum.optional(),
     outputMode: OutputModeEnum,
     audience: AudienceTypeEnum,
   }),

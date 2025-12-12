@@ -1,15 +1,15 @@
 /**
  * @fileoverview CV Assessment API v2.3
- * @description Direct v2.3 implementation - no legacy compatibility
+ * @description Direct v2.3 implementation with multi-provider support
  * 
  * @endpoint POST /api/assess/langchain
- * @accepts application/json with { cv: ParsedCV, outputMode?: "LITE"|"STANDARD"|"FULL", audience?: "STUDENT"|"HR" }
+ * @accepts application/json with { cv: ParsedCV, outputMode?: "LITE"|"STANDARD"|"FULL", audience?: "STUDENT"|"HR", provider?: "gemini"|"openai", model?: string }
  * @returns {Object} v2.3 AnalysisResponse
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import type { ParsedCV } from "@/types/cv";
-import { analyzeCV, type OutputMode, type AudienceType } from "@/lib/langchain/v23-cv-intelligence-chain";
+import { analyzeCV, getAvailableProviders, type OutputMode, type AudienceType, type ProviderType } from "@/lib/langchain/v23-cv-intelligence-chain";
 
 function formatCVText(cv: ParsedCV): string {
   const sections: string[] = [];
@@ -66,33 +66,44 @@ export async function POST(request: NextRequest) {
       cv: ParsedCV; 
       outputMode?: OutputMode;
       audience?: AudienceType;
+      provider?: ProviderType;
+      model?: string;
     };
-    const { cv, outputMode = "STANDARD", audience = "STUDENT" } = body;
+    const { cv, outputMode = "STANDARD", audience = "STUDENT", provider, model } = body;
 
     if (!cv) {
       return NextResponse.json({ error: "CV data is required" }, { status: 400 });
     }
 
-    const userApiKey = process.env.GOOGLE_API_KEY;
-    const replitApiKey = process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
-    if (!userApiKey && !replitApiKey) {
+    const availableProviders = getAvailableProviders();
+    const selectedProvider = provider || (availableProviders.includes("gemini") ? "gemini" : availableProviders[0]);
+    
+    if (!selectedProvider || availableProviders.length === 0) {
       return NextResponse.json({ 
-        error: "AI service not configured (GOOGLE_API_KEY or AI_INTEGRATIONS_GEMINI_API_KEY required)" 
+        error: "No AI service configured. Please configure GOOGLE_API_KEY (Gemini) or AI_INTEGRATIONS_OPENAI_API_KEY (OpenAI)." 
       }, { status: 500 });
+    }
+    
+    if (provider && !availableProviders.includes(provider)) {
+      return NextResponse.json({ 
+        error: `Provider "${provider}" is not available. Available providers: ${availableProviders.join(", ")}` 
+      }, { status: 400 });
     }
 
     const cvText = cv.rawText || formatCVText(cv);
     const filename = cv.originalFilename || "cv.pdf";
     
-    console.log(`[v2.3] Assessment starting for: ${filename}, mode: ${outputMode}, audience: ${audience}`);
+    console.log(`[v2.3] Assessment starting for: ${filename}, mode: ${outputMode}, audience: ${audience}, provider: ${selectedProvider}${model ? `, model: ${model}` : ""}`);
     
     const result = await analyzeCV(cvText, {
       outputMode,
       audience,
+      provider: selectedProvider,
+      model,
     });
     
     const score = result.data && "scores" in result.data ? result.data.scores.overall : "N/A";
-    console.log(`[v2.3] Assessment complete, score: ${score}`);
+    console.log(`[v2.3] Assessment complete, score: ${score}, provider: ${result.meta.provider || selectedProvider}`);
 
     return NextResponse.json(result);
   } catch (error) {

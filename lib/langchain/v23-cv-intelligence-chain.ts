@@ -1,12 +1,12 @@
 /**
  * CV Intelligence Engine v2.3 - Main Chain
  * Pure v2.3 implementation - no legacy compatibility
+ * Supports multiple LLM providers (Gemini, OpenAI, etc.)
  * 
- * @version 2.3.0
+ * @version 2.3.1
  * @file v23-cv-intelligence-chain.ts
  */
 
-import { GoogleGenAI } from "@google/genai";
 import {
   OutputMode,
   AudienceType,
@@ -21,12 +21,19 @@ import {
   scoreToRiskLevel,
   clamp,
 } from "./v23-cv-intelligence-schemas";
+import {
+  ProviderType,
+  LLMProvider,
+  createProvider,
+  getAvailableProviders,
+} from "./llm-providers";
 
 // ============================================================================
 // CONFIGURATION
 // ============================================================================
 
 export interface ChainConfig {
+  provider?: ProviderType;
   model?: string;
   temperature?: number;
   maxOutputTokens?: number;
@@ -35,12 +42,16 @@ export interface ChainConfig {
 }
 
 const DEFAULT_CONFIG: Required<ChainConfig> = {
+  provider: "gemini",
   model: "gemini-2.5-flash",
   temperature: 0.2,
   maxOutputTokens: 16000,
   maxRetries: 3,
   retryDelayMs: 1000,
 };
+
+export type { ProviderType };
+export { getAvailableProviders };
 
 // ============================================================================
 // UTILITIES
@@ -579,26 +590,33 @@ ${audience === "STUDENT" ? "- studentAnalysis: {overallCvQuality, honestAssessme
 // ============================================================================
 
 export class CvIntelligenceChain {
-  private ai: GoogleGenAI;
+  private provider: LLMProvider;
   private config: Required<ChainConfig>;
   
   constructor(config: ChainConfig = {}) {
-    this.config = { ...DEFAULT_CONFIG, ...config };
+    const mergedConfig = { ...DEFAULT_CONFIG, ...config };
     
-    const userKey = process.env.GOOGLE_API_KEY;
-    const replitKey = process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
-    const baseUrl = process.env.AI_INTEGRATIONS_GEMINI_BASE_URL;
-    
-    if (userKey) {
-      this.ai = new GoogleGenAI({ apiKey: userKey });
-    } else if (replitKey) {
-      this.ai = new GoogleGenAI({
-        apiKey: replitKey,
-        httpOptions: { apiVersion: "", baseUrl: baseUrl || undefined },
-      });
-    } else {
-      throw new Error("No API key configured (GOOGLE_API_KEY or AI_INTEGRATIONS_GEMINI_API_KEY)");
+    if (config.provider === "openai" && !config.model) {
+      mergedConfig.model = "gpt-4o";
     }
+    
+    this.config = mergedConfig;
+    this.provider = createProvider({
+      provider: this.config.provider,
+      model: this.config.model,
+      temperature: this.config.temperature,
+      maxOutputTokens: this.config.maxOutputTokens,
+    });
+    
+    console.log(`[CvIntelligenceChain] Initialized with provider: ${this.provider.name}, model: ${this.provider.model}`);
+  }
+  
+  get providerName(): ProviderType {
+    return this.provider.name;
+  }
+  
+  get modelName(): string {
+    return this.provider.model;
   }
   
   async analyze(request: {
@@ -622,19 +640,12 @@ export class CvIntelligenceChain {
         console.log(`[TIMING] Prompt build: ${timings.promptBuild}ms, total prompt length: ${(systemPrompt + userPrompt).length} chars`);
         
         const apiStart = Date.now();
-        console.log(`[TIMING] Calling Gemini API...`);
-        const response = await this.ai.models.generateContent({
-          model: this.config.model,
-          contents: `${systemPrompt}\n\n${userPrompt}`,
-          config: {
-            maxOutputTokens: this.config.maxOutputTokens,
-            temperature: this.config.temperature,
-          },
-        });
+        console.log(`[TIMING] Calling ${this.provider.name} API (model: ${this.provider.model})...`);
+        const response = await this.provider.generate(systemPrompt, userPrompt);
         const apiDuration = Date.now() - apiStart;
-        console.log(`[TIMING] Gemini API response: ${apiDuration}ms, input tokens: ${response.usageMetadata?.promptTokenCount || 0}, output tokens: ${response.usageMetadata?.candidatesTokenCount || 0}`);
+        console.log(`[TIMING] ${this.provider.name} API response: ${apiDuration}ms, input tokens: ${response.usage.inputTokens}, output tokens: ${response.usage.outputTokens}`);
         
-        const text = response.text?.trim() || "";
+        const text = response.text;
         if (!text) throw new Error("Empty response from AI");
         
         const parseStart = Date.now();
@@ -650,8 +661,8 @@ export class CvIntelligenceChain {
         return {
           data: transformed,
           tokens: {
-            input: response.usageMetadata?.promptTokenCount || 0,
-            output: response.usageMetadata?.candidatesTokenCount || 0,
+            input: response.usage.inputTokens,
+            output: response.usage.outputTokens,
           },
           timings: { promptBuild: timings.promptBuild, apiCall: apiDuration, jsonParse: parseDuration, transform: transformDuration },
         };
@@ -666,7 +677,8 @@ export class CvIntelligenceChain {
         meta: {
           processingTimeMs: totalDuration,
           tokensUsed: result.tokens,
-          modelUsed: this.config.model,
+          modelUsed: this.provider.model,
+          provider: this.provider.name,
           outputMode,
           audience,
         },
@@ -691,7 +703,8 @@ export class CvIntelligenceChain {
         meta: {
           processingTimeMs: Date.now() - startTime,
           tokensUsed: { input: 0, output: 0 },
-          modelUsed: this.config.model,
+          modelUsed: this.provider.model,
+          provider: this.provider.name,
           outputMode,
           audience,
         },
@@ -721,13 +734,26 @@ export class CvIntelligenceChain {
 // SINGLETON & CONVENIENCE FUNCTIONS
 // ============================================================================
 
-let chainInstance: CvIntelligenceChain | null = null;
+const chainInstances: Map<string, CvIntelligenceChain> = new Map();
+
+function getChainKey(config?: ChainConfig): string {
+  return `${config?.provider || "gemini"}-${config?.model || "default"}`;
+}
 
 export function getChain(config?: ChainConfig): CvIntelligenceChain {
-  if (!chainInstance) {
-    chainInstance = new CvIntelligenceChain(config);
+  const key = getChainKey(config);
+  let instance = chainInstances.get(key);
+  
+  if (!instance) {
+    instance = new CvIntelligenceChain(config);
+    chainInstances.set(key, instance);
   }
-  return chainInstance;
+  
+  return instance;
+}
+
+export function clearChainCache(): void {
+  chainInstances.clear();
 }
 
 export async function analyzeCV(
@@ -736,9 +762,16 @@ export async function analyzeCV(
     jdContent?: string;
     outputMode?: OutputMode;
     audience?: AudienceType;
+    provider?: ProviderType;
+    model?: string;
   }
 ): Promise<AnalysisResponse> {
-  return getChain().analyze({
+  const chain = getChain({
+    provider: options?.provider,
+    model: options?.model,
+  });
+  
+  return chain.analyze({
     cvContent,
     jdContent: options?.jdContent,
     outputMode: options?.outputMode || "STANDARD",
