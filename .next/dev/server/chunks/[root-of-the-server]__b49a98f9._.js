@@ -1501,7 +1501,9 @@ module.exports = mod;
     "assessCVWithLangChain",
     ()=>assessCVWithLangChain,
     "getAssessor",
-    ()=>getAssessor
+    ()=>getAssessor,
+    "transformToForensicV211",
+    ()=>transformToForensicV211
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$google$2f$genai$2f$dist$2f$node$2f$index$2e$mjs__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@google/genai/dist/node/index.mjs [app-route] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__ = __turbopack_context__.i("[project]/node_modules/zod/v3/external.js [app-route] (ecmascript) <export * as z>");
@@ -1707,6 +1709,147 @@ async function assessCVWithLangChain(cvSummary, filename) {
     const assessor = getAssessor();
     return assessor.assessCV(cvSummary, filename);
 }
+function transformToForensicV211(assessment, filename) {
+    const level = assessment.level;
+    const uiSections = assessment.categories.map((cat)=>({
+            category: cat.category,
+            score: cat.score,
+            weight: cat.weight,
+            weighted: cat.weighted_contribution,
+            feedback: cat.feedback,
+            issues: cat.issues || []
+        }));
+    const uiStrengths = assessment.strengths.map((s, i)=>({
+            icon: i === 0 ? "star" : i === 1 ? "trending_up" : "verified",
+            title: s.split(":")[0] || s.substring(0, 30),
+            detail: s,
+            evidence: []
+        }));
+    const uiWeaknesses = assessment.weaknesses.map((w, i)=>({
+            code: "W" + (i + 1).toString().padStart(2, "0"),
+            icon: "error",
+            severity: "medium",
+            text: w
+        }));
+    const uiRecommendations = assessment.recommendations.map((rec)=>({
+            priority: rec.priority,
+            icon: rec.priority === "high" ? "priority_high" : rec.priority === "medium" ? "schedule" : "low_priority",
+            text: rec.suggestion,
+            impact: rec.impact
+        }));
+    const uiHighlights = assessment.highlights.map((h)=>({
+            type: h.type === "green" ? "achievement" : h.type === "red" ? "concern" : "skill",
+            color: h.type,
+            text: h.snippet,
+            source: "CV",
+            note: h.comment
+        }));
+    const quickStats = {
+        professionalYears: 0,
+        validatedSkills: 0,
+        ghostSkills: 0,
+        validationRate: 0,
+        quantificationRate: 0,
+        issueCount: {
+            critical: 0,
+            high: 0,
+            medium: uiWeaknesses.length,
+            low: 0
+        }
+    };
+    const studentView = {
+        headline: assessment.studentAdvice?.headline || assessment.verdict,
+        overall_score: {
+            score: assessment.overallScore,
+            grade: level,
+            message: assessment.verdict
+        },
+        your_strengths: uiStrengths.map((s)=>({
+                title: s.title,
+                detail: s.detail,
+                icon: s.icon
+            })),
+        your_background: {
+            summary: assessment.verdict,
+            unique_value: assessment.strengths[0] || "",
+            growth_areas: assessment.weaknesses.slice(0, 3)
+        },
+        quick_wins: (assessment.studentAdvice?.quickWins || []).map((qw, i)=>({
+                action: qw,
+                impact: "+5 points",
+                time: "15 min",
+                priority: i === 0 ? "do_first" : "do_soon"
+            })),
+        category_feedback: Object.fromEntries(assessment.categories.map((cat)=>[
+                cat.category.toLowerCase().replace(/\s+/g, "_"),
+                {
+                    score: cat.score,
+                    summary: cat.feedback,
+                    tips: cat.issues || []
+                }
+            ])),
+        improvement_roadmap: {
+            this_week: {
+                actions: assessment.studentAdvice?.quickWins || [],
+                projected_gain: 5
+            },
+            this_month: {
+                actions: assessment.recommendations.filter((r)=>r.priority === "high").map((r)=>r.suggestion),
+                projected_gain: 10
+            },
+            long_term: {
+                actions: [
+                    assessment.studentAdvice?.longTermPath || "Continue developing your skills"
+                ],
+                projected_gain: 15
+            }
+        },
+        encouragement: "Keep improving your CV to stand out!"
+    };
+    return {
+        version: "2.11",
+        input: {
+            cv_filename: filename,
+            jd_provided: false,
+            jd_title: null
+        },
+        analysis_metadata: {
+            cv_name: filename,
+            analysis_date: new Date().toISOString(),
+            engine_version: "2.11-langchain"
+        },
+        cv_nature: {
+            detected_level: level === "Exceptional" || level === "Strong" ? "Senior" : level === "Good" ? "Mid" : "Junior",
+            experience_years: 0,
+            domain: "General",
+            specialization: ""
+        },
+        category_scores: {
+            contact: assessment.categories.find((c)=>c.category.toLowerCase().includes("contact"))?.score || 0,
+            summary: assessment.categories.find((c)=>c.category.toLowerCase().includes("summary"))?.score || 0,
+            experience: assessment.categories.find((c)=>c.category.toLowerCase().includes("experience"))?.score || 0,
+            education: assessment.categories.find((c)=>c.category.toLowerCase().includes("education"))?.score || 0,
+            skills: assessment.categories.find((c)=>c.category.toLowerCase().includes("skills"))?.score || 0,
+            formatting: assessment.categories.find((c)=>c.category.toLowerCase().includes("format"))?.score || 0
+        },
+        ui_output: {
+            overallScore: assessment.overallScore,
+            level,
+            inflation: assessment.inflation,
+            verdict: assessment.verdict,
+            sections: uiSections,
+            strengths: uiStrengths,
+            weaknesses: uiWeaknesses,
+            recommendations: uiRecommendations,
+            highlights: uiHighlights,
+            quickStats
+        },
+        reports: {
+            student_view: studentView
+        },
+        recommended_rewrites: []
+    };
+}
 }),
 "[project]/app/api/assess/langchain/route.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
@@ -1739,10 +1882,11 @@ async function POST(request) {
                 status: 400
             });
         }
-        const apiKey = process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
-        if (!apiKey) {
+        const userApiKey = process.env.GOOGLE_API_KEY;
+        const replitApiKey = process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
+        if (!userApiKey && !replitApiKey) {
             return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-                error: "AI service not configured"
+                error: "AI service not configured (GOOGLE_API_KEY or AI_INTEGRATIONS_GEMINI_API_KEY required)"
             }, {
                 status: 500
             });
@@ -1752,8 +1896,9 @@ async function POST(request) {
         console.log("LangChain assessment starting for:", filename);
         const assessment = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$langchain$2f$assessor$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["assessCVWithLangChain"])(cvSummary, filename);
         console.log("LangChain assessment complete, score:", assessment.overallScore);
+        const analysis = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$langchain$2f$assessor$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["transformToForensicV211"])(assessment, filename);
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-            assessment,
+            analysis,
             engine: "langchain",
             version: "2.11"
         });
