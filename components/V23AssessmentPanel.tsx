@@ -174,11 +174,22 @@ function HeaderSection({ data, meta, candidateName, candidateTitle }: {
     const summaryQuality = data.cvAnalysis?.professionalSummary?.qualityScore ?? 50;
     const validationRate = data.cvAnalysis?.skills?.validationRate ?? 70;
     overall = Math.round((bulletAvg * 0.4 + summaryQuality * 0.3 + validationRate * 0.3));
+    let extractedGrade = false;
     if (data.studentAnalysis?.overallCvQuality) {
-      overall = data.studentAnalysis.overallCvQuality;
+      const quality = data.studentAnalysis.overallCvQuality;
+      overall = typeof quality === "number" ? quality : (quality as { score?: number }).score ?? overall;
+      if (typeof quality === "object" && quality && "grade" in quality) {
+        grade = (quality as { grade?: string }).grade ?? grade;
+        extractedGrade = true;
+      }
     }
-    grade = overall >= 90 ? "A" : overall >= 85 ? "A-" : overall >= 80 ? "B+" : overall >= 70 ? "B" : overall >= 65 ? "B-" : overall >= 60 ? "C+" : overall >= 50 ? "C" : overall >= 40 ? "D" : "F";
-    verdict = data.studentAnalysis?.honestAssessment || data.hrAnalysis?.riskAssessment?.summary || "";
+    if (!extractedGrade) {
+      grade = overall >= 90 ? "A" : overall >= 85 ? "A-" : overall >= 80 ? "B+" : overall >= 70 ? "B" : overall >= 65 ? "B-" : overall >= 60 ? "C+" : overall >= 50 ? "C" : overall >= 40 ? "D" : "F";
+    }
+    const honestAssessment = data.studentAnalysis?.honestAssessment;
+    verdict = typeof honestAssessment === "string" ? honestAssessment : 
+      (honestAssessment as { successProbability?: string } | undefined)?.successProbability || 
+      (data.hrAnalysis?.riskAssessment as { summary?: string } | undefined)?.summary || "";
     hasJd = !!data.jdAnalysis;
   }
   
