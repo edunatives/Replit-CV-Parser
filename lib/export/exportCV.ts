@@ -48,6 +48,7 @@ const templateStyles: Record<TemplateType, TemplateStyle> = {
   "corporate": { headerBg: "#1e3a5f", accent: "#3498db", headerText: "#ffffff", bodyBg: "#f8f9fa", bodyText: "#2c3e50", bodyTextSecondary: "#5d6d7e" },
   "business": { headerBg: "#1b4f72", accent: "#1b4f72", headerText: "#ffffff", bodyBg: "#f8f9fa", bodyText: "#2c3e50", bodyTextSecondary: "#5d6d7e" },
   "classic-underline": { headerBg: "#ffffff", accent: "#1b4f72", headerText: "#1b4f72", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a" },
+  "typical": { headerBg: "#ffffff", accent: "#22c55e", headerText: "#1a1a1a", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a" },
 };
 
 /**

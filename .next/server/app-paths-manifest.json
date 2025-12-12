@@ -3,10 +3,14 @@
   "/_not-found/page": "app/_not-found/page.js",
   "/api-docs/page": "app/api-docs/page.js",
   "/api/advisor/route": "app/api/advisor/route.js",
+  "/api/assess/compare/route": "app/api/assess/compare/route.js",
+  "/api/assess/langchain/route": "app/api/assess/langchain/route.js",
   "/api/assess/route": "app/api/assess/route.js",
   "/api/cvs/route": "app/api/cvs/route.js",
+  "/api/jd-match/langchain/route": "app/api/jd-match/langchain/route.js",
   "/api/jd-match/route": "app/api/jd-match/route.js",
   "/api/parse/batch/route": "app/api/parse/batch/route.js",
   "/api/parse/route": "app/api/parse/route.js",
+  "/api/providers/route": "app/api/providers/route.js",
   "/page": "app/page.js"
 }

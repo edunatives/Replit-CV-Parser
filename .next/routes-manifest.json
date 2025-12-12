@@ -52,6 +52,18 @@
       "namedRegex": "^/api/assess(?:/)?$"
     },
     {
+      "page": "/api/assess/compare",
+      "regex": "^/api/assess/compare(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/assess/compare(?:/)?$"
+    },
+    {
+      "page": "/api/assess/langchain",
+      "regex": "^/api/assess/langchain(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/assess/langchain(?:/)?$"
+    },
+    {
       "page": "/api/cvs",
       "regex": "^/api/cvs(?:/)?$",
       "routeKeys": {},
@@ -64,6 +76,12 @@
       "namedRegex": "^/api/jd\\-match(?:/)?$"
     },
     {
+      "page": "/api/jd-match/langchain",
+      "regex": "^/api/jd\\-match/langchain(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/jd\\-match/langchain(?:/)?$"
+    },
+    {
       "page": "/api/parse",
       "regex": "^/api/parse(?:/)?$",
       "routeKeys": {},
@@ -74,6 +92,12 @@
       "regex": "^/api/parse/batch(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/api/parse/batch(?:/)?$"
+    },
+    {
+      "page": "/api/providers",
+      "regex": "^/api/providers(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/providers(?:/)?$"
     },
     {
       "page": "/api-docs",

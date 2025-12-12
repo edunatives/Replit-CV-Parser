@@ -103,6 +103,14 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$file$2d$save
         bodyBg: "#ffffff",
         bodyText: "#1a1a1a",
         bodyTextSecondary: "#4a4a4a"
+    },
+    "typical": {
+        headerBg: "#ffffff",
+        accent: "#22c55e",
+        headerText: "#1a1a1a",
+        bodyBg: "#ffffff",
+        bodyText: "#1a1a1a",
+        bodyTextSecondary: "#4a4a4a"
     }
 };
 /**
