@@ -1567,7 +1567,7 @@ function transformToFull(raw, audience) {
         },
         bulletAnalysis: {
             totalBullets: safeNum(bulletAnalysisRaw.totalBullets || bulletAnalysisRaw.total_bullets, 0),
-            averageScore: safeNum(bulletAnalysisRaw.averageScore || bulletAnalysisRaw.average_score, 50),
+            averageScore: Math.min(100, safeNum(bulletAnalysisRaw.averageScore || bulletAnalysisRaw.average_score, 50)),
             distribution: {
                 excellent: safeNum(bulletAnalysisRaw.distribution?.excellent, 0),
                 good: safeNum(bulletAnalysisRaw.distribution?.good, 0),
