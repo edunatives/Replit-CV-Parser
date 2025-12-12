@@ -157,7 +157,7 @@ export function V211AssessmentPanel({
               {candidateEmail} • Engine v{analysis.version}
             </Typography>
           </Box>
-          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 0.5 }}>
+          <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
             <Chip 
               label={ui_output.level} 
               size="small"
