@@ -1927,7 +1927,13 @@ class LangChainCVParser {
    * @param rawText - Raw text extracted from CV document
    * @returns Structured CV data validated by Zod
    */ async parseCV(rawText) {
+        const startTime = Date.now();
+        console.log(`[TIMING] CV Parser starting - input length: ${rawText.length} chars`);
+        const promptStart = Date.now();
         const prompt = this.buildParsingPrompt(rawText);
+        console.log(`[TIMING] Prompt build: ${Date.now() - promptStart}ms, prompt length: ${prompt.length} chars`);
+        const apiStart = Date.now();
+        console.log(`[TIMING] Calling Gemini API for CV parsing...`);
         const response = await this.ai.models.generateContent({
             model: "gemini-2.5-flash",
             contents: prompt,
@@ -1936,17 +1942,24 @@ class LangChainCVParser {
                 temperature: 0.1
             }
         });
+        const apiDuration = Date.now() - apiStart;
+        console.log(`[TIMING] Gemini API response: ${apiDuration}ms, input tokens: ${response.usageMetadata?.promptTokenCount || 0}, output tokens: ${response.usageMetadata?.candidatesTokenCount || 0}`);
         const responseText = response.text?.trim() || "";
         if (!responseText) {
             throw new Error("Empty response from AI");
         }
+        const parseStart = Date.now();
         const parsed = repairAndParseJSON(responseText);
         const validated = ParsedCVSchema.parse(parsed);
+        const parseDuration = Date.now() - parseStart;
+        console.log(`[TIMING] JSON parse + Zod validation: ${parseDuration}ms, response length: ${responseText.length} chars`);
         const tokenUsage = {
             promptTokens: response.usageMetadata?.promptTokenCount || 0,
             completionTokens: response.usageMetadata?.candidatesTokenCount || 0,
             totalTokens: response.usageMetadata?.totalTokenCount || 0
         };
+        const totalDuration = Date.now() - startTime;
+        console.log(`[TIMING] CV Parser Complete - Total: ${totalDuration}ms | Breakdown: API=${apiDuration}ms, parse=${parseDuration}ms`);
         return {
             data: validated,
             tokenUsage
@@ -2197,24 +2210,31 @@ function extractNameFallback(text) {
     return "";
 }
 async function parseCV(buffer, fileName, fileId) {
+    const totalStart = Date.now();
+    const timings = {};
     let text = "";
     const extension = fileName.toLowerCase().split(".").pop();
     try {
+        const extractStart = Date.now();
         if (extension === "pdf") {
-            console.log(`Parsing PDF: ${fileName}, size: ${buffer.length}`);
+            console.log(`[TIMING] Parsing PDF: ${fileName}, size: ${buffer.length}`);
             const data = await parsePdfBuffer(buffer);
             text = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$parse$2f$normalize$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["normalizeText"])(data.text);
-            console.log(`PDF parsed: ${text.length} chars, ${data.numpages} pages`);
+            timings.pdfExtraction = Date.now() - extractStart;
+            console.log(`[TIMING] PDF extraction: ${timings.pdfExtraction}ms, ${text.length} chars, ${data.numpages} pages`);
             if (text.length < 50) {
                 throw new Error(`PDF text extraction returned insufficient content (${text.length} chars)`);
             }
         } else if (extension === "docx" || extension === "doc") {
-            console.log(`Parsing Word: ${fileName}, size: ${buffer.length}`);
+            console.log(`[TIMING] Parsing Word: ${fileName}, size: ${buffer.length}`);
             text = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$parse$2f$normalize$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["normalizeText"])(await parseDocxBuffer(buffer));
-            console.log(`Word parsed: ${text.length} chars`);
+            timings.docxExtraction = Date.now() - extractStart;
+            console.log(`[TIMING] Word extraction: ${timings.docxExtraction}ms, ${text.length} chars`);
         } else {
-            console.log(`Parsing text: ${fileName}`);
+            console.log(`[TIMING] Parsing text: ${fileName}`);
             text = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$parse$2f$normalize$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["normalizeText"])(buffer.toString("utf-8"));
+            timings.textExtraction = Date.now() - extractStart;
+            console.log(`[TIMING] Text extraction: ${timings.textExtraction}ms`);
         }
     } catch (error) {
         console.error(`Parse error for ${fileName}:`, error);
@@ -2223,13 +2243,18 @@ async function parseCV(buffer, fileName, fileId) {
         }
         text = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$parse$2f$normalize$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["normalizeText"])(buffer.toString("utf-8"));
     }
-    // Validate that the document is actually a CV
+    const validationStart = Date.now();
     const validationResult = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$ai$2f$rules$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["validateCVDocument"])(text);
+    timings.validation = Date.now() - validationStart;
+    console.log(`[TIMING] CV validation: ${timings.validation}ms`);
     if (!validationResult.isCV) {
         throw new Error(validationResult.reason);
     }
-    // Try Gemini AI extraction first
+    const aiStart = Date.now();
+    console.log(`[TIMING] Starting AI extraction...`);
     const geminiResult = await extractWithGemini(text);
+    timings.aiExtraction = Date.now() - aiStart;
+    console.log(`[TIMING] AI extraction: ${timings.aiExtraction}ms`);
     let rawCv;
     let tokenUsage;
     if (geminiResult) {
@@ -2297,7 +2322,11 @@ async function parseCV(buffer, fileName, fileId) {
             rawText: text
         };
     }
+    const normalizeStart = Date.now();
     const cv = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$parse$2f$normalize$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["validateAndNormalizeCV"])(rawCv);
+    timings.normalization = Date.now() - normalizeStart;
+    timings.total = Date.now() - totalStart;
+    console.log(`[TIMING] CV Parse Complete - Total: ${timings.total}ms | Breakdown: extraction=${timings.pdfExtraction || timings.docxExtraction || timings.textExtraction || 0}ms, validation=${timings.validation}ms, AI=${timings.aiExtraction}ms, normalize=${timings.normalization}ms`);
     return {
         cv,
         rawText: text
@@ -2443,9 +2472,15 @@ async function POST(request) {
                 console.log("Failed to save to MongoDB:", dbError);
             }
         }
+        const tokenUsage = cv.tokenUsage || {
+            promptTokens: 0,
+            completionTokens: 0,
+            totalTokens: 0
+        };
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             cv,
-            rawText
+            rawText,
+            tokenUsage
         });
     } catch (error) {
         console.error("Error parsing CV:", error);

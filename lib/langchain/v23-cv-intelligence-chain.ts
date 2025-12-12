@@ -319,7 +319,27 @@ function transformToFull(raw: unknown, audience: AudienceType): FullOutput {
   const educationRaw = (cvAnalysisRaw.education || {}) as Record<string, unknown>;
   const expFactorsRaw = (cvAnalysisRaw.experienceFactors || cvAnalysisRaw.experience_factors || {}) as Record<string, unknown>;
   
-  const overallScore = safeNum(studentAnalysisRaw.overallCvQuality || hrAnalysisRaw.overallScore || bulletAnalysisRaw.averageScore, 0);
+  const overallCvQualityRaw = studentAnalysisRaw.overallCvQuality || studentAnalysisRaw.overall_cv_quality;
+  let overallScore = 0;
+  let overallGrade: "A" | "A-" | "B+" | "B" | "B-" | "C+" | "C" | "D" | "F" = "B";
+  let overallLabel = "Candidate Assessment";
+  let overallSummary = "";
+  
+  if (typeof overallCvQualityRaw === "object" && overallCvQualityRaw !== null) {
+    const qualityObj = overallCvQualityRaw as Record<string, unknown>;
+    overallScore = safeNum(qualityObj.score, safeNum(bulletAnalysisRaw.averageScore, 70));
+    overallGrade = (qualityObj.grade as typeof overallGrade) || scoreToGrade(overallScore);
+    overallLabel = safeStr(qualityObj.label, "Candidate Assessment");
+    overallSummary = safeStr(qualityObj.summary, "");
+  } else if (typeof overallCvQualityRaw === "string") {
+    overallSummary = overallCvQualityRaw;
+    overallScore = safeNum(bulletAnalysisRaw.averageScore, 70);
+    overallGrade = scoreToGrade(overallScore);
+    overallLabel = overallScore >= 85 ? "Strong Candidate" : overallScore >= 70 ? "Good Candidate" : overallScore >= 50 ? "Needs Improvement" : "Weak Candidate";
+  } else {
+    overallScore = safeNum(hrAnalysisRaw.overallScore || bulletAnalysisRaw.averageScore, 70);
+    overallGrade = scoreToGrade(overallScore);
+  }
   
   const cvAnalysis: FullOutput["cvAnalysis"] = {
     metadata: {
@@ -427,7 +447,7 @@ function transformToFull(raw: unknown, audience: AudienceType): FullOutput {
     },
     bulletAnalysis: {
       totalBullets: safeNum(bulletAnalysisRaw.totalBullets || bulletAnalysisRaw.total_bullets, 0),
-      averageScore: safeNum(bulletAnalysisRaw.averageScore || bulletAnalysisRaw.average_score, 50),
+      averageScore: Math.min(100, safeNum(bulletAnalysisRaw.averageScore || bulletAnalysisRaw.average_score, 50)),
       distribution: {
         excellent: safeNum((bulletAnalysisRaw.distribution as Record<string, unknown>)?.excellent, 0),
         good: safeNum((bulletAnalysisRaw.distribution as Record<string, unknown>)?.good, 0),
@@ -455,6 +475,72 @@ function transformToFull(raw: unknown, audience: AudienceType): FullOutput {
     }),
   };
   
+  let studentAnalysis: FullOutput["studentAnalysis"] = undefined;
+  let hrAnalysis: FullOutput["hrAnalysis"] = undefined;
+  
+  if (audience === "STUDENT") {
+    const improvementsRaw = (studentAnalysisRaw.improvements || {}) as Record<string, unknown>;
+    const alternativesRaw = (studentAnalysisRaw.alternatives || {}) as Record<string, unknown>;
+    const nextStepsRaw = (studentAnalysisRaw.nextSteps || studentAnalysisRaw.next_steps || {}) as Record<string, unknown>;
+    const encouragementRaw = studentAnalysisRaw.encouragement;
+    const honestRaw = (studentAnalysisRaw.honestAssessment || studentAnalysisRaw.honest_assessment || {}) as Record<string, unknown>;
+    const gapStrategyRaw = (studentAnalysisRaw.gapStrategy || studentAnalysisRaw.gap_strategy || {}) as Record<string, unknown>;
+    
+    studentAnalysis = {
+      overallCvQuality: {
+        score: Math.min(100, Math.max(0, overallScore)),
+        grade: overallGrade,
+        label: overallLabel,
+        summary: overallSummary,
+      },
+      honestAssessment: typeof honestRaw === "string" ? undefined : {
+        rawCompatibility: { score: safeNum((honestRaw.rawCompatibility as Record<string, unknown>)?.score, 70), analysis: safeStr((honestRaw.rawCompatibility as Record<string, unknown>)?.analysis, "") },
+        transformationEffort: { level: safeNum((honestRaw.transformationEffort as Record<string, unknown>)?.level, 2), timeline: safeStr((honestRaw.transformationEffort as Record<string, unknown>)?.timeline, "1-2 weeks"), description: safeStr((honestRaw.transformationEffort as Record<string, unknown>)?.description, "") },
+        candidateRisk: { score: safeNum((honestRaw.candidateRisk as Record<string, unknown>)?.score, 30), factors: safeArr((honestRaw.candidateRisk as Record<string, unknown>)?.factors).map(String) },
+        successProbability: safeStr(honestRaw.successProbability, "Moderate"),
+      },
+      improvements: {
+        critical: safeArr(improvementsRaw.critical).map((i: unknown) => typeof i === "string" ? { code: "A1", priority: "critical" as const, action: i, impact: "High", effort: "Medium" } : i as { code: string; priority: "critical" | "high" | "medium" | "low"; action: string; impact: string; effort: string }),
+        high: safeArr(improvementsRaw.high).map((i: unknown) => typeof i === "string" ? { code: "A1", priority: "high" as const, action: i, impact: "Medium", effort: "Medium" } : i as { code: string; priority: "critical" | "high" | "medium" | "low"; action: string; impact: string; effort: string }),
+        medium: safeArr(improvementsRaw.medium).map((i: unknown) => typeof i === "string" ? { code: "A1", priority: "medium" as const, action: i, impact: "Low", effort: "Low" } : i as { code: string; priority: "critical" | "high" | "medium" | "low"; action: string; impact: string; effort: string }),
+        scorePotential: {
+          current: overallScore,
+          afterCritical: safeNum((improvementsRaw.scorePotential as Record<string, unknown>)?.afterCritical, Math.min(100, overallScore + 5)),
+          afterAll: safeNum((improvementsRaw.scorePotential as Record<string, unknown>)?.afterAll, Math.min(100, overallScore + 10)),
+          ceiling: safeNum((improvementsRaw.scorePotential as Record<string, unknown>)?.ceiling, Math.min(100, overallScore + 15)),
+        },
+      },
+      bulletImprovements: safeArr(studentAnalysisRaw.bulletImprovements || studentAnalysisRaw.bullet_improvements).map((b: unknown) => {
+        const bullet = b as Record<string, unknown>;
+        return {
+          original: safeStr(bullet.original, ""),
+          rewritten: safeStr(bullet.rewritten || bullet.improved, ""),
+          scoreGain: safeNum(bullet.scoreGain || bullet.score_gain, 10),
+          issuesFixed: safeArr(bullet.issuesFixed || bullet.issues_fixed).map(String),
+        };
+      }),
+      gapStrategy: {
+        fixable: safeArr(gapStrategyRaw.fixable).map((g: unknown) => ({ gap: safeStr((g as Record<string, unknown>).gap, ""), solution: safeStr((g as Record<string, unknown>).solution, ""), timeline: safeStr((g as Record<string, unknown>).timeline, "") })),
+        unfixable: safeArr(gapStrategyRaw.unfixable).map((g: unknown) => ({ gap: safeStr((g as Record<string, unknown>).gap, ""), mitigation: safeStr((g as Record<string, unknown>).mitigation, "") })),
+      },
+      alternatives: {
+        betterFitRoles: safeArr(alternativesRaw.betterFitRoles || alternativesRaw.better_fit_roles).map((r: unknown) => ({ role: safeStr((r as Record<string, unknown>).role, ""), fitScore: safeNum((r as Record<string, unknown>).fitScore || (r as Record<string, unknown>).fit_score, 70), reason: safeStr((r as Record<string, unknown>).reason, "") })),
+        steppingStones: safeArr(alternativesRaw.steppingStones || alternativesRaw.stepping_stones).map((s: unknown) => ({ role: safeStr((s as Record<string, unknown>).role, ""), gap: safeStr((s as Record<string, unknown>).gap, ""), timeline: safeStr((s as Record<string, unknown>).timeline, "") })),
+      },
+      nextSteps: {
+        immediate: safeArr(nextStepsRaw.immediate).map(String),
+        thisWeek: safeArr(nextStepsRaw.thisWeek || nextStepsRaw.this_week).map(String),
+        beforeApplication: safeArr(nextStepsRaw.beforeApplication || nextStepsRaw.before_application).map(String),
+      },
+      encouragement: typeof encouragementRaw === "string" ? { message: encouragementRaw, competitiveAdvantages: [] } : {
+        message: safeStr((encouragementRaw as Record<string, unknown>)?.message, "Keep improving your CV!"),
+        competitiveAdvantages: safeArr((encouragementRaw as Record<string, unknown>)?.competitiveAdvantages || (encouragementRaw as Record<string, unknown>)?.competitive_advantages).map(String),
+      },
+    };
+  } else if (audience === "HR") {
+    hrAnalysis = hrAnalysisRaw as FullOutput["hrAnalysis"];
+  }
+  
   const output: FullOutput = {
     version: "2.3",
     mode: "FULL",
@@ -462,8 +548,8 @@ function transformToFull(raw: unknown, audience: AudienceType): FullOutput {
     generatedAt: new Date().toISOString(),
     cvAnalysis,
     jdAnalysis: getPath(data, "jdAnalysis", "jd_analysis") as FullOutput["jdAnalysis"],
-    studentAnalysis: audience === "STUDENT" ? studentAnalysisRaw as FullOutput["studentAnalysis"] : undefined,
-    hrAnalysis: audience === "HR" ? hrAnalysisRaw as FullOutput["hrAnalysis"] : undefined,
+    studentAnalysis,
+    hrAnalysis,
   };
   
   return output;
@@ -579,7 +665,22 @@ ${audience === "STUDENT" ? "- alternativeRoles: [{role, fitScore, reason}]\n- ne
     prompt += `Return ~5000 tokens comprehensive JSON with:
 - cvAnalysis: {metadata, professionalSummary, experience{totalYears, roles[], progression, gaps[]}, skills{validated[], implied[], ghost[], validationRate}, education, experienceFactors{h1-h9}, bulletAnalysis{totalBullets, averageScore, distribution, codeScores, rewritePriorities[]}, issuesDetected[], strengthsDetected[]}
 ${jd ? "- jdAnalysis: {metadata, requirements{tier1/2/3Skills[], minimumYears, education, certifications[]}, hardGates[], jdNature}" : ""}
-${audience === "STUDENT" ? "- studentAnalysis: {overallCvQuality, honestAssessment, improvements, bulletImprovements[], gapStrategy, alternatives, nextSteps, encouragement}" : "- hrAnalysis: {riskAssessment, verificationChecklist, interviewGuide, decisionSupport, compensationGuidance}"}`;
+${audience === "STUDENT" ? `- studentAnalysis: {
+  overallCvQuality: {score: <0-100>, grade: "<A|A-|B+|B|B-|C+|C|D|F>", label: "<e.g. Strong Candidate>", summary: "<brief assessment>"},
+  honestAssessment: {rawCompatibility: {score, analysis}, transformationEffort: {level: 1-5, timeline, description}, candidateRisk: {score, factors[]}, successProbability: "<assessment>"},
+  improvements: {critical[], high[], medium[], scorePotential: {current, afterCritical, afterAll, ceiling}},
+  bulletImprovements: [{original, rewritten, scoreGain, issuesFixed[]}],
+  gapStrategy: {fixable: [{gap, solution, timeline}], unfixable: [{gap, mitigation}]},
+  alternatives: {betterFitRoles: [{role, fitScore, reason}], steppingStones: [{role, gap, timeline}]},
+  nextSteps: {immediate[], thisWeek[], beforeApplication[]},
+  encouragement: {message, competitiveAdvantages[]}
+}` : `- hrAnalysis: {
+  riskAssessment: {employerRiskScore, breakdown: {skillVerification, experienceInflation, cultureFit, retention, performance}, redFlags: [{flag, severity, evidence}]},
+  verificationChecklist: {highPriority: [{item, reason, method}], mediumPriority: [{item, reason}]},
+  interviewGuide: {mustAsk: [{question, lookFor, redFlag}], technicalProbes: [{skill, question, expectedDepth}], behavioralQuestions: [{competency, question}]},
+  decisionSupport: {recommendation: "<STRONG_HIRE|HIRE|CONDITIONAL_HIRE|NO_HIRE>", confidence: <0-100>, conditions[], dealBreakers[], alternativeRoles[]},
+  compensationGuidance: {marketRange, suggestedOffer, negotiationFactors[]}
+}`}`;
   }
 
   return prompt;
