@@ -23,6 +23,7 @@ import { getTemplateStyle, getTemplateOptions } from "@/lib/templates";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import InsertPageBreakIcon from "@mui/icons-material/InsertPageBreak";
 import DescriptionIcon from "@mui/icons-material/Description";
+import { LineEditor } from "./LineEditor";
 
 function PageBadge({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) {
   return (
@@ -178,7 +179,8 @@ function EditableField({
   multiline = false,
   placeholder = "(click to edit)",
   rows = 3,
-  showBulletTool = false
+  showBulletTool = false,
+  enableLineDelete = false
 }: { 
   value: string; 
   onChange: (v: string) => void; 
@@ -186,6 +188,7 @@ function EditableField({
   placeholder?: string;
   rows?: number;
   showBulletTool?: boolean;
+  enableLineDelete?: boolean;
 }) {
   const [editing, setEditing] = useState(false);
   const [tempValue, setTempValue] = useState(value);
@@ -314,6 +317,40 @@ function EditableField({
             </Tooltip>
           </Box>
         )}
+      </Box>
+    );
+  }
+
+  if (multiline && enableLineDelete) {
+    return (
+      <Box sx={{ position: "relative" }}>
+        <LineEditor 
+          value={value} 
+          onChange={onChange}
+          placeholder={placeholder}
+        />
+        <Tooltip title="Click to edit full text">
+          <IconButton
+            size="small"
+            onClick={() => {
+              setTempValue(value);
+              setEditing(true);
+            }}
+            sx={{ 
+              position: "absolute", 
+              top: -8, 
+              right: -8,
+              color: "text.secondary",
+              bgcolor: "background.paper",
+              border: "1px solid",
+              borderColor: "divider",
+              "&:hover": { bgcolor: "action.hover" },
+            }}
+            data-testid="button-edit-full-text"
+          >
+            <FormatListBulletedIcon sx={{ fontSize: 14 }} />
+          </IconButton>
+        </Tooltip>
       </Box>
     );
   }
@@ -856,6 +893,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
             rows={6}
             placeholder="Describe your responsibilities and achievements..."
             showBulletTool={true}
+            enableLineDelete={true}
           />
         </Typography>
         {!isLast && <Divider sx={{ mt: 2 }} />}
@@ -929,6 +967,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
                   rows={6}
                   placeholder="Write a professional summary..."
                   showBulletTool={true}
+                  enableLineDelete={true}
                 />
               </Typography>
             </Box>

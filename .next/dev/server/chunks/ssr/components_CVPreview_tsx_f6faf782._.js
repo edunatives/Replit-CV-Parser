@@ -43,7 +43,9 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$templates$2f$index$2e
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$CalendarMonth$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mui/icons-material/esm/CalendarMonth.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$InsertPageBreak$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mui/icons-material/esm/InsertPageBreak.js [app-ssr] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$Description$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mui/icons-material/esm/Description.js [app-ssr] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$components$2f$LineEditor$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/components/LineEditor.tsx [app-ssr] (ecmascript)");
 "use client";
+;
 ;
 ;
 ;
@@ -94,7 +96,7 @@ function PageBadge({ pageNumber, totalPages }) {
                         }
                     }, void 0, false, {
                         fileName: "[project]/components/CVPreview.tsx",
-                        lineNumber: 42,
+                        lineNumber: 43,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -111,13 +113,13 @@ function PageBadge({ pageNumber, totalPages }) {
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/CVPreview.tsx",
-                        lineNumber: 43,
+                        lineNumber: 44,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/CVPreview.tsx",
-                lineNumber: 41,
+                lineNumber: 42,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -129,13 +131,13 @@ function PageBadge({ pageNumber, totalPages }) {
                 children: "(continued)"
             }, void 0, false, {
                 fileName: "[project]/components/CVPreview.tsx",
-                lineNumber: 47,
+                lineNumber: 48,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/CVPreview.tsx",
-        lineNumber: 29,
+        lineNumber: 30,
         columnNumber: 5
     }, this);
 }
@@ -178,7 +180,7 @@ function PageBreakIndicator({ pageNumber }) {
                     }
                 }, void 0, false, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 88,
+                    lineNumber: 89,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -193,18 +195,18 @@ function PageBreakIndicator({ pageNumber }) {
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 89,
+                    lineNumber: 90,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/CVPreview.tsx",
-            lineNumber: 76,
+            lineNumber: 77,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/CVPreview.tsx",
-        lineNumber: 56,
+        lineNumber: 57,
         columnNumber: 5
     }, this);
 }
@@ -239,7 +241,7 @@ function SectionHeader({ title, style, rightContent }) {
                         children: title
                     }, void 0, false, {
                         fileName: "[project]/components/CVPreview.tsx",
-                        lineNumber: 127,
+                        lineNumber: 128,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -248,19 +250,19 @@ function SectionHeader({ title, style, rightContent }) {
                         }
                     }, void 0, false, {
                         fileName: "[project]/components/CVPreview.tsx",
-                        lineNumber: 140,
+                        lineNumber: 141,
                         columnNumber: 11
                     }, this),
                     rightContent
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/CVPreview.tsx",
-                lineNumber: 121,
+                lineNumber: 122,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/CVPreview.tsx",
-            lineNumber: 120,
+            lineNumber: 121,
             columnNumber: 7
         }, this);
     }
@@ -284,7 +286,7 @@ function SectionHeader({ title, style, rightContent }) {
                         }
                     }, void 0, false, {
                         fileName: "[project]/components/CVPreview.tsx",
-                        lineNumber: 150,
+                        lineNumber: 151,
                         columnNumber: 29
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -300,7 +302,7 @@ function SectionHeader({ title, style, rightContent }) {
                         children: title
                     }, void 0, false, {
                         fileName: "[project]/components/CVPreview.tsx",
-                        lineNumber: 151,
+                        lineNumber: 152,
                         columnNumber: 9
                     }, this),
                     isCenteredLines && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -311,7 +313,7 @@ function SectionHeader({ title, style, rightContent }) {
                         }
                     }, void 0, false, {
                         fileName: "[project]/components/CVPreview.tsx",
-                        lineNumber: 164,
+                        lineNumber: 165,
                         columnNumber: 29
                     }, this),
                     !isCenteredLines && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -320,14 +322,14 @@ function SectionHeader({ title, style, rightContent }) {
                         }
                     }, void 0, false, {
                         fileName: "[project]/components/CVPreview.tsx",
-                        lineNumber: 165,
+                        lineNumber: 166,
                         columnNumber: 30
                     }, this),
                     rightContent
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/CVPreview.tsx",
-                lineNumber: 149,
+                lineNumber: 150,
                 columnNumber: 7
             }, this),
             isUnderline && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -340,17 +342,17 @@ function SectionHeader({ title, style, rightContent }) {
                 }
             }, void 0, false, {
                 fileName: "[project]/components/CVPreview.tsx",
-                lineNumber: 169,
+                lineNumber: 170,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/CVPreview.tsx",
-        lineNumber: 148,
+        lineNumber: 149,
         columnNumber: 5
     }, this);
 }
-function EditableField({ value, onChange, multiline = false, placeholder = "(click to edit)", rows = 3, showBulletTool = false }) {
+function EditableField({ value, onChange, multiline = false, placeholder = "(click to edit)", rows = 3, showBulletTool = false, enableLineDelete = false }) {
     const [editing, setEditing] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [tempValue, setTempValue] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(value);
     const inputRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
@@ -443,29 +445,29 @@ function EditableField({ value, onChange, multiline = false, placeholder = "(cli
                                             fontSize: "small"
                                         }, void 0, false, {
                                             fileName: "[project]/components/CVPreview.tsx",
-                                            lineNumber: 276,
+                                            lineNumber: 279,
                                             columnNumber: 23
                                         }, void 0)
                                     }, void 0, false, {
                                         fileName: "[project]/components/CVPreview.tsx",
-                                        lineNumber: 270,
+                                        lineNumber: 273,
                                         columnNumber: 21
                                     }, void 0)
                                 }, void 0, false, {
                                     fileName: "[project]/components/CVPreview.tsx",
-                                    lineNumber: 269,
+                                    lineNumber: 272,
                                     columnNumber: 19
                                 }, void 0)
                             }, void 0, false, {
                                 fileName: "[project]/components/CVPreview.tsx",
-                                lineNumber: 268,
+                                lineNumber: 271,
                                 columnNumber: 17
                             }, void 0)
                         }
                     } : undefined
                 }, void 0, false, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 238,
+                    lineNumber: 241,
                     columnNumber: 9
                 }, this),
                 multiline && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -490,17 +492,17 @@ function EditableField({ value, onChange, multiline = false, placeholder = "(cli
                                     fontSize: "small"
                                 }, void 0, false, {
                                     fileName: "[project]/components/CVPreview.tsx",
-                                    lineNumber: 294,
+                                    lineNumber: 297,
                                     columnNumber: 17
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/CVPreview.tsx",
-                                lineNumber: 287,
+                                lineNumber: 290,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 286,
+                            lineNumber: 289,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Tooltip$2f$Tooltip$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Tooltip$3e$__["Tooltip"], {
@@ -524,34 +526,96 @@ function EditableField({ value, onChange, multiline = false, placeholder = "(cli
                                         fontSize: "small"
                                     }, void 0, false, {
                                         fileName: "[project]/components/CVPreview.tsx",
-                                        lineNumber: 311,
+                                        lineNumber: 314,
                                         columnNumber: 19
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/CVPreview.tsx",
-                                    lineNumber: 299,
+                                    lineNumber: 302,
                                     columnNumber: 17
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/CVPreview.tsx",
-                                lineNumber: 298,
+                                lineNumber: 301,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 297,
+                            lineNumber: 300,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 285,
+                    lineNumber: 288,
                     columnNumber: 11
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/CVPreview.tsx",
-            lineNumber: 237,
+            lineNumber: 240,
+            columnNumber: 7
+        }, this);
+    }
+    if (multiline && enableLineDelete) {
+        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
+            sx: {
+                position: "relative"
+            },
+            children: [
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$LineEditor$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["LineEditor"], {
+                    value: value,
+                    onChange: onChange,
+                    placeholder: placeholder
+                }, void 0, false, {
+                    fileName: "[project]/components/CVPreview.tsx",
+                    lineNumber: 327,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Tooltip$2f$Tooltip$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Tooltip$3e$__["Tooltip"], {
+                    title: "Click to edit full text",
+                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$IconButton$2f$IconButton$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__IconButton$3e$__["IconButton"], {
+                        size: "small",
+                        onClick: ()=>{
+                            setTempValue(value);
+                            setEditing(true);
+                        },
+                        sx: {
+                            position: "absolute",
+                            top: -8,
+                            right: -8,
+                            color: "text.secondary",
+                            bgcolor: "background.paper",
+                            border: "1px solid",
+                            borderColor: "divider",
+                            "&:hover": {
+                                bgcolor: "action.hover"
+                            }
+                        },
+                        "data-testid": "button-edit-full-text",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$FormatListBulleted$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                            sx: {
+                                fontSize: 14
+                            }
+                        }, void 0, false, {
+                            fileName: "[project]/components/CVPreview.tsx",
+                            lineNumber: 351,
+                            columnNumber: 13
+                        }, this)
+                    }, void 0, false, {
+                        fileName: "[project]/components/CVPreview.tsx",
+                        lineNumber: 333,
+                        columnNumber: 11
+                    }, this)
+                }, void 0, false, {
+                    fileName: "[project]/components/CVPreview.tsx",
+                    lineNumber: 332,
+                    columnNumber: 9
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "[project]/components/CVPreview.tsx",
+            lineNumber: 326,
             columnNumber: 7
         }, this);
     }
@@ -581,12 +645,12 @@ function EditableField({ value, onChange, multiline = false, placeholder = "(cli
             children: value || placeholder
         }, void 0, false, {
             fileName: "[project]/components/CVPreview.tsx",
-            lineNumber: 338,
+            lineNumber: 375,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/CVPreview.tsx",
-        lineNumber: 322,
+        lineNumber: 359,
         columnNumber: 5
     }, this);
 }
@@ -607,7 +671,7 @@ function EditableContactField({ icon: Icon, value, onChange, placeholder, header
                     }
                 }, void 0, false, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 362,
+                    lineNumber: 399,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$TextField$2f$TextField$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__TextField$3e$__["TextField"], {
@@ -642,13 +706,13 @@ function EditableContactField({ icon: Icon, value, onChange, placeholder, header
                     }
                 }, void 0, false, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 363,
+                    lineNumber: 400,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/CVPreview.tsx",
-            lineNumber: 361,
+            lineNumber: 398,
             columnNumber: 7
         }, this);
     }
@@ -675,7 +739,7 @@ function EditableContactField({ icon: Icon, value, onChange, placeholder, header
                 }
             }, void 0, false, {
                 fileName: "[project]/components/CVPreview.tsx",
-                lineNumber: 414,
+                lineNumber: 451,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -686,13 +750,13 @@ function EditableContactField({ icon: Icon, value, onChange, placeholder, header
                 children: value || placeholder
             }, void 0, false, {
                 fileName: "[project]/components/CVPreview.tsx",
-                lineNumber: 415,
+                lineNumber: 452,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/CVPreview.tsx",
-        lineNumber: 399,
+        lineNumber: 436,
         columnNumber: 5
     }, this);
 }
@@ -1195,12 +1259,12 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                         fontSize: "small"
                     }, void 0, false, {
                         fileName: "[project]/components/CVPreview.tsx",
-                        lineNumber: 817,
+                        lineNumber: 854,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 810,
+                    lineNumber: 847,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1217,12 +1281,12 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                         placeholder: "Job Title"
                     }, void 0, false, {
                         fileName: "[project]/components/CVPreview.tsx",
-                        lineNumber: 820,
+                        lineNumber: 857,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 819,
+                    lineNumber: 856,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1240,12 +1304,12 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                         placeholder: "Company Name"
                     }, void 0, false, {
                         fileName: "[project]/components/CVPreview.tsx",
-                        lineNumber: 827,
+                        lineNumber: 864,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 826,
+                    lineNumber: 863,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1264,7 +1328,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                             }
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 834,
+                            lineNumber: 871,
                             columnNumber: 35
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1281,12 +1345,12 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                 placeholder: "Duration"
                             }, void 0, false, {
                                 fileName: "[project]/components/CVPreview.tsx",
-                                lineNumber: 836,
+                                lineNumber: 873,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 835,
+                            lineNumber: 872,
                             columnNumber: 11
                         }, this),
                         style.showMetaIcons && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$LocationOn$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -1296,7 +1360,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                             }
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 842,
+                            lineNumber: 879,
                             columnNumber: 35
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1313,18 +1377,18 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                 placeholder: "Location"
                             }, void 0, false, {
                                 fileName: "[project]/components/CVPreview.tsx",
-                                lineNumber: 844,
+                                lineNumber: 881,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 843,
+                            lineNumber: 880,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 833,
+                    lineNumber: 870,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1341,15 +1405,16 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                         multiline: true,
                         rows: 6,
                         placeholder: "Describe your responsibilities and achievements...",
-                        showBulletTool: true
+                        showBulletTool: true,
+                        enableLineDelete: true
                     }, void 0, false, {
                         fileName: "[project]/components/CVPreview.tsx",
-                        lineNumber: 852,
+                        lineNumber: 889,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 851,
+                    lineNumber: 888,
                     columnNumber: 9
                 }, this),
                 !isLast && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Divider$2f$Divider$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Divider$3e$__["Divider"], {
@@ -1358,13 +1423,13 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                     }
                 }, void 0, false, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 861,
+                    lineNumber: 899,
                     columnNumber: 21
                 }, this)
             ]
         }, `exp-${exp.id}`, true, {
             fileName: "[project]/components/CVPreview.tsx",
-            lineNumber: 809,
+            lineNumber: 846,
             columnNumber: 7
         }, this);
     };
@@ -1397,12 +1462,12 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                         fontSize: "small"
                     }, void 0, false, {
                         fileName: "[project]/components/CVPreview.tsx",
-                        lineNumber: 880,
+                        lineNumber: 918,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 873,
+                    lineNumber: 911,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1418,12 +1483,12 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                         placeholder: "Degree"
                     }, void 0, false, {
                         fileName: "[project]/components/CVPreview.tsx",
-                        lineNumber: 883,
+                        lineNumber: 921,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 882,
+                    lineNumber: 920,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1446,12 +1511,12 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                 placeholder: "Institution"
                             }, void 0, false, {
                                 fileName: "[project]/components/CVPreview.tsx",
-                                lineNumber: 891,
+                                lineNumber: 929,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 890,
+                            lineNumber: 928,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1463,7 +1528,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                             children: "|"
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 897,
+                            lineNumber: 935,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1478,24 +1543,24 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                 placeholder: "Year"
                             }, void 0, false, {
                                 fileName: "[project]/components/CVPreview.tsx",
-                                lineNumber: 899,
+                                lineNumber: 937,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 898,
+                            lineNumber: 936,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 889,
+                    lineNumber: 927,
                     columnNumber: 9
                 }, this)
             ]
         }, `edu-${edu.id}`, true, {
             fileName: "[project]/components/CVPreview.tsx",
-            lineNumber: 872,
+            lineNumber: 910,
             columnNumber: 7
         }, this);
     };
@@ -1513,7 +1578,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                             style: style
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 916,
+                            lineNumber: 954,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1538,26 +1603,27 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                     multiline: true,
                                     rows: 6,
                                     placeholder: "Write a professional summary...",
-                                    showBulletTool: true
+                                    showBulletTool: true,
+                                    enableLineDelete: true
                                 }, void 0, false, {
                                     fileName: "[project]/components/CVPreview.tsx",
-                                    lineNumber: 925,
+                                    lineNumber: 963,
                                     columnNumber: 17
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/CVPreview.tsx",
-                                lineNumber: 924,
+                                lineNumber: 962,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 917,
+                            lineNumber: 955,
                             columnNumber: 13
                         }, this)
                     ]
                 }, "summary", true, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 915,
+                    lineNumber: 953,
                     columnNumber: 11
                 }, this);
             case "experience-header":
@@ -1580,22 +1646,22 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                     fontSize: "small"
                                 }, void 0, false, {
                                     fileName: "[project]/components/CVPreview.tsx",
-                                    lineNumber: 947,
+                                    lineNumber: 986,
                                     columnNumber: 21
                                 }, void 0)
                             }, void 0, false, {
                                 fileName: "[project]/components/CVPreview.tsx",
-                                lineNumber: 946,
+                                lineNumber: 985,
                                 columnNumber: 19
                             }, void 0) : undefined
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 941,
+                            lineNumber: 980,
                             columnNumber: 13
                         }, this)
                     }, "experience-header", false, {
                         fileName: "[project]/components/CVPreview.tsx",
-                        lineNumber: 940,
+                        lineNumber: 979,
                         columnNumber: 11
                     }, this);
                 }
@@ -1624,22 +1690,22 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                     fontSize: "small"
                                 }, void 0, false, {
                                     fileName: "[project]/components/CVPreview.tsx",
-                                    lineNumber: 972,
+                                    lineNumber: 1011,
                                     columnNumber: 21
                                 }, void 0)
                             }, void 0, false, {
                                 fileName: "[project]/components/CVPreview.tsx",
-                                lineNumber: 971,
+                                lineNumber: 1010,
                                 columnNumber: 19
                             }, void 0) : undefined
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 966,
+                            lineNumber: 1005,
                             columnNumber: 13
                         }, this)
                     }, "education-header", false, {
                         fileName: "[project]/components/CVPreview.tsx",
-                        lineNumber: 965,
+                        lineNumber: 1004,
                         columnNumber: 11
                     }, this);
                 }
@@ -1668,17 +1734,17 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                     fontSize: "small"
                                 }, void 0, false, {
                                     fileName: "[project]/components/CVPreview.tsx",
-                                    lineNumber: 996,
+                                    lineNumber: 1035,
                                     columnNumber: 19
                                 }, void 0)
                             }, void 0, false, {
                                 fileName: "[project]/components/CVPreview.tsx",
-                                lineNumber: 995,
+                                lineNumber: 1034,
                                 columnNumber: 17
                             }, void 0)
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 991,
+                            lineNumber: 1030,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1696,18 +1762,18 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                     compact: true
                                 }, `skill-${index}`, false, {
                                     fileName: "[project]/components/CVPreview.tsx",
-                                    lineNumber: 1002,
+                                    lineNumber: 1041,
                                     columnNumber: 17
                                 }, this))
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 1000,
+                            lineNumber: 1039,
                             columnNumber: 13
                         }, this)
                     ]
                 }, "skills", true, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 990,
+                    lineNumber: 1029,
                     columnNumber: 11
                 }, this);
             case "strengths":
@@ -1731,17 +1797,17 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                     fontSize: "small"
                                 }, void 0, false, {
                                     fileName: "[project]/components/CVPreview.tsx",
-                                    lineNumber: 1025,
+                                    lineNumber: 1064,
                                     columnNumber: 19
                                 }, void 0)
                             }, void 0, false, {
                                 fileName: "[project]/components/CVPreview.tsx",
-                                lineNumber: 1024,
+                                lineNumber: 1063,
                                 columnNumber: 17
                             }, void 0)
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 1020,
+                            lineNumber: 1059,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1759,18 +1825,18 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                     compact: true
                                 }, `strength-${index}`, false, {
                                     fileName: "[project]/components/CVPreview.tsx",
-                                    lineNumber: 1031,
+                                    lineNumber: 1070,
                                     columnNumber: 17
                                 }, this))
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 1029,
+                            lineNumber: 1068,
                             columnNumber: 13
                         }, this)
                     ]
                 }, "strengths", true, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 1019,
+                    lineNumber: 1058,
                     columnNumber: 11
                 }, this);
             case "certifications":
@@ -1794,17 +1860,17 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                     fontSize: "small"
                                 }, void 0, false, {
                                     fileName: "[project]/components/CVPreview.tsx",
-                                    lineNumber: 1054,
+                                    lineNumber: 1093,
                                     columnNumber: 19
                                 }, void 0)
                             }, void 0, false, {
                                 fileName: "[project]/components/CVPreview.tsx",
-                                lineNumber: 1053,
+                                lineNumber: 1092,
                                 columnNumber: 17
                             }, void 0)
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 1049,
+                            lineNumber: 1088,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1831,18 +1897,18 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                     compact: true
                                 }, cert.id, false, {
                                     fileName: "[project]/components/CVPreview.tsx",
-                                    lineNumber: 1060,
+                                    lineNumber: 1099,
                                     columnNumber: 17
                                 }, this))
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 1058,
+                            lineNumber: 1097,
                             columnNumber: 13
                         }, this)
                     ]
                 }, "certifications", true, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 1048,
+                    lineNumber: 1087,
                     columnNumber: 11
                 }, this);
             default:
@@ -1880,12 +1946,12 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                         placeholder: "Your Name"
                     }, void 0, false, {
                         fileName: "[project]/components/CVPreview.tsx",
-                        lineNumber: 1109,
+                        lineNumber: 1148,
                         columnNumber: 9
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 1099,
+                    lineNumber: 1138,
                     columnNumber: 7
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1904,12 +1970,12 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                         placeholder: "Your Title"
                     }, void 0, false, {
                         fileName: "[project]/components/CVPreview.tsx",
-                        lineNumber: 1118,
+                        lineNumber: 1157,
                         columnNumber: 9
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 1111,
+                    lineNumber: 1150,
                     columnNumber: 7
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1929,7 +1995,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                             headerText: style.headerText
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 1128,
+                            lineNumber: 1167,
                             columnNumber: 9
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(EditableContactField, {
@@ -1940,7 +2006,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                             headerText: style.headerText
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 1135,
+                            lineNumber: 1174,
                             columnNumber: 9
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(EditableContactField, {
@@ -1951,7 +2017,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                             headerText: style.headerText
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 1142,
+                            lineNumber: 1181,
                             columnNumber: 9
                         }, this),
                         cv.linkedin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(EditableContactField, {
@@ -1962,7 +2028,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                             headerText: style.headerText
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 1150,
+                            lineNumber: 1189,
                             columnNumber: 11
                         }, this),
                         showGitHub && cv.github && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(EditableContactField, {
@@ -1973,7 +2039,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                             headerText: style.headerText
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 1159,
+                            lineNumber: 1198,
                             columnNumber: 11
                         }, this),
                         cv.website && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(EditableContactField, {
@@ -1984,19 +2050,19 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                             headerText: style.headerText
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 1168,
+                            lineNumber: 1207,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 1121,
+                    lineNumber: 1160,
                     columnNumber: 7
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/CVPreview.tsx",
-            lineNumber: 1090,
+            lineNumber: 1129,
             columnNumber: 5
         }, this);
     const handleTemplateChange = (event)=>{
@@ -2048,12 +2114,12 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                             children: "CV Preview"
                         }, void 0, false, {
                             fileName: "[project]/components/CVPreview.tsx",
-                            lineNumber: 1218,
+                            lineNumber: 1257,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/CVPreview.tsx",
-                        lineNumber: 1217,
+                        lineNumber: 1256,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2068,7 +2134,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                 size: "small",
                                 startIcon: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$SwapVert$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                                     fileName: "[project]/components/CVPreview.tsx",
-                                    lineNumber: 1227,
+                                    lineNumber: 1266,
                                     columnNumber: 24
                                 }, void 0),
                                 onClick: ()=>setRearrangeModalOpen(true),
@@ -2079,7 +2145,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                 children: "Rearrange Sections"
                             }, void 0, false, {
                                 fileName: "[project]/components/CVPreview.tsx",
-                                lineNumber: 1224,
+                                lineNumber: 1263,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Button$2f$Button$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
@@ -2087,7 +2153,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                 size: "small",
                                 startIcon: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$Palette$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                                     fileName: "[project]/components/CVPreview.tsx",
-                                    lineNumber: 1239,
+                                    lineNumber: 1278,
                                     columnNumber: 24
                                 }, void 0),
                                 onClick: (e)=>setColorAnchorEl(e.currentTarget),
@@ -2098,7 +2164,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                 children: "Colors"
                             }, void 0, false, {
                                 fileName: "[project]/components/CVPreview.tsx",
-                                lineNumber: 1236,
+                                lineNumber: 1275,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Popover$2f$Popover$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Popover$3e$__["Popover"], {
@@ -2128,7 +2194,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                             children: "Color Scheme"
                                         }, void 0, false, {
                                             fileName: "[project]/components/CVPreview.tsx",
-                                            lineNumber: 1256,
+                                            lineNumber: 1295,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2163,7 +2229,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                                                 }
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/CVPreview.tsx",
-                                                                lineNumber: 1276,
+                                                                lineNumber: 1315,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2173,23 +2239,23 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                                                 }
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/CVPreview.tsx",
-                                                                lineNumber: 1277,
+                                                                lineNumber: 1316,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/CVPreview.tsx",
-                                                        lineNumber: 1262,
+                                                        lineNumber: 1301,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, scheme.id, false, {
                                                     fileName: "[project]/components/CVPreview.tsx",
-                                                    lineNumber: 1261,
+                                                    lineNumber: 1300,
                                                     columnNumber: 19
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/components/CVPreview.tsx",
-                                            lineNumber: 1259,
+                                            lineNumber: 1298,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Divider$2f$Divider$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Divider$3e$__["Divider"], {
@@ -2198,7 +2264,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                             }
                                         }, void 0, false, {
                                             fileName: "[project]/components/CVPreview.tsx",
-                                            lineNumber: 1282,
+                                            lineNumber: 1321,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -2212,7 +2278,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                             children: "Custom Colors"
                                         }, void 0, false, {
                                             fileName: "[project]/components/CVPreview.tsx",
-                                            lineNumber: 1283,
+                                            lineNumber: 1322,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2236,7 +2302,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                                             children: "Primary (Name/Headers)"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/CVPreview.tsx",
-                                                            lineNumber: 1288,
+                                                            lineNumber: 1327,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2261,7 +2327,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                                                     "data-testid": "input-custom-primary"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/CVPreview.tsx",
-                                                                    lineNumber: 1292,
+                                                                    lineNumber: 1331,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -2273,19 +2339,19 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                                                     children: customPrimary
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/CVPreview.tsx",
-                                                                    lineNumber: 1299,
+                                                                    lineNumber: 1338,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/CVPreview.tsx",
-                                                            lineNumber: 1291,
+                                                            lineNumber: 1330,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/CVPreview.tsx",
-                                                    lineNumber: 1287,
+                                                    lineNumber: 1326,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2302,7 +2368,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                                             children: "Secondary (Subtitle)"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/CVPreview.tsx",
-                                                            lineNumber: 1305,
+                                                            lineNumber: 1344,
                                                             columnNumber: 19
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2327,7 +2393,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                                                     "data-testid": "input-custom-secondary"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/CVPreview.tsx",
-                                                                    lineNumber: 1309,
+                                                                    lineNumber: 1348,
                                                                     columnNumber: 21
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -2339,25 +2405,25 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                                                     children: customSecondary
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/CVPreview.tsx",
-                                                                    lineNumber: 1316,
+                                                                    lineNumber: 1355,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/CVPreview.tsx",
-                                                            lineNumber: 1308,
+                                                            lineNumber: 1347,
                                                             columnNumber: 19
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/CVPreview.tsx",
-                                                    lineNumber: 1304,
+                                                    lineNumber: 1343,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/CVPreview.tsx",
-                                            lineNumber: 1286,
+                                            lineNumber: 1325,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Button$2f$Button$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
@@ -2373,18 +2439,18 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                             children: "Apply Custom Colors"
                                         }, void 0, false, {
                                             fileName: "[project]/components/CVPreview.tsx",
-                                            lineNumber: 1322,
+                                            lineNumber: 1361,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/CVPreview.tsx",
-                                    lineNumber: 1255,
+                                    lineNumber: 1294,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/CVPreview.tsx",
-                                lineNumber: 1248,
+                                lineNumber: 1287,
                                 columnNumber: 11
                             }, this),
                             onTemplateChange && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$FormControl$2f$FormControl$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__FormControl$3e$__["FormControl"], {
@@ -2401,7 +2467,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                         children: "Template"
                                     }, void 0, false, {
                                         fileName: "[project]/components/CVPreview.tsx",
-                                        lineNumber: 1336,
+                                        lineNumber: 1375,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Select$2f$Select$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Select$3e$__["Select"], {
@@ -2428,30 +2494,30 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                                 children: t.label
                                             }, t.value, false, {
                                                 fileName: "[project]/components/CVPreview.tsx",
-                                                lineNumber: 1351,
+                                                lineNumber: 1390,
                                                 columnNumber: 19
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/components/CVPreview.tsx",
-                                        lineNumber: 1337,
+                                        lineNumber: 1376,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/CVPreview.tsx",
-                                lineNumber: 1335,
+                                lineNumber: 1374,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/CVPreview.tsx",
-                        lineNumber: 1223,
+                        lineNumber: 1262,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/CVPreview.tsx",
-                lineNumber: 1199,
+                lineNumber: 1238,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2486,7 +2552,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                     children: page.items.map((item, idx)=>renderItem(item, idx === page.items.length - 1, page.items))
                                 }, void 0, false, {
                                     fileName: "[project]/components/CVPreview.tsx",
-                                    lineNumber: 1387,
+                                    lineNumber: 1426,
                                     columnNumber: 17
                                 }, this)
                             ]
@@ -2497,7 +2563,7 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                     totalPages: totalPages
                                 }, void 0, false, {
                                     fileName: "[project]/components/CVPreview.tsx",
-                                    lineNumber: 1395,
+                                    lineNumber: 1434,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2509,19 +2575,19 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                                     children: page.items.map((item, idx)=>renderItem(item, idx === page.items.length - 1, page.items))
                                 }, void 0, false, {
                                     fileName: "[project]/components/CVPreview.tsx",
-                                    lineNumber: 1396,
+                                    lineNumber: 1435,
                                     columnNumber: 17
                                 }, this)
                             ]
                         }, void 0, true)
                     }, page.pageNumber, false, {
                         fileName: "[project]/components/CVPreview.tsx",
-                        lineNumber: 1374,
+                        lineNumber: 1413,
                         columnNumber: 11
                     }, this))
             }, void 0, false, {
                 fileName: "[project]/components/CVPreview.tsx",
-                lineNumber: 1362,
+                lineNumber: 1401,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$SectionRearrangeModal$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["SectionRearrangeModal"], {
@@ -2531,13 +2597,13 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
                 onApply: applySectionOrder
             }, void 0, false, {
                 fileName: "[project]/components/CVPreview.tsx",
-                lineNumber: 1407,
+                lineNumber: 1446,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/CVPreview.tsx",
-        lineNumber: 1187,
+        lineNumber: 1226,
         columnNumber: 5
     }, this);
 }
@@ -2573,7 +2639,7 @@ function EditableSkillChip({ skill, accentColor, onUpdate, onDelete, testId, com
             }
         }, void 0, false, {
             fileName: "[project]/components/CVPreview.tsx",
-            lineNumber: 1437,
+            lineNumber: 1476,
             columnNumber: 7
         }, this);
     }
@@ -2608,7 +2674,7 @@ function EditableSkillChip({ skill, accentColor, onUpdate, onDelete, testId, com
         "data-testid": testId
     }, void 0, false, {
         fileName: "[project]/components/CVPreview.tsx",
-        lineNumber: 1466,
+        lineNumber: 1505,
         columnNumber: 5
     }, this);
 }
@@ -2634,7 +2700,7 @@ function EditableCertChip({ cert, accentColor, bodyText, onUpdateName, onUpdateI
                     }
                 }, void 0, false, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 1521,
+                    lineNumber: 1560,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$TextField$2f$TextField$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__TextField$3e$__["TextField"], {
@@ -2668,13 +2734,13 @@ function EditableCertChip({ cert, accentColor, bodyText, onUpdateName, onUpdateI
                     }
                 }, void 0, false, {
                     fileName: "[project]/components/CVPreview.tsx",
-                    lineNumber: 1528,
+                    lineNumber: 1567,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/CVPreview.tsx",
-            lineNumber: 1520,
+            lineNumber: 1559,
             columnNumber: 7
         }, this);
     }
@@ -2704,7 +2770,7 @@ function EditableCertChip({ cert, accentColor, bodyText, onUpdateName, onUpdateI
         "data-testid": testId
     }, void 0, false, {
         fileName: "[project]/components/CVPreview.tsx",
-        lineNumber: 1561,
+        lineNumber: 1600,
         columnNumber: 5
     }, this);
 }
@@ -2740,7 +2806,7 @@ function EditableStrengthChip({ strength, accentColor, onUpdate, onDelete, testI
             }
         }, void 0, false, {
             fileName: "[project]/components/CVPreview.tsx",
-            lineNumber: 1605,
+            lineNumber: 1644,
             columnNumber: 7
         }, this);
     }
@@ -2769,7 +2835,7 @@ function EditableStrengthChip({ strength, accentColor, onUpdate, onDelete, testI
         "data-testid": testId
     }, void 0, false, {
         fileName: "[project]/components/CVPreview.tsx",
-        lineNumber: 1634,
+        lineNumber: 1673,
         columnNumber: 5
     }, this);
 }
