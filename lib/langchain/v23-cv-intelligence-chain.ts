@@ -663,12 +663,12 @@ ${jd ? "- experienceMatch: {totalYearsMatch, domainYearsMatch, domainGap, scopeM
 ${audience === "STUDENT" ? "- alternativeRoles: [{role, fitScore, reason}]\n- nextSteps: {immediate[], thisWeek[], beforeApplication[]}\n- encouragement" : "- riskLevel, hireRecommendation\n- verificationItems: [{item, priority, reason}]\n- interviewQuestions: [{question, probing, redFlag}]"}`;
   } else {
     prompt += `Return ~5000 tokens comprehensive JSON with:
-- cvAnalysis: {metadata, professionalSummary, experience{totalYears, roles[], progression, gaps[]}, skills{validated[], implied[], ghost[], validationRate}, education, experienceFactors{h1-h9}, bulletAnalysis{totalBullets, averageScore, distribution, codeScores, rewritePriorities[]}, issuesDetected[], strengthsDetected[]}
+- cvAnalysis: {metadata, professionalSummary, experience{totalYears, roles[], progression, gaps[]}, skills{validated[], implied[], ghost[], validationRate}, education, experienceFactors{h1-h9}, bulletAnalysis{totalBullets, averageScore, distribution, codeScores, rewritePriorities[]}, issuesDetected[{code, issue, severity, count, fix}], strengthsDetected[{code, strength}]}
 ${jd ? "- jdAnalysis: {metadata, requirements{tier1/2/3Skills[], minimumYears, education, certifications[]}, hardGates[], jdNature}" : ""}
 ${audience === "STUDENT" ? `- studentAnalysis: {
   overallCvQuality: {score: <0-100>, grade: "<A|A-|B+|B|B-|C+|C|D|F>", label: "<e.g. Strong Candidate>", summary: "<brief assessment>"},
   honestAssessment: {rawCompatibility: {score, analysis}, transformationEffort: {level: 1-5, timeline, description}, candidateRisk: {score, factors[]}, successProbability: "<assessment>"},
-  improvements: {critical[], high[], medium[], scorePotential: {current, afterCritical, afterAll, ceiling}},
+  improvements: {critical[], high[], medium[], scorePotential: {current, afterCritical, afterAll, ceiling}} where each item in critical/high/medium is {code, priority, action, impact, effort},
   bulletImprovements: [{original, rewritten, scoreGain, issuesFixed[]}],
   gapStrategy: {fixable: [{gap, solution, timeline}], unfixable: [{gap, mitigation}]},
   alternatives: {betterFitRoles: [{role, fitScore, reason}], steppingStones: [{role, gap, timeline}]},
