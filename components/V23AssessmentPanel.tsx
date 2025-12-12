@@ -1025,8 +1025,8 @@ function BulletsTab({ data }: { data: StandardOutput | FullOutput }) {
         </Box>
       )}
 
-      {/* Priority rewrites for FULL mode (kept as fallback/summary) */}
-      {rewritePriorities.length > 0 && allBullets.length === 0 && (
+      {/* Priority rewrites for FULL mode - show when we have rewrite data */}
+      {rewritePriorities.length > 0 && (
         <Box sx={{ mt: 3 }}>
           <Typography variant="subtitle2" sx={{ mb: 2 }}>Priority Rewrites ({rewritePriorities.length})</Typography>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
