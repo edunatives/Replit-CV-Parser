@@ -37,12 +37,15 @@ function normalizeToLines(text: string): string[] {
   // Pattern 5: Handle numbered bullets like ". 1. " or ". 1) "
   normalized = normalized.replace(/\.\s+(\d+[.)]\s+)/g, ".\n$1");
   
-  // Pattern 6: If no explicit bullet markers found, try splitting long text on sentences
-  // Only do this if the text is long (likely multiple bullet points) and has no newlines yet
-  if (!normalized.includes("\n") && normalized.length > 200) {
-    // Look for patterns like sentence end followed by capital letter start
-    // This handles "...delivery. Implemented..." type text
-    normalized = normalized.replace(/\.\s+([A-Z])/g, ".\n$1");
+  // Pattern 6: If no explicit bullet markers found, split on sentence boundaries
+  // Apply this whenever we have multiple sentences (not just for long text)
+  if (!normalized.includes("\n")) {
+    // Count sentence terminators to see if we have multiple sentences
+    const sentenceEnds = (normalized.match(/[.!?]\s+[A-Z]/g) || []).length;
+    if (sentenceEnds > 0) {
+      // Split on sentence boundaries: period/!/? followed by space and capital letter
+      normalized = normalized.replace(/([.!?])\s+([A-Z])/g, "$1\n$2");
+    }
   }
   
   const lines = normalized.split("\n");

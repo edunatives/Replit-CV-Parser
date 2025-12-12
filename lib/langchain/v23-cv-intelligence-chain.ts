@@ -445,15 +445,41 @@ function transformToFull(raw: unknown, audience: AudienceType): FullOutput {
       h8Progression: { pattern: safeStr((expFactorsRaw.h8Progression as Record<string, unknown>)?.pattern, ""), trajectory: safeStr((expFactorsRaw.h8Progression as Record<string, unknown>)?.trajectory, ""), score: safeNum((expFactorsRaw.h8Progression as Record<string, unknown>)?.score, 50) },
       h9Specialization: { type: safeStr((expFactorsRaw.h9Specialization as Record<string, unknown>)?.type, ""), primaryArea: safeStr((expFactorsRaw.h9Specialization as Record<string, unknown>)?.primaryArea, ""), score: safeNum((expFactorsRaw.h9Specialization as Record<string, unknown>)?.score, 50) },
     },
-    bulletAnalysis: {
-      totalBullets: safeNum(bulletAnalysisRaw.totalBullets || bulletAnalysisRaw.total_bullets, 0),
-      averageScore: Math.min(100, safeNum(bulletAnalysisRaw.averageScore || bulletAnalysisRaw.average_score, 50)),
-      distribution: {
-        excellent: safeNum((bulletAnalysisRaw.distribution as Record<string, unknown>)?.excellent, 0),
-        good: safeNum((bulletAnalysisRaw.distribution as Record<string, unknown>)?.good, 0),
-        fair: safeNum((bulletAnalysisRaw.distribution as Record<string, unknown>)?.fair, 0),
-        poor: safeNum((bulletAnalysisRaw.distribution as Record<string, unknown>)?.poor, 0),
-      },
+    bulletAnalysis: (() => {
+      // Collect all bullets from experience roles to compute distribution
+      const allBulletScores: number[] = [];
+      cvAnalysis.experience.roles.forEach(role => {
+        role.bullets.forEach(bullet => {
+          allBulletScores.push(bullet.score);
+        });
+      });
+      
+      // Compute distribution from bullet scores
+      const computedDistribution = {
+        excellent: allBulletScores.filter(s => s >= 80).length,
+        good: allBulletScores.filter(s => s >= 60 && s < 80).length,
+        fair: allBulletScores.filter(s => s >= 40 && s < 60).length,
+        poor: allBulletScores.filter(s => s < 40).length,
+      };
+      
+      // Use computed values if AI didn't provide them
+      const totalBullets = safeNum(bulletAnalysisRaw.totalBullets || bulletAnalysisRaw.total_bullets, allBulletScores.length);
+      const avgFromAI = safeNum(bulletAnalysisRaw.averageScore || bulletAnalysisRaw.average_score, 0);
+      const avgFromComputed = allBulletScores.length > 0 ? Math.round(allBulletScores.reduce((a, b) => a + b, 0) / allBulletScores.length) : 50;
+      const averageScore = Math.min(100, avgFromAI > 0 ? avgFromAI : avgFromComputed);
+      
+      const aiDistribution = bulletAnalysisRaw.distribution as Record<string, unknown> | undefined;
+      const hasAIDistribution = aiDistribution && (safeNum(aiDistribution.excellent, 0) + safeNum(aiDistribution.good, 0) + safeNum(aiDistribution.fair, 0) + safeNum(aiDistribution.poor, 0)) > 0;
+      
+      return {
+        totalBullets,
+        averageScore,
+        distribution: hasAIDistribution ? {
+          excellent: safeNum(aiDistribution!.excellent, 0),
+          good: safeNum(aiDistribution!.good, 0),
+          fair: safeNum(aiDistribution!.fair, 0),
+          poor: safeNum(aiDistribution!.poor, 0),
+        } : computedDistribution,
       codeScores: {
         A10: safeNum((bulletAnalysisRaw.codeScores as Record<string, unknown>)?.A10, 50),
         A11: safeNum((bulletAnalysisRaw.codeScores as Record<string, unknown>)?.A11, 50),
@@ -464,7 +490,8 @@ function transformToFull(raw: unknown, audience: AudienceType): FullOutput {
         const rewrite = r as Record<string, unknown>;
         return { roleIndex: safeNum(rewrite.roleIndex || rewrite.role_index, 0), bulletIndex: safeNum(rewrite.bulletIndex || rewrite.bullet_index, 0), currentText: safeStr(rewrite.currentText || rewrite.current_text, ""), currentScore: safeNum(rewrite.currentScore || rewrite.current_score, 30), suggestedRewrite: safeStr(rewrite.suggestedRewrite || rewrite.suggested_rewrite, ""), projectedScore: safeNum(rewrite.projectedScore || rewrite.projected_score, 70) };
       }),
-    },
+      };
+    })(),
     issuesDetected: safeArr(cvAnalysisRaw.issuesDetected || cvAnalysisRaw.issues_detected).map((i: unknown) => {
       const issue = i as Record<string, unknown>;
       return { code: safeStr(issue.code, "A1"), issue: safeStr(issue.issue, ""), severity: (issue.severity || "medium") as "info" | "low" | "medium" | "high" | "critical", count: safeNum(issue.count, 1), fix: safeStr(issue.fix) };

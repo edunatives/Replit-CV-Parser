@@ -1557,12 +1557,15 @@ function normalizeToLines(text) {
     normalized = normalized.replace(/([a-zA-Z0-9])\s+•\s*/g, "$1\n• ");
     // Pattern 5: Handle numbered bullets like ". 1. " or ". 1) "
     normalized = normalized.replace(/\.\s+(\d+[.)]\s+)/g, ".\n$1");
-    // Pattern 6: If no explicit bullet markers found, try splitting long text on sentences
-    // Only do this if the text is long (likely multiple bullet points) and has no newlines yet
-    if (!normalized.includes("\n") && normalized.length > 200) {
-        // Look for patterns like sentence end followed by capital letter start
-        // This handles "...delivery. Implemented..." type text
-        normalized = normalized.replace(/\.\s+([A-Z])/g, ".\n$1");
+    // Pattern 6: If no explicit bullet markers found, split on sentence boundaries
+    // Apply this whenever we have multiple sentences (not just for long text)
+    if (!normalized.includes("\n")) {
+        // Count sentence terminators to see if we have multiple sentences
+        const sentenceEnds = (normalized.match(/[.!?]\s+[A-Z]/g) || []).length;
+        if (sentenceEnds > 0) {
+            // Split on sentence boundaries: period/!/? followed by space and capital letter
+            normalized = normalized.replace(/([.!?])\s+([A-Z])/g, "$1\n$2");
+        }
     }
     const lines = normalized.split("\n");
     // Filter out empty lines and trim whitespace
@@ -1589,7 +1592,7 @@ function LineEditor({ value, onChange, textStyle, placeholder }) {
             children: placeholder || "(No content)"
         }, void 0, false, {
             fileName: "[project]/components/LineEditor.tsx",
-            lineNumber: 69,
+            lineNumber: 72,
             columnNumber: 7
         }, this);
     }
@@ -1623,7 +1626,7 @@ function LineEditor({ value, onChange, textStyle, placeholder }) {
                         children: line || "\u00A0"
                     }, void 0, false, {
                         fileName: "[project]/components/LineEditor.tsx",
-                        lineNumber: 99,
+                        lineNumber: 102,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Tooltip$2f$Tooltip$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Tooltip$3e$__["Tooltip"], {
@@ -1658,28 +1661,28 @@ function LineEditor({ value, onChange, textStyle, placeholder }) {
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/components/LineEditor.tsx",
-                                lineNumber: 135,
+                                lineNumber: 138,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/LineEditor.tsx",
-                            lineNumber: 111,
+                            lineNumber: 114,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/LineEditor.tsx",
-                        lineNumber: 110,
+                        lineNumber: 113,
                         columnNumber: 11
                     }, this)
                 ]
             }, index, true, {
                 fileName: "[project]/components/LineEditor.tsx",
-                lineNumber: 85,
+                lineNumber: 88,
                 columnNumber: 9
             }, this))
     }, void 0, false, {
         fileName: "[project]/components/LineEditor.tsx",
-        lineNumber: 83,
+        lineNumber: 86,
         columnNumber: 5
     }, this);
 }
