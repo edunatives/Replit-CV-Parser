@@ -10,7 +10,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { ParsedCV } from "@/types/cv";
 import { formatCVSummary } from "@/lib/ai/rules";
-import { assessCVWithLangChain, type CVAssessment } from "@/lib/langchain/assessor";
+import { assessCVWithLangChain, transformToForensicV211 } from "@/lib/langchain/assessor";
 
 /**
  * Analyze a CV using LangChain with structured output
@@ -69,8 +69,10 @@ export async function POST(request: NextRequest) {
     
     console.log("LangChain assessment complete, score:", assessment.overallScore);
 
+    const analysis = transformToForensicV211(assessment, filename);
+
     return NextResponse.json({ 
-      assessment,
+      analysis,
       engine: "langchain",
       version: "2.11"
     });

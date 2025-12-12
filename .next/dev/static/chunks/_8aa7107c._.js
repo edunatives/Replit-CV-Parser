@@ -11302,14 +11302,13 @@ function AIAnalysisPanel({ cv, activeTrack }) {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch("/api/assess", {
+            const response = await fetch("/api/assess/langchain", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    cv,
-                    version
+                    cv
                 })
             });
             const contentType = response.headers.get("content-type");
@@ -11320,7 +11319,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
             if (!response.ok) {
                 throw new Error(data.error || "Failed to assess CV");
             }
-            if (version === "2.11" && data.analysis) {
+            if (data.analysis) {
                 setV211Analysis(data.analysis);
                 setUseV211(true);
             } else if (data.assessment) {
@@ -11426,7 +11425,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch("/api/jd-match", {
+            const response = await fetch("/api/jd-match/langchain", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

@@ -263,3 +263,154 @@ export async function assessCVWithLangChain(
   const assessor = getAssessor();
   return assessor.assessCV(cvSummary, filename);
 }
+
+// ============================================================================
+// TRANSFORMER: Convert LangChain CVAssessment to ForensicAnalysisV211
+// ============================================================================
+
+/**
+ * Transform LangChain CVAssessment to ForensicAnalysisV211 format
+ * This allows the UI to consume LangChain output without changes
+ */
+export function transformToForensicV211(assessment: CVAssessment, filename: string): Record<string, unknown> {
+  const level = assessment.level as "Exceptional" | "Strong" | "Good" | "Fair" | "Needs Work";
+  
+  const uiSections = assessment.categories.map((cat) => ({
+    category: cat.category,
+    score: cat.score,
+    weight: cat.weight,
+    weighted: cat.weighted_contribution,
+    feedback: cat.feedback,
+    issues: cat.issues || [],
+  }));
+
+  const uiStrengths = assessment.strengths.map((s, i) => ({
+    icon: i === 0 ? "star" : i === 1 ? "trending_up" : "verified",
+    title: s.split(":")[0] || s.substring(0, 30),
+    detail: s,
+    evidence: [],
+  }));
+
+  const uiWeaknesses = assessment.weaknesses.map((w) => ({
+    severity: "medium" as const,
+    code: "W" + Math.random().toString(36).substring(2, 5).toUpperCase(),
+    title: w.split(":")[0] || w.substring(0, 30),
+    detail: w,
+    fix: "Address this issue to improve your CV score",
+    impact: "-5 points",
+  }));
+
+  const uiRecommendations = assessment.recommendations.map((rec) => ({
+    priority: rec.priority,
+    icon: rec.priority === "high" ? "priority_high" : rec.priority === "medium" ? "schedule" : "low_priority",
+    text: rec.suggestion,
+    impact: rec.impact,
+  }));
+
+  const uiHighlights = assessment.highlights.map((h) => ({
+    type: h.type === "green" ? "achievement" : h.type === "red" ? "concern" : "skill",
+    color: h.type as "green" | "red" | "yellow",
+    text: h.snippet,
+    source: "CV",
+    note: h.comment,
+  }));
+
+  const quickStats = {
+    professionalYears: 0,
+    validatedSkills: 0,
+    ghostSkills: 0,
+    validationRate: 0,
+    quantificationRate: 0,
+    issueCount: {
+      critical: 0,
+      high: 0,
+      medium: uiWeaknesses.length,
+      low: 0,
+    },
+  };
+
+  const studentView = {
+    headline: assessment.studentAdvice?.headline || assessment.verdict,
+    overall_score: {
+      score: assessment.overallScore,
+      grade: level,
+      message: assessment.verdict,
+    },
+    your_strengths: uiStrengths.map(s => ({
+      title: s.title,
+      detail: s.detail,
+      icon: s.icon,
+    })),
+    your_background: {
+      summary: assessment.verdict,
+      unique_value: assessment.strengths[0] || "",
+      growth_areas: assessment.weaknesses.slice(0, 3),
+    },
+    quick_wins: (assessment.studentAdvice?.quickWins || []).map((qw, i) => ({
+      action: qw,
+      impact: "+5 points",
+      time: "15 min",
+      priority: i === 0 ? "do_first" : "do_soon",
+    })),
+    category_feedback: Object.fromEntries(
+      assessment.categories.map(cat => [
+        cat.category.toLowerCase().replace(/\s+/g, "_"),
+        {
+          score: cat.score,
+          summary: cat.feedback,
+          tips: cat.issues || [],
+        },
+      ])
+    ),
+    improvement_roadmap: {
+      this_week: { actions: assessment.studentAdvice?.quickWins || [], projected_gain: 5 },
+      this_month: { actions: assessment.recommendations.filter(r => r.priority === "high").map(r => r.suggestion), projected_gain: 10 },
+      long_term: { actions: [assessment.studentAdvice?.longTermPath || "Continue developing your skills"], projected_gain: 15 },
+    },
+    encouragement: "Keep improving your CV to stand out!",
+  };
+
+  return {
+    version: "2.11",
+    input: {
+      cv_filename: filename,
+      jd_provided: false,
+      jd_title: null,
+    },
+    analysis_metadata: {
+      cv_name: filename,
+      analysis_date: new Date().toISOString(),
+      engine_version: "2.11-langchain",
+    },
+    cv_nature: {
+      detected_level: level === "Exceptional" || level === "Strong" ? "Senior" : level === "Good" ? "Mid" : "Junior",
+      experience_years: 0,
+      domain: "General",
+      specialization: "",
+    },
+    category_scores: {
+      contact: assessment.categories.find(c => c.category.toLowerCase().includes("contact"))?.score || 0,
+      summary: assessment.categories.find(c => c.category.toLowerCase().includes("summary"))?.score || 0,
+      experience: assessment.categories.find(c => c.category.toLowerCase().includes("experience"))?.score || 0,
+      education: assessment.categories.find(c => c.category.toLowerCase().includes("education"))?.score || 0,
+      skills: assessment.categories.find(c => c.category.toLowerCase().includes("skills"))?.score || 0,
+      formatting: assessment.categories.find(c => c.category.toLowerCase().includes("format"))?.score || 0,
+    },
+    ui_output: {
+      overallScore: assessment.overallScore,
+      level,
+      inflation: assessment.inflation,
+      verdict: assessment.verdict,
+      sections: uiSections,
+      strengths: uiStrengths,
+      weaknesses: uiWeaknesses,
+      recommendations: uiRecommendations,
+      highlights: uiHighlights,
+      quickStats,
+    },
+    reports: {
+      student_view: studentView,
+    },
+    recommended_rewrites: [],
+  };
+}
