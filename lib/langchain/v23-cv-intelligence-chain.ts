@@ -446,11 +446,13 @@ function transformToFull(raw: unknown, audience: AudienceType): FullOutput {
       h9Specialization: { type: safeStr((expFactorsRaw.h9Specialization as Record<string, unknown>)?.type, ""), primaryArea: safeStr((expFactorsRaw.h9Specialization as Record<string, unknown>)?.primaryArea, ""), score: safeNum((expFactorsRaw.h9Specialization as Record<string, unknown>)?.score, 50) },
     },
     bulletAnalysis: (() => {
-      // Collect all bullets from experience roles to compute distribution
+      // Collect all bullet scores from experienceRaw (raw data) to compute distribution
       const allBulletScores: number[] = [];
-      cvAnalysis.experience.roles.forEach(role => {
-        role.bullets.forEach(bullet => {
-          allBulletScores.push(bullet.score);
+      safeArr(experienceRaw.roles).forEach((r: unknown) => {
+        const role = r as Record<string, unknown>;
+        safeArr(role.bullets).forEach((b: unknown) => {
+          const bullet = (typeof b === "string" ? { score: 50 } : b) as Record<string, unknown>;
+          allBulletScores.push(safeNum(bullet.score, 50));
         });
       });
       
