@@ -1,16 +1,12 @@
 /**
- * @fileoverview LangChain-based CV Assessment Module
- * @description Uses LangChain.js with Google Gemini and Zod for structured output parsing.
- * Provides reliable JSON parsing through LangChain's structured output features.
+ * @fileoverview LangChain-style CV Assessment Module
+ * @description Uses Google GenAI SDK with Zod for structured output parsing.
+ * Provides reliable JSON parsing through Zod validation.
+ * Uses Replit's Gemini integration with custom base URL.
  */
 
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
-
-// LangSmith tracing is automatically enabled via environment variables:
-// LANGSMITH_TRACING=true
-// LANGSMITH_API_KEY=<your-key>
-// LANGSMITH_PROJECT=cv-intelligence-parser
 
 // ============================================================================
 // ZOD SCHEMAS (Pydantic-equivalent for JavaScript)
@@ -86,14 +82,43 @@ export type CategoryScore = z.infer<typeof CategoryScoreSchema>;
 export type Improvement = z.infer<typeof ImprovementSchema>;
 
 // ============================================================================
-// LANGCHAIN ASSESSOR CLASS
+// HELPER: Parse and Repair JSON
+// ============================================================================
+
+function repairAndParseJSON(text: string): unknown {
+  let cleanedText = text.trim();
+  
+  if (cleanedText.startsWith("```json")) {
+    cleanedText = cleanedText.slice(7);
+  } else if (cleanedText.startsWith("```")) {
+    cleanedText = cleanedText.slice(3);
+  }
+  if (cleanedText.endsWith("```")) {
+    cleanedText = cleanedText.slice(0, -3);
+  }
+  cleanedText = cleanedText.trim();
+  
+  try {
+    return JSON.parse(cleanedText);
+  } catch {
+    cleanedText = cleanedText
+      .replace(/,(\s*[}\]])/g, '$1')
+      .replace(/([{,]\s*)(\w+)(\s*:)/g, '$1"$2"$3');
+    
+    return JSON.parse(cleanedText);
+  }
+}
+
+// ============================================================================
+// LANGCHAIN-STYLE ASSESSOR CLASS
 // ============================================================================
 
 /**
- * LangChain-based CV Assessor with structured output
+ * CV Assessor with Zod-validated structured output
+ * Uses Google GenAI SDK with Replit's Gemini integration
  */
 export class LangChainAssessor {
-  private model: ChatGoogleGenerativeAI;
+  private ai: GoogleGenAI;
   
   constructor() {
     const apiKey = process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
@@ -103,42 +128,51 @@ export class LangChainAssessor {
       throw new Error("AI_INTEGRATIONS_GEMINI_API_KEY not configured");
     }
     
-    this.model = new ChatGoogleGenerativeAI({
-      model: "gemini-2.5-flash",
+    this.ai = new GoogleGenAI({
       apiKey,
-      maxOutputTokens: 16000,
-      temperature: 0.3,
-      ...(baseUrl && { 
-        configuration: { 
-          baseURL: baseUrl 
-        } 
-      }),
+      httpOptions: {
+        apiVersion: "",
+        baseUrl: baseUrl || undefined,
+      },
     });
   }
   
   /**
-   * Assess a CV using LangChain with structured output
+   * Assess a CV using structured output with Zod validation
    * @param cvSummary - Formatted CV text summary
    * @param filename - Original filename for context
-   * @returns Structured CV assessment
+   * @returns Structured CV assessment validated by Zod
    */
   async assessCV(cvSummary: string, filename: string): Promise<CVAssessment> {
-    const structuredModel = this.model.withStructuredOutput(CVAssessmentSchema, {
-      name: "cv_assessment",
-    });
-    
     const prompt = this.buildAssessmentPrompt(cvSummary, filename);
     
-    const result = await structuredModel.invoke(prompt);
+    const response = await this.ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: {
+        maxOutputTokens: 16000,
+        temperature: 0.3,
+      },
+    });
     
-    return result;
+    const responseText = response.text?.trim() || "";
+    
+    if (!responseText) {
+      throw new Error("Empty response from AI");
+    }
+    
+    const parsed = repairAndParseJSON(responseText);
+    const validated = CVAssessmentSchema.parse(parsed);
+    
+    return validated;
   }
   
   /**
-   * Build the assessment prompt
+   * Build the assessment prompt requesting JSON output
    */
   private buildAssessmentPrompt(cvSummary: string, filename: string): string {
     return `You are a Forensic CV Auditor v2.11. Analyze this CV with brutal honesty.
+Return your analysis as a valid JSON object matching this exact structure.
 
 DOCUMENT: ${filename}
 
@@ -147,34 +181,64 @@ ${cvSummary}
 
 SCORING RUBRIC (must use these weights):
 1. Contact & LinkedIn (10%): Complete info, professional email, LinkedIn URL
-2. Professional Summary (15%): Role-specific, achievement-focused, no fluff
-3. Work Experience (30%): Quantified achievements, action verbs, relevant progression
-4. Education (15%): Relevant degrees, certifications, GPA if strong
-5. Skills (15%): Relevant technical/soft skills, properly categorized
-6. Presentation (10%): Formatting, consistency, readability
-7. ATS Compatibility (5%): Keywords, standard headings, parseable format
+2. Summary/Objective (15%): Clear value proposition, no clichés
+3. Work Experience (30%): Quantified achievements, STAR format, career progression
+4. Education & Certifications (15%): Relevant degrees, certifications, courses
+5. Skills & Technologies (15%): Industry-relevant, balanced hard/soft skills
+6. Formatting & Structure (15%): Consistent style, ATS-friendly, scannable
 
-SCORING BANDS:
-- 85-100: Exceptional - Ready for top-tier roles
-- 70-84: Strong - Minor improvements needed
-- 55-69: Good - Several areas need work
-- 40-54: Fair - Significant improvements required
-- 0-39: Needs Work - Major overhaul needed
-
-RULES:
-1. Be honest - don't inflate scores to be nice
-2. Identify specific issues with exact CV text snippets
-3. Prioritize actionable feedback
-4. Flag any inflated claims or red flags
-5. Skills must only come from explicit Skills sections - never infer or generate skills
-
-Provide your structured assessment following the exact schema provided.`;
+RESPONSE FORMAT - Return this exact JSON structure:
+{
+  "overallScore": <number 0-100>,
+  "level": "<Exceptional|Strong|Good|Fair|Needs Work>",
+  "inflation": <true|false>,
+  "verdict": "<2-3 sentence summary>",
+  "categories": [
+    {
+      "category": "<category name>",
+      "score": <number 0-100>,
+      "weight": <decimal weight>,
+      "weighted_contribution": <score * weight>,
+      "feedback": "<specific feedback>",
+      "issues": ["<issue 1>", "<issue 2>"]
+    }
+  ],
+  "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
+  "weaknesses": ["<weakness 1>", "<weakness 2>", "<weakness 3>"],
+  "recommendations": [
+    {
+      "priority": "<high|medium|low>",
+      "category": "<affected category>",
+      "suggestion": "<what to do>",
+      "impact": "<expected result>"
+    }
+  ],
+  "highlights": [
+    {
+      "snippet": "<exact text from CV>",
+      "type": "<red|green|yellow>",
+      "comment": "<brief explanation>"
+    }
+  ],
+  "studentAdvice": {
+    "headline": "<one-line summary>",
+    "quickWins": ["<easy fix 1>", "<easy fix 2>"],
+    "longTermPath": "<6-12 month strategy>"
   }
 }
 
-/**
- * Create a singleton assessor instance
- */
+IMPORTANT:
+- Return ONLY the JSON object, no markdown code blocks
+- Ensure all JSON is valid with proper quotes and commas
+- Skills should only come from explicit Skills sections in the CV
+- Be honest but constructive in feedback`;
+  }
+}
+
+// ============================================================================
+// SINGLETON & CONVENIENCE FUNCTIONS
+// ============================================================================
+
 let assessorInstance: LangChainAssessor | null = null;
 
 export function getAssessor(): LangChainAssessor {
@@ -185,7 +249,7 @@ export function getAssessor(): LangChainAssessor {
 }
 
 /**
- * Assess CV using LangChain (convenience function)
+ * Assess CV using LangChain-style structured output (convenience function)
  */
 export async function assessCVWithLangChain(
   cvSummary: string, 

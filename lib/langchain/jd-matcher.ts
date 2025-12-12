@@ -1,16 +1,12 @@
 /**
- * @fileoverview LangChain-based JD Match Module
- * @description Uses LangChain.js with Google Gemini and Zod for structured JD matching output.
+ * @fileoverview LangChain-style JD Match Module
+ * @description Uses Google GenAI SDK with Zod for structured JD matching output.
  * Aligned with EnhancedJDMatchResult interface from types/cv.ts for compatibility.
+ * Uses Replit's Gemini integration with custom base URL.
  */
 
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
-
-// LangSmith tracing is automatically enabled via environment variables:
-// LANGSMITH_TRACING=true
-// LANGSMITH_API_KEY=<your-key>
-// LANGSMITH_PROJECT=cv-intelligence-parser
 
 // ============================================================================
 // ZOD SCHEMAS - Aligned with types/cv.ts
@@ -148,14 +144,43 @@ export const EnhancedJDMatchResultSchema = z.object({
 export type EnhancedJDMatchResult = z.infer<typeof EnhancedJDMatchResultSchema>;
 
 // ============================================================================
-// LANGCHAIN JD MATCHER CLASS
+// HELPER: Parse and Repair JSON
+// ============================================================================
+
+function repairAndParseJSON(text: string): unknown {
+  let cleanedText = text.trim();
+  
+  if (cleanedText.startsWith("```json")) {
+    cleanedText = cleanedText.slice(7);
+  } else if (cleanedText.startsWith("```")) {
+    cleanedText = cleanedText.slice(3);
+  }
+  if (cleanedText.endsWith("```")) {
+    cleanedText = cleanedText.slice(0, -3);
+  }
+  cleanedText = cleanedText.trim();
+  
+  try {
+    return JSON.parse(cleanedText);
+  } catch {
+    cleanedText = cleanedText
+      .replace(/,(\s*[}\]])/g, '$1')
+      .replace(/([{,]\s*)(\w+)(\s*:)/g, '$1"$2"$3');
+    
+    return JSON.parse(cleanedText);
+  }
+}
+
+// ============================================================================
+// LANGCHAIN-STYLE JD MATCHER CLASS
 // ============================================================================
 
 /**
- * LangChain-based JD Matcher with structured output
+ * JD Matcher with Zod-validated structured output
+ * Uses Google GenAI SDK with Replit's Gemini integration
  */
 export class LangChainJDMatcher {
-  private model: ChatGoogleGenerativeAI;
+  private ai: GoogleGenAI;
   
   constructor() {
     const apiKey = process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
@@ -165,42 +190,51 @@ export class LangChainJDMatcher {
       throw new Error("AI_INTEGRATIONS_GEMINI_API_KEY not configured");
     }
     
-    this.model = new ChatGoogleGenerativeAI({
-      model: "gemini-2.5-flash",
+    this.ai = new GoogleGenAI({
       apiKey,
-      maxOutputTokens: 16000,
-      temperature: 0.3,
-      ...(baseUrl && { 
-        configuration: { 
-          baseURL: baseUrl 
-        } 
-      }),
+      httpOptions: {
+        apiVersion: "",
+        baseUrl: baseUrl || undefined,
+      },
     });
   }
   
   /**
-   * Match a CV against a job description using LangChain with structured output
+   * Match a CV against a job description with Zod-validated output
    * @param cvSummary - Formatted CV text summary
    * @param jobDescription - The job description text
-   * @returns Structured JD match result compatible with EnhancedJDMatchResult
+   * @returns Structured JD match result validated by Zod
    */
   async matchJD(cvSummary: string, jobDescription: string): Promise<EnhancedJDMatchResult> {
-    const structuredModel = this.model.withStructuredOutput(EnhancedJDMatchResultSchema, {
-      name: "jd_match_analysis",
-    });
-    
     const prompt = this.buildMatchPrompt(cvSummary, jobDescription);
     
-    const result = await structuredModel.invoke(prompt);
+    const response = await this.ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: {
+        maxOutputTokens: 16000,
+        temperature: 0.3,
+      },
+    });
     
-    return result;
+    const responseText = response.text?.trim() || "";
+    
+    if (!responseText) {
+      throw new Error("Empty response from AI");
+    }
+    
+    const parsed = repairAndParseJSON(responseText);
+    const validated = EnhancedJDMatchResultSchema.parse(parsed);
+    
+    return validated;
   }
   
   /**
-   * Build the JD match prompt
+   * Build the JD match prompt requesting JSON output
    */
   private buildMatchPrompt(cvSummary: string, jobDescription: string): string {
     return `You are an expert JD Match Analyst. Analyze this CV against the job description thoroughly.
+Return your analysis as a valid JSON object matching this exact structure.
 
 JOB DESCRIPTION:
 ${jobDescription}
@@ -208,53 +242,92 @@ ${jobDescription}
 CV CONTENT:
 ${cvSummary}
 
-ANALYSIS REQUIREMENTS:
-
-1. JD PARSING: Extract role_title, company, mandatory_skills, nice_to_have_skills
-
-2. MATCH ANALYSIS: 
-   - overall_match_score (0-100): Honest assessment
-   - verdict: "Excellent Match" (85+), "Good Match" (70-84), "Partial Match" (55-69), "Limited Match" (<55)
-   - matched_skills: Skills from CV that match JD
-   - missing_skills: Required skills not in CV
-   - experience_match: Score and feedback
-   - education_match: Score and feedback
-   - keyword_optimizations: Keywords to add
-   - suggestions: Improvement tips
-
-3. EVIDENCE MAP: For each JD requirement, provide cv_evidence and status (Match/Weak/Missing)
-
-4. JD NATURE: Analyze role_level, domain_required, industry_preferred, education_required, years_required, work_arrangement, company_stage
-
-5. EXPERIENCE FACTORS:
-   - years_analysis: total_years, relevant_domain_years, recency_score, meets_requirement, student_message
-   - depth_analysis: depth_level, scope_score, impact_score, complexity_handled, student_message
-   - issues: List experience gaps with codes H1-H9
-
-6. NATURE FIT:
-   - overall_fit: Excellent/Good/Partial/Challenging
-   - fit_score: 0-100
-   - issues: List nature fit gaps with codes G1-G9
-   - strengths: What makes this candidate strong
-
-7. STUDENT SUMMARY:
-   - headline: One-line encouraging summary
-   - encouragement: Supportive message
-   - quick_wins: 3-5 easy improvements
-
-RULES:
-- Be honest but encouraging
-- Skills must only come from explicit Skills sections in the CV
-- Provide specific, actionable feedback
-- Use student-friendly language in messages
-
-Provide your structured analysis following the exact schema provided.`;
+RESPONSE FORMAT - Return this exact JSON structure:
+{
+  "jd_parsing": {
+    "role_title": "<job title>",
+    "company": "<company name or 'Not specified'>",
+    "mandatory_skills": ["<skill1>", "<skill2>"],
+    "nice_to_have_skills": ["<skill1>", "<skill2>"]
+  },
+  "match_analysis": {
+    "overall_match_score": <number 0-100>,
+    "verdict": "<Excellent Match|Good Match|Partial Match|Limited Match>",
+    "summary": "<match summary>",
+    "matched_skills": ["<skill1>", "<skill2>"],
+    "missing_skills": ["<skill1>", "<skill2>"],
+    "experience_match": {
+      "score": <number 0-100>,
+      "feedback": "<experience feedback>"
+    },
+    "education_match": {
+      "score": <number 0-100>,
+      "feedback": "<education feedback>"
+    },
+    "keyword_optimizations": ["<keyword1>", "<keyword2>"],
+    "suggestions": ["<suggestion1>", "<suggestion2>"]
+  },
+  "evidence_map": [
+    {
+      "jd_requirement": "<requirement>",
+      "cv_evidence": "<evidence or 'Not found'>",
+      "status": "<Match|Weak|Missing>"
+    }
+  ],
+  "jd_nature": {
+    "role_level": "<Junior|Mid|Senior|Lead|Staff|Principal|Director|VP|C-Level>",
+    "domain_required": "<domain>",
+    "industry_preferred": "<industry or null>",
+    "education_required": "<education or null>",
+    "years_required": <number or null>,
+    "work_arrangement": "<Remote|On-site|Hybrid|Flexible or null>",
+    "company_stage": "<Startup|Growth|Enterprise or null>"
+  },
+  "experience_factors": {
+    "years_analysis": {
+      "total_years": <number>,
+      "relevant_domain_years": <number>,
+      "recency_score": <number 0-100>,
+      "meets_requirement": <true|false>,
+      "student_message": "<encouraging message>"
+    },
+    "depth_analysis": {
+      "depth_level": "<Entry|Developing|Proficient|Expert>",
+      "scope_score": <number 0-100>,
+      "impact_score": <number 0-100>,
+      "complexity_handled": "<description>",
+      "student_message": "<encouraging message>"
+    },
+    "issues": []
+  },
+  "nature_fit": {
+    "overall_fit": "<Excellent|Good|Partial|Challenging>",
+    "fit_score": <number 0-100>,
+    "issues": [],
+    "strengths": ["<strength1>", "<strength2>"]
+  },
+  "student_summary": {
+    "headline": "<one-line encouraging summary>",
+    "encouragement": "<supportive message>",
+    "quick_wins": ["<improvement1>", "<improvement2>"]
   }
 }
 
-/**
- * Create a singleton matcher instance
- */
+RULES:
+- Return ONLY the JSON object, no markdown code blocks
+- Ensure all JSON is valid with proper quotes and commas
+- Be honest but encouraging
+- Skills must only come from explicit Skills sections in the CV
+- Use student-friendly language in messages
+
+Provide your structured analysis.`;
+  }
+}
+
+// ============================================================================
+// SINGLETON & CONVENIENCE FUNCTIONS
+// ============================================================================
+
 let matcherInstance: LangChainJDMatcher | null = null;
 
 export function getMatcher(): LangChainJDMatcher {
@@ -265,7 +338,7 @@ export function getMatcher(): LangChainJDMatcher {
 }
 
 /**
- * Match JD using LangChain (convenience function)
+ * Match JD using structured output (convenience function)
  */
 export async function matchJDWithLangChain(
   cvSummary: string, 
