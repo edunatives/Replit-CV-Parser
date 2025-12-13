@@ -728,7 +728,39 @@ ${jd ? "- experienceMatch: {totalYearsMatch, domainYearsMatch, domainGap, scopeM
 ${audience === "STUDENT" ? "- alternativeRoles: [{role, fitScore, reason}]\n- nextSteps: {immediate[], thisWeek[], beforeApplication[]}\n- encouragement" : "- riskLevel, hireRecommendation\n- verificationItems: [{item, priority, reason}]\n- interviewQuestions: [{question, probing, redFlag}]"}`;
   } else {
     prompt += `Return ~5000 tokens comprehensive JSON with:
-- cvAnalysis: {metadata, professionalSummary, experience{totalYears, roles[], progression, gaps[]}, skills{validated[], implied[], ghost[], validationRate}, education, experienceFactors{h1-h9}, bulletAnalysis{totalBullets, averageScore, distribution, codeScores, rewritePriorities[]}, issuesDetected[{code, issue, severity, count, fix}], strengthsDetected[{code, strength}]}
+- cvAnalysis: {
+    metadata: {candidateName, email, phone, location, linkedin, documentStats: {pages, wordCount, bulletCount}},
+    professionalSummary: {text, yearsMentioned, keyThemes[], qualityScore: 0-100, issues[]},
+    experience: {
+      totalYears,
+      roles: [
+        {
+          title, company, location, startDate, endDate, durationMonths, seniorityLevel,
+          bullets: [
+            {
+              text: "<exact bullet text from CV>",
+              index: <0-based>,
+              score: <0-100>,
+              actionVerb: {word: "<verb or null>", strength: "<strong|moderate|weak|none>", score: 0-100},
+              quantification: {hasQuantification: true/false, type: "<percentage|currency|count|duration|null>", score: 0-100},
+              result: {hasResult: true/false, type: "<quantified|implied|missing>", score: 0-100},
+              issues: [{code: "<A10-A13>", issue: "<description>"}],
+              rewrite: {suggested: "<improved version>", projectedScore: <0-100>}
+            }
+          ],
+          bulletSummary: {count, averageScore, excellent, good, fair, poor}
+        }
+      ],
+      progression: {pattern: "<Stagnant|Slow|Steady|Accelerated|Exceptional>", isHealthy, assessment},
+      gaps: [{start, end, durationMonths, explained}]
+    },
+    skills: {validated[], implied[], ghost[], validationRate},
+    education: {degrees[], certifications[]},
+    experienceFactors: {h1TotalYears, h2DomainYears[], h3IndustryYears[], h4Recency, h5Scope, h6Complexity, h7Impact, h8Progression, h9Specialization},
+    bulletAnalysis: {totalBullets, averageScore, distribution: {excellent, good, fair, poor}, codeScores: {A10, A11, A12, A13}, rewritePriorities: [{roleIndex, bulletIndex, currentText, currentScore, suggestedRewrite, projectedScore}]},
+    issuesDetected: [{code, issue, severity, count, fix}],
+    strengthsDetected: [{code, strength}]
+  }
 ${jd ? "- jdAnalysis: {metadata, requirements{tier1/2/3Skills[], minimumYears, education, certifications[]}, hardGates[], jdNature}" : ""}
 ${audience === "STUDENT" ? `- studentAnalysis: {
   overallCvQuality: {score: <0-100>, grade: "<A|A-|B+|B|B-|C+|C|D|F>", label: "<e.g. Strong Candidate>", summary: "<brief assessment>"},
