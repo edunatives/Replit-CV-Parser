@@ -391,7 +391,7 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
   const [assessment, setAssessment] = useState<CVAssessment | null>(null);
   const [v23Analysis, setV23Analysis] = useState<AnalysisResponse | null>(null);
   const [useV23, setUseV23] = useState(true);
-  const [outputMode, setOutputMode] = useState<OutputMode>("STANDARD");
+  const [outputMode, setOutputMode] = useState<OutputMode>("FULL");
   const [jdMatch, setJdMatch] = useState<JDMatchResult | null>(null);
   const [v23JdMatch, setV23JdMatch] = useState<AnalysisResponse | null>(null);
   const [loading, setLoading] = useState(false);
