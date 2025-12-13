@@ -8,7 +8,6 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  LinearProgress,
   Typography,
   Snackbar,
   Alert,
@@ -18,6 +17,7 @@ import { Header } from "@/components/Header";
 import { Dashboard } from "@/components/Dashboard";
 import { CVWorkspace } from "@/components/CVWorkspace";
 import { UploadDropzone } from "@/components/UploadDropzone";
+import { SteppedProgress, UPLOAD_STEPS } from "@/components/SteppedProgress";
 import type { ParsedCV } from "@/types/cv";
 
 type View = "dashboard" | "workspace";
@@ -29,6 +29,7 @@ export default function Home() {
   const [selectedCV, setSelectedCV] = useState<ParsedCV | null>(null);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [uploadStep, setUploadStep] = useState(0);
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: "success" | "error" | "info" }>({
     open: false,
     message: "",
@@ -58,6 +59,7 @@ export default function Home() {
     const file = files[0];
     pendingFileRef.current = file;
     setIsProcessing(true);
+    setUploadStep(0);
     setUploadDialogOpen(false);
 
     try {
@@ -65,11 +67,17 @@ export default function Home() {
       formData.append("file", file);
       formData.append("fileId", `cv-${Date.now()}`);
 
+      setUploadStep(1);
+      await new Promise(r => setTimeout(r, 300));
+      
+      setUploadStep(2);
       const response = await fetch("/api/parse", {
         method: "POST",
         body: formData,
       });
 
+      setUploadStep(3);
+      
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to parse CV");
@@ -87,6 +95,7 @@ export default function Home() {
       showSnackbar(`Error parsing CV: ${error}`, "error");
     } finally {
       setIsProcessing(false);
+      setUploadStep(0);
       pendingFileRef.current = null;
     }
   }, []);
@@ -132,11 +141,13 @@ export default function Home() {
         <Header />
         
         {isProcessing && (
-          <Box sx={{ width: "100%" }}>
-            <LinearProgress />
-            <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center", py: 1 }}>
-              Processing your CV...
-            </Typography>
+          <Box sx={{ p: 2 }}>
+            <SteppedProgress 
+              steps={UPLOAD_STEPS} 
+              currentStep={uploadStep} 
+              title="Processing Your CV"
+              estimatedTime="Usually takes 10-30 seconds"
+            />
           </Box>
         )}
 

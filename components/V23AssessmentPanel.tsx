@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Box, Typography, Card, CardContent, Chip, LinearProgress, Tabs, Tab, Grid, CircularProgress, Alert, Paper } from "@mui/material";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
@@ -19,6 +19,7 @@ import BuildIcon from "@mui/icons-material/Build";
 import StarIcon from "@mui/icons-material/Star";
 import DescriptionIcon from "@mui/icons-material/Description";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import type { AnalysisResponse, LiteOutput, StandardOutput, FullOutput, Issue, Strength, Improvement } from "@/lib/langchain/v23-cv-intelligence-schemas";
 
 interface V23AssessmentPanelProps {
@@ -28,6 +29,13 @@ interface V23AssessmentPanelProps {
   candidateName?: string;
   candidateTitle?: string;
 }
+
+const ANALYSIS_STEPS = [
+  { label: "Preparing analysis", description: "Setting up AI engine..." },
+  { label: "Analyzing CV content", description: "Reviewing experience and skills..." },
+  { label: "Generating insights", description: "Creating personalized feedback..." },
+  { label: "Finalizing report", description: "Compiling results..." },
+];
 
 type TabValue = "overview" | "strengths" | "issues" | "actions" | "bullets";
 
@@ -94,12 +102,98 @@ export function V23AssessmentPanel({
   candidateTitle
 }: V23AssessmentPanelProps) {
   const [activeTab, setActiveTab] = useState<TabValue>("overview");
+  const [analysisStep, setAnalysisStep] = useState(0);
+
+  useEffect(() => {
+    if (loading) {
+      setAnalysisStep(0);
+      const intervals = [2000, 5000, 10000];
+      const timers: NodeJS.Timeout[] = [];
+      
+      intervals.forEach((delay, index) => {
+        const timer = setTimeout(() => {
+          setAnalysisStep(index + 1);
+        }, delay);
+        timers.push(timer);
+      });
+
+      return () => {
+        timers.forEach(t => clearTimeout(t));
+      };
+    } else {
+      setAnalysisStep(0);
+    }
+  }, [loading]);
 
   if (loading) {
+    const progress = Math.min(100, ((analysisStep + 1) / ANALYSIS_STEPS.length) * 100);
+    
     return (
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", py: 8 }}>
-        <CircularProgress size={48} />
-        <Typography sx={{ mt: 2, color: "text.secondary" }}>Analyzing CV with Engine v2.3...</Typography>
+      <Box sx={{ p: 3 }}>
+        <Paper elevation={0} sx={{ p: 3, bgcolor: "#f8fafc", border: "1px solid", borderColor: "divider" }}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+            <Typography variant="subtitle1" fontWeight={600}>
+              Analyzing CV with AI Engine v2.3
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Usually takes 15-45 seconds
+            </Typography>
+          </Box>
+          
+          <LinearProgress 
+            variant="determinate" 
+            value={progress} 
+            sx={{ 
+              height: 6, 
+              borderRadius: 3, 
+              mb: 2,
+              bgcolor: "#e2e8f0",
+              "& .MuiLinearProgress-bar": { borderRadius: 3 }
+            }} 
+          />
+
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            {ANALYSIS_STEPS.map((step, index) => {
+              const isComplete = index < analysisStep;
+              const isCurrent = index === analysisStep;
+              const isPending = index > analysisStep;
+
+              return (
+                <Box 
+                  key={index} 
+                  sx={{ 
+                    display: "flex", 
+                    alignItems: "center", 
+                    gap: 1.5,
+                    opacity: isPending ? 0.5 : 1,
+                  }}
+                >
+                  {isComplete ? (
+                    <CheckCircleIcon sx={{ fontSize: 20, color: "success.main" }} />
+                  ) : isCurrent ? (
+                    <CircularProgress size={18} thickness={5} />
+                  ) : (
+                    <RadioButtonUncheckedIcon sx={{ fontSize: 20, color: "text.disabled" }} />
+                  )}
+                  <Box>
+                    <Typography 
+                      variant="body2" 
+                      fontWeight={isCurrent ? 600 : 400}
+                      color={isComplete ? "success.main" : isCurrent ? "primary.main" : "text.secondary"}
+                    >
+                      {step.label}
+                    </Typography>
+                    {step.description && isCurrent && (
+                      <Typography variant="caption" color="text.secondary">
+                        {step.description}
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
+              );
+            })}
+          </Box>
+        </Paper>
       </Box>
     );
   }
