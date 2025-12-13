@@ -433,7 +433,13 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
       const response = await fetch("/api/assess/langchain", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cv, outputMode, audience: "STUDENT" }),
+        body: JSON.stringify({ 
+          cv, 
+          outputMode, 
+          audience: "STUDENT",
+          version: outputMode === "FULL" ? "2.4" : "2.3",
+          includeFullRewrite: outputMode === "FULL"
+        }),
       });
       
       const contentType = response.headers.get("content-type");
