@@ -1,0 +1,378 @@
+/**
+ * @fileoverview CV Parsing Engine
+ * @description Core parsing module for extracting structured data from CV documents.
+ * Supports PDF, DOCX, DOC, and TXT file formats.
+ * Uses AI-powered extraction (Gemini 2.5 Flash) with regex-based fallback.
+ * 
+ * @exports parseCV - Main parsing function
+ * 
+ * @example
+ * const buffer = fs.readFileSync('resume.pdf');
+ * const { cv, rawText } = await parseCV(buffer, 'resume.pdf', 'file-123');
+ */
+
+import type { ParsedCV, Experience, Education, Certification, TokenUsage } from "@/types/cv";
+import {
+  normalizeText,
+  normalizeWhitespace,
+  generateStableId,
+  normalizeDateRange,
+  normalizeEmail,
+  normalizePhone,
+  normalizeUrl,
+  normalizeSkills,
+  validateAndNormalizeCV,
+} from "./normalize";
+import { GoogleGenAI } from "@google/genai";
+import { buildCVParsingPrompt, cleanAIResponse, validateCVDocument } from "@/lib/ai/rules";
+import { parseCVWithLangChain } from "@/lib/langchain/cv-parser";
+
+type PdfParseResult = { text: string; numpages: number };
+
+/**
+ * Parse PDF file buffer using pdf-parse v2 API
+ * @internal
+ * @param {Buffer} buffer - PDF file buffer
+ * @returns {Promise<PdfParseResult>} Extracted text and page count
+ */
+async function parsePdfBuffer(buffer: Buffer): Promise<PdfParseResult> {
+  const pdfModule = await import("pdf-parse");
+  const PDFParse = pdfModule.PDFParse;
+  
+  if (!PDFParse) {
+    throw new Error("PDFParse class not found in pdf-parse module");
+  }
+  
+  const parser = new PDFParse({ data: buffer, verbosity: 0 });
+  const result = await parser.getText();
+  
+  await parser.destroy();
+  
+  return { text: result.text || "", numpages: result.total || 1 };
+}
+
+/**
+ * Parse Word document (DOCX) buffer using mammoth
+ * @internal
+ * @param {Buffer} buffer - DOCX file buffer
+ * @returns {Promise<string>} Extracted text content
+ */
+async function parseDocxBuffer(buffer: Buffer): Promise<string> {
+  const mammothModule = await import("mammoth");
+  const mammoth = mammothModule.default ?? mammothModule;
+  const result = await mammoth.extractRawText({ buffer });
+  return result.value;
+}
+
+interface GeminiCVResponse {
+  name: string;
+  title: string;
+  email: string;
+  phone: string;
+  location: string;
+  website: string;
+  linkedin: string;
+  github: string;
+  summary: string;
+  experience: Array<{
+    company: string;
+    role: string;
+    duration: string;
+    description: string;
+  }>;
+  education: Array<{
+    institution: string;
+    degree: string;
+    year: string;
+  }>;
+  certifications: Array<{
+    name: string;
+    issuer: string;
+    year: string;
+  }>;
+  skills: string[];
+  strengths: string[];
+}
+
+interface GeminiExtractionResult {
+  data: GeminiCVResponse;
+  tokenUsage: TokenUsage;
+}
+
+/**
+ * Extract structured CV data using LangChain-style Zod-validated parsing
+ * Uses the LangChain module for reliable structured output with validation
+ * 
+ * @internal
+ * @param {string} text - Raw text extracted from CV document
+ * @returns {Promise<GeminiExtractionResult | null>} Parsed data with token usage, or null if AI unavailable
+ */
+async function extractWithGemini(text: string): Promise<GeminiExtractionResult | null> {
+  const userApiKey = process.env.GOOGLE_API_KEY;
+  const replitApiKey = process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
+  
+  if (!userApiKey && !replitApiKey) {
+    console.log("No Gemini API key available, falling back to regex extraction");
+    return null;
+  }
+
+  try {
+    console.log("Using LangChain-style Zod-validated CV parsing");
+    const result = await parseCVWithLangChain(text);
+    
+    console.log(`LangChain CV parsing - Token usage: Prompt: ${result.tokenUsage.promptTokens}, Completion: ${result.tokenUsage.completionTokens}, Total: ${result.tokenUsage.totalTokens}`);
+    
+    const data: GeminiCVResponse = {
+      name: result.data.name,
+      title: result.data.title,
+      email: result.data.email,
+      phone: result.data.phone,
+      location: result.data.location,
+      website: result.data.website,
+      linkedin: result.data.linkedin,
+      github: result.data.github,
+      summary: result.data.summary,
+      experience: result.data.experience.map(exp => ({
+        company: exp.company,
+        role: exp.role,
+        duration: exp.duration,
+        description: exp.description,
+      })),
+      education: result.data.education.map(edu => ({
+        institution: edu.institution,
+        degree: edu.degree,
+        year: edu.year,
+      })),
+      certifications: result.data.certifications.map(cert => ({
+        name: cert.name,
+        issuer: cert.issuer,
+        year: cert.year,
+      })),
+      skills: result.data.skills,
+      strengths: result.data.strengths,
+    };
+    
+    console.log("LangChain CV extraction successful");
+    return { data, tokenUsage: result.tokenUsage };
+  } catch (error) {
+    console.error("LangChain CV extraction error:", error);
+    return null;
+  }
+}
+
+// Fallback regex-based extraction (commented out AI, using basic regex)
+const EMAIL_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+const PHONE_PATTERNS = [
+  /\+?\d{1,4}[-.\s]?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}/g,
+  /(?:\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}/g,
+];
+const LINKEDIN_REGEX = /(?:https?:\/\/)?(?:www\.)?linkedin\.com\/in\/([a-zA-Z0-9_-]+)/i;
+const GITHUB_REGEX = /(?:https?:\/\/)?(?:www\.)?github\.com\/([a-zA-Z0-9_-]+)/i;
+
+function extractEmailFallback(text: string): string {
+  const matches = text.match(EMAIL_REGEX);
+  return matches ? normalizeEmail(matches[0]) : "";
+}
+
+function extractPhoneFallback(text: string): string {
+  for (const pattern of PHONE_PATTERNS) {
+    const matches = text.match(pattern);
+    if (matches) {
+      const phone = matches[0].trim();
+      if (phone.length >= 8 && phone.length <= 20) {
+        return normalizePhone(phone);
+      }
+    }
+  }
+  return "";
+}
+
+function extractLinkedInFallback(text: string): string {
+  const match = text.match(LINKEDIN_REGEX);
+  return match ? `linkedin.com/in/${match[1]}` : "";
+}
+
+function extractGithubFallback(text: string): string {
+  const match = text.match(GITHUB_REGEX);
+  return match && match[1] !== "in" && match[1] !== "www" ? `github.com/${match[1]}` : "";
+}
+
+function extractNameFallback(text: string): string {
+  const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+  
+  const skipPatterns = [
+    /^(resume|cv|curriculum|vitae|profile|contact|email|phone|address)/i,
+    /[@\d]/,
+    /\.(com|org|net|edu)/i,
+  ];
+  
+  for (const line of lines.slice(0, 8)) {
+    if (line.length < 3 || line.length > 60) continue;
+    if (skipPatterns.some(p => p.test(line))) continue;
+    
+    const words = line.split(/\s+/).filter(w => w.length > 0);
+    if (words.length >= 2 && words.length <= 5) {
+      const allCapitalized = words.every(w => /^[A-Z]/.test(w));
+      const noSymbols = words.every(w => /^[A-Za-z'-]+$/.test(w));
+      if (allCapitalized && noSymbols) {
+        return normalizeWhitespace(line);
+      }
+    }
+  }
+  
+  return "";
+}
+
+/**
+ * Parse a CV file and extract structured data
+ * Main entry point for CV parsing. Supports PDF, DOCX, DOC, and TXT formats.
+ * Uses Gemini AI for intelligent extraction with regex-based fallback.
+ * 
+ * @param {Buffer} buffer - File buffer containing CV content
+ * @param {string} fileName - Original filename (used for format detection)
+ * @param {string} fileId - Unique identifier for this CV
+ * @returns {Promise<{cv: ParsedCV, rawText: string}>} Parsed CV data and raw extracted text
+ * 
+ * @example
+ * const buffer = await readFile('resume.pdf');
+ * const { cv, rawText } = await parseCV(buffer, 'resume.pdf', 'file-123');
+ * console.log(cv.name, cv.email, cv.skills);
+ * 
+ * @throws {Error} PDF text extraction fails with insufficient content (<50 chars)
+ */
+export async function parseCV(buffer: Buffer, fileName: string, fileId: string): Promise<{ cv: ParsedCV; rawText: string }> {
+  const totalStart = Date.now();
+  const timings: Record<string, number> = {};
+  let text = "";
+  
+  const extension = fileName.toLowerCase().split(".").pop();
+  
+  try {
+    const extractStart = Date.now();
+    if (extension === "pdf") {
+      console.log(`[TIMING] Parsing PDF: ${fileName}, size: ${buffer.length}`);
+      const data = await parsePdfBuffer(buffer);
+      text = normalizeText(data.text);
+      timings.pdfExtraction = Date.now() - extractStart;
+      console.log(`[TIMING] PDF extraction: ${timings.pdfExtraction}ms, ${text.length} chars, ${data.numpages} pages`);
+      
+      if (text.length < 50) {
+        throw new Error(`PDF text extraction returned insufficient content (${text.length} chars)`);
+      }
+    } else if (extension === "docx" || extension === "doc") {
+      console.log(`[TIMING] Parsing Word: ${fileName}, size: ${buffer.length}`);
+      text = normalizeText(await parseDocxBuffer(buffer));
+      timings.docxExtraction = Date.now() - extractStart;
+      console.log(`[TIMING] Word extraction: ${timings.docxExtraction}ms, ${text.length} chars`);
+    } else {
+      console.log(`[TIMING] Parsing text: ${fileName}`);
+      text = normalizeText(buffer.toString("utf-8"));
+      timings.textExtraction = Date.now() - extractStart;
+      console.log(`[TIMING] Text extraction: ${timings.textExtraction}ms`);
+    }
+  } catch (error) {
+    console.error(`Parse error for ${fileName}:`, error);
+    
+    if (extension === "pdf") {
+      throw new Error(`Failed to extract text from PDF: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
+    
+    text = normalizeText(buffer.toString("utf-8"));
+  }
+  
+  const validationStart = Date.now();
+  const validationResult = validateCVDocument(text);
+  timings.validation = Date.now() - validationStart;
+  console.log(`[TIMING] CV validation: ${timings.validation}ms`);
+  
+  if (!validationResult.isCV) {
+    throw new Error(validationResult.reason);
+  }
+  
+  const aiStart = Date.now();
+  console.log(`[TIMING] Starting AI extraction...`);
+  const geminiResult = await extractWithGemini(text);
+  timings.aiExtraction = Date.now() - aiStart;
+  console.log(`[TIMING] AI extraction: ${timings.aiExtraction}ms`);
+  
+  let rawCv: ParsedCV;
+  let tokenUsage: TokenUsage | undefined;
+  
+  if (geminiResult) {
+    const geminiData = geminiResult.data;
+    tokenUsage = geminiResult.tokenUsage;
+    
+    // Use Gemini-extracted data
+    rawCv = {
+      id: fileId,
+      name: normalizeWhitespace(geminiData.name || ""),
+      title: normalizeWhitespace(geminiData.title || ""),
+      email: normalizeEmail(geminiData.email || ""),
+      phone: normalizePhone(geminiData.phone || ""),
+      location: normalizeWhitespace(geminiData.location || ""),
+      website: normalizeUrl(geminiData.website || ""),
+      linkedin: geminiData.linkedin ? 
+        (geminiData.linkedin.includes("linkedin.com") ? geminiData.linkedin : `linkedin.com/in/${geminiData.linkedin}`) : "",
+      github: geminiData.github ?
+        (geminiData.github.includes("github.com") ? geminiData.github : `github.com/${geminiData.github}`) : "",
+      summary: normalizeWhitespace(geminiData.summary || ""),
+      experience: (geminiData.experience || []).map((exp, i) => ({
+        id: generateStableId("exp", i, fileId),
+        company: normalizeWhitespace(exp.company || ""),
+        role: normalizeWhitespace(exp.role || ""),
+        duration: normalizeDateRange(exp.duration || ""),
+        description: normalizeWhitespace(exp.description || ""),
+      })),
+      education: (geminiData.education || []).map((edu, i) => ({
+        id: generateStableId("edu", i, fileId),
+        institution: normalizeWhitespace(edu.institution || ""),
+        degree: normalizeWhitespace(edu.degree || ""),
+        year: edu.year || "",
+      })),
+      certifications: (geminiData.certifications || []).map((cert, i) => ({
+        id: generateStableId("cert", i, fileId),
+        name: normalizeWhitespace(cert.name || ""),
+        issuer: normalizeWhitespace(cert.issuer || ""),
+        year: cert.year || "",
+      })),
+      skills: normalizeSkills(geminiData.skills || []),
+      strengths: (geminiData.strengths || []).map(s => normalizeWhitespace(s)),
+      originalFilename: fileName,
+      uploadedAt: new Date(),
+      rawText: text,
+      tokenUsage: tokenUsage,
+    };
+  } else {
+    // Fallback to basic regex extraction
+    console.log("Using fallback regex extraction");
+    rawCv = {
+      id: fileId,
+      name: extractNameFallback(text),
+      title: "",
+      email: extractEmailFallback(text),
+      phone: extractPhoneFallback(text),
+      location: "",
+      website: "",
+      linkedin: extractLinkedInFallback(text),
+      github: extractGithubFallback(text),
+      summary: "",
+      experience: [],
+      education: [],
+      certifications: [],
+      skills: [],
+      strengths: [],
+      originalFilename: fileName,
+      uploadedAt: new Date(),
+      rawText: text,
+    };
+  }
+  
+  const normalizeStart = Date.now();
+  const cv = validateAndNormalizeCV(rawCv);
+  timings.normalization = Date.now() - normalizeStart;
+  
+  timings.total = Date.now() - totalStart;
+  console.log(`[TIMING] CV Parse Complete - Total: ${timings.total}ms | Breakdown: extraction=${timings.pdfExtraction || timings.docxExtraction || timings.textExtraction || 0}ms, validation=${timings.validation}ms, AI=${timings.aiExtraction}ms, normalize=${timings.normalization}ms`);
+  
+  return { cv, rawText: text };
+}
