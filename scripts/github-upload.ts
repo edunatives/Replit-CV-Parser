@@ -37,14 +37,19 @@ function getAllFiles(dir: string, baseDir: string = dir): string[] {
   const ignorePatterns = [
     'node_modules', '.git', '.next', '.cache', 'dist', 'build',
     '.local', '.replit', 'replit.nix', '.upm', '.config',
-    'attached_assets', 'scripts/github-upload.ts', 'scripts/github-push.ts'
+    'attached_assets', 'scripts/github-upload.ts', 'scripts/github-push.ts',
+    '.env'
   ];
+  
+  // Include specific hidden files
+  const includeHidden = ['.env.example', '.gitignore'];
   
   for (const item of fs.readdirSync(dir)) {
     const fullPath = path.join(dir, item);
     const relativePath = path.relative(baseDir, fullPath);
     
-    if (ignorePatterns.some(p => relativePath.startsWith(p) || item.startsWith('.'))) continue;
+    const isIncludedHidden = includeHidden.includes(item);
+    if (!isIncludedHidden && ignorePatterns.some(p => relativePath.startsWith(p) || item.startsWith('.'))) continue;
     
     const stat = fs.statSync(fullPath);
     if (stat.isDirectory()) {
