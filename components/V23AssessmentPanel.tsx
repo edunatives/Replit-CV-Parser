@@ -14,6 +14,11 @@ import WorkIcon from "@mui/icons-material/Work";
 import SchoolIcon from "@mui/icons-material/School";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
+import TimelineIcon from "@mui/icons-material/Timeline";
+import BuildIcon from "@mui/icons-material/Build";
+import StarIcon from "@mui/icons-material/Star";
+import DescriptionIcon from "@mui/icons-material/Description";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import type { AnalysisResponse, LiteOutput, StandardOutput, FullOutput, Issue, Strength, Improvement } from "@/lib/langchain/v23-cv-intelligence-schemas";
 
 interface V23AssessmentPanelProps {
@@ -554,6 +559,217 @@ function OverviewTab({ data }: { data: LiteOutput | StandardOutput | FullOutput 
                 </Card>
               ))}
             </Box>
+          </Grid>
+        )}
+
+        {/* Professional Summary Analysis */}
+        {cvAnalysis?.professionalSummary && (
+          <Grid size={12}>
+            <Typography variant="subtitle2" sx={{ mb: 1.5, display: "flex", alignItems: "center", gap: 1 }}>
+              <DescriptionIcon sx={{ fontSize: 18 }} /> Professional Summary Analysis
+            </Typography>
+            <Card elevation={0} sx={{ bgcolor: "#f8fafc" }}>
+              <CardContent>
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1.5 }}>
+                  <Typography variant="body2" color="text.secondary">Quality Score</Typography>
+                  <Chip 
+                    label={`${cvAnalysis.professionalSummary.qualityScore ?? 0}/100`} 
+                    size="small" 
+                    sx={{ bgcolor: getScoreColor(cvAnalysis.professionalSummary.qualityScore ?? 0), color: "white", fontWeight: 600 }} 
+                  />
+                </Box>
+                {cvAnalysis.professionalSummary.keyThemes && cvAnalysis.professionalSummary.keyThemes.length > 0 && (
+                  <Box sx={{ mb: 1.5 }}>
+                    <Typography variant="caption" color="text.secondary">Key Themes</Typography>
+                    <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap", mt: 0.5 }}>
+                      {cvAnalysis.professionalSummary.keyThemes.map((theme, i) => (
+                        <Chip key={i} label={theme} size="small" variant="outlined" sx={{ fontSize: "0.7rem" }} />
+                      ))}
+                    </Box>
+                  </Box>
+                )}
+                {cvAnalysis.professionalSummary.yearsMentioned && (
+                  <Typography variant="caption" color="text.secondary">
+                    Years mentioned: {cvAnalysis.professionalSummary.yearsMentioned}
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
+
+        {/* Experience Factors (H1-H9) */}
+        {cvAnalysis?.experienceFactors && (
+          <Grid size={12}>
+            <Typography variant="subtitle2" sx={{ mb: 1.5, display: "flex", alignItems: "center", gap: 1 }}>
+              <TimelineIcon sx={{ fontSize: 18 }} /> Experience Factors
+            </Typography>
+            <Grid container spacing={1}>
+              {cvAnalysis.experienceFactors.h1TotalYears && (
+                <Grid size={{ xs: 6, md: 3 }}>
+                  <Paper sx={{ p: 1.5, textAlign: "center" }} elevation={0}>
+                    <Typography variant="h5" fontWeight={600} sx={{ color: getScoreColor(cvAnalysis.experienceFactors.h1TotalYears.score ?? 0) }}>
+                      {cvAnalysis.experienceFactors.h1TotalYears.years ?? 0}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">Total Years</Typography>
+                    <LinearProgress 
+                      variant="determinate" 
+                      value={cvAnalysis.experienceFactors.h1TotalYears.score ?? 0} 
+                      sx={{ mt: 0.5, height: 4, borderRadius: 2, bgcolor: "#e2e8f0" }}
+                    />
+                  </Paper>
+                </Grid>
+              )}
+              {cvAnalysis.experienceFactors.h4Recency && (
+                <Grid size={{ xs: 6, md: 3 }}>
+                  <Paper sx={{ p: 1.5, textAlign: "center" }} elevation={0}>
+                    <Typography variant="body1" fontWeight={600} sx={{ color: getScoreColor(cvAnalysis.experienceFactors.h4Recency.score ?? 0) }}>
+                      {cvAnalysis.experienceFactors.h4Recency.recentRelevance ?? "N/A"}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">Recency</Typography>
+                    <LinearProgress 
+                      variant="determinate" 
+                      value={cvAnalysis.experienceFactors.h4Recency.score ?? 0} 
+                      sx={{ mt: 0.5, height: 4, borderRadius: 2, bgcolor: "#e2e8f0" }}
+                    />
+                  </Paper>
+                </Grid>
+              )}
+              {cvAnalysis.experienceFactors.h5Scope && (
+                <Grid size={{ xs: 6, md: 3 }}>
+                  <Paper sx={{ p: 1.5, textAlign: "center" }} elevation={0}>
+                    <Typography variant="body1" fontWeight={600} sx={{ color: getScoreColor(cvAnalysis.experienceFactors.h5Scope.score ?? 0) }}>
+                      {cvAnalysis.experienceFactors.h5Scope.level || "N/A"}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">Scope Level</Typography>
+                    <LinearProgress 
+                      variant="determinate" 
+                      value={cvAnalysis.experienceFactors.h5Scope.score ?? 0} 
+                      sx={{ mt: 0.5, height: 4, borderRadius: 2, bgcolor: "#e2e8f0" }}
+                    />
+                  </Paper>
+                </Grid>
+              )}
+              {cvAnalysis.experienceFactors.h2DomainYears && cvAnalysis.experienceFactors.h2DomainYears.length > 0 && (
+                <Grid size={{ xs: 6, md: 3 }}>
+                  <Paper sx={{ p: 1.5, textAlign: "center" }} elevation={0}>
+                    <Typography variant="body1" fontWeight={600} sx={{ color: getScoreColor(cvAnalysis.experienceFactors.h2DomainYears[0].score ?? 0) }}>
+                      {cvAnalysis.experienceFactors.h2DomainYears[0].years ?? 0}y
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {cvAnalysis.experienceFactors.h2DomainYears[0].domain ?? "Primary Domain"}
+                    </Typography>
+                    <LinearProgress 
+                      variant="determinate" 
+                      value={cvAnalysis.experienceFactors.h2DomainYears[0].score ?? 0} 
+                      sx={{ mt: 0.5, height: 4, borderRadius: 2, bgcolor: "#e2e8f0" }}
+                    />
+                  </Paper>
+                </Grid>
+              )}
+            </Grid>
+          </Grid>
+        )}
+
+        {/* Gap Strategy */}
+        {studentAnalysis?.gapStrategy && (studentAnalysis.gapStrategy.fixable?.length > 0 || studentAnalysis.gapStrategy.unfixable?.length > 0) && (
+          <Grid size={12}>
+            <Typography variant="subtitle2" sx={{ mb: 1.5, display: "flex", alignItems: "center", gap: 1 }}>
+              <BuildIcon sx={{ fontSize: 18 }} /> Gap Strategy
+            </Typography>
+            <Grid container spacing={2}>
+              {studentAnalysis.gapStrategy.fixable && studentAnalysis.gapStrategy.fixable.length > 0 && (
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <Card elevation={0} sx={{ bgcolor: "#dcfce7", height: "100%" }}>
+                    <CardContent>
+                      <Typography variant="caption" fontWeight={600} color="success.main">Fixable Gaps</Typography>
+                      <Box sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 1 }}>
+                        {studentAnalysis.gapStrategy.fixable.map((g, i) => (
+                          <Box key={i}>
+                            <Typography variant="body2" fontWeight={500}>{g.gap}</Typography>
+                            <Typography variant="caption" color="text.secondary">{g.solution}</Typography>
+                            {g.timeline && <Chip label={g.timeline} size="small" sx={{ mt: 0.5, fontSize: "0.65rem", height: 18 }} />}
+                          </Box>
+                        ))}
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              )}
+              {studentAnalysis.gapStrategy.unfixable && studentAnalysis.gapStrategy.unfixable.length > 0 && (
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <Card elevation={0} sx={{ bgcolor: "#fef9c3", height: "100%" }}>
+                    <CardContent>
+                      <Typography variant="caption" fontWeight={600} sx={{ color: "#ca8a04" }}>Unfixable Gaps (Mitigate)</Typography>
+                      <Box sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 1 }}>
+                        {studentAnalysis.gapStrategy.unfixable.map((g, i) => (
+                          <Box key={i}>
+                            <Typography variant="body2" fontWeight={500}>{g.gap}</Typography>
+                            <Typography variant="caption" color="text.secondary">{g.mitigation}</Typography>
+                          </Box>
+                        ))}
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              )}
+            </Grid>
+          </Grid>
+        )}
+
+        {/* Stepping Stones */}
+        {studentAnalysis?.alternatives?.steppingStones && studentAnalysis.alternatives.steppingStones.length > 0 && (
+          <Grid size={12}>
+            <Typography variant="subtitle2" sx={{ mb: 1.5, display: "flex", alignItems: "center", gap: 1 }}>
+              <TrendingUpIcon sx={{ fontSize: 18 }} /> Stepping Stone Roles
+            </Typography>
+            <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+              {studentAnalysis.alternatives.steppingStones.map((stone, i) => (
+                <Card key={i} elevation={0} sx={{ flex: "1 1 200px", bgcolor: "#e0e7ff" }}>
+                  <CardContent sx={{ py: 1.5 }}>
+                    <Typography variant="body2" fontWeight={600}>{stone.role}</Typography>
+                    <Typography variant="caption" color="text.secondary">Gap: {stone.gap}</Typography>
+                    {stone.timeline && (
+                      <Chip label={stone.timeline} size="small" sx={{ mt: 0.5, fontSize: "0.65rem", height: 18 }} />
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
+          </Grid>
+        )}
+
+        {/* Encouragement with Competitive Advantages */}
+        {studentAnalysis?.encouragement && (
+          <Grid size={12}>
+            <Card elevation={0} sx={{ bgcolor: "#f0fdf4", border: "1px solid #a7f3d0" }}>
+              <CardContent>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+                  <EmojiEventsIcon sx={{ color: "#22c55e" }} />
+                  <Typography variant="subtitle2" color="success.main">Your Competitive Edge</Typography>
+                </Box>
+                <Typography variant="body2" sx={{ mb: 1.5 }}>
+                  {typeof studentAnalysis.encouragement === "string" 
+                    ? studentAnalysis.encouragement 
+                    : studentAnalysis.encouragement.message}
+                </Typography>
+                {typeof studentAnalysis.encouragement === "object" && 
+                 studentAnalysis.encouragement.competitiveAdvantages && 
+                 studentAnalysis.encouragement.competitiveAdvantages.length > 0 && (
+                  <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap" }}>
+                    {studentAnalysis.encouragement.competitiveAdvantages.map((adv, i) => (
+                      <Chip 
+                        key={i} 
+                        label={adv} 
+                        size="small" 
+                        icon={<StarIcon sx={{ fontSize: 14 }} />}
+                        sx={{ bgcolor: "#dcfce7", fontSize: "0.7rem" }} 
+                      />
+                    ))}
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
           </Grid>
         )}
 

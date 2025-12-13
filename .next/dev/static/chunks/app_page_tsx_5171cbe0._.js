@@ -1,7 +1,7 @@
 (globalThis.TURBOPACK_CHUNK_LISTS || (globalThis.TURBOPACK_CHUNK_LISTS = [])).push({
     script: typeof document === "object" ? document.currentScript : undefined,
     chunks: [
-  "static/chunks/node_modules_f61ef662._.js",
+  "static/chunks/node_modules_60de84a1._.js",
   "static/chunks/components_CVPreview_tsx_0d254050._.js",
   "static/chunks/components_V23AssessmentPanel_tsx_67bc5736._.js",
   "static/chunks/components_JDMatchPanel_tsx_eabb2e21._.js",
@@ -13,7 +13,7 @@
   "static/chunks/6b4ca_pako_dist_pako_esm_mjs_effcac73._.js",
   "static/chunks/node_modules_jspdf_dist_jspdf_es_min_0d42d46a.js",
   "static/chunks/node_modules_docx_dist_index_mjs_dc9c6205._.js",
-  "static/chunks/node_modules_4c85b22c._.js",
+  "static/chunks/node_modules_27bb28f5._.js",
   "static/chunks/node_modules_react-circular-progressbar_dist_styles_16350359.css"
 ],
     source: "dynamic"
