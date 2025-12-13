@@ -21,6 +21,9 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import type { AnalysisResponse, LiteOutput, StandardOutput, FullOutput, Issue, Strength, Improvement } from "@/lib/langchain/v23-cv-intelligence-schemas";
+import type { V24Output } from "@/lib/langchain/v24-cv-intelligence-schemas";
+import EditIcon from "@mui/icons-material/Edit";
+import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 
 interface V23AssessmentPanelProps {
   analysis: AnalysisResponse | null;
@@ -37,7 +40,7 @@ const ANALYSIS_STEPS = [
   { label: "Finalizing report", description: "Compiling results..." },
 ];
 
-type TabValue = "overview" | "strengths" | "issues" | "actions" | "bullets";
+type TabValue = "overview" | "strengths" | "issues" | "actions" | "bullets" | "rewrites";
 
 const getScoreColor = (score: number): string => {
   if (score >= 90) return "#22c55e";
@@ -92,6 +95,15 @@ function isStandardOutput(data: LiteOutput | StandardOutput | FullOutput): data 
 
 function isFullOutput(data: LiteOutput | StandardOutput | FullOutput): data is FullOutput {
   return data.mode === "FULL";
+}
+
+function isV24Output(data: unknown): data is V24Output {
+  return (
+    typeof data === "object" &&
+    data !== null &&
+    "version" in data &&
+    (data as { version: string }).version === "2.4"
+  );
 }
 
 export function V23AssessmentPanel({ 
@@ -234,6 +246,9 @@ export function V23AssessmentPanel({
         {(isStandardOutput(data) || isFullOutput(data)) && (
           <Tab label="Bullets" value="bullets" icon={<AutoAwesomeIcon sx={{ fontSize: 16 }} />} iconPosition="start" sx={{ minHeight: 48, textTransform: "none" }} />
         )}
+        {isV24Output(data) && (
+          <Tab label="Rewrites" value="rewrites" icon={<EditIcon sx={{ fontSize: 16 }} />} iconPosition="start" sx={{ minHeight: 48, textTransform: "none" }} data-testid="tab-rewrites" />
+        )}
       </Tabs>
 
       <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
@@ -242,6 +257,7 @@ export function V23AssessmentPanel({
         {activeTab === "issues" && <IssuesTab data={data} />}
         {activeTab === "actions" && <ActionsTab data={data} />}
         {activeTab === "bullets" && (isStandardOutput(data) || isFullOutput(data)) && <BulletsTab data={data} />}
+        {activeTab === "rewrites" && isV24Output(data) && <V24RewritesTab data={data} />}
       </Box>
     </Box>
   );
@@ -1359,6 +1375,220 @@ function BulletsTab({ data }: { data: StandardOutput | FullOutput }) {
               </Card>
             ))}
           </Box>
+        </Box>
+      )}
+    </Box>
+  );
+}
+
+function V24RewritesTab({ data }: { data: V24Output }) {
+  const fullRewrite = data.fullRewrite;
+  const summaryRewrite = data.cvAnalysis?.sections?.summary?.rewrite;
+  const skillsRewrite = data.cvAnalysis?.sections?.skills?.rewrite;
+  const experienceRoles = data.cvAnalysis?.sections?.experience?.roles || [];
+  
+  const bulletsWithRewrites = experienceRoles.flatMap((role) =>
+    (role.bullets || [])
+      .filter((b) => b.rewrite?.needed)
+      .map((b) => ({
+        roleTitle: role.title,
+        company: role.company,
+        original: b.text,
+        suggested: b.rewrite?.suggested || "",
+        score: b.score,
+        projectedScore: b.rewrite?.projectedScore || 0,
+        changes: b.rewrite?.changes || [],
+      }))
+  );
+
+  return (
+    <Box data-testid="v24-rewrites-tab">
+      {fullRewrite?.available && (
+        <Card sx={{ mb: 3, bgcolor: "#ecfdf5", border: "1px solid #a7f3d0" }} elevation={0}>
+          <CardContent>
+            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+              <Typography variant="subtitle1" fontWeight={600} color="success.main" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <TrendingUpIcon sx={{ fontSize: 20 }} /> Full CV Rewrite Available
+              </Typography>
+              <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+                <Chip label={`Current: ${fullRewrite.currentScore}`} size="small" sx={{ bgcolor: getScoreColor(fullRewrite.currentScore), color: "white" }} />
+                <CompareArrowsIcon sx={{ color: "success.main" }} />
+                <Chip label={`Projected: ${fullRewrite.projectedScore}`} size="small" sx={{ bgcolor: getScoreColor(fullRewrite.projectedScore), color: "white" }} />
+              </Box>
+            </Box>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              Effort: {fullRewrite.effortEstimate}
+            </Typography>
+            {fullRewrite.completeRewrittenCV && (
+              <Paper sx={{ p: 2, mt: 2, bgcolor: "white", maxHeight: 300, overflow: "auto" }} elevation={0}>
+                <Typography variant="caption" fontWeight={600} color="text.secondary" sx={{ mb: 1, display: "block" }}>
+                  Complete Rewritten CV:
+                </Typography>
+                <Typography variant="body2" sx={{ whiteSpace: "pre-wrap", fontFamily: "monospace", fontSize: "0.8rem" }}>
+                  {fullRewrite.completeRewrittenCV}
+                </Typography>
+              </Paper>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {summaryRewrite?.needed && (
+        <Card sx={{ mb: 3 }} elevation={0}>
+          <CardContent>
+            <Typography variant="subtitle2" sx={{ mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
+              <DescriptionIcon sx={{ fontSize: 18 }} /> Summary Rewrite
+            </Typography>
+            <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 2 }}>
+              <Typography variant="caption" color="text.secondary">Projected Score:</Typography>
+              <Chip label={summaryRewrite.projectedScore} size="small" sx={{ bgcolor: getScoreColor(summaryRewrite.projectedScore), color: "white" }} />
+            </Box>
+            {summaryRewrite.original && (
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="caption" fontWeight={600} color="text.secondary">Original:</Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontStyle: "italic" }}>
+                  "{summaryRewrite.original}"
+                </Typography>
+              </Box>
+            )}
+            {summaryRewrite.suggested && (
+              <Box sx={{ bgcolor: "#ecfdf5", p: 2, borderRadius: 1, border: "1px solid #a7f3d0" }}>
+                <Typography variant="caption" fontWeight={600} color="success.main">Suggested:</Typography>
+                <Typography variant="body2" sx={{ mt: 0.5 }}>
+                  "{summaryRewrite.suggested}"
+                </Typography>
+              </Box>
+            )}
+            {summaryRewrite.changes && summaryRewrite.changes.length > 0 && (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="caption" fontWeight={600} color="text.secondary">Changes:</Typography>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, mt: 0.5 }}>
+                  {summaryRewrite.changes.map((change, i) => (
+                    <Typography key={i} variant="caption" color="text.secondary">
+                      - {change}
+                    </Typography>
+                  ))}
+                </Box>
+              </Box>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {bulletsWithRewrites.length > 0 && (
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="subtitle2" sx={{ mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
+            <AutoAwesomeIcon sx={{ fontSize: 18 }} /> Bullet Rewrites ({bulletsWithRewrites.length})
+          </Typography>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {bulletsWithRewrites.map((bullet, idx) => (
+              <Card key={idx} elevation={0} sx={{ bgcolor: "#f8fafc", border: "1px solid #e2e8f0" }} data-testid={`rewrite-bullet-${idx}`}>
+                <CardContent sx={{ py: 1.5 }}>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1.5 }}>
+                    <Typography variant="caption" color="text.secondary">{bullet.roleTitle} at {bullet.company}</Typography>
+                    <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                      <Chip label={bullet.score} size="small" sx={{ bgcolor: getScoreColor(bullet.score), color: "white" }} />
+                      <CompareArrowsIcon sx={{ fontSize: 16, color: "success.main" }} />
+                      <Chip label={bullet.projectedScore} size="small" sx={{ bgcolor: getScoreColor(bullet.projectedScore), color: "white" }} />
+                    </Box>
+                  </Box>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1, textDecoration: "line-through" }}>
+                    "{bullet.original}"
+                  </Typography>
+                  <Box sx={{ bgcolor: "#ecfdf5", p: 1.5, borderRadius: 1, border: "1px solid #a7f3d0" }}>
+                    <Typography variant="body2" fontWeight={500}>
+                      "{bullet.suggested}"
+                    </Typography>
+                  </Box>
+                  {bullet.changes.length > 0 && (
+                    <Box sx={{ mt: 1 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Changes: {bullet.changes.join(", ")}
+                      </Typography>
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
+        </Box>
+      )}
+
+      {skillsRewrite?.needed && (
+        <Card elevation={0}>
+          <CardContent>
+            <Typography variant="subtitle2" sx={{ mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
+              <BuildIcon sx={{ fontSize: 18 }} /> Skills Section Rewrite
+            </Typography>
+            <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 2 }}>
+              <Typography variant="caption" color="text.secondary">Projected Score:</Typography>
+              <Chip label={skillsRewrite.projectedScore} size="small" sx={{ bgcolor: getScoreColor(skillsRewrite.projectedScore), color: "white" }} />
+            </Box>
+            {skillsRewrite.removed && skillsRewrite.removed.length > 0 && (
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="caption" fontWeight={600} color="error.main">Removed (Ghost Skills):</Typography>
+                <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap", mt: 0.5 }}>
+                  {skillsRewrite.removed.map((skill, i) => (
+                    <Chip key={i} label={skill} size="small" sx={{ bgcolor: "#fecaca", color: "#dc2626", textDecoration: "line-through" }} />
+                  ))}
+                </Box>
+              </Box>
+            )}
+            {skillsRewrite.suggested && (
+              <Box>
+                <Typography variant="caption" fontWeight={600} color="success.main">Reorganized Skills:</Typography>
+                <Grid container spacing={2} sx={{ mt: 0.5 }}>
+                  {skillsRewrite.suggested.technical && skillsRewrite.suggested.technical.length > 0 && (
+                    <Grid size={{ xs: 12, md: 6 }}>
+                      <Typography variant="caption" color="text.secondary">Technical:</Typography>
+                      <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap", mt: 0.5 }}>
+                        {skillsRewrite.suggested.technical.map((skill, i) => (
+                          <Chip key={i} label={skill} size="small" />
+                        ))}
+                      </Box>
+                    </Grid>
+                  )}
+                  {skillsRewrite.suggested.tools && skillsRewrite.suggested.tools.length > 0 && (
+                    <Grid size={{ xs: 12, md: 6 }}>
+                      <Typography variant="caption" color="text.secondary">Tools:</Typography>
+                      <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap", mt: 0.5 }}>
+                        {skillsRewrite.suggested.tools.map((skill, i) => (
+                          <Chip key={i} label={skill} size="small" />
+                        ))}
+                      </Box>
+                    </Grid>
+                  )}
+                  {skillsRewrite.suggested.frameworks && skillsRewrite.suggested.frameworks.length > 0 && (
+                    <Grid size={{ xs: 12, md: 6 }}>
+                      <Typography variant="caption" color="text.secondary">Frameworks:</Typography>
+                      <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap", mt: 0.5 }}>
+                        {skillsRewrite.suggested.frameworks.map((skill, i) => (
+                          <Chip key={i} label={skill} size="small" />
+                        ))}
+                      </Box>
+                    </Grid>
+                  )}
+                  {skillsRewrite.suggested.methodologies && skillsRewrite.suggested.methodologies.length > 0 && (
+                    <Grid size={{ xs: 12, md: 6 }}>
+                      <Typography variant="caption" color="text.secondary">Methodologies:</Typography>
+                      <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap", mt: 0.5 }}>
+                        {skillsRewrite.suggested.methodologies.map((skill, i) => (
+                          <Chip key={i} label={skill} size="small" />
+                        ))}
+                      </Box>
+                    </Grid>
+                  )}
+                </Grid>
+              </Box>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {!fullRewrite?.available && !summaryRewrite?.needed && bulletsWithRewrites.length === 0 && !skillsRewrite?.needed && (
+        <Box sx={{ textAlign: "center", py: 4 }}>
+          <CheckCircleIcon sx={{ fontSize: 48, color: "success.main", mb: 2 }} />
+          <Typography color="text.secondary">No rewrites needed - your CV looks great!</Typography>
         </Box>
       )}
     </Box>

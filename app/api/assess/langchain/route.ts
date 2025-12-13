@@ -1,15 +1,16 @@
 /**
- * @fileoverview CV Assessment API v2.3
- * @description Direct v2.3 implementation with multi-provider support
+ * @fileoverview CV Assessment API v2.3/v2.4
+ * @description Multi-version implementation with v2.4 rewrite support
  * 
  * @endpoint POST /api/assess/langchain
- * @accepts application/json with { cv: ParsedCV, outputMode?: "LITE"|"STANDARD"|"FULL", audience?: "STUDENT"|"HR", provider?: "gemini"|"openai", model?: string }
- * @returns {Object} v2.3 AnalysisResponse
+ * @accepts application/json with { cv: ParsedCV, version?: "2.3"|"2.4", outputMode?: "LITE"|"STANDARD"|"FULL", audience?: "STUDENT"|"HR", provider?: "gemini"|"openai", model?: string, includeFullRewrite?: boolean }
+ * @returns {Object} AnalysisResponse (v2.3 or v2.4 format based on version)
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import type { ParsedCV } from "@/types/cv";
 import { analyzeCV, getAvailableProviders, type OutputMode, type AudienceType, type ProviderType } from "@/lib/langchain/v23-cv-intelligence-chain";
+import { runV24Analysis } from "@/lib/langchain/v24-cv-intelligence-chain";
 
 function formatCVText(cv: ParsedCV): string {
   const sections: string[] = [];
@@ -64,12 +65,24 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json() as { 
       cv: ParsedCV; 
+      version?: "2.3" | "2.4";
       outputMode?: OutputMode;
       audience?: AudienceType;
       provider?: ProviderType;
       model?: string;
+      jd?: string;
+      includeFullRewrite?: boolean;
     };
-    const { cv, outputMode = "STANDARD", audience = "STUDENT", provider, model } = body;
+    const { 
+      cv, 
+      version = "2.3", 
+      outputMode = "STANDARD", 
+      audience = "STUDENT", 
+      provider, 
+      model,
+      jd,
+      includeFullRewrite = true 
+    } = body;
 
     if (!cv) {
       return NextResponse.json({ error: "CV data is required" }, { status: 400 });
@@ -93,6 +106,40 @@ export async function POST(request: NextRequest) {
     const cvText = cv.rawText || formatCVText(cv);
     const filename = cv.originalFilename || "cv.pdf";
     
+    if (version === "2.4") {
+      console.log(`[v2.4] Assessment starting for: ${filename}, audience: ${audience}, provider: ${selectedProvider}${model ? `, model: ${model}` : ""}, fullRewrite: ${includeFullRewrite}`);
+      
+      const result = await runV24Analysis(
+        {
+          cvText,
+          jdText: jd,
+          audience,
+          includeFullRewrite,
+        },
+        {
+          provider: selectedProvider,
+          model,
+        }
+      );
+      
+      const score = result.data && typeof result.data === 'object' && 'scores' in result.data 
+        ? (result.data as { scores?: { overall?: number } }).scores?.overall ?? "N/A" 
+        : "N/A";
+      console.log(`[v2.4] Assessment complete, score: ${score}, provider: ${result.provider || selectedProvider}`);
+
+      return NextResponse.json({
+        success: result.success,
+        data: result.data,
+        error: result.error,
+        meta: {
+          version: "2.4",
+          audience,
+          provider: result.provider || selectedProvider,
+          model: result.model,
+        }
+      });
+    }
+    
     console.log(`[v2.3] Assessment starting for: ${filename}, mode: ${outputMode}, audience: ${audience}, provider: ${selectedProvider}${model ? `, model: ${model}` : ""}`);
     
     const result = await analyzeCV(cvText, {
@@ -107,7 +154,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("[v2.3] CV Assessment error:", error);
+    console.error("[Assessment] CV Assessment error:", error);
     return NextResponse.json(
       { 
         success: false,
