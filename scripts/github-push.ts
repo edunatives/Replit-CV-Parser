@@ -53,8 +53,11 @@ async function main() {
   const repoName = 'Replit-CV-Parser';
   let repoUrl = '';
   
+  const orgName = 'edunatives';
+  
   try {
-    const { data: repo } = await octokit.repos.createForAuthenticatedUser({
+    const { data: repo } = await octokit.repos.createInOrg({
+      org: orgName,
       name: repoName,
       description: 'CV Intelligence Parser - AI-powered CV/Resume parsing, assessment, and job matching',
       private: false,
@@ -66,7 +69,7 @@ async function main() {
     if (error.status === 422) {
       console.log('Repository already exists, using existing...');
       const { data: repo } = await octokit.repos.get({
-        owner: user.login,
+        owner: orgName,
         repo: repoName
       });
       console.log(`Repository exists: ${repo.html_url}`);
