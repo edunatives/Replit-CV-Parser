@@ -29,7 +29,7 @@ const DEFAULT_CONFIG: Required<ChainConfig> = {
   provider: "openai",
   model: "gpt-4o",
   temperature: 0.2,
-  maxOutputTokens: 16000,
+  maxOutputTokens: 8192,
   maxRetries: 3,
   retryDelayMs: 1000,
 };
