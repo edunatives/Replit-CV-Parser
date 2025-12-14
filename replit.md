@@ -10,25 +10,21 @@ Preferred communication style: Simple, everyday language.
 
 ### Frontend Architecture
 - **Framework**: Next.js 15 with React and TypeScript, utilizing Server-Side Rendering (SSR) via the App Router.
+- **Role**: Pure frontend - no API routes. All backend calls go directly to NestJS.
 - **UI/UX**: Material UI (MUI) with custom theming (Cormorant Garamond for headings, Source Sans 3 for body), featuring a light theme with indigo and cyan accents, soft shadows, and rounded corners.
 - **Design System**: Includes a modular registry for eight CV template styles (e.g., modern-dark, classic-light, executive) and EduNatives branding.
-- **Key Design Decisions**: App Router with client components, MUI Grid v2 for responsiveness, and AppRouterCacheProvider for MUI hydration.
+- **API Configuration**: Uses `NEXT_PUBLIC_API_URL` environment variable to point to NestJS backend (default: `http://localhost:3001/api`).
 - **UX Flow**: A two-pane workspace with a left-sidebar navigation, a dashboard for CV management, and a right-pane for AI Analysis featuring three assessment tracks: CV Assessment, AI Advisor, and JD Match.
 
 ### Backend Architecture
-- **Framework**: Dual-server architecture with Next.js frontend (port 5000) and NestJS backend (port 3001).
+- **Framework**: NestJS backend (port 3001) handles all API logic. Next.js (port 5000) is purely frontend.
 - **NestJS Backend** (`nest/` folder):
-    - `nest/start.ts`: Bootstrap entry point on port 3001 with `/api` prefix
+    - `nest/start.ts`: Bootstrap entry point on port 3001 with `/api` prefix, CORS enabled
     - `nest/app.module.ts`: Root module importing AssessmentModule, CvModule, DatabaseModule
-    - `nest/assessment/`: CV assessment and JD matching with LangChain integration
+    - `nest/assessment/`: CV assessment, JD matching, prompt comparison, and AI advisor
     - `nest/cv/`: CV parsing with file upload support
     - `nest/database/`: MongoDB connection service
-- **Proxy Architecture**: Next.js API routes proxy to NestJS backend:
-    - `/api/providers` → NestJS `/api/assess/providers`
-    - `/api/assess/langchain` → NestJS `/api/assess/langchain`
-    - `/api/jd-match/langchain` → NestJS `/api/assess/jd-match`
-- **CV Parsing**: Implemented using `mammoth` (DOCX), `pdf-parse` (PDF), and LangChain-style Zod-validated AI extraction via Gemini 2.5 Flash. Regex-based fallbacks are in place for key fields.
-- **API Endpoints** (NestJS):
+- **API Endpoints** (NestJS - all prefixed with `/api`):
     - `POST /api/cv/parse`: Single CV parsing with file upload
     - `POST /api/cv/parse/batch`: Batch CV parsing
     - `GET /api/cv/list`: List parsed CVs
@@ -36,16 +32,24 @@ Preferred communication style: Simple, everyday language.
     - `GET /api/assess/providers`: Available LLM providers
     - `POST /api/assess/langchain`: CV assessment with structured output
     - `POST /api/assess/jd-match`: JD matching with three-score system
+    - `POST /api/assess/compare`: Compare old vs new assessment prompts
+    - `POST /api/assess/advisor`: AI career advisor chat
+- **CV Parsing**: Implemented using `mammoth` (DOCX), `pdf-parse` (PDF), and LangChain-style Zod-validated AI extraction via Gemini 2.5 Flash. Regex-based fallbacks are in place for key fields.
 - **AI-Powered Features**: All AI operations use a multi-provider LLM abstraction layer supporting Gemini and OpenAI. The v2.3 CV Intelligence Engine provides consistent, type-safe structured output via Zod schemas.
 - **Multi-Provider Support**: 
     - Gemini: GOOGLE_API_KEY (user's direct key) or AI_INTEGRATIONS_GEMINI_API_KEY (Replit integration)
     - OpenAI: AI_INTEGRATIONS_OPENAI_API_KEY (Replit integration) - uses gpt-4o by default
-    - Provider selection via `/api/providers` endpoint and `provider` parameter in assessment APIs
+    - Provider selection via `/api/assess/providers` endpoint and `provider` parameter in assessment APIs
 - **API Key Priority**: GOOGLE_API_KEY takes precedence for Gemini. Both providers can be used simultaneously.
-- **Startup**: `server/index.ts` automatically starts both Next.js and NestJS servers together.
+- **Startup**: `server/index.ts` starts both Next.js (frontend) and NestJS (backend) servers together.
 
 ### Data Storage
 - **Database**: MongoDB for persistent storage of CV documents and parsed data.
+
+## Environment Variables
+- `NEXT_PUBLIC_API_URL`: NestJS API base URL (default: `http://localhost:3001/api`)
+- `GOOGLE_API_KEY` or `AI_INTEGRATIONS_GEMINI_API_KEY`: Gemini API key
+- `AI_INTEGRATIONS_OPENAI_API_KEY`: OpenAI API key
 
 ## External Dependencies
 
@@ -61,7 +65,9 @@ Preferred communication style: Simple, everyday language.
 
 ### Backend Libraries
 - `mongodb`: MongoDB driver for database interaction.
-- `@google/genai`: Gemini API integration for AI functionalities (via Replit AI Integrations).
+- `@google/genai`: Gemini API integration for AI functionalities.
+- `openai`: OpenAI API integration.
+- `@nestjs/common`, `@nestjs/core`: NestJS framework.
 
 ### Build Tools
 - `next`: Next.js framework.
