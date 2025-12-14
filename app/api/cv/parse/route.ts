@@ -7,9 +7,11 @@ export async function POST(request: NextRequest) {
   try {
     // Get the raw body as array buffer for proper streaming
     const contentType = request.headers.get('content-type') || '';
+    console.log('[CV Parse Route] Received request, content-type:', contentType);
     
     // Read the request body
     const body = await request.arrayBuffer();
+    console.log('[CV Parse Route] Body size:', body.byteLength);
     
     // Forward to NestJS with the same content-type and body
     // Use AbortController with 2-minute timeout for AI processing
@@ -26,10 +28,11 @@ export async function POST(request: NextRequest) {
     });
     
     clearTimeout(timeoutId);
+    console.log('[CV Parse Route] NestJS response status:', response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('NestJS error:', errorText);
+      console.error('[CV Parse Route] NestJS error:', response.status, errorText);
       return NextResponse.json(
         { error: errorText || 'Failed to parse CV' },
         { status: response.status }
