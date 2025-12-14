@@ -71,7 +71,9 @@ export default function Home() {
       await new Promise(r => setTimeout(r, 300));
       
       setUploadStep(2);
-      const response = await fetch("/api/cv/parse", {
+      // Use direct NestJS URL for file uploads (Next.js rewrites don't handle multipart/form-data well)
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
+      const response = await fetch(`${apiUrl}/cv/parse`, {
         method: "POST",
         body: formData,
       });
