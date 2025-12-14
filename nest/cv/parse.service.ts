@@ -267,7 +267,6 @@ Be precise. Only include information clearly present in the CV. Return ONLY vali
     
     return {
       numpages: doc.numPages,
-      info: {},
       text: fullText,
     };
   }

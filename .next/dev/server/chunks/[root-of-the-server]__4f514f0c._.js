@@ -60,13 +60,18 @@ async function POST(request) {
         // Read the request body
         const body = await request.arrayBuffer();
         // Forward to NestJS with the same content-type and body
+        // Use AbortController with 2-minute timeout for AI processing
+        const controller = new AbortController();
+        const timeoutId = setTimeout(()=>controller.abort(), 120000);
         const response = await fetch('http://localhost:3001/api/cv/parse', {
             method: 'POST',
             headers: {
                 'content-type': contentType
             },
-            body: Buffer.from(body)
+            body: Buffer.from(body),
+            signal: controller.signal
         });
+        clearTimeout(timeoutId);
         if (!response.ok) {
             const errorText = await response.text();
             console.error('NestJS error:', errorText);
