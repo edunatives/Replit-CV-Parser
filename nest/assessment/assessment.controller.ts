@@ -29,6 +29,16 @@ interface JdMatchRequest {
   model?: string;
 }
 
+interface CompareRequest {
+  cv: ParsedCV;
+}
+
+interface AdvisorRequest {
+  cv: ParsedCV;
+  message: string;
+  history?: Array<{ role: "user" | "assistant"; content: string }>;
+}
+
 @Controller("assess")
 export class AssessmentController {
   constructor(
@@ -81,5 +91,26 @@ export class AssessmentController {
     });
 
     return result;
+  }
+
+  @Post("compare")
+  async comparePrompts(@Body() body: CompareRequest) {
+    if (!body.cv) {
+      throw new BadRequestException("CV data is required");
+    }
+
+    return this.assessmentService.comparePrompts(body.cv);
+  }
+
+  @Post("advisor")
+  async getAdvisorResponse(@Body() body: AdvisorRequest) {
+    if (!body.cv) {
+      throw new BadRequestException("CV data is required");
+    }
+    if (!body.message) {
+      throw new BadRequestException("Message is required");
+    }
+
+    return this.assessmentService.getAdvisorResponse(body.cv, body.message, body.history || []);
   }
 }

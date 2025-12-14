@@ -1,57 +1,68 @@
-import { spawn, ChildProcess } from 'child_process';
+import { spawn } from 'child_process';
 
 const isDev = process.env.NODE_ENV !== 'production';
 
-let nestProcess: ChildProcess | null = null;
+console.log('[Server] Starting CV Intelligence Parser...');
+console.log('[Server] Mode:', isDev ? 'development' : 'production');
 
-function startNestJS() {
+if (isDev) {
   console.log('[Server] Starting NestJS backend on port 3001...');
-  nestProcess = spawn('npx', ['tsx', '--tsconfig', 'nest/tsconfig.json', 'nest/start.ts'], {
+  const nest = spawn('npx', ['tsx', '--tsconfig', 'nest/tsconfig.json', 'nest/start.ts'], {
     stdio: 'inherit',
     shell: true
   });
 
-  nestProcess.on('error', (err) => {
-    console.error('[Server] NestJS failed to start:', err);
-  });
-
-  nestProcess.on('close', (code) => {
-    if (code !== 0) {
-      console.error(`[Server] NestJS exited with code ${code}`);
-    }
-  });
-}
-
-function cleanup() {
-  if (nestProcess) {
-    console.log('[Server] Stopping NestJS...');
-    nestProcess.kill();
-  }
-}
-
-process.on('SIGINT', cleanup);
-process.on('SIGTERM', cleanup);
-
-startNestJS();
-
-if (isDev) {
+  console.log('[Server] Starting Next.js frontend on port 5000...');
   const next = spawn('npx', ['next', 'dev', '-p', '5000', '-H', '0.0.0.0'], {
     stdio: 'inherit',
     shell: true
   });
 
+  const cleanup = () => {
+    console.log('[Server] Shutting down...');
+    nest.kill();
+    next.kill();
+    process.exit(0);
+  };
+
+  process.on('SIGINT', cleanup);
+  process.on('SIGTERM', cleanup);
+
+  nest.on('close', (code) => {
+    if (code !== 0) console.error(`[Server] NestJS exited with code ${code}`);
+  });
+
   next.on('close', (code) => {
     cleanup();
-    process.exit(code || 0);
   });
 } else {
+  console.log('[Server] Starting NestJS backend on port 3001...');
+  const nest = spawn('npx', ['tsx', '--tsconfig', 'nest/tsconfig.json', 'nest/start.ts'], {
+    stdio: 'inherit',
+    shell: true
+  });
+
+  console.log('[Server] Starting Next.js production server on port 5000...');
   const next = spawn('npx', ['next', 'start', '-p', '5000', '-H', '0.0.0.0'], {
     stdio: 'inherit',
     shell: true
   });
 
+  const cleanup = () => {
+    console.log('[Server] Shutting down...');
+    nest.kill();
+    next.kill();
+    process.exit(0);
+  };
+
+  process.on('SIGINT', cleanup);
+  process.on('SIGTERM', cleanup);
+
+  nest.on('close', (code) => {
+    if (code !== 0) console.error(`[Server] NestJS exited with code ${code}`);
+  });
+
   next.on('close', (code) => {
     cleanup();
-    process.exit(code || 0);
   });
 }

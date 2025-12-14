@@ -426,11 +426,13 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatHistory]);
 
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
+
   const runAssessment = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/assess/langchain", {
+      const response = await fetch(`${apiUrl}/assess/langchain`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
@@ -466,7 +468,7 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
     setError(null);
     setPromptComparison(null);
     try {
-      const response = await fetch("/api/assess/compare", {
+      const response = await fetch(`${apiUrl}/assess/compare`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cv }),
@@ -510,7 +512,7 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
     setError(null);
 
     try {
-      const response = await fetch("/api/advisor", {
+      const response = await fetch(`${apiUrl}/assess/advisor`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cv, message: chatMessage, history: chatHistory }),
@@ -540,10 +542,10 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/jd-match/langchain", {
+      const response = await fetch(`${apiUrl}/assess/jd-match`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cv, jobDescription: jdText, outputMode, audience: "STUDENT" }),
+        body: JSON.stringify({ cv, jd: jdText, outputMode, audience: "STUDENT" }),
       });
       
       const contentType = response.headers.get("content-type");

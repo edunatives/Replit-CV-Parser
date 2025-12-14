@@ -5,6 +5,11 @@ import type { ParsedCV } from "../../types/cv";
 export type OutputMode = "LITE" | "STANDARD" | "FULL";
 export type AudienceType = "STUDENT" | "HR";
 
+interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
 interface AssessmentConfig {
   provider?: ProviderType;
   model?: string;
@@ -204,6 +209,161 @@ export class AssessmentService {
         issues: [],
         improvements: [],
       };
+    }
+  }
+
+  async comparePrompts(cv: ParsedCV): Promise<Record<string, unknown>> {
+    const cvText = this.formatCVText(cv);
+
+    const oldPrompt = `You are an expert CV/Resume analyst. Analyze the following CV and provide a comprehensive assessment.
+
+CV DATA:
+${cvText}
+
+Provide your assessment as a valid JSON object with this exact structure:
+{
+  "overallScore": <number 0-100>,
+  "sections": [
+    {"name": "Contact Information", "score": <0-100>, "feedback": "<specific feedback>"},
+    {"name": "Professional Summary", "score": <0-100>, "feedback": "<specific feedback>"},
+    {"name": "Work Experience", "score": <0-100>, "feedback": "<specific feedback>"},
+    {"name": "Education", "score": <0-100>, "feedback": "<specific feedback>"},
+    {"name": "Skills", "score": <0-100>, "feedback": "<specific feedback>"},
+    {"name": "Overall Presentation", "score": <0-100>, "feedback": "<specific feedback>"}
+  ],
+  "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
+  "weaknesses": ["<weakness 1>", "<weakness 2>", "<weakness 3>"],
+  "recommendations": ["<recommendation 1>", "<recommendation 2>", "<recommendation 3>", "<recommendation 4>", "<recommendation 5>"]
+}
+
+Return ONLY valid JSON, no markdown, no code blocks.`;
+
+    const newPrompt = `You are the EduNatives Forensic CV Analyst (v10.0). Analyze the following CV using our strict weighted scoring system.
+
+CV DATA:
+"""
+${cvText}
+"""
+
+--- WEIGHTED SCORING SYSTEM ---
+Calculate the overall score as a WEIGHTED AVERAGE based on these exact weights:
+- Work Experience: 30% weight
+- Professional Summary: 20% weight
+- Education: 15% weight
+- Skills: 15% weight
+- Contact Information: 10% weight
+- Overall Presentation: 10% weight
+
+Formula: overallScore = (section1Score * 30 + section2Score * 20 + ...) / 100
+
+--- OUTPUT FORMAT ---
+Return ONLY a valid JSON object with this structure:
+{
+  "overallScore": <number 0-100, calculated using weighted average>,
+  "sections": [
+    {"name": "Contact Information", "score": <0-100>, "feedback": "<detailed feedback>"},
+    {"name": "Professional Summary", "score": <0-100>, "feedback": "<forensic analysis>"},
+    {"name": "Work Experience", "score": <0-100>, "feedback": "<forensic review>"},
+    {"name": "Education", "score": <0-100>, "feedback": "<analysis>"},
+    {"name": "Skills", "score": <0-100>, "feedback": "<review>"},
+    {"name": "Overall Presentation", "score": <0-100>, "feedback": "<assessment>"}
+  ],
+  "strengths": ["<specific strength with evidence>", "<strength 2>", "<strength 3>"],
+  "weaknesses": ["<specific weakness with recommendation>", "<weakness 2>", "<weakness 3>"],
+  "recommendations": ["<specific actionable recommendation>", "<recommendation 2>", "<recommendation 3>", "<recommendation 4>", "<recommendation 5>"]
+}
+
+Return ONLY valid JSON, no markdown code blocks.`;
+
+    try {
+      const [oldResponse, newResponse] = await Promise.all([
+        this.langchainService.generate("", oldPrompt, { provider: "gemini", maxOutputTokens: 4096 }),
+        this.langchainService.generate("", newPrompt, { provider: "gemini", maxOutputTokens: 4096 }),
+      ]);
+
+      const oldAssessment = this.parseResponse(oldResponse.text);
+      const newAssessment = this.parseResponse(newResponse.text);
+
+      return {
+        comparison: {
+          oldPrompt: {
+            label: "OLD (Simple Generic)",
+            assessment: oldAssessment,
+            tokenUsage: {
+              promptTokens: oldResponse.usage.inputTokens,
+              completionTokens: oldResponse.usage.outputTokens,
+            },
+          },
+          newPrompt: {
+            label: "NEW (Forensic v10.0)",
+            assessment: newAssessment,
+            tokenUsage: {
+              promptTokens: newResponse.usage.inputTokens,
+              completionTokens: newResponse.usage.outputTokens,
+            },
+          },
+          scoreDifference: {
+            oldScore: (oldAssessment as { overallScore?: number }).overallScore || 0,
+            newScore: (newAssessment as { overallScore?: number }).overallScore || 0,
+            diff: ((newAssessment as { overallScore?: number }).overallScore || 0) - 
+                  ((oldAssessment as { overallScore?: number }).overallScore || 0),
+          },
+        },
+      };
+    } catch (error) {
+      console.error("Comparison error:", error);
+      throw new Error("Failed to run comparison");
+    }
+  }
+
+  async getAdvisorResponse(
+    cv: ParsedCV,
+    message: string,
+    history: ChatMessage[] = []
+  ): Promise<{ response: string; tokenUsage: Record<string, number> }> {
+    const cvText = this.formatCVText(cv);
+    
+    const conversationHistory = history
+      .slice(-10)
+      .map(msg => `${msg.role === "user" ? "User" : "Assistant"}: ${msg.content}`)
+      .join("\n");
+
+    const systemPrompt = `You are an expert AI Career Advisor specializing in CV/resume improvement.
+You have access to the candidate's CV and are having a conversation to help them improve it.
+
+CANDIDATE'S CV:
+${cvText}
+
+CONVERSATION GUIDELINES:
+1. Be specific and actionable in your advice
+2. Reference specific sections of their CV when giving feedback
+3. Provide examples and rewrites when helpful
+4. Be encouraging but honest about areas for improvement
+5. Consider ATS compatibility in your recommendations
+6. Keep responses concise and focused`;
+
+    const userPrompt = conversationHistory 
+      ? `Previous conversation:\n${conversationHistory}\n\nUser's new message: ${message}`
+      : message;
+
+    try {
+      const response = await this.langchainService.generate(
+        systemPrompt,
+        userPrompt,
+        { provider: "gemini", maxOutputTokens: 1024, temperature: 0.7 }
+      );
+
+      return {
+        response: response.text || "I apologize, but I couldn't generate a response. Please try again.",
+        tokenUsage: {
+          promptTokens: response.usage.inputTokens,
+          completionTokens: response.usage.outputTokens,
+          totalTokens: response.usage.inputTokens + response.usage.outputTokens,
+        },
+      };
+    } catch (error) {
+      console.error("Advisor error:", error);
+      throw new Error(error instanceof Error ? error.message : "Failed to get advice");
     }
   }
 }
