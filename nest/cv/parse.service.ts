@@ -124,30 +124,25 @@ export class ParseService {
   }
 
   private async parsePdfBuffer(buffer: Buffer): Promise<PdfParseResult> {
-    const pdfModule = await import("pdf-parse") as unknown as
-      | PdfParseFunction
-      | { default: PdfParseFunction | { default: PdfParseFunction } };
-
-    let pdfParse: PdfParseFunction | undefined;
-
-    if (typeof pdfModule === "function") {
-      pdfParse = pdfModule;
-    } else if (typeof (pdfModule as { default: unknown }).default === "function") {
-      pdfParse = (pdfModule as { default: PdfParseFunction }).default;
-    } else if (
-      (pdfModule as { default: { default: unknown } }).default &&
-      typeof (pdfModule as { default: { default: PdfParseFunction } }).default.default === "function"
-    ) {
-      pdfParse = (pdfModule as { default: { default: PdfParseFunction } }).default.default;
+    // Use pdfjs-dist directly for reliable PDF parsing
+    const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf.mjs");
+    const uint8 = new Uint8Array(buffer);
+    
+    const doc = await pdfjsLib.getDocument({ data: uint8 }).promise;
+    
+    let fullText = "";
+    for (let i = 1; i <= doc.numPages; i++) {
+      const page = await doc.getPage(i);
+      const content = await page.getTextContent();
+      const text = (content.items as Array<{ str: string }>).map(item => item.str).join(" ");
+      fullText += text + "\n";
     }
-
-    if (!pdfParse || typeof pdfParse !== "function") {
-      const keys = Object.keys(pdfModule as object);
-      console.error("pdf-parse module structure:", JSON.stringify(keys));
-      throw new Error(`pdf-parse module not callable. Keys: ${keys.join(", ")}`);
-    }
-
-    return pdfParse(buffer, { max: 0 });
+    
+    return {
+      numpages: doc.numPages,
+      info: {},
+      text: fullText,
+    };
   }
 
   private async parseDocxBuffer(buffer: Buffer): Promise<string> {
