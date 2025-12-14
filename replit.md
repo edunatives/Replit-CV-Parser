@@ -65,8 +65,10 @@ Preferred communication style: Simple, everyday language.
 
 ### Backend Libraries
 - `mongodb`: MongoDB driver for database interaction.
-- `@google/genai`: Gemini API integration for AI functionalities.
-- `openai`: OpenAI API integration.
+- `@langchain/google-genai`: LangChain Gemini integration (ChatGoogleGenerativeAI).
+- `@langchain/openai`: LangChain OpenAI integration (ChatOpenAI).
+- `@langchain/core`: LangChain core utilities (prompts, messages, chains).
+- `langchain`: LangChain base utilities.
 - `@nestjs/common`, `@nestjs/core`: NestJS framework.
 
 ### Build Tools
