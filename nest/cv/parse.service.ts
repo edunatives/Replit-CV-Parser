@@ -1,5 +1,6 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Inject } from "@nestjs/common";
 import type { ParsedCV, Experience, Education, Certification } from "../../types/cv";
+import { LangchainService } from "../assessment/langchain.service";
 
 type PdfParseResult = { text: string; numpages: number };
 type PdfParseFunction = (buffer: Buffer, options?: object) => Promise<PdfParseResult>;
@@ -76,6 +77,10 @@ const CERT_PATTERNS = [
 
 @Injectable()
 export class ParseService {
+  constructor(
+    @Inject(LangchainService) private readonly langchainService: LangchainService
+  ) {}
+
   async parseCV(buffer: Buffer, fileName: string, fileId: string): Promise<{ cv: ParsedCV; rawText: string }> {
     let text = "";
     const extension = fileName.toLowerCase().split(".").pop();
@@ -99,6 +104,35 @@ export class ParseService {
       text = this.normalizeText(buffer.toString("utf-8"));
     }
 
+    // Try LangChain AI extraction first
+    const aiExtracted = await this.extractWithLangChain(text, fileId);
+    
+    if (aiExtracted) {
+      console.log(`[LANGCHAIN] Successfully extracted CV data for ${fileName}`);
+      const cv: ParsedCV = {
+        id: fileId,
+        name: aiExtracted.name || "",
+        title: aiExtracted.title || "",
+        email: aiExtracted.email || "",
+        phone: aiExtracted.phone || "",
+        location: aiExtracted.location || "",
+        website: aiExtracted.website || "",
+        linkedin: aiExtracted.linkedin || "",
+        github: aiExtracted.github || "",
+        summary: aiExtracted.summary || "",
+        experience: aiExtracted.experience || [],
+        education: aiExtracted.education || [],
+        certifications: aiExtracted.certifications || [],
+        skills: aiExtracted.skills || [],
+        originalFilename: fileName,
+        uploadedAt: new Date(),
+        rawText: text,
+      };
+      return { cv: this.validateAndNormalizeCV(cv), rawText: text };
+    }
+
+    // Fallback to regex extraction
+    console.log(`[LANGCHAIN] AI extraction unavailable, using regex fallback for ${fileName}`);
     const rawCv: ParsedCV = {
       id: fileId,
       name: this.extractName(text),
@@ -121,6 +155,99 @@ export class ParseService {
 
     const cv = this.validateAndNormalizeCV(rawCv);
     return { cv, rawText: text };
+  }
+
+  private async extractWithLangChain(text: string, fileId: string): Promise<Partial<ParsedCV> | null> {
+    const providers = this.langchainService.getAvailableProviders();
+    if (providers.length === 0) {
+      console.log("[LANGCHAIN] No AI providers available");
+      return null;
+    }
+
+    console.log(`[LANGCHAIN] Using providers: ${providers.join(", ")}`);
+    console.log("[LANGCHAIN] Starting CV extraction with LangChain...");
+
+    try {
+      const systemPrompt = `You are a CV/resume parser. Extract structured information from the provided CV text.
+Return a valid JSON object with these exact fields:
+{
+  "name": "full name",
+  "title": "professional title/role",
+  "email": "email address",
+  "phone": "phone number",
+  "location": "city, country or region",
+  "website": "personal website URL if any",
+  "linkedin": "LinkedIn profile URL",
+  "github": "GitHub profile URL",
+  "summary": "professional summary or objective",
+  "experience": [{"role": "job title", "company": "company name", "duration": "date range", "description": "responsibilities"}],
+  "education": [{"degree": "degree name", "institution": "school name", "year": "graduation year"}],
+  "certifications": [{"name": "cert name", "issuer": "issuing organization", "year": "year obtained"}],
+  "skills": ["skill1", "skill2"]
+}
+Be precise. Only include information clearly present in the CV. Return ONLY valid JSON.`;
+
+      const userPrompt = `Extract CV data from this text:\n\n${text.substring(0, 10000)}`;
+
+      const response = await this.langchainService.generate(systemPrompt, userPrompt, {
+        temperature: 0.1,
+        maxOutputTokens: 4000,
+      });
+
+      console.log(`[LANGCHAIN] Received response (${response.text.length} chars)`);
+
+      // Parse JSON from response
+      let jsonStr = response.text.trim();
+      // Handle markdown code blocks
+      if (jsonStr.startsWith("```")) {
+        jsonStr = jsonStr.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
+      }
+
+      const parsed = JSON.parse(jsonStr);
+      console.log(`[LANGCHAIN] Parsed JSON successfully`);
+
+      // Convert to ParsedCV format with IDs
+      const experience: Experience[] = (parsed.experience || []).map((exp: Record<string, string>, i: number) => ({
+        id: `exp-${fileId}-${i}`,
+        role: exp.role || "",
+        company: exp.company || "",
+        duration: exp.duration || "",
+        description: exp.description || "",
+      }));
+
+      const education: Education[] = (parsed.education || []).map((edu: Record<string, string>, i: number) => ({
+        id: `edu-${fileId}-${i}`,
+        degree: edu.degree || "",
+        institution: edu.institution || "",
+        year: edu.year || "",
+      }));
+
+      const certifications: Certification[] = (parsed.certifications || []).map((cert: Record<string, string>, i: number) => ({
+        id: `cert-${fileId}-${i}`,
+        name: cert.name || "",
+        issuer: cert.issuer || "",
+        year: cert.year || "",
+      }));
+
+      return {
+        name: parsed.name || "",
+        title: parsed.title || "",
+        email: parsed.email || "",
+        phone: parsed.phone || "",
+        location: parsed.location || "",
+        website: parsed.website || "",
+        linkedin: parsed.linkedin || "",
+        github: parsed.github || "",
+        summary: parsed.summary || "",
+        experience,
+        education,
+        certifications,
+        skills: Array.isArray(parsed.skills) ? parsed.skills : [],
+      };
+    } catch (error) {
+      console.error("[LANGCHAIN] Extraction failed:", error);
+      return null;
+    }
   }
 
   private async parsePdfBuffer(buffer: Buffer): Promise<PdfParseResult> {
