@@ -34,7 +34,6 @@ Preferred communication style: Simple, everyday language.
     - Provider selection via `/api/providers` endpoint and `provider` parameter in assessment APIs
 - **API Key Priority**: GOOGLE_API_KEY takes precedence for Gemini. Both providers can be used simultaneously.
 - **API Documentation**: Interactive Swagger UI at `/api-docs` with an OpenAPI 3.0 specification.
-- **NestJS Backend (Optional)**: An alternative NestJS backend is provided for future expansion, supporting advanced features like job queues, real-time processing, and microservices.
 
 ### Data Storage
 - **Database**: MongoDB for persistent storage of CV documents and parsed data.
