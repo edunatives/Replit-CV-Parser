@@ -50,4 +50,9 @@ integrations = ["javascript_openai_ai_integrations:1.0.0", "javascript_gemini_ai
 [userenv.shared]
 LANGSMITH_TRACING = "false"
 LANGSMITH_PROJECT = "cv-intelligence-parser"
+
+[userenv.development]
 NEXT_PUBLIC_API_URL = "http://localhost:3001/api"
+
+[userenv.production]
+NEXT_PUBLIC_API_URL = "/api"
