@@ -1,6 +1,11 @@
 import { Injectable } from "@nestjs/common";
-import { GoogleGenAI } from "@google/genai";
-import OpenAI from "openai";
+import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { ChatOpenAI } from "@langchain/openai";
+import { ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate } from "@langchain/core/prompts";
+import { StringOutputParser } from "@langchain/core/output_parsers";
+import { RunnableSequence } from "@langchain/core/runnables";
+import { BaseChatModel } from "@langchain/core/language_models/chat_models";
+import { HumanMessage, AIMessage, SystemMessage, BaseMessage } from "@langchain/core/messages";
 
 export type ProviderType = "gemini" | "openai";
 
@@ -26,40 +31,73 @@ const DEFAULT_MODELS: Record<ProviderType, string> = {
 
 @Injectable()
 export class LangchainService {
-  private geminiClient: GoogleGenAI | null = null;
-  private openaiClient: OpenAI | null = null;
+  private geminiAvailable: boolean;
+  private openaiAvailable: boolean;
+  private geminiApiKey: string | undefined;
+  private geminiBaseUrl: string | undefined;
+  private openaiApiKey: string | undefined;
+  private openaiBaseUrl: string | undefined;
 
   constructor() {
-    const googleKey = process.env.GOOGLE_API_KEY || process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
-    const geminiBaseUrl = process.env.AI_INTEGRATIONS_GEMINI_BASE_URL;
-    
-    if (googleKey) {
-      if (process.env.GOOGLE_API_KEY) {
-        this.geminiClient = new GoogleGenAI({ apiKey: googleKey });
-      } else {
-        this.geminiClient = new GoogleGenAI({
-          apiKey: googleKey,
-          httpOptions: { apiVersion: "", baseUrl: geminiBaseUrl || undefined },
-        });
-      }
-    }
+    this.geminiApiKey = process.env.GOOGLE_API_KEY || process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
+    this.geminiBaseUrl = process.env.AI_INTEGRATIONS_GEMINI_BASE_URL;
+    this.geminiAvailable = !!this.geminiApiKey;
 
-    const openaiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
-    const openaiBaseUrl = process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
-    
-    if (openaiKey) {
-      this.openaiClient = new OpenAI({
-        apiKey: openaiKey,
-        baseURL: openaiBaseUrl,
-      });
-    }
+    this.openaiApiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
+    this.openaiBaseUrl = process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
+    this.openaiAvailable = !!this.openaiApiKey;
   }
 
   getAvailableProviders(): ProviderType[] {
     const available: ProviderType[] = [];
-    if (this.geminiClient) available.push("gemini");
-    if (this.openaiClient) available.push("openai");
+    if (this.geminiAvailable) available.push("gemini");
+    if (this.openaiAvailable) available.push("openai");
     return available;
+  }
+
+  private createGeminiModel(model: string, temperature: number, maxOutputTokens: number): ChatGoogleGenerativeAI {
+    if (!this.geminiApiKey) throw new Error("Gemini not configured");
+
+    const useProxy = this.geminiBaseUrl && !process.env.GOOGLE_API_KEY;
+
+    return new ChatGoogleGenerativeAI({
+      apiKey: this.geminiApiKey,
+      model,
+      temperature,
+      maxOutputTokens,
+      ...(useProxy && { 
+        clientOptions: { 
+          apiEndpoint: this.geminiBaseUrl 
+        } 
+      }),
+    });
+  }
+
+  private createOpenAIModel(model: string, temperature: number, maxOutputTokens: number): ChatOpenAI {
+    if (!this.openaiApiKey) throw new Error("OpenAI not configured");
+
+    return new ChatOpenAI({
+      apiKey: this.openaiApiKey,
+      model,
+      temperature,
+      maxTokens: maxOutputTokens,
+      configuration: this.openaiBaseUrl ? { baseURL: this.openaiBaseUrl } : undefined,
+    });
+  }
+
+  private getModel(config: LLMConfig = {}): BaseChatModel {
+    const provider = config.provider || (this.openaiAvailable ? "openai" : "gemini");
+    const model = config.model || DEFAULT_MODELS[provider];
+    const temperature = config.temperature ?? 0.2;
+    const maxOutputTokens = config.maxOutputTokens ?? 8192;
+
+    if (provider === "openai" && this.openaiAvailable) {
+      return this.createOpenAIModel(model, temperature, maxOutputTokens);
+    } else if (provider === "gemini" && this.geminiAvailable) {
+      return this.createGeminiModel(model, temperature, maxOutputTokens);
+    }
+
+    throw new Error("No AI provider available");
   }
 
   async generate(
@@ -67,73 +105,61 @@ export class LangchainService {
     userPrompt: string,
     config: LLMConfig = {}
   ): Promise<LLMResponse> {
-    const provider = config.provider || (this.openaiClient ? "openai" : "gemini");
-    const model = config.model || DEFAULT_MODELS[provider];
-    const temperature = config.temperature ?? 0.2;
-    const maxOutputTokens = config.maxOutputTokens ?? 8192;
+    const model = this.getModel(config);
 
-    if (provider === "openai" && this.openaiClient) {
-      return this.generateOpenAI(systemPrompt, userPrompt, model, temperature, maxOutputTokens);
-    } else if (provider === "gemini" && this.geminiClient) {
-      return this.generateGemini(systemPrompt, userPrompt, model, temperature, maxOutputTokens);
-    }
+    const prompt = ChatPromptTemplate.fromMessages([
+      SystemMessagePromptTemplate.fromTemplate("{system}"),
+      HumanMessagePromptTemplate.fromTemplate("{user}"),
+    ]);
 
-    throw new Error("No AI provider available");
-  }
-
-  private async generateGemini(
-    systemPrompt: string,
-    userPrompt: string,
-    model: string,
-    temperature: number,
-    maxOutputTokens: number
-  ): Promise<LLMResponse> {
-    if (!this.geminiClient) throw new Error("Gemini not configured");
-
-    const response = await this.geminiClient.models.generateContent({
+    const chain = RunnableSequence.from([
+      prompt,
       model,
-      contents: [
-        { role: "user", parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }
-      ],
-      config: {
-        maxOutputTokens,
-        temperature,
-      },
+      new StringOutputParser(),
+    ]);
+
+    const result = await chain.invoke({
+      system: systemPrompt,
+      user: userPrompt,
     });
 
     return {
-      text: response.text?.trim() || "",
+      text: result.trim(),
       usage: {
-        inputTokens: response.usageMetadata?.promptTokenCount || 0,
-        outputTokens: response.usageMetadata?.candidatesTokenCount || 0,
+        inputTokens: 0,
+        outputTokens: 0,
       },
     };
   }
 
-  private async generateOpenAI(
-    systemPrompt: string,
-    userPrompt: string,
-    model: string,
-    temperature: number,
-    maxOutputTokens: number
+  async generateWithMessages(
+    messages: Array<{ role: "system" | "user" | "assistant"; content: string }>,
+    config: LLMConfig = {}
   ): Promise<LLMResponse> {
-    if (!this.openaiClient) throw new Error("OpenAI not configured");
+    const model = this.getModel(config);
 
-    const response = await this.openaiClient.chat.completions.create({
-      model,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      max_tokens: maxOutputTokens,
-      temperature,
+    const langchainMessages: BaseMessage[] = messages.map((msg) => {
+      if (msg.role === "system") {
+        return new SystemMessage(msg.content);
+      } else if (msg.role === "user") {
+        return new HumanMessage(msg.content);
+      } else {
+        return new AIMessage(msg.content);
+      }
     });
 
+    const chain = RunnableSequence.from([
+      model,
+      new StringOutputParser(),
+    ]);
+
+    const result = await chain.invoke(langchainMessages);
+
     return {
-      text: response.choices[0]?.message?.content?.trim() || "",
+      text: result.trim(),
       usage: {
-        inputTokens: response.usage?.prompt_tokens || 0,
-        outputTokens: response.usage?.completion_tokens || 0,
+        inputTokens: 0,
+        outputTokens: 0,
       },
     };
   }
