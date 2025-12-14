@@ -16,24 +16,33 @@ Preferred communication style: Simple, everyday language.
 - **UX Flow**: A two-pane workspace with a left-sidebar navigation, a dashboard for CV management, and a right-pane for AI Analysis featuring three assessment tracks: CV Assessment, AI Advisor, and JD Match.
 
 ### Backend Architecture
-- **Framework**: Next.js API Routes for core functionalities.
+- **Framework**: Dual-server architecture with Next.js frontend (port 5000) and NestJS backend (port 3001).
+- **NestJS Backend** (`nest/` folder):
+    - `nest/start.ts`: Bootstrap entry point on port 3001 with `/api` prefix
+    - `nest/app.module.ts`: Root module importing AssessmentModule, CvModule, DatabaseModule
+    - `nest/assessment/`: CV assessment and JD matching with LangChain integration
+    - `nest/cv/`: CV parsing with file upload support
+    - `nest/database/`: MongoDB connection service
+- **Proxy Architecture**: Next.js API routes proxy to NestJS backend:
+    - `/api/providers` → NestJS `/api/assess/providers`
+    - `/api/assess/langchain` → NestJS `/api/assess/langchain`
+    - `/api/jd-match/langchain` → NestJS `/api/assess/jd-match`
 - **CV Parsing**: Implemented using `mammoth` (DOCX), `pdf-parse` (PDF), and LangChain-style Zod-validated AI extraction via Gemini 2.5 Flash. Regex-based fallbacks are in place for key fields.
-- **API Endpoints**:
-    - `/api/parse`: Single CV parsing (uses LangChain module with Zod validation).
-    - `/api/parse/batch`: Batch CV parsing.
-    - `/api/cvs`: CV CRUD operations.
-    - `/api/assess/langchain`: LangChain-based CV assessment with Zod-validated structured output (primary endpoint).
-    - `/api/jd-match/langchain`: LangChain-based JD matching with v2.2 three-score system (primary endpoint).
-    - `/api/advisor`: AI career advisor chat.
-    - `/api/assess`: Legacy CV assessment endpoint.
-    - `/api/jd-match`: Legacy JD match endpoint.
+- **API Endpoints** (NestJS):
+    - `POST /api/cv/parse`: Single CV parsing with file upload
+    - `POST /api/cv/parse/batch`: Batch CV parsing
+    - `GET /api/cv/list`: List parsed CVs
+    - `DELETE /api/cv`: Delete CV
+    - `GET /api/assess/providers`: Available LLM providers
+    - `POST /api/assess/langchain`: CV assessment with structured output
+    - `POST /api/assess/jd-match`: JD matching with three-score system
 - **AI-Powered Features**: All AI operations use a multi-provider LLM abstraction layer supporting Gemini and OpenAI. The v2.3 CV Intelligence Engine provides consistent, type-safe structured output via Zod schemas.
 - **Multi-Provider Support**: 
     - Gemini: GOOGLE_API_KEY (user's direct key) or AI_INTEGRATIONS_GEMINI_API_KEY (Replit integration)
     - OpenAI: AI_INTEGRATIONS_OPENAI_API_KEY (Replit integration) - uses gpt-4o by default
     - Provider selection via `/api/providers` endpoint and `provider` parameter in assessment APIs
 - **API Key Priority**: GOOGLE_API_KEY takes precedence for Gemini. Both providers can be used simultaneously.
-- **API Documentation**: Interactive Swagger UI at `/api-docs` with an OpenAPI 3.0 specification.
+- **Startup**: `server/index.ts` automatically starts both Next.js and NestJS servers together.
 
 ### Data Storage
 - **Database**: MongoDB for persistent storage of CV documents and parsed data.
