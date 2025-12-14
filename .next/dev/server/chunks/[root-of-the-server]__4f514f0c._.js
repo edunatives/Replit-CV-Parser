@@ -85,6 +85,14 @@ async function POST(request) {
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json(data);
     } catch (error) {
         console.error('CV parse proxy error:', error);
+        // Handle timeout/abort errors with 504
+        if (error instanceof Error && error.name === 'AbortError') {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                error: 'CV parsing timed out. Please try again with a smaller file.'
+            }, {
+                status: 504
+            });
+        }
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             error: error instanceof Error ? error.message : 'Internal server error'
         }, {
