@@ -1,12 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Force Node.js runtime - Edge runtime fails with large file uploads
+export const runtime = 'nodejs';
+
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData();
+    // Get the raw body as array buffer for proper streaming
+    const contentType = request.headers.get('content-type') || '';
     
+    // Read the request body
+    const body = await request.arrayBuffer();
+    
+    // Forward to NestJS with the same content-type and body
     const response = await fetch('http://localhost:3001/api/cv/parse', {
       method: 'POST',
-      body: formData,
+      headers: {
+        'content-type': contentType,
+      },
+      body: Buffer.from(body),
     });
 
     if (!response.ok) {

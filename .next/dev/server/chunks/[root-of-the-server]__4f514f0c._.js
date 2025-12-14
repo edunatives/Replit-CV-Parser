@@ -46,16 +46,26 @@ module.exports = mod;
 
 __turbopack_context__.s([
     "POST",
-    ()=>POST
+    ()=>POST,
+    "runtime",
+    ()=>runtime
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/server.js [app-route] (ecmascript)");
 ;
+const runtime = 'nodejs';
 async function POST(request) {
     try {
-        const formData = await request.formData();
+        // Get the raw body as array buffer for proper streaming
+        const contentType = request.headers.get('content-type') || '';
+        // Read the request body
+        const body = await request.arrayBuffer();
+        // Forward to NestJS with the same content-type and body
         const response = await fetch('http://localhost:3001/api/cv/parse', {
             method: 'POST',
-            body: formData
+            headers: {
+                'content-type': contentType
+            },
+            body: Buffer.from(body)
         });
         if (!response.ok) {
             const errorText = await response.text();
