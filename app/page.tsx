@@ -71,11 +71,12 @@ export default function Home() {
       await new Promise(r => setTimeout(r, 300));
       
       setUploadStep(2);
-      // Use Next.js rewrites to proxy to NestJS backend
+      console.log("[Upload] Starting fetch to /api/cv/parse");
       const response = await fetch("/api/cv/parse", {
         method: "POST",
         body: formData,
       });
+      console.log("[Upload] Response status:", response.status, response.statusText);
 
       setUploadStep(3);
       
