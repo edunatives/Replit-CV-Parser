@@ -31,10 +31,31 @@ async function startServer() {
   // Create Express server
   const app = express();
 
-  // Proxy /api/* requests to NestJS backend (keep the full path)
+  // Log all requests
+  app.use((req, res, next) => {
+    console.log(`[Express] ${req.method} ${req.url}`);
+    next();
+  });
+
+  // Proxy /api/* requests to NestJS backend
   app.use('/api', createProxyMiddleware({
     target: `http://localhost:${NEST_PORT}/api`,
     changeOrigin: true,
+    on: {
+      proxyReq: (proxyReq, req) => {
+        console.log(`[Proxy] Forwarding: ${req.method} ${req.url} -> ${NEST_PORT}`);
+      },
+      proxyRes: (proxyRes, req) => {
+        console.log(`[Proxy] Response: ${req.method} ${req.url} -> ${proxyRes.statusCode}`);
+      },
+      error: (err, req, res) => {
+        console.error(`[Proxy] Error: ${err.message}`);
+        if ('writeHead' in res) {
+          (res as any).writeHead(502, { 'Content-Type': 'application/json' });
+          (res as any).end(JSON.stringify({ error: 'Backend unavailable' }));
+        }
+      }
+    }
   }));
 
   // Handle all other requests with Next.js
