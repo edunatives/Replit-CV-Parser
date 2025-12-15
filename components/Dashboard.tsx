@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Box, Typography, Card, CardContent, CardActions, Button, IconButton, Chip, Tooltip } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import AddIcon from "@mui/icons-material/Add";
@@ -21,7 +22,14 @@ interface DashboardProps {
 }
 
 export function Dashboard({ cvs, onUploadNew, onSelectCV, onDeleteCV, onDuplicateCV }: DashboardProps) {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const formatDate = (dateValue?: Date | string) => {
+    if (!isMounted) return "Loading...";
     if (!dateValue) return "Just now";
     const date = typeof dateValue === "string" ? new Date(dateValue) : dateValue;
     return date.toLocaleDateString("en-US", { 
