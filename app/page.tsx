@@ -54,9 +54,11 @@ export default function Home() {
   }, []);
 
   const handleFilesAdded = useCallback(async (files: File[]) => {
+    console.log("[handleFilesAdded] Called with files:", files.length);
     if (files.length === 0) return;
 
     const file = files[0];
+    console.log("[handleFilesAdded] Processing file:", file.name);
     pendingFileRef.current = file;
     setIsProcessing(true);
     setUploadStep(0);

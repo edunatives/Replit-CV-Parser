@@ -17,6 +17,7 @@ export function UploadDropzone({ onFilesAdded, disabled }: UploadDropzoneProps) 
   const [sizeError, setSizeError] = useState<string | null>(null);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
+    console.log("[UploadDropzone] onDrop called with files:", acceptedFiles.map(f => f.name));
     setSizeError(null);
     onFilesAdded(acceptedFiles);
   }, [onFilesAdded]);
