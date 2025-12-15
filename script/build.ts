@@ -9,39 +9,29 @@ async function buildAll() {
   mkdirSync("dist", { recursive: true });
   
   const entryPoint = `
-const { spawn, spawnSync } = require('child_process');
+const { spawn } = require('child_process');
 const http = require('http');
 
 const PORT = process.env.PORT || 5000;
 const NEST_PORT = 3001;
 
-console.log('[Production] Starting CV Intelligence Parser on port ' + PORT);
+console.log('[Production] Starting on port ' + PORT);
 
-// Start NestJS backend first
-console.log('[Production] Starting NestJS backend on port ' + NEST_PORT);
 const nestProcess = spawn('npx', ['tsx', '--tsconfig', 'nest/tsconfig.json', 'nest/start.ts'], {
   stdio: 'inherit',
   shell: true,
   env: { ...process.env, NODE_ENV: 'production' }
 });
 
-// Wait for NestJS to be ready
-function waitForNest(retries = 30) {
+function waitForNest(maxWait = 20000) {
+  const start = Date.now();
   return new Promise((resolve, reject) => {
     const check = () => {
-      const req = http.request({ host: '127.0.0.1', port: NEST_PORT, path: '/api/cv/list', timeout: 1000 }, (res) => {
-        resolve(true);
-      });
-      req.on('error', () => {
-        if (retries > 0) {
-          setTimeout(() => {
-            retries--;
-            check();
-          }, 500);
-        } else {
-          reject(new Error('NestJS failed to start'));
-        }
-      });
+      if (Date.now() - start > maxWait) {
+        return reject(new Error('NestJS timeout'));
+      }
+      const req = http.request({ host: '127.0.0.1', port: NEST_PORT, path: '/api/cv/list', timeout: 500 }, () => resolve(true));
+      req.on('error', () => setTimeout(check, 300));
       req.end();
     };
     check();
@@ -49,33 +39,19 @@ function waitForNest(retries = 30) {
 }
 
 waitForNest().then(() => {
-  console.log('[Production] NestJS ready, starting Next.js on port ' + PORT);
-  
-  // Start Next.js frontend
+  console.log('[Production] Starting Next.js');
   const nextProcess = spawn('npx', ['next', 'start', '-p', PORT.toString(), '-H', '0.0.0.0'], {
     stdio: 'inherit',
     shell: true,
     env: { ...process.env, NODE_ENV: 'production' }
   });
-
-  nextProcess.on('close', (code) => {
-    nestProcess.kill();
-    process.exit(code || 0);
-  });
-
-  process.on('SIGINT', () => {
-    nestProcess.kill();
-    nextProcess.kill();
-    process.exit(0);
-  });
-
-  process.on('SIGTERM', () => {
-    nestProcess.kill();
-    nextProcess.kill();
-    process.exit(0);
-  });
+  
+  const cleanup = () => { nestProcess.kill(); nextProcess.kill(); process.exit(0); };
+  process.on('SIGINT', cleanup);
+  process.on('SIGTERM', cleanup);
+  nextProcess.on('close', (code) => { nestProcess.kill(); process.exit(code || 0); });
 }).catch((err) => {
-  console.error('[Production] Failed to start:', err);
+  console.error('[Production] Failed:', err.message);
   nestProcess.kill();
   process.exit(1);
 });
