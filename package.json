@@ -76,6 +76,7 @@
     "file-saver": "^2.0.5",
     "formidable": "^3.5.4",
     "framer-motion": "^11.13.1",
+    "http-proxy-middleware": "^3.0.5",
     "input-otp": "^1.4.2",
     "jspdf": "^3.0.4",
     "langchain": "^1.1.5",
