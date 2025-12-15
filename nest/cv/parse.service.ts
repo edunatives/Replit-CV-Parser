@@ -78,27 +78,32 @@ const CERT_PATTERNS = [
 export class ParseService {
 
   async parseCV(buffer: Buffer, fileName: string, fileId: string): Promise<{ cv: ParsedCV; rawText: string }> {
+    console.log(`[ParseService] parseCV called - File: ${fileName}, Size: ${buffer.length}, ID: ${fileId}`);
     let text = "";
     const extension = fileName.toLowerCase().split(".").pop();
+    console.log(`[ParseService] File extension: ${extension}`);
 
     try {
       if (extension === "pdf") {
-        console.log(`Parsing PDF: ${fileName}, size: ${buffer.length}`);
+        console.log(`[ParseService] Parsing PDF: ${fileName}, size: ${buffer.length}`);
         const data = await this.parsePdfBuffer(buffer);
         text = this.normalizeText(data.text);
-        console.log(`PDF parsed: ${text.length} chars, ${data.numpages} pages`);
+        console.log(`[ParseService] PDF parsed: ${text.length} chars, ${data.numpages} pages`);
       } else if (extension === "docx" || extension === "doc") {
-        console.log(`Parsing Word: ${fileName}, size: ${buffer.length}`);
+        console.log(`[ParseService] Parsing Word: ${fileName}, size: ${buffer.length}`);
         text = this.normalizeText(await this.parseDocxBuffer(buffer));
-        console.log(`Word parsed: ${text.length} chars`);
+        console.log(`[ParseService] Word parsed: ${text.length} chars`);
       } else {
-        console.log(`Parsing text: ${fileName}`);
+        console.log(`[ParseService] Parsing text: ${fileName}`);
         text = this.normalizeText(buffer.toString("utf-8"));
+        console.log(`[ParseService] Text parsed: ${text.length} chars`);
       }
     } catch (error) {
-      console.error(`Parse error for ${fileName}:`, error);
+      console.error(`[ParseService] Parse error for ${fileName}:`, error);
       text = this.normalizeText(buffer.toString("utf-8"));
     }
+    
+    console.log(`[ParseService] Starting extraction for ${fileName}`);
 
     // Use regex-based extraction (LangChain is only for CV analysis, not parsing)
     const rawCv: ParsedCV = {
@@ -122,6 +127,7 @@ export class ParseService {
     };
 
     const cv = this.validateAndNormalizeCV(rawCv);
+    console.log(`[ParseService] Extraction complete - Name: "${cv.name}", Email: "${cv.email}", Skills: ${cv.skills.length}`);
     return { cv, rawText: text };
   }
 

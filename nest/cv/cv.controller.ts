@@ -51,25 +51,36 @@ export class CvController {
   @Post("parse")
   @UseInterceptors(FileInterceptor("file", uploadConfig))
   async parseCv(@UploadedFile() file: Express.Multer.File) {
+    console.log("[CvController] POST /parse - Request received");
+    
     if (!file) {
+      console.log("[CvController] ERROR: No file uploaded");
       throw new BadRequestException("No file uploaded");
     }
 
+    console.log("[CvController] File received:", file.originalname, "Size:", file.size, "Type:", file.mimetype);
+
     if (file.size > 10 * 1024 * 1024) {
+      console.log("[CvController] ERROR: File too large");
       throw new PayloadTooLargeException("File too large. Maximum size is 10MB.");
     }
 
     const fileId = `file-${Date.now()}`;
+    console.log("[CvController] Parsing CV with fileId:", fileId);
+    
     const { cv, rawText } = await this.parseService.parseCV(
       file.buffer,
       file.originalname,
       fileId
     );
 
+    console.log("[CvController] Parse complete. Name:", cv.name, "Email:", cv.email);
+
     cv.mimeType = file.mimetype;
     cv.size = file.size;
 
     await this.cvService.saveCv(cv);
+    console.log("[CvController] CV saved successfully");
 
     return { cv, rawText };
   }
