@@ -2,15 +2,5 @@
   "/_global-error/page": "/_global-error",
   "/_not-found/page": "/_not-found",
   "/api-docs/page": "/api-docs",
-  "/api/advisor/route": "/api/advisor",
-  "/api/assess/compare/route": "/api/assess/compare",
-  "/api/assess/langchain/route": "/api/assess/langchain",
-  "/api/assess/route": "/api/assess",
-  "/api/cvs/route": "/api/cvs",
-  "/api/jd-match/langchain/route": "/api/jd-match/langchain",
-  "/api/jd-match/route": "/api/jd-match",
-  "/api/parse/batch/route": "/api/parse/batch",
-  "/api/parse/route": "/api/parse",
-  "/api/providers/route": "/api/providers",
   "/page": "/"
 }

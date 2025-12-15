@@ -295,7 +295,17 @@
     "turbopack": {
       "root": "/home/runner/workspace"
     },
-    "distDirRoot": ".next"
+    "distDirRoot": ".next",
+    "_originalRewrites": {
+      "beforeFiles": [],
+      "afterFiles": [
+        {
+          "source": "/api/:path*",
+          "destination": "http://localhost:3001/api/:path*"
+        }
+      ],
+      "fallback": []
+    }
   },
   "appDir": "/home/runner/workspace",
   "relativeAppDir": "",

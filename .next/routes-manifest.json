@@ -16,7 +16,13 @@
   "headers": [],
   "rewrites": {
     "beforeFiles": [],
-    "afterFiles": [],
+    "afterFiles": [
+      {
+        "source": "/api/:path*",
+        "destination": "http://localhost:3001/api/:path*",
+        "regex": "^/api(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+      }
+    ],
     "fallback": []
   },
   "dynamicRoutes": [],
@@ -38,66 +44,6 @@
       "regex": "^/_not\\-found(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/_not\\-found(?:/)?$"
-    },
-    {
-      "page": "/api/advisor",
-      "regex": "^/api/advisor(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/advisor(?:/)?$"
-    },
-    {
-      "page": "/api/assess",
-      "regex": "^/api/assess(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/assess(?:/)?$"
-    },
-    {
-      "page": "/api/assess/compare",
-      "regex": "^/api/assess/compare(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/assess/compare(?:/)?$"
-    },
-    {
-      "page": "/api/assess/langchain",
-      "regex": "^/api/assess/langchain(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/assess/langchain(?:/)?$"
-    },
-    {
-      "page": "/api/cvs",
-      "regex": "^/api/cvs(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/cvs(?:/)?$"
-    },
-    {
-      "page": "/api/jd-match",
-      "regex": "^/api/jd\\-match(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/jd\\-match(?:/)?$"
-    },
-    {
-      "page": "/api/jd-match/langchain",
-      "regex": "^/api/jd\\-match/langchain(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/jd\\-match/langchain(?:/)?$"
-    },
-    {
-      "page": "/api/parse",
-      "regex": "^/api/parse(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/parse(?:/)?$"
-    },
-    {
-      "page": "/api/parse/batch",
-      "regex": "^/api/parse/batch(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/parse/batch(?:/)?$"
-    },
-    {
-      "page": "/api/providers",
-      "regex": "^/api/providers(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/providers(?:/)?$"
     },
     {
       "page": "/api-docs",
