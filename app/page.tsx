@@ -11,6 +11,7 @@ import {
   Typography,
   Snackbar,
   Alert,
+  CircularProgress,
 } from "@mui/material";
 import { Sidebar } from "@/components/Sidebar";
 import { Header } from "@/components/Header";
@@ -18,11 +19,12 @@ import { Dashboard } from "@/components/Dashboard";
 import { CVWorkspace } from "@/components/CVWorkspace";
 import { UploadDropzone } from "@/components/UploadDropzone";
 import { SteppedProgress, UPLOAD_STEPS } from "@/components/SteppedProgress";
+import { ClientOnly } from "@/components/ClientOnly";
 import type { ParsedCV } from "@/types/cv";
 
 type View = "dashboard" | "workspace";
 
-export default function Home() {
+function HomeContent() {
   const [view, setView] = useState<View>("dashboard");
   const [activeMenuItem, setActiveMenuItem] = useState("ai-career-chat");
   const [cvs, setCvs] = useState<ParsedCV[]>([]);
@@ -211,5 +213,19 @@ export default function Home() {
         </Alert>
       </Snackbar>
     </Box>
+  );
+}
+
+export default function Home() {
+  return (
+    <ClientOnly
+      fallback={
+        <Box sx={{ display: "flex", minHeight: "100vh", alignItems: "center", justifyContent: "center", bgcolor: "background.default" }}>
+          <CircularProgress />
+        </Box>
+      }
+    >
+      <HomeContent />
+    </ClientOnly>
   );
 }
