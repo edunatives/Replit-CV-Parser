@@ -31,6 +31,7 @@ const SECTION_LABELS: Record<CVSection, string> = {
   skills: "Skills",
   certifications: "Certifications",
   strengths: "Key Strengths",
+  projects: "Featured Projects",
 };
 
 export function SectionRearrangeModal({
