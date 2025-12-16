@@ -301,7 +301,9 @@ export class AssessmentService {
       "distribution": {"excellent": <n>, "good": <n>, "fair": <n>, "poor": <n>},
       "codeScores": {"A10": <0-100>, "A11": <0-100>, "A12": <0-100>, "A13": <0-100>},
       "rewritePriorities": []
-    }
+    },
+    "strengthsDetected": [{"code": "D1", "strength": "<strength description>"}],
+    "issuesDetected": [{"code": "A1", "issue": "<issue description>", "severity": "high", "count": 1, "fix": "<how to fix>"}]
   },
   "studentAnalysis": {
     "overallCvQuality": {"score": <0-100>, "grade": "<A|A-|B+|B|B-|C+|C|D|F>"},
