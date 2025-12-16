@@ -158,27 +158,173 @@ export class AssessmentService {
     jd?: string,
     includeFullRewrite?: boolean
   ): string {
-    let prompt = `Analyze this CV for a ${audience} audience using ${outputMode} depth.\n\n`;
-    prompt += `CV:\n${cvText}\n\n`;
+    let prompt = `Analyze this CV for a ${audience} audience.\n\nCV:\n${cvText}\n\n`;
     
     if (jd) {
       prompt += `JOB DESCRIPTION:\n${jd}\n\n`;
     }
 
-    prompt += `Return JSON with structure:
+    if (outputMode === "LITE") {
+      prompt += `Return JSON matching this LITE schema:
 {
-  "scores": { "overall": 0-100, "grade": "A-F", "breakdown": {...} },
-  "verdict": "one-line summary",
-  "strengths": [{ "code": "S1", "text": "...", "impact": "high|medium|low" }],
-  "issues": [{ "code": "A1", "severity": "critical|high|medium|low", "text": "...", "fix": "..." }],
-  "improvements": [{ "priority": 1-5, "action": "...", "effort": "quick|moderate|major" }]
+  "version": "2.3",
+  "mode": "LITE",
+  "audience": "${audience}",
+  "generatedAt": "<ISO timestamp>",
+  "candidate": "<full name>",
+  "hasJd": ${jd ? "true" : "false"},
+  "scores": {
+    "overall": <0-100>,
+    "grade": "<A|A-|B+|B|B-|C+|C|D|F>",
+    "rawCompatibility": ${jd ? "<0-100>" : "null"},
+    "tei": ${jd ? "<1-5>" : "null"},
+    "candidateRisk": null,
+    "employerRisk": null
+  },
+  "verdict": "<one sentence assessment>",
+  "topIssues": [{"code": "A1", "issue": "...", "severity": "high|medium|low", "count": 1, "fix": "..."}],
+  "topStrengths": [{"code": "D1", "strength": "..."}],
+  "bestFitRole": "<suggested role or null>",
+  "nextAction": "<most important next step>"
 }`;
+    } else if (outputMode === "STANDARD") {
+      prompt += `Return JSON matching this STANDARD schema:
+{
+  "version": "2.3",
+  "mode": "STANDARD",
+  "audience": "${audience}",
+  "generatedAt": "<ISO timestamp>",
+  "cvSummary": {
+    "candidateName": "<full name>",
+    "totalYears": <number>,
+    "currentRole": "<current/most recent role>",
+    "seniorityLevel": "<Entry|Mid|Senior|Lead|Principal|Director|VP|C-Level>",
+    "topSkills": ["skill1", "skill2", "skill3"],
+    "certificationCount": <number>
+  },
+  "scores": {
+    "overall": <0-100>,
+    "grade": "<A|A-|B+|B|B-|C+|C|D|F>",
+    "rawCompatibility": ${jd ? "<0-100>" : "null"},
+    "tei": ${jd ? "<1-5>" : "null"},
+    "candidateRisk": null,
+    "employerRisk": null
+  },
+  "bulletHealth": {
+    "totalBullets": <count of bullet points>,
+    "averageScore": <0-100>,
+    "distribution": {"excellent": <n>, "good": <n>, "fair": <n>, "poor": <n>},
+    "topIssue": "<most common bullet issue>",
+    "topFix": "<how to fix>"
+  },
+  "topIssues": [{"code": "A1", "issue": "...", "severity": "high|medium|low", "count": 1, "fix": "..."}],
+  "topStrengths": [{"code": "D1", "strength": "..."}],
+  "improvements": {
+    "critical": [{"code": "...", "priority": "critical", "action": "...", "impact": "...", "effort": "..."}],
+    "high": [],
+    "medium": [],
+    "scorePotential": {"current": <score>, "afterCritical": <score>, "afterAll": <score>, "ceiling": 100}
+  },
+  "verdict": "<one sentence assessment>",
+  "alternativeRoles": [{"role": "...", "fitScore": <0-100>, "reason": "..."}]
+}`;
+    } else {
+      // FULL mode
+      prompt += `Return JSON matching this FULL schema:
+{
+  "version": "2.3",
+  "mode": "FULL",
+  "audience": "${audience}",
+  "generatedAt": "<ISO timestamp>",
+  "cvAnalysis": {
+    "metadata": {
+      "candidateName": "<full name>",
+      "email": "<email or null>",
+      "phone": "<phone or null>",
+      "location": "<location or null>",
+      "linkedin": "<linkedin or null>",
+      "documentStats": {"pages": 1, "wordCount": <approx>, "bulletCount": <count>}
+    },
+    "professionalSummary": {
+      "text": "<summary text>",
+      "yearsMentioned": <years mentioned or null>,
+      "keyThemes": ["theme1", "theme2"],
+      "qualityScore": <0-100>,
+      "issues": []
+    },
+    "experience": {
+      "totalYears": <total years of experience>,
+      "roles": [
+        {
+          "title": "<job title>",
+          "company": "<company>",
+          "location": null,
+          "startDate": "<start>",
+          "endDate": "<end or Present>",
+          "durationMonths": <months>,
+          "seniorityLevel": "<Entry|Mid|Senior|Lead|Principal|Director|VP|C-Level>",
+          "bullets": [],
+          "bulletSummary": {"count": <n>, "averageScore": <0-100>, "excellent": 0, "good": 0, "fair": 0, "poor": 0}
+        }
+      ],
+      "progression": {
+        "pattern": "<Stagnant|Slow|Steady|Accelerated|Exceptional>",
+        "isHealthy": <true|false>,
+        "assessment": "<progression assessment>"
+      },
+      "gaps": []
+    },
+    "skills": {
+      "validated": [{"skill": "<skill>", "evidence": "<where demonstrated>", "proficiency": <1-5>}],
+      "implied": [],
+      "ghost": [],
+      "validationRate": <0-100>
+    },
+    "education": {
+      "degrees": [{"degree": "<degree>", "field": "<field>", "institution": "<school>", "year": <year or null>}],
+      "certifications": [{"name": "<cert>", "issuer": "<issuer>", "year": <year or null>, "status": "Active", "relevance": "High"}]
+    },
+    "experienceFactors": {
+      "h1TotalYears": {"years": <n>, "score": <0-100>, "assessment": "<comment>"},
+      "h2DomainYears": [{"domain": "<domain>", "years": <n>, "isPrimary": true, "score": <0-100>}],
+      "h3IndustryYears": [{"industry": "<industry>", "years": <n>}],
+      "h4Recency": {"recentRelevance": "<Current|Recent|Dated>", "score": <0-100>},
+      "h5Scope": {"level": "<scope level>", "evidence": [], "score": <0-100>},
+      "h6Complexity": {"level": "<complexity>", "evidence": [], "score": <0-100>},
+      "h7Impact": {"quantifiedCount": <n>, "totalValue": "<value>", "score": <0-100>},
+      "h8Progression": {"pattern": "<pattern>", "trajectory": "<trajectory>", "score": <0-100>},
+      "h9Specialization": {"type": "<type>", "primaryArea": "<area>", "score": <0-100>}
+    },
+    "bulletAnalysis": {
+      "totalBullets": <count>,
+      "averageScore": <0-100>,
+      "distribution": {"excellent": <n>, "good": <n>, "fair": <n>, "poor": <n>},
+      "codeScores": {"A10": <0-100>, "A11": <0-100>, "A12": <0-100>, "A13": <0-100>},
+      "rewritePriorities": []
+    }
+  },
+  "studentAnalysis": {
+    "overallCvQuality": {"score": <0-100>, "grade": "<A|A-|B+|B|B-|C+|C|D|F>"},
+    "honestAssessment": "<honest 1-2 sentence assessment>",
+    "topStrengths": [{"code": "D1", "strength": "..."}],
+    "topIssues": [{"code": "A1", "issue": "...", "severity": "high", "count": 1, "fix": "..."}],
+    "improvements": {
+      "critical": [],
+      "high": [],
+      "medium": [],
+      "scorePotential": {"current": <score>, "afterCritical": <score>, "afterAll": <score>, "ceiling": 100}
+    },
+    "alternatives": {"betterFitRoles": [{"role": "...", "fitScore": <0-100>, "reason": "..."}]}
+  },
+  "hrAnalysis": {
+    "riskAssessment": {"summary": "<risk summary>", "level": "<LOW|MODERATE|HIGH|CRITICAL>"},
+    "hireRecommendation": "<STRONG_HIRE|HIRE|CONDITIONAL_HIRE|NO_HIRE>"
+  }
+}`;
+    }
 
     if (includeFullRewrite) {
-      prompt += `\n\nAlso include:
-{
-  "fullRewrite": { "available": true, "currentScore": X, "projectedScore": Y, "completeRewrittenCV": "..." }
-}`;
+      prompt += `\n\nAlso include "fullRewrite": {"available": true, "currentScore": <X>, "projectedScore": <Y>, "completeRewrittenCV": "<full rewritten CV text>"}`;
     }
 
     return prompt;
