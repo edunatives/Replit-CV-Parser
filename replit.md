@@ -12,7 +12,12 @@ Preferred communication style: Simple, everyday language.
 - **Framework**: Next.js 15 with React and TypeScript, utilizing Server-Side Rendering (SSR) via the App Router.
 - **Role**: Pure frontend - no API routes. All backend calls go directly to NestJS.
 - **UI/UX**: Material UI (MUI) with custom theming (Cormorant Garamond for headings, Source Sans 3 for body), featuring a light theme with indigo and cyan accents, soft shadows, and rounded corners.
-- **Design System**: Includes a modular registry for eight CV template styles (e.g., modern-dark, classic-light, executive) and EduNatives branding.
+- **Design System**: Includes a modular registry for nine CV template styles (modern-dark, classic-light, executive, student-modern, etc.) and EduNatives branding.
+- **Student Template Features**: The student-modern template includes:
+    - Circular photo placeholder in header
+    - Forced education-first section ordering (projects → summary → education → experience → skills → certifications → strengths)
+    - Featured Projects section with editable technology badges (add/remove)
+    - Left-bordered section headers with accent color
 - **API Configuration**: Uses `NEXT_PUBLIC_API_URL` environment variable to point to NestJS backend (default: `http://localhost:3001/api`).
 - **UX Flow**: A two-pane workspace with a left-sidebar navigation, a dashboard for CV management, and a right-pane for AI Analysis featuring three assessment tracks: CV Assessment, AI Advisor, and JD Match.
 
