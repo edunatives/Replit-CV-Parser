@@ -111,6 +111,14 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$file$2d$save
         bodyBg: "#ffffff",
         bodyText: "#1a1a1a",
         bodyTextSecondary: "#4a4a4a"
+    },
+    "student-modern": {
+        headerBg: "#f8fafc",
+        accent: "#3b82f6",
+        headerText: "#1e293b",
+        bodyBg: "#ffffff",
+        bodyText: "#1e293b",
+        bodyTextSecondary: "#64748b"
     }
 };
 /**
