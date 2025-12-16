@@ -1507,7 +1507,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
           >
             {page.isFirstPage ? (
               <>
-                {renderHeader()}
+                {template === "student-modern" ? renderStudentHeader() : renderHeader()}
                 <Box sx={{ pt: 1.5, px: 3, pb: `${BOTTOM_GUTTER}px`, color: style.bodyText }}>
                   {page.items.map((item, idx) => 
                     renderItem(item, idx === page.items.length - 1, page.items)
