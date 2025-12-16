@@ -1149,43 +1149,50 @@ function BulletsTab({ data }: { data: StandardOutput | FullOutput }) {
     actionVerb?: { word: string | null; strength: string; score: number };
     quantification?: { hasQuantification: boolean; type: string | null; score: number };
     result?: { hasResult: boolean; type: string; score: number };
-    issues: Array<{ code: string; issue: string }>;
+    issues?: Array<{ code: string; issue: string }>;
     rewrite?: { suggested: string; projectedScore: number };
   }> = [];
   
-  if (isStandardOutput(data) && data.bulletHealth) {
-    bulletHealth = data.bulletHealth;
-  } else if (isFullOutput(data) && data.cvAnalysis?.bulletAnalysis) {
-    const ba = data.cvAnalysis.bulletAnalysis;
-    bulletHealth = {
-      totalBullets: ba.totalBullets,
-      averageScore: Math.min(100, ba.averageScore),
-      distribution: ba.distribution,
-      topIssue: "See detailed analysis below",
-      topFix: "Focus on bullets with lowest scores",
-    };
-    rewritePriorities = ba.rewritePriorities || [];
-    
-    // Extract all bullets from experience roles for FULL mode
-    if (data.cvAnalysis?.experience?.roles) {
-      data.cvAnalysis.experience.roles.forEach((role) => {
-        if (role.bullets && Array.isArray(role.bullets)) {
-          role.bullets.forEach((bullet) => {
-            allBullets.push({
-              roleTitle: role.title,
-              company: role.company,
-              text: bullet.text,
-              score: bullet.score,
-              actionVerb: bullet.actionVerb,
-              quantification: bullet.quantification,
-              result: bullet.result,
-              issues: bullet.issues || [],
-              rewrite: bullet.rewrite,
+  try {
+    if (isStandardOutput(data) && data.bulletHealth) {
+      bulletHealth = data.bulletHealth;
+    } else if (isFullOutput(data) && data.cvAnalysis?.bulletAnalysis) {
+      const ba = data.cvAnalysis.bulletAnalysis;
+      bulletHealth = {
+        totalBullets: ba.totalBullets || 0,
+        averageScore: Math.min(100, ba.averageScore || 0),
+        distribution: ba.distribution || { excellent: 0, good: 0, fair: 0, poor: 0 },
+        topIssue: "See detailed analysis below",
+        topFix: "Focus on bullets with lowest scores",
+      };
+      rewritePriorities = ba.rewritePriorities || [];
+      
+      // Extract all bullets from experience roles for FULL mode
+      const roles = data.cvAnalysis?.experience?.roles;
+      if (roles && Array.isArray(roles)) {
+        roles.forEach((role) => {
+          if (role && role.bullets && Array.isArray(role.bullets)) {
+            role.bullets.forEach((bullet) => {
+              if (bullet) {
+                allBullets.push({
+                  roleTitle: role.title || "Unknown Role",
+                  company: role.company || "Unknown Company",
+                  text: bullet.text || "",
+                  score: typeof bullet.score === "number" ? bullet.score : 0,
+                  actionVerb: bullet.actionVerb,
+                  quantification: bullet.quantification,
+                  result: bullet.result,
+                  issues: Array.isArray(bullet.issues) ? bullet.issues : [],
+                  rewrite: bullet.rewrite,
+                });
+              }
             });
-          });
-        }
-      });
+          }
+        });
+      }
     }
+  } catch (err) {
+    console.error("Error parsing bullet data:", err);
   }
 
   if (!bulletHealth) {
