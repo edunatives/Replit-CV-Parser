@@ -1,12 +1,23 @@
 import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
-import { ValidationPipe } from "@nestjs/common";
+import { ValidationPipe, Logger } from "@nestjs/common";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const logger = new Logger("NestJS");
   
   app.setGlobalPrefix("api");
+  
+  // Request logging middleware
+  app.use((req: any, res: any, next: any) => {
+    const start = Date.now();
+    res.on("finish", () => {
+      const duration = Date.now() - start;
+      logger.log(`${req.method} ${req.url} ${res.statusCode} - ${duration}ms`);
+    });
+    next();
+  });
   
   app.useGlobalPipes(
     new ValidationPipe({
