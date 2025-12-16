@@ -36,6 +36,8 @@ async function startServer() {
   app.use('/api', createProxyMiddleware({
     target: `http://localhost:${NEST_PORT}/api`,
     changeOrigin: true,
+    timeout: 120000,
+    proxyTimeout: 120000,
     on: {
       proxyReq: (proxyReq, req) => {
         logger.proxy(`Forwarding: ${req.method} ${req.url} -> ${NEST_PORT}`);
