@@ -1124,6 +1124,91 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
     }
   };
 
+  // Render Student Modern header with photo placeholder
+  const renderStudentHeader = () => (
+    <Box sx={{ 
+      bgcolor: style.bodyBg, 
+      pt: 3,
+      pb: 2,
+      px: 3, 
+    }}>
+      <Box sx={{ display: "flex", gap: 3 }}>
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="h4" component="div" sx={{ 
+            fontFamily: "'Arial', sans-serif", 
+            fontWeight: 700,
+            fontSize: "2rem",
+            color: style.headerText,
+            letterSpacing: "-0.01em",
+            lineHeight: 1.1,
+            mb: 0.5,
+          }}>
+            <EditableField value={cv.name} onChange={(v) => updateField("name", v)} placeholder="Your Name" />
+          </Typography>
+          <Typography variant="subtitle1" component="div" sx={{ 
+            color: style.accent, 
+            fontWeight: 600,
+            fontSize: "1rem",
+            lineHeight: 1.3,
+            mb: 1.5,
+          }}>
+            <EditableField value={cv.title} onChange={(v) => updateField("title", v)} placeholder="Your Title & Enthusiasm" />
+          </Typography>
+          
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, mb: 1 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+              <LocationOnIcon sx={{ fontSize: 14, color: style.bodyTextSecondary }} />
+              <Typography variant="caption" sx={{ color: style.bodyTextSecondary, fontSize: "0.75rem" }}>
+                <EditableField value={cv.location} onChange={(v) => updateField("location", v)} placeholder="City, Country" />
+              </Typography>
+            </Box>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+              <EmailIcon sx={{ fontSize: 14, color: style.bodyTextSecondary }} />
+              <Typography variant="caption" sx={{ color: style.bodyTextSecondary, fontSize: "0.75rem" }}>
+                <EditableField value={cv.email} onChange={(v) => updateField("email", v)} placeholder="email@edu.com" />
+              </Typography>
+            </Box>
+          </Box>
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
+            {cv.linkedin && (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <LinkedInIcon sx={{ fontSize: 14, color: style.bodyTextSecondary }} />
+                <Typography variant="caption" sx={{ color: style.bodyTextSecondary, fontSize: "0.75rem" }}>
+                  <EditableField value={cv.linkedin} onChange={(v) => updateField("linkedin", v)} placeholder="linkedin.com/in/..." />
+                </Typography>
+              </Box>
+            )}
+            {cv.github && (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <GitHubIcon sx={{ fontSize: 14, color: style.bodyTextSecondary }} />
+                <Typography variant="caption" sx={{ color: style.bodyTextSecondary, fontSize: "0.75rem" }}>
+                  <EditableField value={cv.github} onChange={(v) => updateField("github", v)} placeholder="github.com/..." />
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        </Box>
+        
+        <Box sx={{ 
+          width: 90, 
+          height: 90, 
+          borderRadius: "50%", 
+          bgcolor: "#e2e8f0",
+          border: "3px solid #1e293b",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+          overflow: "hidden",
+        }} data-testid="student-photo-placeholder">
+          <Typography variant="caption" sx={{ color: "#64748b", fontSize: "0.65rem", textAlign: "center", px: 1 }}>
+            Photo
+          </Typography>
+        </Box>
+      </Box>
+    </Box>
+  );
+
   // Render CV header (only on first page)
   const renderHeader = () => (
     <Box sx={{ 
