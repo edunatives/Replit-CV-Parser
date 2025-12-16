@@ -84,7 +84,16 @@ export interface CVFile {
   error?: string;
 }
 
-export type TemplateType = "modern-dark" | "classic-light" | "executive" | "minimal" | "creative" | "professional" | "corporate" | "business" | "classic-underline" | "typical";
+export type TemplateType = "modern-dark" | "classic-light" | "executive" | "minimal" | "creative" | "professional" | "corporate" | "business" | "classic-underline" | "typical" | "student-modern";
+
+export interface Project {
+  id: string;
+  title: string;
+  role?: string;
+  description: string;
+  technologies: string[];
+  impact?: string[];
+}
 
 // ============================================================================
 // FORENSIC ASSESSMENT TYPES (v9.3)

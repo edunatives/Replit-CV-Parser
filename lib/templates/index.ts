@@ -197,6 +197,23 @@ export const templateRegistry: Record<TemplateType, TemplateStyle> = {
     companyColor: "#22c55e",
     summaryBoxed: false,
   },
+  "student-modern": {
+    id: "student-modern",
+    name: "Student Modern",
+    description: "Modern student-focused template with photo, education-first layout, and project showcases",
+    headerBg: "#ffffff",
+    accent: "#0891b2",
+    headerText: "#1e293b",
+    bodyBg: "#f8fafc",
+    bodyText: "#1e293b",
+    bodyTextSecondary: "#64748b",
+    borderBottom: "none",
+    headerCentered: false,
+    sectionHeaderVariant: "leftBorder",
+    showMetaIcons: true,
+    companyColor: "#0891b2",
+    summaryBoxed: true,
+  },
 };
 
 /**
