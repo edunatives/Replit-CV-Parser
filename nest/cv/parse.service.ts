@@ -132,7 +132,6 @@ export class ParseService {
   }
 
   private async parsePdfBuffer(buffer: Buffer): Promise<PdfParseResult> {
-    // Use pdfjs-dist directly for reliable PDF parsing
     const pdfjsLib = await import("pdfjs-dist/legacy/build/pdf.mjs");
     const uint8 = new Uint8Array(buffer);
     
@@ -142,8 +141,49 @@ export class ParseService {
     for (let i = 1; i <= doc.numPages; i++) {
       const page = await doc.getPage(i);
       const content = await page.getTextContent();
-      const text = (content.items as Array<{ str: string }>).map(item => item.str).join(" ");
-      fullText += text + "\n";
+      
+      type TextItem = { str: string; transform: number[]; width: number; height: number };
+      const items = content.items as TextItem[];
+      
+      if (items.length === 0) continue;
+      
+      // Sort by Y position (descending = top to bottom), then X position
+      const sorted = items
+        .filter(item => item.str.trim().length > 0)
+        .sort((a, b) => {
+          const yA = a.transform[5];
+          const yB = b.transform[5];
+          // Group items within 5 units as same line
+          if (Math.abs(yA - yB) > 5) return yB - yA;
+          return a.transform[4] - b.transform[4];
+        });
+      
+      let lastY: number | null = null;
+      let lineText = "";
+      
+      for (const item of sorted) {
+        const y = item.transform[5];
+        
+        if (lastY !== null && Math.abs(y - lastY) > 5) {
+          // New line detected
+          if (lineText.trim()) {
+            fullText += lineText.trim() + "\n";
+          }
+          lineText = item.str;
+        } else {
+          // Same line - add space if needed
+          if (lineText && !lineText.endsWith(" ") && !item.str.startsWith(" ")) {
+            lineText += " ";
+          }
+          lineText += item.str;
+        }
+        lastY = y;
+      }
+      
+      if (lineText.trim()) {
+        fullText += lineText.trim() + "\n";
+      }
+      fullText += "\n"; // Page break
     }
     
     return {
