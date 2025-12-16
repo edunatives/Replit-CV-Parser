@@ -45,9 +45,11 @@ export const COLOR_SCHEME_PRESETS: ColorScheme[] = [
   { id: "black-purple", name: "Black & Purple", primary: "#1a1a1a", secondary: "#8b5cf6" },
 ];
 
-export type CVSection = "summary" | "experience" | "education" | "skills" | "certifications" | "strengths";
+export type CVSection = "summary" | "experience" | "education" | "skills" | "certifications" | "strengths" | "projects";
 
-export const DEFAULT_SECTION_ORDER: CVSection[] = ["summary", "experience", "education", "skills", "certifications", "strengths"];
+export const DEFAULT_SECTION_ORDER: CVSection[] = ["summary", "experience", "education", "skills", "certifications", "strengths", "projects"];
+
+export const STUDENT_SECTION_ORDER: CVSection[] = ["summary", "education", "projects", "experience", "skills", "certifications", "strengths"];
 
 export interface ParsedCV {
   id: string;
@@ -65,6 +67,7 @@ export interface ParsedCV {
   certifications: Certification[];
   skills: string[];
   strengths?: string[];
+  projects?: Project[];
   sectionOrder?: CVSection[];
   colorScheme?: ColorScheme;
   originalFilename?: string;

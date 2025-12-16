@@ -2171,7 +2171,9 @@ __turbopack_context__.s([
     "COLOR_SCHEME_PRESETS",
     ()=>COLOR_SCHEME_PRESETS,
     "DEFAULT_SECTION_ORDER",
-    ()=>DEFAULT_SECTION_ORDER
+    ()=>DEFAULT_SECTION_ORDER,
+    "STUDENT_SECTION_ORDER",
+    ()=>STUDENT_SECTION_ORDER
 ]);
 const COLOR_SCHEME_PRESETS = [
     {
@@ -2227,6 +2229,16 @@ const DEFAULT_SECTION_ORDER = [
     "summary",
     "experience",
     "education",
+    "skills",
+    "certifications",
+    "strengths",
+    "projects"
+];
+const STUDENT_SECTION_ORDER = [
+    "summary",
+    "education",
+    "projects",
+    "experience",
     "skills",
     "certifications",
     "strengths"

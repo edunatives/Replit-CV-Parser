@@ -16,7 +16,7 @@ import SwapVertIcon from "@mui/icons-material/SwapVert";
 import PaletteIcon from "@mui/icons-material/Palette";
 import type { ParsedCV, TemplateType, CVSection, ColorScheme } from "@/types/cv";
 import { SectionRearrangeModal } from "./SectionRearrangeModal";
-import { DEFAULT_SECTION_ORDER, COLOR_SCHEME_PRESETS } from "@/types/cv";
+import { DEFAULT_SECTION_ORDER, STUDENT_SECTION_ORDER, COLOR_SCHEME_PRESETS } from "@/types/cv";
 import { useState, useRef, useMemo } from "react";
 import { isDeveloperRole } from "@/lib/ai/rules";
 import { getTemplateStyle, getTemplateOptions } from "@/lib/templates";
@@ -237,7 +237,14 @@ function EditableField({
 
   if (editing) {
     return (
-      <Box sx={{ position: "relative" }}>
+      <Box sx={{ 
+        position: "relative",
+        border: "1px solid",
+        borderColor: "divider",
+        borderRadius: 1,
+        bgcolor: "background.paper",
+        overflow: "hidden",
+      }}>
         <TextField
           inputRef={inputRef}
           size="small"
@@ -264,57 +271,66 @@ function EditableField({
           rows={multiline ? rows : 1}
           autoFocus
           fullWidth
-          sx={{ my: 0.5, "& .MuiInputBase-input": { fontSize: "0.8rem" } }}
-          slotProps={showBulletTool && multiline ? {
-            input: {
-              startAdornment: (
-                <InputAdornment position="start" sx={{ alignSelf: "flex-start", mt: 0.5 }}>
-                  <Tooltip title="Add bullet point (new line)">
-                    <IconButton
-                      size="small"
-                      onClick={insertBullet}
-                      data-action-btn="true"
-                      data-testid="button-insert-bullet"
-                    >
-                      <FormatListBulletedIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                </InputAdornment>
-              )
-            }
-          } : undefined}
+          sx={{ 
+            "& .MuiInputBase-input": { fontSize: "0.8rem" },
+            "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+          }}
         />
         {multiline && (
-          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1, mt: 0.5 }}>
-            <Tooltip title="Cancel">
-              <IconButton 
-                size="small" 
-                onClick={handleCancel}
-                data-action-btn="true"
-                data-testid="button-cancel-edit"
-                sx={{ color: "text.secondary" }}
-              >
-                <CloseIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={hasChanges ? "Save changes" : "No changes"}>
-              <span>
+          <Box sx={{ 
+            display: "flex", 
+            alignItems: "center",
+            justifyContent: "space-between",
+            px: 1,
+            py: 0.5,
+            borderTop: "1px solid",
+            borderColor: "divider",
+            bgcolor: "action.hover",
+          }}>
+            {showBulletTool ? (
+              <Tooltip title="Add bullet point">
+                <IconButton
+                  size="small"
+                  onClick={insertBullet}
+                  data-action-btn="true"
+                  data-testid="button-insert-bullet"
+                  sx={{ color: "text.secondary" }}
+                >
+                  <FormatListBulletedIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            ) : <Box />}
+            <Box sx={{ display: "flex", gap: 0.5 }}>
+              <Tooltip title="Cancel">
                 <IconButton 
                   size="small" 
-                  onClick={handleSave}
+                  onClick={handleCancel}
                   data-action-btn="true"
-                  data-testid="button-save-edit"
-                  disabled={!hasChanges}
-                  sx={{ 
-                    color: hasChanges ? "success.main" : "text.disabled",
-                    bgcolor: hasChanges ? "success.light" : "transparent",
-                    "&:hover": hasChanges ? { bgcolor: "success.main", color: "white" } : {},
-                  }}
+                  data-testid="button-cancel-edit"
+                  sx={{ color: "text.secondary" }}
                 >
-                  <CheckIcon fontSize="small" />
+                  <CloseIcon fontSize="small" />
                 </IconButton>
-              </span>
-            </Tooltip>
+              </Tooltip>
+              <Tooltip title={hasChanges ? "Save changes" : "No changes"}>
+                <span>
+                  <IconButton 
+                    size="small" 
+                    onClick={handleSave}
+                    data-action-btn="true"
+                    data-testid="button-save-edit"
+                    disabled={!hasChanges}
+                    sx={{ 
+                      color: hasChanges ? "success.main" : "text.disabled",
+                      bgcolor: hasChanges ? "success.light" : "transparent",
+                      "&:hover": hasChanges ? { bgcolor: "success.main", color: "white" } : {},
+                    }}
+                  >
+                    <CheckIcon fontSize="small" />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Box>
           </Box>
         )}
       </Box>
@@ -323,14 +339,15 @@ function EditableField({
 
   if (multiline && enableLineDelete) {
     return (
-      <Box sx={{ position: "relative" }}>
+      <Box sx={{ position: "relative", "&:hover .edit-btn": { visibility: "visible" } }}>
         <LineEditor 
           value={value} 
           onChange={onChange}
           placeholder={placeholder}
         />
-        <Tooltip title="Click to edit full text">
+        <Tooltip title="Edit full text with bullet tool">
           <IconButton
+            className="edit-btn"
             size="small"
             onClick={() => {
               setTempValue(value);
@@ -338,8 +355,9 @@ function EditableField({
             }}
             sx={{ 
               position: "absolute", 
-              top: -8, 
-              right: -8,
+              top: -4, 
+              right: -4,
+              visibility: "hidden",
               color: "text.secondary",
               bgcolor: "background.paper",
               border: "1px solid",
@@ -456,7 +474,10 @@ function EditableContactField({
 
 export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = true }: CVPreviewProps) {
   const templateOptions = getTemplateOptions();
-  const sectionOrder = cv.sectionOrder || DEFAULT_SECTION_ORDER;
+  // Student template ALWAYS enforces education-first order
+  const sectionOrder = template === "student-modern" 
+    ? STUDENT_SECTION_ORDER 
+    : (cv.sectionOrder || DEFAULT_SECTION_ORDER);
   const [rearrangeModalOpen, setRearrangeModalOpen] = useState(false);
   const [colorAnchorEl, setColorAnchorEl] = useState<HTMLElement | null>(null);
   const [customPrimary, setCustomPrimary] = useState(cv.colorScheme?.primary || "#1b4f72");
@@ -581,6 +602,64 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
     onUpdateCV({ ...cv, certifications: [...(cv.certifications || []), newCert] });
   };
 
+  const updateProject = (index: number, field: string, value: string | string[]) => {
+    const newProjects = [...(cv.projects || [])];
+    newProjects[index] = { ...newProjects[index], [field]: value };
+    onUpdateCV({ ...cv, projects: newProjects });
+  };
+
+  const deleteProject = (index: number) => {
+    const newProjects = (cv.projects || []).filter((_, i) => i !== index);
+    onUpdateCV({ ...cv, projects: newProjects });
+  };
+
+  const addProject = () => {
+    const newProject = {
+      id: `proj-new-${Date.now()}`,
+      title: "Project Title",
+      role: "",
+      description: "Project description",
+      technologies: ["Tech1", "Tech2"],
+      impact: []
+    };
+    onUpdateCV({ ...cv, projects: [...(cv.projects || []), newProject] });
+  };
+
+  const addProjectTech = (projectIndex: number, tech: string) => {
+    const newProjects = [...(cv.projects || [])];
+    const project = newProjects[projectIndex];
+    if (project) {
+      newProjects[projectIndex] = {
+        ...project,
+        technologies: [...(project.technologies || []), tech]
+      };
+      onUpdateCV({ ...cv, projects: newProjects });
+    }
+  };
+
+  const removeProjectTech = (projectIndex: number, techIndex: number) => {
+    const newProjects = [...(cv.projects || [])];
+    const project = newProjects[projectIndex];
+    if (project) {
+      newProjects[projectIndex] = {
+        ...project,
+        technologies: (project.technologies || []).filter((_, i) => i !== techIndex)
+      };
+      onUpdateCV({ ...cv, projects: newProjects });
+    }
+  };
+
+  const updateProjectTech = (projectIndex: number, techIndex: number, value: string) => {
+    const newProjects = [...(cv.projects || [])];
+    const project = newProjects[projectIndex];
+    if (project) {
+      const newTechs = [...(project.technologies || [])];
+      newTechs[techIndex] = value;
+      newProjects[projectIndex] = { ...project, technologies: newTechs };
+      onUpdateCV({ ...cv, projects: newProjects });
+    }
+  };
+
   const baseStyle = getTemplateStyle(template);
   
   // Merge CV colorScheme with template defaults
@@ -615,7 +694,9 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
     | { type: "education-entry"; index: number }
     | { type: "skills" }
     | { type: "strengths" }
-    | { type: "certifications" };
+    | { type: "certifications" }
+    | { type: "projects-header"; continued?: boolean }
+    | { type: "project-entry"; index: number };
 
   interface PageData {
     pageNumber: number;
@@ -666,6 +747,15 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
       const count = cv.strengths?.length || 0;
       const rows = Math.ceil(count / 6);
       return SECTION_HEADER + rows * 28 + 16;
+    };
+
+    const estimateProjectEntryHeight = (project: { title: string; description: string; technologies?: string[] }): number => {
+      const headerHeight = 48; // Title and role line
+      const desc = project.description || "";
+      const textLines = Math.ceil(desc.length / CHARS_PER_LINE);
+      const techCount = project.technologies?.length || 0;
+      const techRows = Math.ceil(techCount / 6); // ~6 tech badges per row
+      return headerHeight + textLines * LINE_HEIGHT + techRows * 28 + 16;
     };
 
     const estimateCertificationsHeight = (): number => {
@@ -809,6 +899,42 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
         case "certifications": {
           const height = estimateCertificationsHeight();
           addItem({ type: "certifications" }, height);
+          break;
+        }
+
+        case "projects": {
+          if (!cv.projects || cv.projects.length === 0) break;
+          
+          cv.projects.forEach((project, index) => {
+            const entryHeight = estimateProjectEntryHeight(project);
+            const headerHeight = SECTION_HEADER;
+            
+            if (index === 0) {
+              const combined = headerHeight + entryHeight;
+              if (currentHeight + combined > getAvailable() && currentItems.length > 0) {
+                pushPage();
+              }
+              currentItems.push({ type: "projects-header", continued: false });
+              currentItems.push({ type: "project-entry", index });
+              currentHeight += combined;
+            } else {
+              if (currentHeight + entryHeight > getAvailable() && currentItems.length > 0) {
+                pushPage();
+                const combined = headerHeight + entryHeight;
+                if (combined <= getAvailable()) {
+                  currentItems.push({ type: "projects-header", continued: true });
+                  currentItems.push({ type: "project-entry", index });
+                  currentHeight += combined;
+                } else {
+                  currentItems.push({ type: "project-entry", index });
+                  currentHeight += entryHeight;
+                }
+              } else {
+                currentItems.push({ type: "project-entry", index });
+                currentHeight += entryHeight;
+              }
+            }
+          });
           break;
         }
       }
@@ -1118,6 +1244,100 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
             </Box>
           </Box>
         );
+
+      case "projects-header": {
+        return (
+          <Box key="projects-header" sx={{ mb: 1 }}>
+            <SectionHeader
+              title={item.continued ? "Featured Projects (continued)" : "Featured Projects"}
+              style={style}
+              rightContent={
+                !item.continued ? (
+                  <IconButton size="small" onClick={addProject} sx={{ color: style.accent }} data-testid="button-add-project">
+                    <AddIcon fontSize="small" />
+                  </IconButton>
+                ) : undefined
+              }
+            />
+          </Box>
+        );
+      }
+
+      case "project-entry": {
+        const project = cv.projects?.[item.index];
+        if (!project) return null;
+        const isLastProj = isLast || 
+          (pageItems.findIndex(i => i === item) === pageItems.length - 1) ||
+          (pageItems[pageItems.findIndex(i => i === item) + 1]?.type !== "project-entry");
+        return (
+          <Box key={`proj-${project.id}`} sx={{ mb: isLastProj ? 0 : 2, position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
+            <IconButton 
+              className="delete-btn"
+              size="small" 
+              onClick={() => deleteProject(item.index)}
+              sx={{ position: "absolute", right: 0, top: 0, visibility: "hidden", color: "error.main" }}
+              data-testid={`button-delete-project-${item.index}`}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+            <Typography variant="subtitle1" fontWeight={600} sx={{ color: style.bodyText, lineHeight: 1.2 }} component="div">
+              <EditableField 
+                value={project.title} 
+                onChange={(v) => updateProject(item.index, "title", v)} 
+                placeholder="Project Title"
+              />
+            </Typography>
+            {project.role && (
+              <Typography variant="body2" sx={{ color: style.companyColor, fontWeight: 600, lineHeight: 1.2, mt: 0 }} component="div">
+                <EditableField 
+                  value={project.role} 
+                  onChange={(v) => updateProject(item.index, "role", v)} 
+                  placeholder="Your Role"
+                />
+              </Typography>
+            )}
+            <Typography variant="body2" sx={{ color: style.bodyText, whiteSpace: "pre-wrap", lineHeight: 1.5, mt: 0.5 }} component="div">
+              <EditableField 
+                value={project.description} 
+                onChange={(v) => updateProject(item.index, "description", v)} 
+                multiline
+                rows={3}
+                placeholder="Project description and achievements..."
+              />
+            </Typography>
+            {((project.technologies || []).length > 0 || template === "student-modern") && (
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mt: 1, alignItems: "center" }}>
+                {(project.technologies || []).map((tech, techIdx) => (
+                  <Chip
+                    key={`tech-${techIdx}`}
+                    label={tech}
+                    size="small"
+                    sx={{
+                      bgcolor: `${style.accent}15`,
+                      color: style.accent,
+                      fontWeight: 600,
+                      fontSize: "0.7rem",
+                      height: 22,
+                      borderRadius: "4px",
+                      "&:hover": { bgcolor: `${style.accent}25` },
+                    }}
+                    onDelete={() => removeProjectTech(item.index, techIdx)}
+                    data-testid={`chip-project-${item.index}-tech-${techIdx}`}
+                  />
+                ))}
+                <IconButton 
+                  size="small" 
+                  onClick={() => addProjectTech(item.index, "NewTech")}
+                  sx={{ color: style.accent, width: 22, height: 22 }}
+                  data-testid={`button-add-project-tech-${item.index}`}
+                >
+                  <AddIcon sx={{ fontSize: 14 }} />
+                </IconButton>
+              </Box>
+            )}
+          </Box>
+        );
+      }
 
       default:
         return null;
