@@ -1,5 +1,6 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Inject } from "@nestjs/common";
 import type { ParsedCV, Experience, Education, Certification } from "../../types/cv";
+import { LangchainService } from "../assessment/langchain.service";
 
 type PdfParseResult = { text: string; numpages: number };
 type PdfParseFunction = (buffer: Buffer, options?: object) => Promise<PdfParseResult>;
@@ -76,6 +77,9 @@ const CERT_PATTERNS = [
 
 @Injectable()
 export class ParseService {
+  constructor(
+    @Inject(LangchainService) private readonly langchainService: LangchainService
+  ) {}
 
   async parseCV(buffer: Buffer, fileName: string, fileId: string): Promise<{ cv: ParsedCV; rawText: string }> {
     console.log(`[ParseService] parseCV called - File: ${fileName}, Size: ${buffer.length}, ID: ${fileId}`);
@@ -141,34 +145,24 @@ export class ParseService {
   }
 
   /**
-   * AI-powered CV extraction using LangChain-style parser
+   * AI-powered CV extraction using multi-provider LangchainService
+   * Uses OpenAI by default, falls back to Gemini if unavailable
    */
   private async extractWithAI(text: string, fileId: string): Promise<ParsedCV | null> {
-    const userApiKey = process.env.GOOGLE_API_KEY;
-    const replitApiKey = process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
+    const providers = this.langchainService.getAvailableProviders();
     
-    if (!userApiKey && !replitApiKey) {
-      console.log(`[ParseService] No AI API key available`);
+    if (providers.length === 0) {
+      console.log(`[ParseService] No AI provider available`);
       return null;
     }
 
-    try {
-      const { GoogleGenAI } = await import("@google/genai");
-      
-      let ai: InstanceType<typeof GoogleGenAI>;
-      if (userApiKey) {
-        ai = new GoogleGenAI({ apiKey: userApiKey });
-      } else {
-        ai = new GoogleGenAI({
-          apiKey: replitApiKey!,
-          httpOptions: {
-            apiVersion: "",
-            baseUrl: process.env.AI_INTEGRATIONS_GEMINI_BASE_URL || undefined,
-          },
-        });
-      }
+    const provider = providers.includes("openai") ? "openai" : providers[0];
+    console.log(`[ParseService] Using ${provider} for CV extraction (available: ${providers.join(", ")})`);
 
-      const prompt = `Extract structured data from this CV/resume. Return ONLY valid JSON with this exact structure:
+    try {
+      const systemPrompt = `You are a CV/resume parser. Extract structured information and return ONLY valid JSON.`;
+      
+      const userPrompt = `Extract structured data from this CV/resume. Return ONLY valid JSON with this exact structure:
 {
   "name": "Full name",
   "title": "Professional title or current role",
@@ -213,14 +207,11 @@ IMPORTANT:
 CV TEXT:
 ${text}`;
 
-      console.log(`[ParseService] Calling AI for CV extraction...`);
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-        config: {
-          maxOutputTokens: 8000,
-          temperature: 0.1,
-        },
+      console.log(`[ParseService] Calling ${provider} for CV extraction...`);
+      const response = await this.langchainService.generate(systemPrompt, userPrompt, {
+        provider,
+        temperature: 0.1,
+        maxOutputTokens: 8000,
       });
 
       const responseText = response.text?.trim() || "";
