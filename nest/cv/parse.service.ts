@@ -105,30 +105,182 @@ export class ParseService {
     
     console.log(`[ParseService] Starting extraction for ${fileName}`);
 
-    // Use regex-based extraction (LangChain is only for CV analysis, not parsing)
-    const rawCv: ParsedCV = {
-      id: fileId,
-      name: this.extractName(text),
-      title: this.extractTitle(text),
-      email: this.extractEmail(text),
-      phone: this.extractPhone(text),
-      location: this.extractLocation(text),
-      website: this.extractWebsite(text),
-      linkedin: this.extractLinkedIn(text),
-      github: this.extractGithub(text),
-      summary: this.extractSummary(text),
-      experience: this.extractExperience(text, fileId),
-      education: this.extractEducation(text, fileId),
-      certifications: this.extractCertifications(text, fileId),
-      skills: this.extractSkills(text),
-      originalFilename: fileName,
-      uploadedAt: new Date(),
-      rawText: text,
-    };
+    // Try AI-powered extraction first, fall back to regex
+    let rawCv: ParsedCV;
+    const aiResult = await this.extractWithAI(text, fileId);
+    
+    if (aiResult) {
+      console.log(`[ParseService] Using AI-powered extraction`);
+      rawCv = aiResult;
+    } else {
+      console.log(`[ParseService] Using regex-based extraction (AI unavailable)`);
+      rawCv = {
+        id: fileId,
+        name: this.extractName(text),
+        title: this.extractTitle(text),
+        email: this.extractEmail(text),
+        phone: this.extractPhone(text),
+        location: this.extractLocation(text),
+        website: this.extractWebsite(text),
+        linkedin: this.extractLinkedIn(text),
+        github: this.extractGithub(text),
+        summary: this.extractSummary(text),
+        experience: this.extractExperience(text, fileId),
+        education: this.extractEducation(text, fileId),
+        certifications: this.extractCertifications(text, fileId),
+        skills: this.extractSkills(text),
+        originalFilename: fileName,
+        uploadedAt: new Date(),
+        rawText: text,
+      };
+    }
 
     const cv = this.validateAndNormalizeCV(rawCv);
-    console.log(`[ParseService] Extraction complete - Name: "${cv.name}", Email: "${cv.email}", Skills: ${cv.skills.length}`);
+    console.log(`[ParseService] Extraction complete - Name: "${cv.name}", Email: "${cv.email}", Experience: ${cv.experience.length}, Skills: ${cv.skills.length}`);
     return { cv, rawText: text };
+  }
+
+  /**
+   * AI-powered CV extraction using LangChain-style parser
+   */
+  private async extractWithAI(text: string, fileId: string): Promise<ParsedCV | null> {
+    const userApiKey = process.env.GOOGLE_API_KEY;
+    const replitApiKey = process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
+    
+    if (!userApiKey && !replitApiKey) {
+      console.log(`[ParseService] No AI API key available`);
+      return null;
+    }
+
+    try {
+      const { GoogleGenAI } = await import("@google/genai");
+      
+      let ai: InstanceType<typeof GoogleGenAI>;
+      if (userApiKey) {
+        ai = new GoogleGenAI({ apiKey: userApiKey });
+      } else {
+        ai = new GoogleGenAI({
+          apiKey: replitApiKey!,
+          httpOptions: {
+            apiVersion: "",
+            baseUrl: process.env.AI_INTEGRATIONS_GEMINI_BASE_URL || undefined,
+          },
+        });
+      }
+
+      const prompt = `Extract structured data from this CV/resume. Return ONLY valid JSON with this exact structure:
+{
+  "name": "Full name",
+  "title": "Professional title or current role",
+  "email": "Email address",
+  "phone": "Phone number",
+  "location": "Location/city",
+  "website": "Personal website URL if any",
+  "linkedin": "LinkedIn URL if any",
+  "github": "GitHub URL if any",
+  "summary": "Professional summary or objective",
+  "experience": [
+    {
+      "company": "Company name",
+      "role": "Job title",
+      "duration": "Date range (e.g., 'Jan 2020 - Present')",
+      "description": "Job responsibilities and achievements as bullet points joined with newlines"
+    }
+  ],
+  "education": [
+    {
+      "institution": "School/university name",
+      "degree": "Degree or qualification",
+      "year": "Graduation year or date range"
+    }
+  ],
+  "certifications": [
+    {
+      "name": "Certification name",
+      "issuer": "Issuing organization",
+      "year": "Year obtained"
+    }
+  ],
+  "skills": ["skill1", "skill2"],
+  "strengths": ["strength1", "strength2"]
+}
+
+IMPORTANT: 
+- Extract ALL work experiences, not just the first one
+- Include the full job description with all bullet points
+- If a field is not found, use empty string "" or empty array []
+
+CV TEXT:
+${text}`;
+
+      console.log(`[ParseService] Calling AI for CV extraction...`);
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: {
+          maxOutputTokens: 8000,
+          temperature: 0.1,
+        },
+      });
+
+      const responseText = response.text?.trim() || "";
+      if (!responseText) {
+        console.log(`[ParseService] Empty AI response`);
+        return null;
+      }
+
+      // Clean and parse JSON
+      let cleanedText = responseText.trim();
+      if (cleanedText.startsWith("```json")) cleanedText = cleanedText.slice(7);
+      else if (cleanedText.startsWith("```")) cleanedText = cleanedText.slice(3);
+      if (cleanedText.endsWith("```")) cleanedText = cleanedText.slice(0, -3);
+      cleanedText = cleanedText.trim();
+
+      const parsed = JSON.parse(cleanedText);
+      
+      console.log(`[ParseService] AI extraction successful - found ${parsed.experience?.length || 0} experiences`);
+
+      return {
+        id: fileId,
+        name: parsed.name || "",
+        title: parsed.title || "",
+        email: parsed.email || "",
+        phone: parsed.phone || "",
+        location: parsed.location || "",
+        website: parsed.website || "",
+        linkedin: parsed.linkedin || "",
+        github: parsed.github || "",
+        summary: parsed.summary || "",
+        experience: (parsed.experience || []).map((exp: { company?: string; role?: string; duration?: string; description?: string; location?: string }, i: number) => ({
+          id: this.generateStableId("exp", i, fileId),
+          company: exp.company || "",
+          role: exp.role || "",
+          duration: exp.duration || "",
+          description: exp.description || "",
+          location: exp.location || "",
+        })),
+        education: (parsed.education || []).map((edu: { institution?: string; degree?: string; year?: string }, i: number) => ({
+          id: this.generateStableId("edu", i, fileId),
+          institution: edu.institution || "",
+          degree: edu.degree || "",
+          year: edu.year || "",
+        })),
+        certifications: (parsed.certifications || []).map((cert: { name?: string; issuer?: string; year?: string }, i: number) => ({
+          id: this.generateStableId("cert", i, fileId),
+          name: cert.name || "",
+          issuer: cert.issuer || "",
+          year: cert.year || "",
+        })),
+        skills: parsed.skills || [],
+        strengths: parsed.strengths || [],
+        originalFilename: "",
+        uploadedAt: new Date(),
+        rawText: text,
+      };
+    } catch (error) {
+      console.error(`[ParseService] AI extraction failed:`, error);
+      return null;
+    }
   }
 
   private async parsePdfBuffer(buffer: Buffer): Promise<PdfParseResult> {

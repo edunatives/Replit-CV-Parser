@@ -39,7 +39,7 @@ Preferred communication style: Simple, everyday language.
     - `POST /api/assess/jd-match`: JD matching with three-score system
     - `POST /api/assess/compare`: Compare old vs new assessment prompts
     - `POST /api/assess/advisor`: AI career advisor chat
-- **CV Parsing**: Implemented using `mammoth` (DOCX), `pdf-parse` (PDF), and LangChain-style Zod-validated AI extraction via Gemini 2.5 Flash. Regex-based fallbacks are in place for key fields.
+- **CV Parsing**: Implemented using `mammoth` (DOCX), `pdf-parse` (PDF), and AI-powered extraction via Gemini 2.5 Flash. The NestJS ParseService now uses AI for comprehensive CV parsing (all experiences, education, skills) with regex-based fallback when AI is unavailable.
 - **AI-Powered Features**: All AI operations use a multi-provider LLM abstraction layer supporting Gemini and OpenAI. The v2.3 CV Intelligence Engine provides consistent, type-safe structured output via Zod schemas.
 - **Multi-Provider Support**: 
     - Gemini: GOOGLE_API_KEY (user's direct key) or AI_INTEGRATIONS_GEMINI_API_KEY (Replit integration)
