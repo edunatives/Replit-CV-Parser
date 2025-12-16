@@ -45,6 +45,7 @@ Preferred communication style: Simple, everyday language.
     - Gemini: GOOGLE_API_KEY (user's direct key) or AI_INTEGRATIONS_GEMINI_API_KEY (Replit integration)
     - OpenAI: AI_INTEGRATIONS_OPENAI_API_KEY (Replit integration) - uses gpt-4o by default
     - Provider selection via `/api/assess/providers` endpoint and `provider` parameter in assessment APIs
+    - CV parsing prefers OpenAI when available, falls back to Gemini
 - **API Key Priority**: GOOGLE_API_KEY takes precedence for Gemini. Both providers can be used simultaneously.
 - **Startup**: `server/index.ts` starts both Next.js (frontend) and NestJS (backend) servers together.
 

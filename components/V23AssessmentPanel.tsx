@@ -1146,9 +1146,9 @@ function BulletsTab({ data }: { data: StandardOutput | FullOutput }) {
     company: string;
     text: string;
     score: number;
-    actionVerb: { word: string | null; strength: string; score: number };
-    quantification: { hasQuantification: boolean; type: string | null; score: number };
-    result: { hasResult: boolean; type: string; score: number };
+    actionVerb?: { word: string | null; strength: string; score: number };
+    quantification?: { hasQuantification: boolean; type: string | null; score: number };
+    result?: { hasResult: boolean; type: string; score: number };
     issues: Array<{ code: string; issue: string }>;
     rewrite?: { suggested: string; projectedScore: number };
   }> = [];
@@ -1298,28 +1298,34 @@ function BulletsTab({ data }: { data: StandardOutput | FullOutput }) {
                   
                   {/* Analysis breakdown */}
                   <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 1.5 }}>
-                    <Chip 
-                      label={`Verb: ${bullet.actionVerb.word || "none"} (${bullet.actionVerb.strength})`}
-                      size="small"
-                      variant="outlined"
-                      sx={{ borderColor: getVerbStrengthColor(bullet.actionVerb.strength), color: getVerbStrengthColor(bullet.actionVerb.strength) }}
-                    />
-                    <Chip 
-                      label={bullet.quantification.hasQuantification ? `Quantified: ${bullet.quantification.type}` : "No quantification"}
-                      size="small"
-                      variant="outlined"
-                      sx={{ borderColor: bullet.quantification.hasQuantification ? "#22c55e" : "#ef4444", color: bullet.quantification.hasQuantification ? "#22c55e" : "#ef4444" }}
-                    />
-                    <Chip 
-                      label={`Result: ${bullet.result.type}`}
-                      size="small"
-                      variant="outlined"
-                      sx={{ borderColor: bullet.result.hasResult ? "#22c55e" : "#ef4444", color: bullet.result.hasResult ? "#22c55e" : "#ef4444" }}
-                    />
+                    {bullet.actionVerb && (
+                      <Chip 
+                        label={`Verb: ${bullet.actionVerb.word || "none"} (${bullet.actionVerb.strength || "unknown"})`}
+                        size="small"
+                        variant="outlined"
+                        sx={{ borderColor: getVerbStrengthColor(bullet.actionVerb.strength || "none"), color: getVerbStrengthColor(bullet.actionVerb.strength || "none") }}
+                      />
+                    )}
+                    {bullet.quantification && (
+                      <Chip 
+                        label={bullet.quantification.hasQuantification ? `Quantified: ${bullet.quantification.type}` : "No quantification"}
+                        size="small"
+                        variant="outlined"
+                        sx={{ borderColor: bullet.quantification.hasQuantification ? "#22c55e" : "#ef4444", color: bullet.quantification.hasQuantification ? "#22c55e" : "#ef4444" }}
+                      />
+                    )}
+                    {bullet.result && (
+                      <Chip 
+                        label={`Result: ${bullet.result.type || "none"}`}
+                        size="small"
+                        variant="outlined"
+                        sx={{ borderColor: bullet.result.hasResult ? "#22c55e" : "#ef4444", color: bullet.result.hasResult ? "#22c55e" : "#ef4444" }}
+                      />
+                    )}
                   </Box>
                   
                   {/* Issues detected */}
-                  {bullet.issues.length > 0 && (
+                  {bullet.issues && bullet.issues.length > 0 && (
                     <Box sx={{ mb: 1.5 }}>
                       <Typography variant="caption" fontWeight={600} color="error.main">Issues:</Typography>
                       <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, mt: 0.5 }}>
