@@ -83,8 +83,6 @@ function HomeContent() {
         body: formData,
       });
       console.log("[Upload] Response status:", response.status, response.statusText);
-
-      setUploadStep(3);
       
       if (!response.ok) {
         const errorData = await response.json();
@@ -93,10 +91,14 @@ function HomeContent() {
 
       const { cv, tokenUsage } = await response.json();
       
-      // Update detected CV type to show in progress indicator
+      // Update detected CV type to show in progress indicator right after AI parsing
       if (cv.cvType) {
         setDetectedCvType(cv.cvType);
       }
+      
+      // Move to Finalizing step after CV type is detected
+      setUploadStep(3);
+      await new Promise(r => setTimeout(r, 800)); // Brief pause to show the detected type
 
       setCvs((prev) => [cv, ...prev]);
       setSelectedCV(cv);
