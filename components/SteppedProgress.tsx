@@ -15,18 +15,44 @@ interface SteppedProgressProps {
   currentStep: number;
   title?: string;
   estimatedTime?: string;
+  cvType?: string;
 }
 
-export function SteppedProgress({ steps, currentStep, title, estimatedTime }: SteppedProgressProps) {
+const CV_TYPE_LABELS: Record<string, { label: string; color: string }> = {
+  student: { label: "Student", color: "#3b82f6" },
+  fresh_grad: { label: "Fresh Graduate", color: "#8b5cf6" },
+  researcher: { label: "Researcher", color: "#06b6d4" },
+  professional: { label: "Professional", color: "#10b981" },
+};
+
+export function SteppedProgress({ steps, currentStep, title, estimatedTime, cvType }: SteppedProgressProps) {
   const progress = Math.min(100, ((currentStep + 1) / steps.length) * 100);
+  const typeInfo = cvType ? CV_TYPE_LABELS[cvType] : null;
 
   return (
     <Paper elevation={0} sx={{ p: 3, bgcolor: "#f8fafc", border: "1px solid", borderColor: "divider" }}>
       {title && (
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-          <Typography variant="subtitle1" fontWeight={600}>
-            {title}
-          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Typography variant="subtitle1" fontWeight={600}>
+              {title}
+            </Typography>
+            {typeInfo && (
+              <Box 
+                sx={{ 
+                  px: 1.5, 
+                  py: 0.25, 
+                  borderRadius: 1, 
+                  bgcolor: typeInfo.color,
+                  color: "white",
+                  fontSize: "0.75rem",
+                  fontWeight: 600,
+                }}
+              >
+                {typeInfo.label}
+              </Box>
+            )}
+          </Box>
           {estimatedTime && (
             <Typography variant="caption" color="text.secondary">
               {estimatedTime}

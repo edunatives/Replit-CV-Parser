@@ -177,7 +177,7 @@ export class ParseService {
   "linkedin": "LinkedIn URL if any",
   "github": "GitHub URL if any",
   "summary": "Professional summary or objective",
-  "cvType": "One of: student, fresh_grad, or professional",
+  "cvType": "One of: student, fresh_grad, researcher, or professional",
   "experience": [
     {
       "company": "Company name",
@@ -211,7 +211,8 @@ IMPORTANT:
 - For cvType, determine based on these criteria:
   * "student": Currently enrolled in education, no or only internship/part-time work experience
   * "fresh_grad": Graduated within last 2 years, limited professional experience (0-2 years)
-  * "professional": 3+ years of professional work experience
+  * "researcher": PhD candidate, postdoc, research fellow, or academic role with publications/research focus
+  * "professional": 3+ years of professional work experience in industry
 
 CV TEXT:
 ${text}`;
@@ -364,11 +365,12 @@ ${text}`;
   /**
    * Normalize CV type string from AI response to valid CVType
    */
-  private normalizeCVType(cvType: string | undefined): "student" | "fresh_grad" | "professional" {
+  private normalizeCVType(cvType: string | undefined): "student" | "fresh_grad" | "researcher" | "professional" {
     if (!cvType) return "professional";
     const normalized = cvType.toLowerCase().trim();
     if (normalized === "student" || normalized.includes("student")) return "student";
     if (normalized === "fresh_grad" || normalized.includes("fresh") || normalized.includes("graduate")) return "fresh_grad";
+    if (normalized === "researcher" || normalized.includes("research") || normalized.includes("phd") || normalized.includes("postdoc")) return "researcher";
     return "professional";
   }
 
@@ -376,8 +378,25 @@ ${text}`;
    * Detect CV type using regex-based heuristics
    * Used as fallback when AI parsing is unavailable
    */
-  private detectCVType(text: string, experience: { duration: string }[]): "student" | "fresh_grad" | "professional" {
+  private detectCVType(text: string, experience: { duration: string }[]): "student" | "fresh_grad" | "researcher" | "professional" {
     const lowerText = text.toLowerCase();
+    
+    // Check for researcher indicators (check first as researchers may also have student indicators)
+    const researcherIndicators = [
+      /\bphd\b|\bph\.?d\.?\b/i,
+      /\bpostdoc(?:toral)?\b/i,
+      /research\s+(?:fellow|scientist|assistant|associate)/i,
+      /\bpublications?\b/i,
+      /\bjournal\s+(?:article|paper)/i,
+      /\bconference\s+(?:paper|proceeding)/i,
+      /\bdissertation\b/i,
+      /\bthesis\b/i,
+      /principal\s+investigator/i,
+      /\blab(?:oratory)?\s+(?:director|manager|head)/i,
+      /academic\s+(?:position|role|career)/i,
+    ];
+    
+    const hasResearcherIndicators = researcherIndicators.some(regex => regex.test(lowerText));
     
     // Check for student indicators
     const studentIndicators = [
@@ -387,7 +406,7 @@ ${text}`;
       /(?:freshman|sophomore|junior|senior)\s+(?:year|student)/i,
       /gpa\s*[:;]\s*\d/i,
       /student\s+(?:at|of)/i,
-      /pursuing\s+(?:a\s+)?(?:bachelor|master|phd|degree)/i,
+      /pursuing\s+(?:a\s+)?(?:bachelor|master|degree)/i,
     ];
     
     const hasStudentIndicators = studentIndicators.some(regex => regex.test(lowerText));
@@ -418,7 +437,11 @@ ${text}`;
       }
     }
     
-    // Decision logic
+    // Decision logic - researcher takes priority if indicators are strong
+    if (hasResearcherIndicators) {
+      return "researcher";
+    }
+    
     if (hasStudentIndicators && experience.length <= 2 && totalYears <= 1) {
       return "student";
     }

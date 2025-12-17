@@ -40,13 +40,13 @@ Preferred communication style: Simple, everyday language.
     - `POST /api/assess/compare`: Compare old vs new assessment prompts
     - `POST /api/assess/advisor`: AI career advisor chat
 - **CV Parsing**: Implemented using `mammoth` (DOCX), `pdf-parse` (PDF), and AI-powered extraction via Gemini 2.5 Flash. The NestJS ParseService now uses AI for comprehensive CV parsing (all experiences, education, skills) with regex-based fallback when AI is unavailable.
-- **CV Type Detection**: During parsing, the system automatically detects if a CV is for a student, fresh graduate, or professional based on:
+- **CV Type Detection**: During parsing, the system automatically detects CV classification displayed in progress bar:
     - AI analysis of experience, education indicators, and keywords
-    - Heuristic fallback: number of experiences, total years of experience, student/fresh grad keywords
-    - CVType values: `student` (enrolled), `fresh_grad` (0-2 years experience), `professional` (3+ years)
+    - Heuristic fallback: regex patterns for research/academic indicators, experience count, years of experience
+    - CVType values: `student` (enrolled), `fresh_grad` (0-2 years), `researcher` (PhD/postdoc/academic), `professional` (3+ years industry)
 - **Template Selector Logic**: Based on detected cvType, template dropdowns are conditionally enabled:
     - Student/Fresh Grad CVs: Students Templates enabled, Professional Templates disabled
-    - Professional CVs: Professional Templates enabled, Students Templates disabled
+    - Researcher/Professional CVs: Professional Templates enabled, Students Templates disabled
 - **AI-Powered Features**: All AI operations use a multi-provider LLM abstraction layer supporting Gemini and OpenAI. The v2.3 CV Intelligence Engine provides consistent, type-safe structured output via Zod schemas.
 - **Multi-Provider Support**: 
     - Gemini: GOOGLE_API_KEY (user's direct key) or AI_INTEGRATIONS_GEMINI_API_KEY (Replit integration)

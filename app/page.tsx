@@ -32,6 +32,7 @@ function HomeContent() {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadStep, setUploadStep] = useState(0);
+  const [detectedCvType, setDetectedCvType] = useState<string | undefined>(undefined);
   const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: "success" | "error" | "info" }>({
     open: false,
     message: "",
@@ -64,6 +65,7 @@ function HomeContent() {
     pendingFileRef.current = file;
     setIsProcessing(true);
     setUploadStep(0);
+    setDetectedCvType(undefined);
     setUploadDialogOpen(false);
 
     try {
@@ -90,6 +92,11 @@ function HomeContent() {
       }
 
       const { cv, tokenUsage } = await response.json();
+      
+      // Update detected CV type to show in progress indicator
+      if (cv.cvType) {
+        setDetectedCvType(cv.cvType);
+      }
 
       setCvs((prev) => [cv, ...prev]);
       setSelectedCV(cv);
@@ -153,6 +160,7 @@ function HomeContent() {
               currentStep={uploadStep} 
               title="Processing Your CV"
               estimatedTime="Usually takes 10-30 seconds"
+              cvType={detectedCvType}
             />
           </Box>
         )}

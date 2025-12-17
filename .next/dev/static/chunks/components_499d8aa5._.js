@@ -2352,8 +2352,27 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$mat
 ;
 ;
 ;
-function SteppedProgress({ steps, currentStep, title, estimatedTime }) {
+const CV_TYPE_LABELS = {
+    student: {
+        label: "Student",
+        color: "#3b82f6"
+    },
+    fresh_grad: {
+        label: "Fresh Graduate",
+        color: "#8b5cf6"
+    },
+    researcher: {
+        label: "Researcher",
+        color: "#06b6d4"
+    },
+    professional: {
+        label: "Professional",
+        color: "#10b981"
+    }
+};
+function SteppedProgress({ steps, currentStep, title, estimatedTime, cvType }) {
     const progress = Math.min(100, (currentStep + 1) / steps.length * 100);
+    const typeInfo = cvType ? CV_TYPE_LABELS[cvType] : null;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Paper$2f$Paper$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Paper$3e$__["Paper"], {
         elevation: 0,
         sx: {
@@ -2371,13 +2390,42 @@ function SteppedProgress({ steps, currentStep, title, estimatedTime }) {
                     mb: 2
                 },
                 children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
-                        variant: "subtitle1",
-                        fontWeight: 600,
-                        children: title
-                    }, void 0, false, {
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
+                        sx: {
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 2
+                        },
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
+                                variant: "subtitle1",
+                                fontWeight: 600,
+                                children: title
+                            }, void 0, false, {
+                                fileName: "[project]/components/SteppedProgress.tsx",
+                                lineNumber: 37,
+                                columnNumber: 13
+                            }, this),
+                            typeInfo && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
+                                sx: {
+                                    px: 1.5,
+                                    py: 0.25,
+                                    borderRadius: 1,
+                                    bgcolor: typeInfo.color,
+                                    color: "white",
+                                    fontSize: "0.75rem",
+                                    fontWeight: 600
+                                },
+                                children: typeInfo.label
+                            }, void 0, false, {
+                                fileName: "[project]/components/SteppedProgress.tsx",
+                                lineNumber: 41,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, void 0, true, {
                         fileName: "[project]/components/SteppedProgress.tsx",
-                        lineNumber: 27,
+                        lineNumber: 36,
                         columnNumber: 11
                     }, this),
                     estimatedTime && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -2386,13 +2434,13 @@ function SteppedProgress({ steps, currentStep, title, estimatedTime }) {
                         children: estimatedTime
                     }, void 0, false, {
                         fileName: "[project]/components/SteppedProgress.tsx",
-                        lineNumber: 31,
+                        lineNumber: 57,
                         columnNumber: 13
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/SteppedProgress.tsx",
-                lineNumber: 26,
+                lineNumber: 35,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$LinearProgress$2f$LinearProgress$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__LinearProgress$3e$__["LinearProgress"], {
@@ -2409,7 +2457,7 @@ function SteppedProgress({ steps, currentStep, title, estimatedTime }) {
                 }
             }, void 0, false, {
                 fileName: "[project]/components/SteppedProgress.tsx",
-                lineNumber: 38,
+                lineNumber: 64,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2437,14 +2485,14 @@ function SteppedProgress({ steps, currentStep, title, estimatedTime }) {
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/components/SteppedProgress.tsx",
-                                lineNumber: 67,
+                                lineNumber: 93,
                                 columnNumber: 17
                             }, this) : isCurrent ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$CircularProgress$2f$CircularProgress$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                 size: 18,
                                 thickness: 5
                             }, void 0, false, {
                                 fileName: "[project]/components/SteppedProgress.tsx",
-                                lineNumber: 69,
+                                lineNumber: 95,
                                 columnNumber: 17
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$RadioButtonUnchecked$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                 sx: {
@@ -2453,7 +2501,7 @@ function SteppedProgress({ steps, currentStep, title, estimatedTime }) {
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/components/SteppedProgress.tsx",
-                                lineNumber: 71,
+                                lineNumber: 97,
                                 columnNumber: 17
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2465,7 +2513,7 @@ function SteppedProgress({ steps, currentStep, title, estimatedTime }) {
                                         children: step.label
                                     }, void 0, false, {
                                         fileName: "[project]/components/SteppedProgress.tsx",
-                                        lineNumber: 74,
+                                        lineNumber: 100,
                                         columnNumber: 17
                                     }, this),
                                     step.description && isCurrent && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -2474,31 +2522,31 @@ function SteppedProgress({ steps, currentStep, title, estimatedTime }) {
                                         children: step.description
                                     }, void 0, false, {
                                         fileName: "[project]/components/SteppedProgress.tsx",
-                                        lineNumber: 82,
+                                        lineNumber: 108,
                                         columnNumber: 19
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/SteppedProgress.tsx",
-                                lineNumber: 73,
+                                lineNumber: 99,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, index, true, {
                         fileName: "[project]/components/SteppedProgress.tsx",
-                        lineNumber: 57,
+                        lineNumber: 83,
                         columnNumber: 13
                     }, this);
                 })
             }, void 0, false, {
                 fileName: "[project]/components/SteppedProgress.tsx",
-                lineNumber: 50,
+                lineNumber: 76,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/SteppedProgress.tsx",
-        lineNumber: 24,
+        lineNumber: 33,
         columnNumber: 5
     }, this);
 }

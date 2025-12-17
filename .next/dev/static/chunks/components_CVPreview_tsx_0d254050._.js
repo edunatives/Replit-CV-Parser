@@ -812,10 +812,10 @@ function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = t
     const isStudentTemplate = template === "student-modern";
     // Determine which template category should be enabled based on CV type
     // student and fresh_grad -> Students Templates enabled, Professional disabled
-    // professional -> Professional Templates enabled, Students disabled
+    // professional and researcher -> Professional Templates enabled, Students disabled
     const cvType = cv.cvType || "professional";
     const isStudentOrFreshGrad = cvType === "student" || cvType === "fresh_grad";
-    const isProfessionalCV = cvType === "professional";
+    const isProfessionalCV = cvType === "professional" || cvType === "researcher";
     // Student template ALWAYS enforces education-first order
     const sectionOrder = isStudentTemplate ? __TURBOPACK__imported__module__$5b$project$5d2f$types$2f$cv$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["STUDENT_SECTION_ORDER"] : cv.sectionOrder || __TURBOPACK__imported__module__$5b$project$5d2f$types$2f$cv$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["DEFAULT_SECTION_ORDER"];
     const [rearrangeModalOpen, setRearrangeModalOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);

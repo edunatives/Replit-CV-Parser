@@ -51,7 +51,7 @@ export const DEFAULT_SECTION_ORDER: CVSection[] = ["summary", "experience", "edu
 
 export const STUDENT_SECTION_ORDER: CVSection[] = ["summary", "education", "projects", "experience", "skills", "certifications", "strengths"];
 
-export type CVType = "student" | "fresh_grad" | "professional";
+export type CVType = "student" | "fresh_grad" | "researcher" | "professional";
 
 export interface ParsedCV {
   id: string;

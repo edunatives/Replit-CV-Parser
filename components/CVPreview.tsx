@@ -498,10 +498,10 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
   
   // Determine which template category should be enabled based on CV type
   // student and fresh_grad -> Students Templates enabled, Professional disabled
-  // professional -> Professional Templates enabled, Students disabled
+  // professional and researcher -> Professional Templates enabled, Students disabled
   const cvType: CVType = cv.cvType || "professional";
   const isStudentOrFreshGrad = cvType === "student" || cvType === "fresh_grad";
-  const isProfessionalCV = cvType === "professional";
+  const isProfessionalCV = cvType === "professional" || cvType === "researcher";
   // Student template ALWAYS enforces education-first order
   const sectionOrder = isStudentTemplate 
     ? STUDENT_SECTION_ORDER 
