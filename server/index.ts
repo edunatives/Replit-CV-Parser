@@ -41,7 +41,8 @@ async function startServer() {
     pathRewrite: (path) => `/api${path}`,
     on: {
       proxyReq: (proxyReq, req) => {
-        logger.proxy(`Forwarding: ${req.method} ${req.url} -> ${NEST_PORT}/api${req.url}`);
+        const targetPath = req.url?.replace(/^\/api/, '') || req.url;
+        logger.proxy(`Forwarding: ${req.method} ${req.url} -> ${NEST_PORT}/api${targetPath}`);
       },
       proxyRes: (proxyRes, req) => {
         logger.proxy(`Response: ${req.method} ${req.url} -> ${proxyRes.statusCode}`);
