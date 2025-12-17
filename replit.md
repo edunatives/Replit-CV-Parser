@@ -55,6 +55,7 @@ Preferred communication style: Simple, everyday language.
     - CV parsing prefers OpenAI when available, falls back to Gemini
 - **API Key Priority**: GOOGLE_API_KEY takes precedence for Gemini. Both providers can be used simultaneously.
 - **Startup**: `server/index.ts` starts both Next.js (frontend) and NestJS (backend) servers together.
+- **API Proxy**: All `/api/*` requests are proxied through Express (http-proxy-middleware) with a 120-second timeout to support long-running AI assessment requests (7-45 seconds). This unified proxy is used in both development and production to avoid the ~30s timeout limitation of Next.js rewrites.
 
 ### Data Storage
 - **Database**: MongoDB for persistent storage of CV documents and parsed data.

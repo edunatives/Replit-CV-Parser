@@ -8,52 +8,35 @@ async function buildAll() {
   console.log("Creating production entry point...");
   mkdirSync("dist", { recursive: true });
   
+  // Production uses the same Express server as development (server/index.ts)
+  // This ensures the 120s proxy timeout is applied in both environments
+  // Fixing the "non-JSON response" error caused by Next.js rewrites ~30s timeout
   const entryPoint = `
 const { spawn } = require('child_process');
-const http = require('http');
 
 const PORT = process.env.PORT || 5000;
-const NEST_PORT = 3001;
+console.log('[Production] Starting unified server on port ' + PORT);
+console.log('[Production] Using Express server with 120s proxy timeout for AI requests');
 
-console.log('[Production] Starting on port ' + PORT);
-
-const nestProcess = spawn('npx', ['tsx', '--tsconfig', 'nest/tsconfig.json', 'nest/start.ts'], {
+// Use the same server/index.ts as development - it handles:
+// 1. Starting NestJS backend
+// 2. Starting Next.js with proper configuration
+// 3. Proxying /api/* with 120s timeout (required for AI assessment)
+const serverProcess = spawn('npx', ['tsx', 'server/index.ts'], {
   stdio: 'inherit',
   shell: true,
-  env: { ...process.env, NODE_ENV: 'production' }
+  env: { ...process.env, NODE_ENV: 'production', PORT: PORT.toString() }
 });
 
-function waitForNest(maxWait = 20000) {
-  const start = Date.now();
-  return new Promise((resolve, reject) => {
-    const check = () => {
-      if (Date.now() - start > maxWait) {
-        return reject(new Error('NestJS timeout'));
-      }
-      const req = http.request({ host: '127.0.0.1', port: NEST_PORT, path: '/api/cv/list', timeout: 500 }, () => resolve(true));
-      req.on('error', () => setTimeout(check, 300));
-      req.end();
-    };
-    check();
-  });
-}
+const cleanup = () => { 
+  serverProcess.kill(); 
+  process.exit(0); 
+};
 
-waitForNest().then(() => {
-  console.log('[Production] Starting Next.js');
-  const nextProcess = spawn('npx', ['next', 'start', '-p', PORT.toString(), '-H', '0.0.0.0'], {
-    stdio: 'inherit',
-    shell: true,
-    env: { ...process.env, NODE_ENV: 'production' }
-  });
-  
-  const cleanup = () => { nestProcess.kill(); nextProcess.kill(); process.exit(0); };
-  process.on('SIGINT', cleanup);
-  process.on('SIGTERM', cleanup);
-  nextProcess.on('close', (code) => { nestProcess.kill(); process.exit(code || 0); });
-}).catch((err) => {
-  console.error('[Production] Failed:', err.message);
-  nestProcess.kill();
-  process.exit(1);
+process.on('SIGINT', cleanup);
+process.on('SIGTERM', cleanup);
+serverProcess.on('close', (code) => { 
+  process.exit(code || 0); 
 });
 `;
   
