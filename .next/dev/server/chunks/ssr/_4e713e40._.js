@@ -1970,6 +1970,10 @@ function validateCVDocument(text) {
  */ __turbopack_context__.s([
     "getAllTemplates",
     ()=>getAllTemplates,
+    "getProfessionalTemplateOptions",
+    ()=>getProfessionalTemplateOptions,
+    "getStudentTemplateOptions",
+    ()=>getStudentTemplateOptions,
     "getTemplateOptions",
     ()=>getTemplateOptions,
     "getTemplateStyle",
@@ -1982,6 +1986,7 @@ const templateRegistry = {
         id: "modern-dark",
         name: "Modern Dark",
         description: "Dark header with gold accents for a sophisticated look",
+        category: "professional",
         headerBg: "#1a1a2e",
         accent: "#d4af37",
         headerText: "#ffffff",
@@ -1998,6 +2003,7 @@ const templateRegistry = {
         id: "classic-light",
         name: "Classic Light",
         description: "Clean and traditional with subtle gray tones",
+        category: "professional",
         headerBg: "#f5f5f5",
         accent: "#2c3e50",
         headerText: "#1a1a1a",
@@ -2014,6 +2020,7 @@ const templateRegistry = {
         id: "executive",
         name: "Executive",
         description: "Navy blue with teal accents for senior professionals",
+        category: "professional",
         headerBg: "#0a192f",
         accent: "#64ffda",
         headerText: "#ffffff",
@@ -2030,6 +2037,7 @@ const templateRegistry = {
         id: "minimal",
         name: "Minimal",
         description: "Clean white design with bold black accents",
+        category: "professional",
         headerBg: "#ffffff",
         accent: "#000000",
         headerText: "#1a1a1a",
@@ -2046,6 +2054,7 @@ const templateRegistry = {
         id: "creative",
         name: "Creative",
         description: "Vibrant purple gradient for creative professionals",
+        category: "professional",
         headerBg: "#667eea",
         accent: "#9b59b6",
         headerText: "#ffffff",
@@ -2062,6 +2071,7 @@ const templateRegistry = {
         id: "professional",
         name: "Professional",
         description: "Dark gray with light blue accents",
+        category: "professional",
         headerBg: "#2d3436",
         accent: "#74b9ff",
         headerText: "#ffffff",
@@ -2078,6 +2088,7 @@ const templateRegistry = {
         id: "corporate",
         name: "Corporate",
         description: "Light blue header with centered layout and decorative lines",
+        category: "professional",
         headerBg: "#d4e5ed",
         accent: "#1a5276",
         headerText: "#1a5276",
@@ -2094,6 +2105,7 @@ const templateRegistry = {
         id: "business",
         name: "Business",
         description: "Clean professional style with blue accents and left-bordered sections",
+        category: "professional",
         headerBg: "#ffffff",
         accent: "#1b4f72",
         headerText: "#1b4f72",
@@ -2111,6 +2123,7 @@ const templateRegistry = {
         id: "classic-underline",
         name: "Classic Underline",
         description: "Professional style matching industry standards with underlined section headers",
+        category: "professional",
         headerBg: "#ffffff",
         accent: "#1b4f72",
         headerText: "#1b4f72",
@@ -2128,6 +2141,7 @@ const templateRegistry = {
         id: "typical",
         name: "Typical",
         description: "Clean professional style with green accents and uppercase section headers",
+        category: "professional",
         headerBg: "#ffffff",
         accent: "#1a1a1a",
         headerText: "#1a1a1a",
@@ -2145,6 +2159,7 @@ const templateRegistry = {
         id: "student-modern",
         name: "Student Modern",
         description: "Modern student-focused template with dark teal header, education-first layout, and visual elements",
+        category: "student",
         headerBg: "#0f766e",
         accent: "#14b8a6",
         headerText: "#ffffff",
@@ -2167,6 +2182,18 @@ function getAllTemplates() {
 }
 function getTemplateOptions() {
     return getAllTemplates().map((t)=>({
+            value: t.id,
+            label: t.name
+        }));
+}
+function getProfessionalTemplateOptions() {
+    return getAllTemplates().filter((t)=>t.category === "professional").map((t)=>({
+            value: t.id,
+            label: t.name
+        }));
+}
+function getStudentTemplateOptions() {
+    return getAllTemplates().filter((t)=>t.category === "student").map((t)=>({
             value: t.id,
             label: t.name
         }));
