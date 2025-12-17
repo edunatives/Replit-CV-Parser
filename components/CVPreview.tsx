@@ -14,7 +14,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
 import PaletteIcon from "@mui/icons-material/Palette";
-import type { ParsedCV, TemplateType, CVSection, ColorScheme } from "@/types/cv";
+import type { ParsedCV, TemplateType, CVSection, ColorScheme, CVType } from "@/types/cv";
 import { SectionRearrangeModal } from "./SectionRearrangeModal";
 import { DEFAULT_SECTION_ORDER, STUDENT_SECTION_ORDER, COLOR_SCHEME_PRESETS } from "@/types/cv";
 import { useState, useRef, useMemo } from "react";
@@ -495,6 +495,13 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
   const studentTemplates = getStudentTemplateOptions();
   // Compute student template flag once to avoid type narrowing issues
   const isStudentTemplate = template === "student-modern";
+  
+  // Determine which template category should be enabled based on CV type
+  // student and fresh_grad -> Students Templates enabled, Professional disabled
+  // professional -> Professional Templates enabled, Students disabled
+  const cvType: CVType = cv.cvType || "professional";
+  const isStudentOrFreshGrad = cvType === "student" || cvType === "fresh_grad";
+  const isProfessionalCV = cvType === "professional";
   // Student template ALWAYS enforces education-first order
   const sectionOrder = isStudentTemplate 
     ? STUDENT_SECTION_ORDER 
@@ -1704,62 +1711,66 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
           </Popover>
           {onTemplateChange && (
             <>
-              <FormControl size="small" sx={{ minWidth: 160 }}>
-                <InputLabel id="cv-professional-template-label" sx={{ fontSize: "0.8rem" }}>Professional Templates</InputLabel>
-                <Select
-                  labelId="cv-professional-template-label"
-                  value={professionalTemplates.some(t => t.value === template) ? template : ""}
-                  label="Professional Templates"
-                  onChange={handleTemplateChange}
-                  displayEmpty
-                  data-testid="select-cv-template-professional"
-                  sx={{ fontSize: "0.8rem" }}
-                  MenuProps={{
-                    PaperProps: {
-                      sx: { "& .MuiMenuItem-root": { fontSize: "0.8rem", py: 0.75 } }
-                    }
-                  }}
-                  renderValue={(value) => {
-                    if (!value) return <em style={{ opacity: 0.6 }}>Select...</em>;
-                    const t = professionalTemplates.find(opt => opt.value === value);
-                    return t?.label || "";
-                  }}
-                >
-                  {professionalTemplates.map((t) => (
-                    <MenuItem key={t.value} value={t.value}>
-                      {t.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <FormControl size="small" sx={{ minWidth: 160 }}>
-                <InputLabel id="cv-student-template-label" sx={{ fontSize: "0.8rem" }}>Students Templates</InputLabel>
-                <Select
-                  labelId="cv-student-template-label"
-                  value={studentTemplates.some(t => t.value === template) ? template : ""}
-                  label="Students Templates"
-                  onChange={handleTemplateChange}
-                  displayEmpty
-                  data-testid="select-cv-template-student"
-                  sx={{ fontSize: "0.8rem" }}
-                  MenuProps={{
-                    PaperProps: {
-                      sx: { "& .MuiMenuItem-root": { fontSize: "0.8rem", py: 0.75 } }
-                    }
-                  }}
-                  renderValue={(value) => {
-                    if (!value) return <em style={{ opacity: 0.6 }}>Select...</em>;
-                    const t = studentTemplates.find(opt => opt.value === value);
-                    return t?.label || "";
-                  }}
-                >
-                  {studentTemplates.map((t) => (
-                    <MenuItem key={t.value} value={t.value}>
-                      {t.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <Tooltip title={isStudentOrFreshGrad ? "This CV is detected as student/fresh grad - use Students Templates" : ""} placement="top">
+                <FormControl size="small" sx={{ minWidth: 160 }} disabled={isStudentOrFreshGrad}>
+                  <InputLabel id="cv-professional-template-label" sx={{ fontSize: "0.8rem" }}>Professional Templates</InputLabel>
+                  <Select
+                    labelId="cv-professional-template-label"
+                    value={professionalTemplates.some(t => t.value === template) ? template : ""}
+                    label="Professional Templates"
+                    onChange={handleTemplateChange}
+                    displayEmpty
+                    data-testid="select-cv-template-professional"
+                    sx={{ fontSize: "0.8rem" }}
+                    MenuProps={{
+                      PaperProps: {
+                        sx: { "& .MuiMenuItem-root": { fontSize: "0.8rem", py: 0.75 } }
+                      }
+                    }}
+                    renderValue={(value) => {
+                      if (!value) return <em style={{ opacity: 0.6 }}>Select...</em>;
+                      const t = professionalTemplates.find(opt => opt.value === value);
+                      return t?.label || "";
+                    }}
+                  >
+                    {professionalTemplates.map((t) => (
+                      <MenuItem key={t.value} value={t.value}>
+                        {t.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Tooltip>
+              <Tooltip title={isProfessionalCV ? "This CV is detected as professional - use Professional Templates" : ""} placement="top">
+                <FormControl size="small" sx={{ minWidth: 160 }} disabled={isProfessionalCV}>
+                  <InputLabel id="cv-student-template-label" sx={{ fontSize: "0.8rem" }}>Students Templates</InputLabel>
+                  <Select
+                    labelId="cv-student-template-label"
+                    value={studentTemplates.some(t => t.value === template) ? template : ""}
+                    label="Students Templates"
+                    onChange={handleTemplateChange}
+                    displayEmpty
+                    data-testid="select-cv-template-student"
+                    sx={{ fontSize: "0.8rem" }}
+                    MenuProps={{
+                      PaperProps: {
+                        sx: { "& .MuiMenuItem-root": { fontSize: "0.8rem", py: 0.75 } }
+                      }
+                    }}
+                    renderValue={(value) => {
+                      if (!value) return <em style={{ opacity: 0.6 }}>Select...</em>;
+                      const t = studentTemplates.find(opt => opt.value === value);
+                      return t?.label || "";
+                    }}
+                  >
+                    {studentTemplates.map((t) => (
+                      <MenuItem key={t.value} value={t.value}>
+                        {t.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Tooltip>
             </>
           )}
         </Box>

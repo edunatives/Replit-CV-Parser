@@ -118,6 +118,9 @@ export class ParseService {
       rawCv = aiResult;
     } else {
       console.log(`[ParseService] Using regex-based extraction (AI unavailable)`);
+      const experience = this.extractExperience(text, fileId);
+      const cvType = this.detectCVType(text, experience);
+      console.log(`[ParseService] Detected cvType: ${cvType}`);
       rawCv = {
         id: fileId,
         name: this.extractName(text),
@@ -129,7 +132,8 @@ export class ParseService {
         linkedin: this.extractLinkedIn(text),
         github: this.extractGithub(text),
         summary: this.extractSummary(text),
-        experience: this.extractExperience(text, fileId),
+        cvType,
+        experience,
         education: this.extractEducation(text, fileId),
         certifications: this.extractCertifications(text, fileId),
         skills: this.extractSkills(text),
@@ -173,6 +177,7 @@ export class ParseService {
   "linkedin": "LinkedIn URL if any",
   "github": "GitHub URL if any",
   "summary": "Professional summary or objective",
+  "cvType": "One of: student, fresh_grad, or professional",
   "experience": [
     {
       "company": "Company name",
@@ -203,6 +208,10 @@ IMPORTANT:
 - Extract ALL work experiences, not just the first one
 - Include the full job description with all bullet points
 - If a field is not found, use empty string "" or empty array []
+- For cvType, determine based on these criteria:
+  * "student": Currently enrolled in education, no or only internship/part-time work experience
+  * "fresh_grad": Graduated within last 2 years, limited professional experience (0-2 years)
+  * "professional": 3+ years of professional work experience
 
 CV TEXT:
 ${text}`;
@@ -229,7 +238,23 @@ ${text}`;
 
       const parsed = JSON.parse(cleanedText);
       
-      console.log(`[ParseService] AI extraction successful - found ${parsed.experience?.length || 0} experiences`);
+      // Parse experience first for heuristic fallback
+      const experiences = (parsed.experience || []).map((exp: { company?: string; role?: string; duration?: string; description?: string; location?: string }, i: number) => ({
+        id: this.generateStableId("exp", i, fileId),
+        company: exp.company || "",
+        role: exp.role || "",
+        duration: exp.duration || "",
+        description: exp.description || "",
+        location: exp.location || "",
+      }));
+      
+      // Use AI-detected cvType, or fall back to heuristic detection if AI omitted it
+      let cvType = this.normalizeCVType(parsed.cvType);
+      if (!parsed.cvType || parsed.cvType === "") {
+        cvType = this.detectCVType(text, experiences);
+        console.log(`[ParseService] AI omitted cvType, using heuristic detection: ${cvType}`);
+      }
+      console.log(`[ParseService] AI extraction successful - found ${experiences.length} experiences, cvType: ${cvType}`);
 
       return {
         id: fileId,
@@ -242,14 +267,8 @@ ${text}`;
         linkedin: parsed.linkedin || "",
         github: parsed.github || "",
         summary: parsed.summary || "",
-        experience: (parsed.experience || []).map((exp: { company?: string; role?: string; duration?: string; description?: string; location?: string }, i: number) => ({
-          id: this.generateStableId("exp", i, fileId),
-          company: exp.company || "",
-          role: exp.role || "",
-          duration: exp.duration || "",
-          description: exp.description || "",
-          location: exp.location || "",
-        })),
+        cvType,
+        experience: experiences,
         education: (parsed.education || []).map((edu: { institution?: string; degree?: string; year?: string }, i: number) => ({
           id: this.generateStableId("edu", i, fileId),
           institution: edu.institution || "",
@@ -340,6 +359,82 @@ ${text}`;
     const mammoth = mammothModule.default ?? mammothModule;
     const result = await mammoth.extractRawText({ buffer });
     return result.value;
+  }
+
+  /**
+   * Normalize CV type string from AI response to valid CVType
+   */
+  private normalizeCVType(cvType: string | undefined): "student" | "fresh_grad" | "professional" {
+    if (!cvType) return "professional";
+    const normalized = cvType.toLowerCase().trim();
+    if (normalized === "student" || normalized.includes("student")) return "student";
+    if (normalized === "fresh_grad" || normalized.includes("fresh") || normalized.includes("graduate")) return "fresh_grad";
+    return "professional";
+  }
+
+  /**
+   * Detect CV type using regex-based heuristics
+   * Used as fallback when AI parsing is unavailable
+   */
+  private detectCVType(text: string, experience: { duration: string }[]): "student" | "fresh_grad" | "professional" {
+    const lowerText = text.toLowerCase();
+    
+    // Check for student indicators
+    const studentIndicators = [
+      /currently\s+(?:enrolled|studying|pursuing)/i,
+      /expected\s+graduation/i,
+      /undergraduate|postgraduate/i,
+      /(?:freshman|sophomore|junior|senior)\s+(?:year|student)/i,
+      /gpa\s*[:;]\s*\d/i,
+      /student\s+(?:at|of)/i,
+      /pursuing\s+(?:a\s+)?(?:bachelor|master|phd|degree)/i,
+    ];
+    
+    const hasStudentIndicators = studentIndicators.some(regex => regex.test(lowerText));
+    
+    // Check for fresh grad indicators
+    const freshGradIndicators = [
+      /recent(?:ly)?\s+graduat/i,
+      /new\s+graduat/i,
+      /entry[\s-]level/i,
+      /fresh\s+graduat/i,
+      /class\s+of\s+202[3-5]/i,
+      /graduated?\s+(?:in\s+)?202[3-5]/i,
+    ];
+    
+    const hasFreshGradIndicators = freshGradIndicators.some(regex => regex.test(lowerText));
+    
+    // Calculate total experience duration
+    let totalYears = 0;
+    const currentYear = new Date().getFullYear();
+    
+    for (const exp of experience) {
+      const duration = exp.duration || "";
+      const yearMatch = duration.match(/(\d{4})\s*[-–—to]+\s*(?:(\d{4})|present|current|now)/i);
+      if (yearMatch) {
+        const startYear = parseInt(yearMatch[1]);
+        const endYear = yearMatch[2] ? parseInt(yearMatch[2]) : currentYear;
+        totalYears += Math.max(0, endYear - startYear);
+      }
+    }
+    
+    // Decision logic
+    if (hasStudentIndicators && experience.length <= 2 && totalYears <= 1) {
+      return "student";
+    }
+    
+    if (hasFreshGradIndicators || (experience.length <= 2 && totalYears <= 2)) {
+      return "fresh_grad";
+    }
+    
+    if (totalYears >= 3 || experience.length >= 3) {
+      return "professional";
+    }
+    
+    // Default based on experience count
+    if (experience.length === 0) return "student";
+    if (experience.length <= 2) return "fresh_grad";
+    return "professional";
   }
 
   private normalizeText(text: string): string {
