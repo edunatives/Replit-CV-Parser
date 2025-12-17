@@ -29,6 +29,9 @@ const DEFAULT_MODELS: Record<ProviderType, string> = {
   openai: "gpt-4o",
 };
 
+const MAX_RETRIES = 2;
+const RETRY_DELAY_MS = 1000;
+
 @Injectable()
 export class LangchainService {
   private geminiAvailable: boolean;
@@ -46,6 +49,8 @@ export class LangchainService {
     this.openaiApiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
     this.openaiBaseUrl = process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
     this.openaiAvailable = !!this.openaiApiKey;
+
+    console.log(`[LangchainService] Initialized - OpenAI: ${this.openaiAvailable}, Gemini: ${this.geminiAvailable}`);
   }
 
   getAvailableProviders(): ProviderType[] {
@@ -85,19 +90,41 @@ export class LangchainService {
     });
   }
 
-  private getModel(config: LLMConfig = {}): BaseChatModel {
+  private getModel(config: LLMConfig = {}): { model: BaseChatModel; provider: ProviderType } {
     const provider = config.provider || (this.openaiAvailable ? "openai" : "gemini");
-    const model = config.model || DEFAULT_MODELS[provider];
+    const modelName = config.model || DEFAULT_MODELS[provider];
     const temperature = config.temperature ?? 0.2;
     const maxOutputTokens = config.maxOutputTokens ?? 8192;
 
     if (provider === "openai" && this.openaiAvailable) {
-      return this.createOpenAIModel(model, temperature, maxOutputTokens);
+      return { model: this.createOpenAIModel(modelName, temperature, maxOutputTokens), provider: "openai" };
     } else if (provider === "gemini" && this.geminiAvailable) {
-      return this.createGeminiModel(model, temperature, maxOutputTokens);
+      return { model: this.createGeminiModel(modelName, temperature, maxOutputTokens), provider: "gemini" };
     }
 
     throw new Error("No AI provider available");
+  }
+
+  private async delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  private isRetryableError(error: unknown): boolean {
+    if (error instanceof Error) {
+      const message = error.message.toLowerCase();
+      return (
+        message.includes("timeout") ||
+        message.includes("rate limit") ||
+        message.includes("429") ||
+        message.includes("503") ||
+        message.includes("502") ||
+        message.includes("500") ||
+        message.includes("econnreset") ||
+        message.includes("socket hang up") ||
+        message.includes("network")
+      );
+    }
+    return false;
   }
 
   async generate(
@@ -105,62 +132,104 @@ export class LangchainService {
     userPrompt: string,
     config: LLMConfig = {}
   ): Promise<LLMResponse> {
-    const model = this.getModel(config);
+    let lastError: Error | null = null;
+    
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const { model, provider } = this.getModel(config);
+        console.log(`[LangchainService] Generate attempt ${attempt + 1}/${MAX_RETRIES + 1} using ${provider}`);
 
-    const prompt = ChatPromptTemplate.fromMessages([
-      SystemMessagePromptTemplate.fromTemplate("{system}"),
-      HumanMessagePromptTemplate.fromTemplate("{user}"),
-    ]);
+        const prompt = ChatPromptTemplate.fromMessages([
+          SystemMessagePromptTemplate.fromTemplate("{system}"),
+          HumanMessagePromptTemplate.fromTemplate("{user}"),
+        ]);
 
-    const chain = RunnableSequence.from([
-      prompt,
-      model,
-      new StringOutputParser(),
-    ]);
+        const chain = RunnableSequence.from([
+          prompt,
+          model,
+          new StringOutputParser(),
+        ]);
 
-    const result = await chain.invoke({
-      system: systemPrompt,
-      user: userPrompt,
-    });
+        const result = await chain.invoke({
+          system: systemPrompt,
+          user: userPrompt,
+        });
 
-    return {
-      text: result.trim(),
-      usage: {
-        inputTokens: 0,
-        outputTokens: 0,
-      },
-    };
+        console.log(`[LangchainService] Generate succeeded on attempt ${attempt + 1}`);
+        
+        return {
+          text: result.trim(),
+          usage: {
+            inputTokens: 0,
+            outputTokens: 0,
+          },
+        };
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+        console.error(`[LangchainService] Generate attempt ${attempt + 1} failed:`, lastError.message);
+
+        if (attempt < MAX_RETRIES && this.isRetryableError(error)) {
+          console.log(`[LangchainService] Retrying in ${RETRY_DELAY_MS}ms...`);
+          await this.delay(RETRY_DELAY_MS * (attempt + 1));
+        } else if (attempt < MAX_RETRIES) {
+          await this.delay(RETRY_DELAY_MS);
+        }
+      }
+    }
+
+    throw lastError || new Error("Generate failed after all retries");
   }
 
   async generateWithMessages(
     messages: Array<{ role: "system" | "user" | "assistant"; content: string }>,
     config: LLMConfig = {}
   ): Promise<LLMResponse> {
-    const model = this.getModel(config);
+    let lastError: Error | null = null;
 
-    const langchainMessages: BaseMessage[] = messages.map((msg) => {
-      if (msg.role === "system") {
-        return new SystemMessage(msg.content);
-      } else if (msg.role === "user") {
-        return new HumanMessage(msg.content);
-      } else {
-        return new AIMessage(msg.content);
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const { model, provider } = this.getModel(config);
+        console.log(`[LangchainService] GenerateWithMessages attempt ${attempt + 1}/${MAX_RETRIES + 1} using ${provider}`);
+
+        const langchainMessages: BaseMessage[] = messages.map((msg) => {
+          if (msg.role === "system") {
+            return new SystemMessage(msg.content);
+          } else if (msg.role === "user") {
+            return new HumanMessage(msg.content);
+          } else {
+            return new AIMessage(msg.content);
+          }
+        });
+
+        const chain = RunnableSequence.from([
+          model,
+          new StringOutputParser(),
+        ]);
+
+        const result = await chain.invoke(langchainMessages);
+
+        console.log(`[LangchainService] GenerateWithMessages succeeded on attempt ${attempt + 1}`);
+
+        return {
+          text: result.trim(),
+          usage: {
+            inputTokens: 0,
+            outputTokens: 0,
+          },
+        };
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error(String(error));
+        console.error(`[LangchainService] GenerateWithMessages attempt ${attempt + 1} failed:`, lastError.message);
+
+        if (attempt < MAX_RETRIES && this.isRetryableError(error)) {
+          console.log(`[LangchainService] Retrying in ${RETRY_DELAY_MS}ms...`);
+          await this.delay(RETRY_DELAY_MS * (attempt + 1));
+        } else if (attempt < MAX_RETRIES) {
+          await this.delay(RETRY_DELAY_MS);
+        }
       }
-    });
+    }
 
-    const chain = RunnableSequence.from([
-      model,
-      new StringOutputParser(),
-    ]);
-
-    const result = await chain.invoke(langchainMessages);
-
-    return {
-      text: result.trim(),
-      usage: {
-        inputTokens: 0,
-        outputTokens: 0,
-      },
-    };
+    throw lastError || new Error("GenerateWithMessages failed after all retries");
   }
 }
