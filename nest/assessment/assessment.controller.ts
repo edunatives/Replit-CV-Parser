@@ -60,17 +60,23 @@ export class AssessmentController {
       throw new BadRequestException("CV data is required");
     }
 
-    const result = await this.assessmentService.assessCV(body.cv, {
-      version: body.version || "2.3",
-      outputMode: body.outputMode || "STANDARD",
-      audience: body.audience || "STUDENT",
-      provider: body.provider,
-      model: body.model,
-      jd: body.jd,
-      includeFullRewrite: body.includeFullRewrite ?? (body.outputMode === "FULL"),
-    });
+    try {
+      const result = await this.assessmentService.assessCV(body.cv, {
+        version: body.version || "2.3",
+        outputMode: body.outputMode || "STANDARD",
+        audience: body.audience || "STUDENT",
+        provider: body.provider,
+        model: body.model,
+        jd: body.jd,
+        includeFullRewrite: body.includeFullRewrite ?? (body.outputMode === "FULL"),
+      });
 
-    return result;
+      return result;
+    } catch (error) {
+      console.error("[AssessmentController] CV assessment failed:", error);
+      const errorMessage = error instanceof Error ? error.message : "Assessment failed";
+      throw new BadRequestException(`CV assessment failed: ${errorMessage}`);
+    }
   }
 
   @Post("jd-match")
@@ -82,15 +88,21 @@ export class AssessmentController {
       throw new BadRequestException("Job description is required");
     }
 
-    const result = await this.assessmentService.assessCV(body.cv, {
-      outputMode: body.outputMode || "STANDARD",
-      audience: body.audience || "STUDENT",
-      provider: body.provider,
-      model: body.model,
-      jd: body.jd,
-    });
+    try {
+      const result = await this.assessmentService.assessCV(body.cv, {
+        outputMode: body.outputMode || "STANDARD",
+        audience: body.audience || "STUDENT",
+        provider: body.provider,
+        model: body.model,
+        jd: body.jd,
+      });
 
-    return result;
+      return result;
+    } catch (error) {
+      console.error("[AssessmentController] JD match failed:", error);
+      const errorMessage = error instanceof Error ? error.message : "JD matching failed";
+      throw new BadRequestException(`JD matching failed: ${errorMessage}`);
+    }
   }
 
   @Post("compare")
@@ -99,7 +111,13 @@ export class AssessmentController {
       throw new BadRequestException("CV data is required");
     }
 
-    return this.assessmentService.comparePrompts(body.cv);
+    try {
+      return await this.assessmentService.comparePrompts(body.cv);
+    } catch (error) {
+      console.error("[AssessmentController] Prompt comparison failed:", error);
+      const errorMessage = error instanceof Error ? error.message : "Comparison failed";
+      throw new BadRequestException(`Prompt comparison failed: ${errorMessage}`);
+    }
   }
 
   @Post("advisor")
@@ -111,6 +129,12 @@ export class AssessmentController {
       throw new BadRequestException("Message is required");
     }
 
-    return this.assessmentService.getAdvisorResponse(body.cv, body.message, body.history || []);
+    try {
+      return await this.assessmentService.getAdvisorResponse(body.cv, body.message, body.history || []);
+    } catch (error) {
+      console.error("[AssessmentController] Advisor response failed:", error);
+      const errorMessage = error instanceof Error ? error.message : "Advisor failed";
+      throw new BadRequestException(`AI Advisor failed: ${errorMessage}`);
+    }
   }
 }
