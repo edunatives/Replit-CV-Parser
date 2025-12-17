@@ -65,24 +65,30 @@ export class CvController {
       throw new PayloadTooLargeException("File too large. Maximum size is 10MB.");
     }
 
-    const fileId = `file-${Date.now()}`;
-    console.log("[CvController] Parsing CV with fileId:", fileId);
-    
-    const { cv, rawText } = await this.parseService.parseCV(
-      file.buffer,
-      file.originalname,
-      fileId
-    );
+    try {
+      const fileId = `file-${Date.now()}`;
+      console.log("[CvController] Parsing CV with fileId:", fileId);
+      
+      const { cv, rawText } = await this.parseService.parseCV(
+        file.buffer,
+        file.originalname,
+        fileId
+      );
 
-    console.log("[CvController] Parse complete. Name:", cv.name, "Email:", cv.email);
+      console.log("[CvController] Parse complete. Name:", cv.name, "Email:", cv.email);
 
-    cv.mimeType = file.mimetype;
-    cv.size = file.size;
+      cv.mimeType = file.mimetype;
+      cv.size = file.size;
 
-    await this.cvService.saveCv(cv);
-    console.log("[CvController] CV saved successfully");
+      await this.cvService.saveCv(cv);
+      console.log("[CvController] CV saved successfully");
 
-    return { cv, rawText };
+      return { cv, rawText };
+    } catch (error) {
+      console.error("[CvController] Parse error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to parse CV";
+      throw new BadRequestException(`CV parsing failed: ${errorMessage}`);
+    }
   }
 
   @Post("parse/batch")
