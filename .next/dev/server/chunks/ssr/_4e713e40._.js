@@ -2144,19 +2144,19 @@ const templateRegistry = {
     "student-modern": {
         id: "student-modern",
         name: "Student Modern",
-        description: "Modern student-focused template with photo, education-first layout, and project showcases",
-        headerBg: "#ffffff",
-        accent: "#0891b2",
-        headerText: "#1e293b",
-        bodyBg: "#f8fafc",
-        bodyText: "#1e293b",
-        bodyTextSecondary: "#64748b",
+        description: "Modern student-focused template with dark teal header, education-first layout, and visual elements",
+        headerBg: "#0f766e",
+        accent: "#14b8a6",
+        headerText: "#ffffff",
+        bodyBg: "#ffffff",
+        bodyText: "#1a1a1a",
+        bodyTextSecondary: "#4a4a4a",
         borderBottom: "none",
         headerCentered: false,
-        sectionHeaderVariant: "leftBorder",
-        showMetaIcons: true,
-        companyColor: "#0891b2",
-        summaryBoxed: true
+        sectionHeaderVariant: "default",
+        showMetaIcons: false,
+        companyColor: "#14b8a6",
+        summaryBoxed: false
     }
 };
 function getTemplateStyle(template) {

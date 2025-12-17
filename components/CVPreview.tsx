@@ -106,15 +106,46 @@ interface CVPreviewProps {
 function SectionHeader({ 
   title, 
   style, 
-  rightContent 
+  rightContent,
+  isStudentTemplate = false
 }: { 
   title: string; 
   style: ReturnType<typeof getTemplateStyle>;
   rightContent?: React.ReactNode;
+  isStudentTemplate?: boolean;
 }) {
   const isUnderline = style.sectionHeaderVariant === "underline";
   const isCenteredLines = style.sectionHeaderVariant === "centeredLines";
   const isLeftBorder = style.sectionHeaderVariant === "leftBorder";
+  
+  if (isStudentTemplate) {
+    return (
+      <Box sx={{ mb: 1.5, mt: 2 }}>
+        <Box sx={{ 
+          display: "flex", 
+          alignItems: "center",
+          borderLeft: `3px solid ${style.accent}`,
+          pl: 1.5,
+        }}>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              color: style.accent, 
+              fontFamily: "'Arial', sans-serif",
+              textTransform: "uppercase",
+              fontWeight: 700,
+              letterSpacing: "0.1em",
+              fontSize: "0.9rem",
+            }}
+          >
+            {title}
+          </Typography>
+          <Box sx={{ flex: 1 }} />
+          {rightContent}
+        </Box>
+      </Box>
+    );
+  }
   
   if (isLeftBorder) {
     return (
@@ -967,6 +998,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
   const renderExperienceEntry = (index: number, isLast: boolean) => {
     const exp = cv.experience[index];
     if (!exp) return null;
+    const isStudent = template === "student-modern";
     
     return (
       <Box key={`exp-${exp.id}`} sx={{ mb: isLast ? 0 : 2, position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
@@ -986,7 +1018,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
             placeholder="Job Title"
           />
         </Typography>
-        <Typography variant="body2" sx={{ color: style.companyColor, fontWeight: 700, lineHeight: 1.2, mt: 0 }} component="div">
+        <Typography variant="body2" sx={{ color: style.companyColor, fontWeight: isStudent ? 400 : 700, lineHeight: 1.2, mt: 0 }} component="div">
           <EditableField 
             value={exp.company} 
             onChange={(v) => updateExperience(index, "company", v)} 
@@ -994,22 +1026,24 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
           />
         </Typography>
         <Box sx={{ display: "flex", gap: 1.5, alignItems: "center", flexWrap: "wrap", mt: 0 }}>
-          {style.showMetaIcons && <CalendarMonthIcon sx={{ fontSize: 12, color: style.bodyTextSecondary }} />}
-          <Typography variant="caption" sx={{ color: style.bodyTextSecondary, ml: style.showMetaIcons ? -1 : 0, fontSize: "0.75rem" }} component="span">
+          {style.showMetaIcons && !isStudent && <CalendarMonthIcon sx={{ fontSize: 12, color: style.bodyTextSecondary }} />}
+          <Typography variant="caption" sx={{ color: isStudent ? style.accent : style.bodyTextSecondary, ml: style.showMetaIcons && !isStudent ? -1 : 0, fontSize: "0.75rem", fontStyle: isStudent ? "italic" : "normal" }} component="span">
             <EditableField 
               value={exp.duration} 
               onChange={(v) => updateExperience(index, "duration", v)} 
               placeholder="Duration"
             />
           </Typography>
-          {style.showMetaIcons && <LocationOnIcon sx={{ fontSize: 12, color: style.bodyTextSecondary }} />}
-          <Typography variant="caption" sx={{ color: style.bodyTextSecondary, ml: style.showMetaIcons ? -1 : 0, fontSize: "0.75rem" }} component="span">
-            <EditableField 
-              value={exp.location || ""} 
-              onChange={(v) => updateExperience(index, "location", v)} 
-              placeholder="Location"
-            />
-          </Typography>
+          {style.showMetaIcons && !isStudent && <LocationOnIcon sx={{ fontSize: 12, color: style.bodyTextSecondary }} />}
+          {!isStudent && (
+            <Typography variant="caption" sx={{ color: style.bodyTextSecondary, ml: style.showMetaIcons ? -1 : 0, fontSize: "0.75rem" }} component="span">
+              <EditableField 
+                value={exp.location || ""} 
+                onChange={(v) => updateExperience(index, "location", v)} 
+                placeholder="Location"
+              />
+            </Typography>
+          )}
         </Box>
         <Typography variant="body2" sx={{ mt: 0.5, color: style.bodyText, whiteSpace: "pre-wrap" }} component="div">
           <EditableField 
@@ -1031,9 +1065,10 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
   const renderEducationEntry = (index: number, isLast: boolean) => {
     const edu = cv.education?.[index];
     if (!edu) return null;
+    const isStudent = template === "student-modern";
 
     return (
-      <Box key={`edu-${edu.id}`} sx={{ mb: isLast ? 0 : 1, position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
+      <Box key={`edu-${edu.id}`} sx={{ mb: isLast ? 0 : 1.5, position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
         <IconButton 
           className="delete-btn"
           size="small" 
@@ -1050,23 +1085,20 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
             placeholder="Degree"
           />
         </Typography>
-        <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap" }}>
-          <Typography variant="body2" sx={{ color: style.bodyTextSecondary }} component="span">
-            <EditableField 
-              value={edu.institution} 
-              onChange={(v) => updateEducation(index, "institution", v)} 
-              placeholder="Institution"
-            />
-          </Typography>
-          <Typography variant="body2" sx={{ color: style.bodyTextSecondary }} component="span">|</Typography>
-          <Typography variant="body2" sx={{ color: style.bodyTextSecondary }} component="span">
-            <EditableField 
-              value={edu.year} 
-              onChange={(v) => updateEducation(index, "year", v)} 
-              placeholder="Year"
-            />
-          </Typography>
-        </Box>
+        <Typography variant="body2" sx={{ color: style.bodyTextSecondary }} component="div">
+          <EditableField 
+            value={edu.institution} 
+            onChange={(v) => updateEducation(index, "institution", v)} 
+            placeholder="Institution"
+          />
+        </Typography>
+        <Typography variant="caption" sx={{ color: isStudent ? style.accent : style.bodyTextSecondary, fontStyle: isStudent ? "italic" : "normal" }} component="div">
+          <EditableField 
+            value={edu.year} 
+            onChange={(v) => updateEducation(index, "year", v)} 
+            placeholder="Year/Duration"
+          />
+        </Typography>
       </Box>
     );
   };
@@ -1075,9 +1107,10 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
   const renderItem = (item: PageItem, isLast: boolean, pageItems: PageItem[]) => {
     switch (item.type) {
       case "summary":
+        if (template === "student-modern") return null;
         return (
           <Box key="summary" sx={{ mb: isLast ? 0 : 2 }}>
-            <SectionHeader title="Summary" style={style} />
+            <SectionHeader title="Summary" style={style} isStudentTemplate={template === "student-modern"} />
             <Box sx={style.summaryBoxed ? {
               border: "1px solid rgba(27, 79, 114, 0.15)",
               borderLeft: `3px solid ${style.accent}`,
@@ -1104,8 +1137,9 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
         return (
           <Box key="experience-header" sx={{ mb: 1 }}>
             <SectionHeader
-              title={item.continued ? "Experience (continued)" : "Experience"}
+              title={item.continued ? (template === "student-modern" ? "Internships (continued)" : "Experience (continued)") : (template === "student-modern" ? "Internships" : "Experience")}
               style={style}
+              isStudentTemplate={template === "student-modern"}
               rightContent={
                 !item.continued ? (
                   <IconButton size="small" onClick={addExperience} sx={{ color: style.accent }} data-testid="button-add-experience">
@@ -1131,6 +1165,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
             <SectionHeader
               title={item.continued ? "Education (continued)" : "Education"}
               style={style}
+              isStudentTemplate={template === "student-modern"}
               rightContent={
                 !item.continued ? (
                   <IconButton size="small" onClick={addEducation} sx={{ color: style.accent }} data-testid="button-add-education">
@@ -1154,8 +1189,9 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
         return (
           <Box key="skills" sx={{ mb: isLast ? 0 : 2 }}>
             <SectionHeader
-              title="Skills"
+              title={template === "student-modern" ? "Technical Skills" : "Skills"}
               style={style}
+              isStudentTemplate={template === "student-modern"}
               rightContent={
                 <IconButton size="small" onClick={addSkill} sx={{ color: style.accent }} data-testid="button-add-skill">
                   <AddIcon fontSize="small" />
@@ -1185,6 +1221,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
             <SectionHeader
               title="Strengths"
               style={style}
+              isStudentTemplate={template === "student-modern"}
               rightContent={
                 <IconButton size="small" onClick={addStrength} sx={{ color: style.accent }} data-testid="button-add-strength">
                   <AddIcon fontSize="small" />
@@ -1214,6 +1251,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
             <SectionHeader
               title="Certifications"
               style={style}
+              isStudentTemplate={template === "student-modern"}
               rightContent={
                 <IconButton size="small" onClick={addCertification} sx={{ color: style.accent }} data-testid="button-add-certification">
                   <AddIcon fontSize="small" />
@@ -1249,8 +1287,9 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
         return (
           <Box key="projects-header" sx={{ mb: 1 }}>
             <SectionHeader
-              title={item.continued ? "Featured Projects (continued)" : "Featured Projects"}
+              title={item.continued ? (template === "student-modern" ? "Volunteer Experience (continued)" : "Featured Projects (continued)") : (template === "student-modern" ? "Volunteer Experience" : "Featured Projects")}
               style={style}
+              isStudentTemplate={template === "student-modern"}
               rightContent={
                 !item.continued ? (
                   <IconButton size="small" onClick={addProject} sx={{ color: style.accent }} data-testid="button-add-project">
@@ -1344,87 +1383,85 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
     }
   };
 
-  // Render Student Modern header with photo placeholder
+  // Render Student Modern header with dark teal design
   const renderStudentHeader = () => (
-    <Box sx={{ 
-      bgcolor: style.bodyBg, 
-      pt: 3,
-      pb: 2,
-      px: 3, 
-    }}>
-      <Box sx={{ display: "flex", gap: 3 }}>
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="h4" component="div" sx={{ 
-            fontFamily: "'Arial', sans-serif", 
-            fontWeight: 700,
-            fontSize: "2rem",
-            color: style.headerText,
-            letterSpacing: "-0.01em",
-            lineHeight: 1.1,
-            mb: 0.5,
-          }}>
-            <EditableField value={cv.name} onChange={(v) => updateField("name", v)} placeholder="Your Name" />
-          </Typography>
-          <Typography variant="subtitle1" component="div" sx={{ 
-            color: style.accent, 
-            fontWeight: 600,
-            fontSize: "1rem",
-            lineHeight: 1.3,
-            mb: 1.5,
-          }}>
-            <EditableField value={cv.title} onChange={(v) => updateField("title", v)} placeholder="Your Title & Enthusiasm" />
-          </Typography>
-          
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, mb: 1 }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <LocationOnIcon sx={{ fontSize: 14, color: style.bodyTextSecondary }} />
-              <Typography variant="caption" sx={{ color: style.bodyTextSecondary, fontSize: "0.75rem" }}>
-                <EditableField value={cv.location} onChange={(v) => updateField("location", v)} placeholder="City, Country" />
-              </Typography>
-            </Box>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <EmailIcon sx={{ fontSize: 14, color: style.bodyTextSecondary }} />
-              <Typography variant="caption" sx={{ color: style.bodyTextSecondary, fontSize: "0.75rem" }}>
-                <EditableField value={cv.email} onChange={(v) => updateField("email", v)} placeholder="email@edu.com" />
-              </Typography>
-            </Box>
-          </Box>
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
-            {cv.linkedin && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                <LinkedInIcon sx={{ fontSize: 14, color: style.bodyTextSecondary }} />
-                <Typography variant="caption" sx={{ color: style.bodyTextSecondary, fontSize: "0.75rem" }}>
-                  <EditableField value={cv.linkedin} onChange={(v) => updateField("linkedin", v)} placeholder="linkedin.com/in/..." />
-                </Typography>
-              </Box>
-            )}
-            {cv.github && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                <GitHubIcon sx={{ fontSize: 14, color: style.bodyTextSecondary }} />
-                <Typography variant="caption" sx={{ color: style.bodyTextSecondary, fontSize: "0.75rem" }}>
-                  <EditableField value={cv.github} onChange={(v) => updateField("github", v)} placeholder="github.com/..." />
-                </Typography>
-              </Box>
-            )}
-          </Box>
-        </Box>
+    <Box sx={{ bgcolor: style.headerBg }}>
+      <Box sx={{ pt: 2.5, pb: 1.5, px: 3 }}>
+        <Typography variant="h4" component="div" sx={{ 
+          fontFamily: "'Arial', sans-serif", 
+          fontWeight: 700,
+          fontSize: "2rem",
+          color: style.headerText,
+          letterSpacing: "-0.01em",
+          lineHeight: 1.1,
+          mb: 0.25,
+        }}>
+          <EditableField value={cv.name} onChange={(v) => updateField("name", v)} placeholder="Your Name" />
+        </Typography>
+        <Typography variant="subtitle1" component="div" sx={{ 
+          color: style.accent, 
+          fontWeight: 500,
+          fontSize: "0.95rem",
+          lineHeight: 1.3,
+          fontStyle: "italic",
+          mb: 1,
+        }}>
+          <EditableField value={cv.title} onChange={(v) => updateField("title", v)} placeholder="Your Title & Career Goal" />
+        </Typography>
         
-        <Box sx={{ 
-          width: 90, 
-          height: 90, 
-          borderRadius: "50%", 
-          bgcolor: "#e2e8f0",
-          border: "3px solid #1e293b",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-          overflow: "hidden",
-        }} data-testid="student-photo-placeholder">
-          <Typography variant="caption" sx={{ color: "#64748b", fontSize: "0.65rem", textAlign: "center", px: 1 }}>
-            Photo
+        {cv.summary && (
+          <Typography variant="body2" component="div" sx={{ 
+            color: "rgba(255,255,255,0.85)", 
+            fontSize: "0.8rem",
+            lineHeight: 1.5,
+            maxWidth: "100%",
+          }}>
+            <EditableField 
+              value={cv.summary} 
+              onChange={(v) => updateField("summary", v)} 
+              placeholder="Write a brief professional summary..."
+              multiline
+              rows={2}
+            />
+          </Typography>
+        )}
+      </Box>
+      
+      <Box sx={{ 
+        display: "flex", 
+        flexWrap: "wrap", 
+        gap: 2.5, 
+        px: 3,
+        py: 1,
+        bgcolor: "rgba(0,0,0,0.15)",
+        borderTop: "1px solid rgba(255,255,255,0.1)",
+      }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+          <EmailIcon sx={{ fontSize: 14, color: style.headerText }} />
+          <Typography variant="caption" sx={{ color: style.headerText, fontSize: "0.75rem" }}>
+            <EditableField value={cv.email} onChange={(v) => updateField("email", v)} placeholder="email@edu.com" />
           </Typography>
         </Box>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+          <PhoneIcon sx={{ fontSize: 14, color: style.headerText }} />
+          <Typography variant="caption" sx={{ color: style.headerText, fontSize: "0.75rem" }}>
+            <EditableField value={cv.phone} onChange={(v) => updateField("phone", v)} placeholder="(123) 456-7890" />
+          </Typography>
+        </Box>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+          <LocationOnIcon sx={{ fontSize: 14, color: style.headerText }} />
+          <Typography variant="caption" sx={{ color: style.headerText, fontSize: "0.75rem" }}>
+            <EditableField value={cv.location} onChange={(v) => updateField("location", v)} placeholder="City, State" />
+          </Typography>
+        </Box>
+        {(cv.linkedin || true) && (
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+            <LinkedInIcon sx={{ fontSize: 14, color: style.headerText }} />
+            <Typography variant="caption" sx={{ color: style.headerText, fontSize: "0.75rem" }}>
+              <EditableField value={cv.linkedin || ""} onChange={(v) => updateField("linkedin", v)} placeholder="linkedin.com/in/yourname" />
+            </Typography>
+          </Box>
+        )}
       </Box>
     </Box>
   );
