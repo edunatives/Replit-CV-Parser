@@ -370,36 +370,23 @@ function EditableField({
 
   if (multiline && enableLineDelete) {
     return (
-      <Box sx={{ position: "relative", "&:hover .edit-btn": { visibility: "visible" } }}>
+      <Box 
+        onClick={() => {
+          setTempValue(value);
+          setEditing(true);
+        }}
+        sx={{ 
+          cursor: "pointer",
+          "&:hover": { bgcolor: "action.hover", borderRadius: 1 },
+          p: 0.5,
+        }}
+        data-testid="editable-multiline-text"
+      >
         <LineEditor 
           value={value} 
           onChange={onChange}
           placeholder={placeholder}
         />
-        <Tooltip title="Edit full text with bullet tool">
-          <IconButton
-            className="edit-btn"
-            size="small"
-            onClick={() => {
-              setTempValue(value);
-              setEditing(true);
-            }}
-            sx={{ 
-              position: "absolute", 
-              top: -4, 
-              right: -4,
-              visibility: "hidden",
-              color: "text.secondary",
-              bgcolor: "background.paper",
-              border: "1px solid",
-              borderColor: "divider",
-              "&:hover": { bgcolor: "action.hover" },
-            }}
-            data-testid="button-edit-full-text"
-          >
-            <FormatListBulletedIcon sx={{ fontSize: 14 }} />
-          </IconButton>
-        </Tooltip>
       </Box>
     );
   }
