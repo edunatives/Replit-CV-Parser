@@ -34,7 +34,7 @@ async function startServer() {
   });
 
   app.use('/api', createProxyMiddleware({
-    target: `http://localhost:${NEST_PORT}/api`,
+    target: `http://localhost:${NEST_PORT}`,
     changeOrigin: true,
     timeout: 120000,
     proxyTimeout: 120000,
@@ -61,7 +61,7 @@ async function startServer() {
 
   app.listen(PORT, '0.0.0.0', () => {
     logger.server(`Running on http://0.0.0.0:${PORT}`);
-    logger.server(`API proxy: /api/* -> http://localhost:${NEST_PORT}/api/*`);
+    logger.server(`API proxy: /api/* -> http://localhost:${NEST_PORT}/*`);
   });
 
   const cleanup = () => {
