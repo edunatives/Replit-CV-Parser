@@ -38,9 +38,10 @@ async function startServer() {
     changeOrigin: true,
     timeout: 120000,
     proxyTimeout: 120000,
+    pathRewrite: (path) => `/api${path}`,
     on: {
       proxyReq: (proxyReq, req) => {
-        logger.proxy(`Forwarding: ${req.method} ${req.url} -> ${NEST_PORT}`);
+        logger.proxy(`Forwarding: ${req.method} ${req.url} -> ${NEST_PORT}/api${req.url}`);
       },
       proxyRes: (proxyRes, req) => {
         logger.proxy(`Response: ${req.method} ${req.url} -> ${proxyRes.statusCode}`);
