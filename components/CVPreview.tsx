@@ -493,8 +493,10 @@ function EditableContactField({
 export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showToolbar = true }: CVPreviewProps) {
   const professionalTemplates = getProfessionalTemplateOptions();
   const studentTemplates = getStudentTemplateOptions();
+  // Compute student template flag once to avoid type narrowing issues
+  const isStudentTemplate = template === "student-modern";
   // Student template ALWAYS enforces education-first order
-  const sectionOrder = template === "student-modern" 
+  const sectionOrder = isStudentTemplate 
     ? STUDENT_SECTION_ORDER 
     : (cv.sectionOrder || DEFAULT_SECTION_ORDER);
   const [rearrangeModalOpen, setRearrangeModalOpen] = useState(false);
@@ -986,7 +988,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
   const renderExperienceEntry = (index: number, isLast: boolean) => {
     const exp = cv.experience[index];
     if (!exp) return null;
-    const isStudent = template === "student-modern";
+    const isStudent = isStudentTemplate;
     
     return (
       <Box key={`exp-${exp.id}`} sx={{ mb: isLast ? 0 : 2, position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
@@ -1053,7 +1055,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
   const renderEducationEntry = (index: number, isLast: boolean) => {
     const edu = cv.education?.[index];
     if (!edu) return null;
-    const isStudent = template === "student-modern";
+    const isStudent = isStudentTemplate;
 
     return (
       <Box key={`edu-${edu.id}`} sx={{ mb: isLast ? 0 : 1.5, position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
@@ -1095,10 +1097,10 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
   const renderItem = (item: PageItem, isLast: boolean, pageItems: PageItem[]) => {
     switch (item.type) {
       case "summary":
-        if (template === "student-modern") return null;
+        if (isStudentTemplate) return null;
         return (
           <Box key="summary" sx={{ mb: isLast ? 0 : 2 }}>
-            <SectionHeader title="Summary" style={style} isStudentTemplate={template === "student-modern"} />
+            <SectionHeader title="Summary" style={style} isStudentTemplate={isStudentTemplate} />
             <Box sx={style.summaryBoxed ? {
               border: "1px solid rgba(27, 79, 114, 0.15)",
               borderLeft: `3px solid ${style.accent}`,
@@ -1125,9 +1127,9 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
         return (
           <Box key="experience-header" sx={{ mb: 1 }}>
             <SectionHeader
-              title={item.continued ? (template === "student-modern" ? "Internships (continued)" : "Experience (continued)") : (template === "student-modern" ? "Internships" : "Experience")}
+              title={item.continued ? (isStudentTemplate ? "Internships (continued)" : "Experience (continued)") : (isStudentTemplate ? "Internships" : "Experience")}
               style={style}
-              isStudentTemplate={template === "student-modern"}
+              isStudentTemplate={isStudentTemplate}
               rightContent={
                 !item.continued ? (
                   <IconButton size="small" onClick={addExperience} sx={{ color: style.accent }} data-testid="button-add-experience">
@@ -1153,7 +1155,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
             <SectionHeader
               title={item.continued ? "Education (continued)" : "Education"}
               style={style}
-              isStudentTemplate={template === "student-modern"}
+              isStudentTemplate={isStudentTemplate}
               rightContent={
                 !item.continued ? (
                   <IconButton size="small" onClick={addEducation} sx={{ color: style.accent }} data-testid="button-add-education">
@@ -1177,9 +1179,9 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
         return (
           <Box key="skills" sx={{ mb: isLast ? 0 : 2 }}>
             <SectionHeader
-              title={template === "student-modern" ? "Technical Skills" : "Skills"}
+              title={isStudentTemplate ? "Technical Skills" : "Skills"}
               style={style}
-              isStudentTemplate={template === "student-modern"}
+              isStudentTemplate={isStudentTemplate}
               rightContent={
                 <IconButton size="small" onClick={addSkill} sx={{ color: style.accent }} data-testid="button-add-skill">
                   <AddIcon fontSize="small" />
@@ -1209,7 +1211,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
             <SectionHeader
               title="Strengths"
               style={style}
-              isStudentTemplate={template === "student-modern"}
+              isStudentTemplate={isStudentTemplate}
               rightContent={
                 <IconButton size="small" onClick={addStrength} sx={{ color: style.accent }} data-testid="button-add-strength">
                   <AddIcon fontSize="small" />
@@ -1239,7 +1241,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
             <SectionHeader
               title="Certifications"
               style={style}
-              isStudentTemplate={template === "student-modern"}
+              isStudentTemplate={isStudentTemplate}
               rightContent={
                 <IconButton size="small" onClick={addCertification} sx={{ color: style.accent }} data-testid="button-add-certification">
                   <AddIcon fontSize="small" />
@@ -1275,9 +1277,9 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
         return (
           <Box key="projects-header" sx={{ mb: 1 }}>
             <SectionHeader
-              title={item.continued ? (template === "student-modern" ? "Volunteer Experience (continued)" : "Featured Projects (continued)") : (template === "student-modern" ? "Volunteer Experience" : "Featured Projects")}
+              title={item.continued ? (isStudentTemplate ? "Volunteer Experience (continued)" : "Featured Projects (continued)") : (isStudentTemplate ? "Volunteer Experience" : "Featured Projects")}
               style={style}
-              isStudentTemplate={template === "student-modern"}
+              isStudentTemplate={isStudentTemplate}
               rightContent={
                 !item.continued ? (
                   <IconButton size="small" onClick={addProject} sx={{ color: style.accent }} data-testid="button-add-project">
@@ -1332,7 +1334,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
                 placeholder="Project description and achievements..."
               />
             </Typography>
-            {((project.technologies || []).length > 0 || template === "student-modern") && (
+            {((project.technologies || []).length > 0 || isStudentTemplate) && (
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mt: 1, alignItems: "center" }}>
                 {(project.technologies || []).map((tech, techIdx) => (
                   <Chip
@@ -1788,7 +1790,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
           >
             {page.isFirstPage ? (
               <>
-                {template === "student-modern" ? renderStudentHeader() : renderHeader()}
+                {isStudentTemplate ? renderStudentHeader() : renderHeader()}
                 <Box sx={{ pt: 1.5, px: 3, pb: `${BOTTOM_GUTTER}px`, color: style.bodyText }}>
                   {page.items.map((item, idx) => 
                     renderItem(item, idx === page.items.length - 1, page.items)
