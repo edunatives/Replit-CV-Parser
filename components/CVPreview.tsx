@@ -16,7 +16,7 @@ import SwapVertIcon from "@mui/icons-material/SwapVert";
 import PaletteIcon from "@mui/icons-material/Palette";
 import type { ParsedCV, TemplateType, CVSection, ColorScheme, CVType } from "@/types/cv";
 import { SectionRearrangeModal } from "./SectionRearrangeModal";
-import { DEFAULT_SECTION_ORDER, STUDENT_SECTION_ORDER, COLOR_SCHEME_PRESETS } from "@/types/cv";
+import { DEFAULT_SECTION_ORDER, STUDENT_SECTION_ORDER, PHD_RESEARCH_SECTION_ORDER, COLOR_SCHEME_PRESETS } from "@/types/cv";
 import { useState, useRef, useMemo } from "react";
 import { isDeveloperRole } from "@/lib/ai/rules";
 import { getTemplateStyle, getProfessionalTemplateOptions, getStudentTemplateOptions } from "@/lib/templates";
@@ -494,7 +494,7 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
   const professionalTemplates = getProfessionalTemplateOptions();
   const studentTemplates = getStudentTemplateOptions();
   // Compute student template flag once to avoid type narrowing issues
-  const isStudentTemplate = template === "student-modern";
+  const isStudentTemplate = template === "student-modern" || template === "phd-research";
   
   // Determine which template category should be enabled based on CV type
   // student and fresh_grad -> Students Templates enabled, Professional disabled
@@ -502,10 +502,12 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
   const cvType: CVType = cv.cvType || "professional";
   const isStudentOrFreshGrad = cvType === "student" || cvType === "fresh_grad";
   const isProfessionalCV = cvType === "professional" || cvType === "researcher";
-  // Student template ALWAYS enforces education-first order
-  const sectionOrder = isStudentTemplate 
-    ? STUDENT_SECTION_ORDER 
-    : (cv.sectionOrder || DEFAULT_SECTION_ORDER);
+  // Student/PhD templates enforce specific section orders
+  const sectionOrder = template === "phd-research"
+    ? PHD_RESEARCH_SECTION_ORDER
+    : isStudentTemplate 
+      ? STUDENT_SECTION_ORDER 
+      : (cv.sectionOrder || DEFAULT_SECTION_ORDER);
   const [rearrangeModalOpen, setRearrangeModalOpen] = useState(false);
   const [colorAnchorEl, setColorAnchorEl] = useState<HTMLElement | null>(null);
   const [customPrimary, setCustomPrimary] = useState(cv.colorScheme?.primary || "#1b4f72");
@@ -630,6 +632,34 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
     onUpdateCV({ ...cv, certifications: [...(cv.certifications || []), newCert] });
   };
 
+  const addPublication = () => {
+    const newPub = {
+      id: `pub-new-${Date.now()}`,
+      citation: "Author(s). (Year). Title. Journal/Conference.",
+      status: "published" as const
+    };
+    onUpdateCV({ ...cv, publications: [...(cv.publications || []), newPub] });
+  };
+
+  const addTraining = () => {
+    const newTraining = {
+      id: `train-new-${Date.now()}`,
+      title: "Training/Teaching Title",
+      description: "Description of training or teaching role..."
+    };
+    onUpdateCV({ ...cv, training: [...(cv.training || []), newTraining] });
+  };
+
+  const addHonor = () => {
+    const newHonor = {
+      id: `honor-new-${Date.now()}`,
+      title: "Honor, Award, or Activity",
+      year: new Date().getFullYear().toString(),
+      description: ""
+    };
+    onUpdateCV({ ...cv, honors: [...(cv.honors || []), newHonor] });
+  };
+
   const updateProject = (index: number, field: string, value: string | string[]) => {
     const newProjects = [...(cv.projects || [])];
     newProjects[index] = { ...newProjects[index], [field]: value };
@@ -724,7 +754,10 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
     | { type: "strengths" }
     | { type: "certifications" }
     | { type: "projects-header"; continued?: boolean }
-    | { type: "project-entry"; index: number };
+    | { type: "project-entry"; index: number }
+    | { type: "publications" }
+    | { type: "training" }
+    | { type: "honors" };
 
   interface PageData {
     pageNumber: number;
@@ -791,6 +824,21 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
       const count = cv.certifications?.length || 0;
       const rows = Math.ceil(count / 4);
       return SECTION_HEADER + rows * 28 + 16;
+    };
+
+    const estimatePublicationsHeight = (): number => {
+      const count = cv.publications?.length || 0;
+      return SECTION_HEADER + count * 48 + 16;
+    };
+
+    const estimateTrainingHeight = (): number => {
+      const count = cv.training?.length || 0;
+      return SECTION_HEADER + count * 60 + 16;
+    };
+
+    const estimateHonorsHeight = (): number => {
+      const count = cv.honors?.length || 0;
+      return SECTION_HEADER + count * 32 + 16;
     };
 
     const result: PageData[] = [];
@@ -963,6 +1011,24 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
               }
             }
           });
+          break;
+        }
+
+        case "publications": {
+          const height = estimatePublicationsHeight();
+          addItem({ type: "publications" }, height);
+          break;
+        }
+
+        case "training": {
+          const height = estimateTrainingHeight();
+          addItem({ type: "training" }, height);
+          break;
+        }
+
+        case "honors": {
+          const height = estimateHonorsHeight();
+          addItem({ type: "honors" }, height);
           break;
         }
       }
@@ -1374,6 +1440,198 @@ export function CVPreview({ cv, template, onUpdateCV, onTemplateChange, showTool
           </Box>
         );
       }
+
+      case "publications":
+        return (
+          <Box key="publications" sx={{ mb: isLast ? 0 : 2 }}>
+            <SectionHeader
+              title="Publications"
+              style={style}
+              isStudentTemplate={isStudentTemplate}
+              rightContent={
+                <IconButton size="small" onClick={addPublication} sx={{ color: style.accent }} data-testid="button-add-publication">
+                  <AddIcon fontSize="small" />
+                </IconButton>
+              }
+            />
+            {(!cv.publications || cv.publications.length === 0) ? (
+              <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
+                Click + to add publications
+              </Typography>
+            ) : (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              {cv.publications.map((pub, index) => (
+                <Box key={pub.id} sx={{ position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
+                  <IconButton 
+                    className="delete-btn"
+                    size="small" 
+                    onClick={() => {
+                      const newPubs = (cv.publications || []).filter((_, i) => i !== index);
+                      onUpdateCV({ ...cv, publications: newPubs });
+                    }}
+                    sx={{ position: "absolute", right: 0, top: 0, visibility: "hidden", color: "error.main" }}
+                    data-testid={`button-delete-publication-${index}`}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                  <Typography variant="body2" sx={{ color: style.bodyText, lineHeight: 1.5, pr: 3 }} component="div">
+                    <EditableField 
+                      value={pub.citation} 
+                      onChange={(v) => {
+                        const newPubs = [...(cv.publications || [])];
+                        newPubs[index] = { ...newPubs[index], citation: v };
+                        onUpdateCV({ ...cv, publications: newPubs });
+                      }}
+                      multiline
+                      rows={2}
+                      placeholder="Author(s). (Year). Title. Journal/Conference."
+                    />
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+            )}
+          </Box>
+        );
+
+      case "training":
+        return (
+          <Box key="training" sx={{ mb: isLast ? 0 : 2 }}>
+            <SectionHeader
+              title="Training & Teaching"
+              style={style}
+              isStudentTemplate={isStudentTemplate}
+              rightContent={
+                <IconButton size="small" onClick={addTraining} sx={{ color: style.accent }} data-testid="button-add-training">
+                  <AddIcon fontSize="small" />
+                </IconButton>
+              }
+            />
+            {(!cv.training || cv.training.length === 0) ? (
+              <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
+                Click + to add training or teaching experience
+              </Typography>
+            ) : (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+              {cv.training.map((train, index) => (
+                <Box key={train.id} sx={{ position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
+                  <IconButton 
+                    className="delete-btn"
+                    size="small" 
+                    onClick={() => {
+                      const newTraining = (cv.training || []).filter((_, i) => i !== index);
+                      onUpdateCV({ ...cv, training: newTraining });
+                    }}
+                    sx={{ position: "absolute", right: 0, top: 0, visibility: "hidden", color: "error.main" }}
+                    data-testid={`button-delete-training-${index}`}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                  <Typography variant="subtitle2" fontWeight={600} sx={{ color: style.bodyText, lineHeight: 1.3 }} component="div">
+                    <EditableField 
+                      value={train.title} 
+                      onChange={(v) => {
+                        const newTraining = [...(cv.training || [])];
+                        newTraining[index] = { ...newTraining[index], title: v };
+                        onUpdateCV({ ...cv, training: newTraining });
+                      }}
+                      placeholder="Training/Teaching Title"
+                    />
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: style.bodyTextSecondary, lineHeight: 1.5, pr: 3 }} component="div">
+                    <EditableField 
+                      value={train.description} 
+                      onChange={(v) => {
+                        const newTraining = [...(cv.training || [])];
+                        newTraining[index] = { ...newTraining[index], description: v };
+                        onUpdateCV({ ...cv, training: newTraining });
+                      }}
+                      multiline
+                      rows={2}
+                      placeholder="Description of training or teaching role..."
+                    />
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+            )}
+          </Box>
+        );
+
+      case "honors":
+        return (
+          <Box key="honors" sx={{ mb: isLast ? 0 : 2 }}>
+            <SectionHeader
+              title="Honors & Activities"
+              style={style}
+              isStudentTemplate={isStudentTemplate}
+              rightContent={
+                <IconButton size="small" onClick={addHonor} sx={{ color: style.accent }} data-testid="button-add-honor">
+                  <AddIcon fontSize="small" />
+                </IconButton>
+              }
+            />
+            {(!cv.honors || cv.honors.length === 0) ? (
+              <Typography variant="body2" sx={{ color: style.bodyTextSecondary, fontStyle: "italic" }}>
+                Click + to add honors and activities
+              </Typography>
+            ) : (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              {cv.honors.map((honor, index) => (
+                <Box key={honor.id} sx={{ position: "relative", "&:hover .delete-btn": { visibility: "visible" } }}>
+                  <IconButton 
+                    className="delete-btn"
+                    size="small" 
+                    onClick={() => {
+                      const newHonors = (cv.honors || []).filter((_, i) => i !== index);
+                      onUpdateCV({ ...cv, honors: newHonors });
+                    }}
+                    sx={{ position: "absolute", right: 0, top: 0, visibility: "hidden", color: "error.main" }}
+                    data-testid={`button-delete-honor-${index}`}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                  <Box sx={{ display: "flex", alignItems: "baseline", gap: 1, pr: 3 }}>
+                    <Typography variant="body2" sx={{ color: style.bodyText, lineHeight: 1.4, flex: 1 }} component="div">
+                      <EditableField 
+                        value={honor.title} 
+                        onChange={(v) => {
+                          const newHonors = [...(cv.honors || [])];
+                          newHonors[index] = { ...newHonors[index], title: v };
+                          onUpdateCV({ ...cv, honors: newHonors });
+                        }}
+                        placeholder="Honor, Award, or Activity"
+                      />
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: style.bodyTextSecondary, whiteSpace: "nowrap" }} component="div">
+                      (<EditableField 
+                        value={honor.year || ""} 
+                        onChange={(v) => {
+                          const newHonors = [...(cv.honors || [])];
+                          newHonors[index] = { ...newHonors[index], year: v };
+                          onUpdateCV({ ...cv, honors: newHonors });
+                        }}
+                        placeholder="Year"
+                      />)
+                    </Typography>
+                  </Box>
+                  <Typography variant="body2" sx={{ color: style.bodyTextSecondary, lineHeight: 1.4, mt: 0.25, pr: 3 }} component="div">
+                    <EditableField 
+                      value={honor.description || ""} 
+                      onChange={(v) => {
+                        const newHonors = [...(cv.honors || [])];
+                        newHonors[index] = { ...newHonors[index], description: v };
+                        onUpdateCV({ ...cv, honors: newHonors });
+                      }}
+                      placeholder="Optional description"
+                    />
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+            )}
+          </Box>
+        );
 
       default:
         return null;
