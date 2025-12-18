@@ -40,9 +40,13 @@ Preferred communication style: Simple, everyday language.
     - `POST /api/assess/compare`: Compare old vs new assessment prompts
     - `POST /api/assess/advisor`: AI career advisor chat
 - **CV Parsing**: Implemented using `mammoth` (DOCX), `pdf-parse` (PDF), and AI-powered extraction via Gemini 2.5 Flash. The NestJS ParseService now uses AI for comprehensive CV parsing (all experiences, education, skills) with regex-based fallback when AI is unavailable.
-- **CV Type Detection**: During parsing, the system automatically detects CV classification displayed in progress bar:
-    - AI analysis of experience, education indicators, and keywords
-    - Heuristic fallback: regex patterns for research/academic indicators, experience count, years of experience
+- **CV Type Detection**: Hybrid approach with heuristic-first detection to reduce token consumption:
+    - `nest/cv/cv-type-detection.ts`: Dedicated module with signal extraction and confidence scoring
+    - Heuristic detection runs first with 70% confidence threshold
+    - High confidence (>=70%): Pre-detected type passed to AI, skipping LLM type inference (~200-500 tokens saved)
+    - Low confidence (<70%): AI determines type with full inference instructions
+    - Scoring system: Student max 165, Fresh_grad 110, Researcher 305, Professional 150 points
+    - Expected ~85% of CVs skip LLM type detection
     - CVType values: `student` (enrolled), `fresh_grad` (0-2 years), `researcher` (PhD/postdoc/academic), `professional` (3+ years industry)
 - **Template Selector Logic**: Based on detected cvType, template dropdowns are conditionally enabled:
     - Student/Fresh Grad CVs: Students Templates enabled, Professional Templates disabled
