@@ -1029,10 +1029,10 @@ function ActionsTab({ data }: { data: LiteOutput | StandardOutput | FullOutput }
   const nextAction = isLiteOutput(data) ? data.nextAction : null;
 
   const allImprovements = [
-    ...(improvements.critical || []), 
-    ...(improvements.high || []), 
-    ...(improvements.medium || [])
-  ];
+    ...(improvements.critical || []).map(imp => ({ ...imp, priority: imp.priority || "critical" })), 
+    ...(improvements.high || []).map(imp => ({ ...imp, priority: imp.priority || "high" })), 
+    ...(improvements.medium || []).map(imp => ({ ...imp, priority: imp.priority || "medium" }))
+  ].filter(imp => imp.action || imp.code);
 
   return (
     <Box>
@@ -1050,30 +1050,38 @@ function ActionsTab({ data }: { data: LiteOutput | StandardOutput | FullOutput }
             Improvements ({allImprovements.length})
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-            {allImprovements.map((imp, idx) => (
-              <Card key={idx} sx={{ borderLeft: 3, borderColor: getPriorityColor(imp.priority) }} elevation={0}>
+            {allImprovements.map((imp, idx) => {
+              const priority = imp.priority || "medium";
+              const effort = imp.effort || "moderate";
+              const action = imp.action || "Improvement suggested";
+              const impact = imp.impact || "";
+              return (
+              <Card key={idx} sx={{ borderLeft: 3, borderColor: getPriorityColor(priority) }} elevation={0}>
                 <CardContent sx={{ py: 1.5, px: 2, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                   <Box sx={{ display: "flex", gap: 2, alignItems: "flex-start", flex: 1 }}>
-                    <LightbulbIcon sx={{ color: getPriorityColor(imp.priority), mt: 0.3 }} />
+                    <LightbulbIcon sx={{ color: getPriorityColor(priority), mt: 0.3 }} />
                     <Box>
                       <Box sx={{ display: "flex", gap: 1, mb: 0.5, flexWrap: "wrap" }}>
-                        <Chip label={imp.code} size="small" sx={{ fontSize: "0.7rem", height: 20 }} />
+                        {imp.code && <Chip label={imp.code} size="small" sx={{ fontSize: "0.7rem", height: 20 }} />}
                         <Chip 
-                          label={imp.priority} 
+                          label={priority} 
                           size="small" 
-                          sx={{ fontSize: "0.65rem", height: 18, bgcolor: getPriorityColor(imp.priority), color: "white" }} 
+                          sx={{ fontSize: "0.65rem", height: 18, bgcolor: getPriorityColor(priority), color: "white" }} 
                         />
-                        <Chip label={imp.effort} size="small" variant="outlined" sx={{ fontSize: "0.65rem", height: 18 }} />
+                        <Chip label={effort} size="small" variant="outlined" sx={{ fontSize: "0.65rem", height: 18 }} />
                       </Box>
-                      <Typography variant="body2">{imp.action}</Typography>
+                      <Typography variant="body2">{action}</Typography>
                     </Box>
                   </Box>
-                  <Typography variant="body2" fontWeight={600} sx={{ color: "#22c55e", whiteSpace: "nowrap" }}>
-                    {imp.impact}
-                  </Typography>
+                  {impact && (
+                    <Typography variant="body2" fontWeight={600} sx={{ color: "#22c55e", whiteSpace: "nowrap" }}>
+                      {impact}
+                    </Typography>
+                  )}
                 </CardContent>
               </Card>
-            ))}
+              );
+            })}
           </Box>
         </>
       )}

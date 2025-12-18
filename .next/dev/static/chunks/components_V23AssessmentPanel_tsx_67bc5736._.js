@@ -3792,10 +3792,19 @@ function ActionsTab({ data }) {
     }
     const nextAction = isLiteOutput(data) ? data.nextAction : null;
     const allImprovements = [
-        ...improvements.critical || [],
-        ...improvements.high || [],
-        ...improvements.medium || []
-    ];
+        ...(improvements.critical || []).map((imp)=>({
+                ...imp,
+                priority: imp.priority || "critical"
+            })),
+        ...(improvements.high || []).map((imp)=>({
+                ...imp,
+                priority: imp.priority || "high"
+            })),
+        ...(improvements.medium || []).map((imp)=>({
+                ...imp,
+                priority: imp.priority || "medium"
+            }))
+    ].filter((imp)=>imp.action || imp.code);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
         children: [
             nextAction && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Paper$2f$Paper$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Paper$3e$__["Paper"], {
@@ -3864,10 +3873,15 @@ function ActionsTab({ data }) {
                             flexDirection: "column",
                             gap: 1.5
                         },
-                        children: allImprovements.map((imp, idx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Card$2f$Card$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Card$3e$__["Card"], {
+                        children: allImprovements.map((imp, idx)=>{
+                            const priority = imp.priority || "medium";
+                            const effort = imp.effort || "moderate";
+                            const action = imp.action || "Improvement suggested";
+                            const impact = imp.impact || "";
+                            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Card$2f$Card$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Card$3e$__["Card"], {
                                 sx: {
                                     borderLeft: 3,
-                                    borderColor: getPriorityColor(imp.priority)
+                                    borderColor: getPriorityColor(priority)
                                 },
                                 elevation: 0,
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$CardContent$2f$CardContent$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CardContent$3e$__["CardContent"], {
@@ -3889,12 +3903,12 @@ function ActionsTab({ data }) {
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$Lightbulb$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                                     sx: {
-                                                        color: getPriorityColor(imp.priority),
+                                                        color: getPriorityColor(priority),
                                                         mt: 0.3
                                                     }
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1057,
+                                                    lineNumber: 1062,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -3907,7 +3921,7 @@ function ActionsTab({ data }) {
                                                                 flexWrap: "wrap"
                                                             },
                                                             children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Chip$2f$Chip$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Chip$3e$__["Chip"], {
+                                                                imp.code && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Chip$2f$Chip$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Chip$3e$__["Chip"], {
                                                                     label: imp.code,
                                                                     size: "small",
                                                                     sx: {
@@ -3916,25 +3930,25 @@ function ActionsTab({ data }) {
                                                                     }
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                                    lineNumber: 1060,
-                                                                    columnNumber: 25
+                                                                    lineNumber: 1065,
+                                                                    columnNumber: 38
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Chip$2f$Chip$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Chip$3e$__["Chip"], {
-                                                                    label: imp.priority,
+                                                                    label: priority,
                                                                     size: "small",
                                                                     sx: {
                                                                         fontSize: "0.65rem",
                                                                         height: 18,
-                                                                        bgcolor: getPriorityColor(imp.priority),
+                                                                        bgcolor: getPriorityColor(priority),
                                                                         color: "white"
                                                                     }
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                                    lineNumber: 1061,
+                                                                    lineNumber: 1066,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Chip$2f$Chip$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Chip$3e$__["Chip"], {
-                                                                    label: imp.effort,
+                                                                    label: effort,
                                                                     size: "small",
                                                                     variant: "outlined",
                                                                     sx: {
@@ -3943,59 +3957,60 @@ function ActionsTab({ data }) {
                                                                     }
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                                    lineNumber: 1066,
+                                                                    lineNumber: 1071,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                            lineNumber: 1059,
+                                                            lineNumber: 1064,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
                                                             variant: "body2",
-                                                            children: imp.action
+                                                            children: action
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                            lineNumber: 1068,
+                                                            lineNumber: 1073,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1058,
+                                                    lineNumber: 1063,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1056,
+                                            lineNumber: 1061,
                                             columnNumber: 19
                                         }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
+                                        impact && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
                                             variant: "body2",
                                             fontWeight: 600,
                                             sx: {
                                                 color: "#22c55e",
                                                 whiteSpace: "nowrap"
                                             },
-                                            children: imp.impact
+                                            children: impact
                                         }, void 0, false, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1071,
-                                            columnNumber: 19
+                                            lineNumber: 1077,
+                                            columnNumber: 21
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1055,
+                                    lineNumber: 1060,
                                     columnNumber: 17
                                 }, this)
                             }, idx, false, {
                                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                lineNumber: 1054,
+                                lineNumber: 1059,
                                 columnNumber: 15
-                            }, this))
+                            }, this);
+                        })
                     }, void 0, false, {
                         fileName: "[project]/components/V23AssessmentPanel.tsx",
                         lineNumber: 1052,
@@ -4028,7 +4043,7 @@ function ActionsTab({ data }) {
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1085,
+                                    lineNumber: 1093,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -4037,13 +4052,13 @@ function ActionsTab({ data }) {
                                     children: "Score Potential"
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1086,
+                                    lineNumber: 1094,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1084,
+                            lineNumber: 1092,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -4059,7 +4074,7 @@ function ActionsTab({ data }) {
                                     children: scorePotential.current
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1089,
+                                    lineNumber: 1097,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -4068,7 +4083,7 @@ function ActionsTab({ data }) {
                                     children: "→"
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1090,
+                                    lineNumber: 1098,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -4078,13 +4093,13 @@ function ActionsTab({ data }) {
                                     children: scorePotential.afterAll
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1091,
+                                    lineNumber: 1099,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1088,
+                            lineNumber: 1096,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -4098,18 +4113,18 @@ function ActionsTab({ data }) {
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1093,
+                            lineNumber: 1101,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                    lineNumber: 1083,
+                    lineNumber: 1091,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                lineNumber: 1082,
+                lineNumber: 1090,
                 columnNumber: 9
             }, this),
             nextSteps && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -4125,7 +4140,7 @@ function ActionsTab({ data }) {
                         children: "Next Steps"
                     }, void 0, false, {
                         fileName: "[project]/components/V23AssessmentPanel.tsx",
-                        lineNumber: 1102,
+                        lineNumber: 1110,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Grid$2f$Grid$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Grid$3e$__["Grid"], {
@@ -4147,7 +4162,7 @@ function ActionsTab({ data }) {
                                             children: "Immediate"
                                         }, void 0, false, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1106,
+                                            lineNumber: 1114,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -4161,28 +4176,28 @@ function ActionsTab({ data }) {
                                                         children: step
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                        lineNumber: 1109,
+                                                        lineNumber: 1117,
                                                         columnNumber: 33
                                                     }, this)
                                                 }, i, false, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1109,
+                                                    lineNumber: 1117,
                                                     columnNumber: 21
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1107,
+                                            lineNumber: 1115,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1105,
+                                    lineNumber: 1113,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                lineNumber: 1104,
+                                lineNumber: 1112,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Grid$2f$Grid$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Grid$3e$__["Grid"], {
@@ -4200,7 +4215,7 @@ function ActionsTab({ data }) {
                                             children: "This Week"
                                         }, void 0, false, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1116,
+                                            lineNumber: 1124,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -4214,28 +4229,28 @@ function ActionsTab({ data }) {
                                                         children: step
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                        lineNumber: 1119,
+                                                        lineNumber: 1127,
                                                         columnNumber: 33
                                                     }, this)
                                                 }, i, false, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1119,
+                                                    lineNumber: 1127,
                                                     columnNumber: 21
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1117,
+                                            lineNumber: 1125,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1115,
+                                    lineNumber: 1123,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                lineNumber: 1114,
+                                lineNumber: 1122,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Grid$2f$Grid$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Grid$3e$__["Grid"], {
@@ -4253,7 +4268,7 @@ function ActionsTab({ data }) {
                                             children: "Before Application"
                                         }, void 0, false, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1126,
+                                            lineNumber: 1134,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -4267,40 +4282,40 @@ function ActionsTab({ data }) {
                                                         children: step
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                        lineNumber: 1129,
+                                                        lineNumber: 1137,
                                                         columnNumber: 33
                                                     }, this)
                                                 }, i, false, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1129,
+                                                    lineNumber: 1137,
                                                     columnNumber: 21
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1127,
+                                            lineNumber: 1135,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1125,
+                                    lineNumber: 1133,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                lineNumber: 1124,
+                                lineNumber: 1132,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/V23AssessmentPanel.tsx",
-                        lineNumber: 1103,
+                        lineNumber: 1111,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                lineNumber: 1101,
+                lineNumber: 1109,
                 columnNumber: 9
             }, this)
         ]
@@ -4371,12 +4386,12 @@ function BulletsTab({ data }) {
                 children: "Bullet analysis not available in this mode"
             }, void 0, false, {
                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                lineNumber: 1201,
+                lineNumber: 1209,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/components/V23AssessmentPanel.tsx",
-            lineNumber: 1200,
+            lineNumber: 1208,
             columnNumber: 7
         }, this);
     }
@@ -4409,14 +4424,14 @@ function BulletsTab({ data }) {
                         }
                     }, void 0, false, {
                         fileName: "[project]/components/V23AssessmentPanel.tsx",
-                        lineNumber: 1218,
+                        lineNumber: 1226,
                         columnNumber: 9
                     }, this),
                     "Bullet Analysis"
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                lineNumber: 1217,
+                lineNumber: 1225,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Grid$2f$Grid$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Grid$3e$__["Grid"], {
@@ -4438,7 +4453,7 @@ function BulletsTab({ data }) {
                                     children: bulletHealth.totalBullets
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1225,
+                                    lineNumber: 1233,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -4447,18 +4462,18 @@ function BulletsTab({ data }) {
                                     children: "Total Bullets"
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1226,
+                                    lineNumber: 1234,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1224,
+                            lineNumber: 1232,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/V23AssessmentPanel.tsx",
-                        lineNumber: 1223,
+                        lineNumber: 1231,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Grid$2f$Grid$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Grid$3e$__["Grid"], {
@@ -4479,7 +4494,7 @@ function BulletsTab({ data }) {
                                     children: bulletHealth.averageScore
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1231,
+                                    lineNumber: 1239,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -4488,24 +4503,24 @@ function BulletsTab({ data }) {
                                     children: "Average Score"
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1234,
+                                    lineNumber: 1242,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1230,
+                            lineNumber: 1238,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/V23AssessmentPanel.tsx",
-                        lineNumber: 1229,
+                        lineNumber: 1237,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                lineNumber: 1222,
+                lineNumber: 1230,
                 columnNumber: 7
             }, this),
             bulletHealth.distribution && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Grid$2f$Grid$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Grid$3e$__["Grid"], {
@@ -4532,7 +4547,7 @@ function BulletsTab({ data }) {
                                     children: bulletHealth.distribution.excellent
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1243,
+                                    lineNumber: 1251,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -4541,18 +4556,18 @@ function BulletsTab({ data }) {
                                     children: "Excellent"
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1244,
+                                    lineNumber: 1252,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1242,
+                            lineNumber: 1250,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/V23AssessmentPanel.tsx",
-                        lineNumber: 1241,
+                        lineNumber: 1249,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Grid$2f$Grid$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Grid$3e$__["Grid"], {
@@ -4574,7 +4589,7 @@ function BulletsTab({ data }) {
                                     children: bulletHealth.distribution.good
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1249,
+                                    lineNumber: 1257,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -4583,18 +4598,18 @@ function BulletsTab({ data }) {
                                     children: "Good"
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1250,
+                                    lineNumber: 1258,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1248,
+                            lineNumber: 1256,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/V23AssessmentPanel.tsx",
-                        lineNumber: 1247,
+                        lineNumber: 1255,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Grid$2f$Grid$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Grid$3e$__["Grid"], {
@@ -4616,7 +4631,7 @@ function BulletsTab({ data }) {
                                     children: bulletHealth.distribution.fair
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1255,
+                                    lineNumber: 1263,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -4625,18 +4640,18 @@ function BulletsTab({ data }) {
                                     children: "Fair"
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1256,
+                                    lineNumber: 1264,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1254,
+                            lineNumber: 1262,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/V23AssessmentPanel.tsx",
-                        lineNumber: 1253,
+                        lineNumber: 1261,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Grid$2f$Grid$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Grid$3e$__["Grid"], {
@@ -4656,7 +4671,7 @@ function BulletsTab({ data }) {
                                     children: bulletHealth.distribution.poor
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1261,
+                                    lineNumber: 1269,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -4665,24 +4680,24 @@ function BulletsTab({ data }) {
                                     children: "Poor"
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1262,
+                                    lineNumber: 1270,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1260,
+                            lineNumber: 1268,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/V23AssessmentPanel.tsx",
-                        lineNumber: 1259,
+                        lineNumber: 1267,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                lineNumber: 1240,
+                lineNumber: 1248,
                 columnNumber: 9
             }, this),
             isStandardOutput(data) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Card$2f$Card$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Card$3e$__["Card"], {
@@ -4700,7 +4715,7 @@ function BulletsTab({ data }) {
                             children: "Top Issue"
                         }, void 0, false, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1271,
+                            lineNumber: 1279,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -4709,7 +4724,7 @@ function BulletsTab({ data }) {
                             children: bulletHealth.topIssue
                         }, void 0, false, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1272,
+                            lineNumber: 1280,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -4721,7 +4736,7 @@ function BulletsTab({ data }) {
                             children: "Recommended Fix"
                         }, void 0, false, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1273,
+                            lineNumber: 1281,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -4729,18 +4744,18 @@ function BulletsTab({ data }) {
                             children: bulletHealth.topFix
                         }, void 0, false, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1274,
+                            lineNumber: 1282,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                    lineNumber: 1270,
+                    lineNumber: 1278,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                lineNumber: 1269,
+                lineNumber: 1277,
                 columnNumber: 9
             }, this),
             isFullOutput(data) && allBullets.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -4763,7 +4778,7 @@ function BulletsTab({ data }) {
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/V23AssessmentPanel.tsx",
-                        lineNumber: 1282,
+                        lineNumber: 1290,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -4803,12 +4818,12 @@ function BulletsTab({ data }) {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                        lineNumber: 1292,
+                                                        lineNumber: 1300,
                                                         columnNumber: 23
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1291,
+                                                    lineNumber: 1299,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Chip$2f$Chip$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Chip$3e$__["Chip"], {
@@ -4821,13 +4836,13 @@ function BulletsTab({ data }) {
                                                     }
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1294,
+                                                    lineNumber: 1302,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1290,
+                                            lineNumber: 1298,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -4844,7 +4859,7 @@ function BulletsTab({ data }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1302,
+                                            lineNumber: 1310,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -4865,7 +4880,7 @@ function BulletsTab({ data }) {
                                                     }
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1309,
+                                                    lineNumber: 1317,
                                                     columnNumber: 23
                                                 }, this),
                                                 bullet.quantification && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Chip$2f$Chip$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Chip$3e$__["Chip"], {
@@ -4878,7 +4893,7 @@ function BulletsTab({ data }) {
                                                     }
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1317,
+                                                    lineNumber: 1325,
                                                     columnNumber: 23
                                                 }, this),
                                                 bullet.result && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Chip$2f$Chip$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Chip$3e$__["Chip"], {
@@ -4891,13 +4906,13 @@ function BulletsTab({ data }) {
                                                     }
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1325,
+                                                    lineNumber: 1333,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1307,
+                                            lineNumber: 1315,
                                             columnNumber: 19
                                         }, this),
                                         bullet.issues && bullet.issues.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -4912,7 +4927,7 @@ function BulletsTab({ data }) {
                                                     children: "Issues:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1337,
+                                                    lineNumber: 1345,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -4937,7 +4952,7 @@ function BulletsTab({ data }) {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                                    lineNumber: 1341,
+                                                                    lineNumber: 1349,
                                                                     columnNumber: 29
                                                                 }, this),
                                                                 " ",
@@ -4945,18 +4960,18 @@ function BulletsTab({ data }) {
                                                             ]
                                                         }, i, true, {
                                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                            lineNumber: 1340,
+                                                            lineNumber: 1348,
                                                             columnNumber: 27
                                                         }, this))
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1338,
+                                                    lineNumber: 1346,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1336,
+                                            lineNumber: 1344,
                                             columnNumber: 21
                                         }, this),
                                         bullet.rewrite && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -4982,7 +4997,7 @@ function BulletsTab({ data }) {
                                                             children: "Suggested Rewrite:"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                            lineNumber: 1352,
+                                                            lineNumber: 1360,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -4996,13 +5011,13 @@ function BulletsTab({ data }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                            lineNumber: 1353,
+                                                            lineNumber: 1361,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1351,
+                                                    lineNumber: 1359,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -5010,35 +5025,35 @@ function BulletsTab({ data }) {
                                                     children: bullet.rewrite.suggested
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1357,
+                                                    lineNumber: 1365,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1350,
+                                            lineNumber: 1358,
                                             columnNumber: 21
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1288,
+                                    lineNumber: 1296,
                                     columnNumber: 17
                                 }, this)
                             }, idx, false, {
                                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                lineNumber: 1287,
+                                lineNumber: 1295,
                                 columnNumber: 15
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/components/V23AssessmentPanel.tsx",
-                        lineNumber: 1285,
+                        lineNumber: 1293,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                lineNumber: 1281,
+                lineNumber: 1289,
                 columnNumber: 9
             }, this),
             rewritePriorities.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -5058,7 +5073,7 @@ function BulletsTab({ data }) {
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/V23AssessmentPanel.tsx",
-                        lineNumber: 1370,
+                        lineNumber: 1378,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -5094,7 +5109,7 @@ function BulletsTab({ data }) {
                                                     }
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1376,
+                                                    lineNumber: 1384,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -5108,13 +5123,13 @@ function BulletsTab({ data }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1377,
+                                                    lineNumber: 1385,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1375,
+                                            lineNumber: 1383,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -5127,7 +5142,7 @@ function BulletsTab({ data }) {
                                             children: item.currentText
                                         }, void 0, false, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1381,
+                                            lineNumber: 1389,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -5136,35 +5151,35 @@ function BulletsTab({ data }) {
                                             children: item.suggestedRewrite
                                         }, void 0, false, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1384,
+                                            lineNumber: 1392,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1374,
+                                    lineNumber: 1382,
                                     columnNumber: 17
                                 }, this)
                             }, idx, false, {
                                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                lineNumber: 1373,
+                                lineNumber: 1381,
                                 columnNumber: 15
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/components/V23AssessmentPanel.tsx",
-                        lineNumber: 1371,
+                        lineNumber: 1379,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                lineNumber: 1369,
+                lineNumber: 1377,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/V23AssessmentPanel.tsx",
-        lineNumber: 1216,
+        lineNumber: 1224,
         columnNumber: 5
     }, this);
 }
@@ -5219,14 +5234,14 @@ function V24RewritesTab({ data }) {
                                             }
                                         }, void 0, false, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1424,
+                                            lineNumber: 1432,
                                             columnNumber: 17
                                         }, this),
                                         " Full CV Rewrite Available"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1423,
+                                    lineNumber: 1431,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -5245,7 +5260,7 @@ function V24RewritesTab({ data }) {
                                             }
                                         }, void 0, false, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1427,
+                                            lineNumber: 1435,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$CompareArrows$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -5254,7 +5269,7 @@ function V24RewritesTab({ data }) {
                                             }
                                         }, void 0, false, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1428,
+                                            lineNumber: 1436,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Chip$2f$Chip$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Chip$3e$__["Chip"], {
@@ -5266,19 +5281,19 @@ function V24RewritesTab({ data }) {
                                             }
                                         }, void 0, false, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1429,
+                                            lineNumber: 1437,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1426,
+                                    lineNumber: 1434,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1422,
+                            lineNumber: 1430,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -5293,7 +5308,7 @@ function V24RewritesTab({ data }) {
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1432,
+                            lineNumber: 1440,
                             columnNumber: 13
                         }, this),
                         fullRewrite.completeRewrittenCV && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Paper$2f$Paper$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Paper$3e$__["Paper"], {
@@ -5317,7 +5332,7 @@ function V24RewritesTab({ data }) {
                                     children: "Complete Rewritten CV:"
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1437,
+                                    lineNumber: 1445,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -5330,24 +5345,24 @@ function V24RewritesTab({ data }) {
                                     children: fullRewrite.completeRewrittenCV
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1440,
+                                    lineNumber: 1448,
                                     columnNumber: 17
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1436,
+                            lineNumber: 1444,
                             columnNumber: 15
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                    lineNumber: 1421,
+                    lineNumber: 1429,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                lineNumber: 1420,
+                lineNumber: 1428,
                 columnNumber: 9
             }, this),
             summaryRewrite?.needed && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Card$2f$Card$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Card$3e$__["Card"], {
@@ -5372,14 +5387,14 @@ function V24RewritesTab({ data }) {
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1453,
+                                    lineNumber: 1461,
                                     columnNumber: 15
                                 }, this),
                                 " Summary Rewrite"
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1452,
+                            lineNumber: 1460,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -5396,7 +5411,7 @@ function V24RewritesTab({ data }) {
                                     children: "Projected Score:"
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1456,
+                                    lineNumber: 1464,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Chip$2f$Chip$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Chip$3e$__["Chip"], {
@@ -5408,13 +5423,13 @@ function V24RewritesTab({ data }) {
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1457,
+                                    lineNumber: 1465,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1455,
+                            lineNumber: 1463,
                             columnNumber: 13
                         }, this),
                         summaryRewrite.original && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -5429,7 +5444,7 @@ function V24RewritesTab({ data }) {
                                     children: "Original:"
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1461,
+                                    lineNumber: 1469,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -5446,13 +5461,13 @@ function V24RewritesTab({ data }) {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1462,
+                                    lineNumber: 1470,
                                     columnNumber: 17
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1460,
+                            lineNumber: 1468,
                             columnNumber: 15
                         }, this),
                         summaryRewrite.suggested && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -5470,7 +5485,7 @@ function V24RewritesTab({ data }) {
                                     children: "Suggested:"
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1469,
+                                    lineNumber: 1477,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -5485,13 +5500,13 @@ function V24RewritesTab({ data }) {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1470,
+                                    lineNumber: 1478,
                                     columnNumber: 17
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1468,
+                            lineNumber: 1476,
                             columnNumber: 15
                         }, this),
                         summaryRewrite.changes && summaryRewrite.changes.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -5506,7 +5521,7 @@ function V24RewritesTab({ data }) {
                                     children: "Changes:"
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1477,
+                                    lineNumber: 1485,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -5525,29 +5540,29 @@ function V24RewritesTab({ data }) {
                                             ]
                                         }, i, true, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1480,
+                                            lineNumber: 1488,
                                             columnNumber: 21
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1478,
+                                    lineNumber: 1486,
                                     columnNumber: 17
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1476,
+                            lineNumber: 1484,
                             columnNumber: 15
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                    lineNumber: 1451,
+                    lineNumber: 1459,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                lineNumber: 1450,
+                lineNumber: 1458,
                 columnNumber: 9
             }, this),
             bulletsWithRewrites.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -5570,7 +5585,7 @@ function V24RewritesTab({ data }) {
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                lineNumber: 1494,
+                                lineNumber: 1502,
                                 columnNumber: 13
                             }, this),
                             " Bullet Rewrites (",
@@ -5579,7 +5594,7 @@ function V24RewritesTab({ data }) {
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/V23AssessmentPanel.tsx",
-                        lineNumber: 1493,
+                        lineNumber: 1501,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -5618,7 +5633,7 @@ function V24RewritesTab({ data }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1501,
+                                                    lineNumber: 1509,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -5637,7 +5652,7 @@ function V24RewritesTab({ data }) {
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                            lineNumber: 1503,
+                                                            lineNumber: 1511,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$CompareArrows$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -5647,7 +5662,7 @@ function V24RewritesTab({ data }) {
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                            lineNumber: 1504,
+                                                            lineNumber: 1512,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Chip$2f$Chip$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Chip$3e$__["Chip"], {
@@ -5659,19 +5674,19 @@ function V24RewritesTab({ data }) {
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                            lineNumber: 1505,
+                                                            lineNumber: 1513,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1502,
+                                                    lineNumber: 1510,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1500,
+                                            lineNumber: 1508,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -5688,7 +5703,7 @@ function V24RewritesTab({ data }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1508,
+                                            lineNumber: 1516,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -5708,12 +5723,12 @@ function V24RewritesTab({ data }) {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                lineNumber: 1512,
+                                                lineNumber: 1520,
                                                 columnNumber: 21
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1511,
+                                            lineNumber: 1519,
                                             columnNumber: 19
                                         }, this),
                                         bullet.changes.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -5729,34 +5744,34 @@ function V24RewritesTab({ data }) {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                lineNumber: 1518,
+                                                lineNumber: 1526,
                                                 columnNumber: 23
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1517,
+                                            lineNumber: 1525,
                                             columnNumber: 21
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1499,
+                                    lineNumber: 1507,
                                     columnNumber: 17
                                 }, this)
                             }, idx, false, {
                                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                lineNumber: 1498,
+                                lineNumber: 1506,
                                 columnNumber: 15
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/components/V23AssessmentPanel.tsx",
-                        lineNumber: 1496,
+                        lineNumber: 1504,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                lineNumber: 1492,
+                lineNumber: 1500,
                 columnNumber: 9
             }, this),
             skillsRewrite?.needed && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Card$2f$Card$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Card$3e$__["Card"], {
@@ -5778,14 +5793,14 @@ function V24RewritesTab({ data }) {
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1534,
+                                    lineNumber: 1542,
                                     columnNumber: 15
                                 }, this),
                                 " Skills Section Rewrite"
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1533,
+                            lineNumber: 1541,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -5802,7 +5817,7 @@ function V24RewritesTab({ data }) {
                                     children: "Projected Score:"
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1537,
+                                    lineNumber: 1545,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Chip$2f$Chip$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Chip$3e$__["Chip"], {
@@ -5814,13 +5829,13 @@ function V24RewritesTab({ data }) {
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1538,
+                                    lineNumber: 1546,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1536,
+                            lineNumber: 1544,
                             columnNumber: 13
                         }, this),
                         skillsRewrite.removed && skillsRewrite.removed.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -5835,7 +5850,7 @@ function V24RewritesTab({ data }) {
                                     children: "Removed (Ghost Skills):"
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1542,
+                                    lineNumber: 1550,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -5855,18 +5870,18 @@ function V24RewritesTab({ data }) {
                                             }
                                         }, i, false, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1545,
+                                            lineNumber: 1553,
                                             columnNumber: 21
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1543,
+                                    lineNumber: 1551,
                                     columnNumber: 17
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1541,
+                            lineNumber: 1549,
                             columnNumber: 15
                         }, this),
                         skillsRewrite.suggested && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -5878,7 +5893,7 @@ function V24RewritesTab({ data }) {
                                     children: "Reorganized Skills:"
                                 }, void 0, false, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1552,
+                                    lineNumber: 1560,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Grid$2f$Grid$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Grid$3e$__["Grid"], {
@@ -5900,7 +5915,7 @@ function V24RewritesTab({ data }) {
                                                     children: "Technical:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1556,
+                                                    lineNumber: 1564,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -5915,18 +5930,18 @@ function V24RewritesTab({ data }) {
                                                             size: "small"
                                                         }, i, false, {
                                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                            lineNumber: 1559,
+                                                            lineNumber: 1567,
                                                             columnNumber: 27
                                                         }, this))
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1557,
+                                                    lineNumber: 1565,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1555,
+                                            lineNumber: 1563,
                                             columnNumber: 21
                                         }, this),
                                         skillsRewrite.suggested.tools && skillsRewrite.suggested.tools.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Grid$2f$Grid$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Grid$3e$__["Grid"], {
@@ -5941,7 +5956,7 @@ function V24RewritesTab({ data }) {
                                                     children: "Tools:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1566,
+                                                    lineNumber: 1574,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -5956,18 +5971,18 @@ function V24RewritesTab({ data }) {
                                                             size: "small"
                                                         }, i, false, {
                                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                            lineNumber: 1569,
+                                                            lineNumber: 1577,
                                                             columnNumber: 27
                                                         }, this))
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1567,
+                                                    lineNumber: 1575,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1565,
+                                            lineNumber: 1573,
                                             columnNumber: 21
                                         }, this),
                                         skillsRewrite.suggested.frameworks && skillsRewrite.suggested.frameworks.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Grid$2f$Grid$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Grid$3e$__["Grid"], {
@@ -5982,7 +5997,7 @@ function V24RewritesTab({ data }) {
                                                     children: "Frameworks:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1576,
+                                                    lineNumber: 1584,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -5997,18 +6012,18 @@ function V24RewritesTab({ data }) {
                                                             size: "small"
                                                         }, i, false, {
                                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                            lineNumber: 1579,
+                                                            lineNumber: 1587,
                                                             columnNumber: 27
                                                         }, this))
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1577,
+                                                    lineNumber: 1585,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1575,
+                                            lineNumber: 1583,
                                             columnNumber: 21
                                         }, this),
                                         skillsRewrite.suggested.methodologies && skillsRewrite.suggested.methodologies.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Grid$2f$Grid$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Grid$3e$__["Grid"], {
@@ -6023,7 +6038,7 @@ function V24RewritesTab({ data }) {
                                                     children: "Methodologies:"
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1586,
+                                                    lineNumber: 1594,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -6038,41 +6053,41 @@ function V24RewritesTab({ data }) {
                                                             size: "small"
                                                         }, i, false, {
                                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                            lineNumber: 1589,
+                                                            lineNumber: 1597,
                                                             columnNumber: 27
                                                         }, this))
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                                    lineNumber: 1587,
+                                                    lineNumber: 1595,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                            lineNumber: 1585,
+                                            lineNumber: 1593,
                                             columnNumber: 21
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                                    lineNumber: 1553,
+                                    lineNumber: 1561,
                                     columnNumber: 17
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/V23AssessmentPanel.tsx",
-                            lineNumber: 1551,
+                            lineNumber: 1559,
                             columnNumber: 15
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/V23AssessmentPanel.tsx",
-                    lineNumber: 1532,
+                    lineNumber: 1540,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                lineNumber: 1531,
+                lineNumber: 1539,
                 columnNumber: 9
             }, this),
             !fullRewrite?.available && !summaryRewrite?.needed && bulletsWithRewrites.length === 0 && !skillsRewrite?.needed && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -6089,7 +6104,7 @@ function V24RewritesTab({ data }) {
                         }
                     }, void 0, false, {
                         fileName: "[project]/components/V23AssessmentPanel.tsx",
-                        lineNumber: 1603,
+                        lineNumber: 1611,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -6097,19 +6112,19 @@ function V24RewritesTab({ data }) {
                         children: "No rewrites needed - your CV looks great!"
                     }, void 0, false, {
                         fileName: "[project]/components/V23AssessmentPanel.tsx",
-                        lineNumber: 1604,
+                        lineNumber: 1612,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/V23AssessmentPanel.tsx",
-                lineNumber: 1602,
+                lineNumber: 1610,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/V23AssessmentPanel.tsx",
-        lineNumber: 1418,
+        lineNumber: 1426,
         columnNumber: 5
     }, this);
 }
