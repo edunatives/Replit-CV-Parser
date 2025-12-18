@@ -1,6 +1,7 @@
 import { Injectable, Inject } from "@nestjs/common";
 import type { ParsedCV, Experience, Education, Certification } from "../../types/cv";
 import { LangchainService } from "../assessment/langchain.service";
+import { detectCVType, isHighConfidence, HIGH_CONFIDENCE_THRESHOLD, type CVTypeResult } from "./cv-type-detection";
 
 type PdfParseResult = { text: string; numpages: number };
 type PdfParseFunction = (buffer: Buffer, options?: object) => Promise<PdfParseResult>;
@@ -109,9 +110,15 @@ export class ParseService {
     
     console.log(`[ParseService] Starting extraction for ${fileName}`);
 
+    // Run pre-LLM heuristic CV type detection
+    const typeDetection = detectCVType(text);
+    const useHeuristicType = isHighConfidence(typeDetection);
+    console.log(`[ParseService] Heuristic CV type detection: ${typeDetection.cvType} (${typeDetection.confidence}% confidence, threshold: ${HIGH_CONFIDENCE_THRESHOLD}%)`);
+    console.log(`[ParseService] ${useHeuristicType ? 'Using heuristic type (high confidence)' : 'Will let LLM decide (low confidence)'}`);
+
     // Try AI-powered extraction first, fall back to regex
     let rawCv: ParsedCV;
-    const aiResult = await this.extractWithAI(text, fileId);
+    const aiResult = await this.extractWithAI(text, fileId, useHeuristicType ? typeDetection : null);
     
     if (aiResult) {
       console.log(`[ParseService] Using AI-powered extraction`);
@@ -119,8 +126,9 @@ export class ParseService {
     } else {
       console.log(`[ParseService] Using regex-based extraction (AI unavailable)`);
       const experience = this.extractExperience(text, fileId);
-      const cvType = this.detectCVType(text, experience);
-      console.log(`[ParseService] Detected cvType: ${cvType}`);
+      // Use heuristic detection result since AI is unavailable
+      const cvType = typeDetection.cvType;
+      console.log(`[ParseService] Using heuristic cvType: ${cvType} (${typeDetection.reason})`);
       rawCv = {
         id: fileId,
         name: this.extractName(text),
@@ -151,8 +159,9 @@ export class ParseService {
   /**
    * AI-powered CV extraction using multi-provider LangchainService
    * Uses OpenAI by default, falls back to Gemini if unavailable
+   * @param preDetectedType - If provided with high confidence, skip LLM type inference
    */
-  private async extractWithAI(text: string, fileId: string): Promise<ParsedCV | null> {
+  private async extractWithAI(text: string, fileId: string, preDetectedType: CVTypeResult | null): Promise<ParsedCV | null> {
     const providers = this.langchainService.getAvailableProviders();
     
     if (providers.length === 0) {
@@ -166,7 +175,20 @@ export class ParseService {
     try {
       const systemPrompt = `You are a CV/resume parser. Extract structured information and return ONLY valid JSON.`;
       
-      const userPrompt = `Extract structured data from this CV/resume. Return ONLY valid JSON with this exact structure:
+      // Build cvType instruction based on whether we have high-confidence pre-detection
+      let cvTypeValue: string;
+      let preDetectionNote = "";
+      if (preDetectedType) {
+        // High confidence: instruct LLM to use pre-detected type
+        cvTypeValue = preDetectedType.cvType;
+        preDetectionNote = `\nNOTE: The cvType has been pre-determined as "${preDetectedType.cvType}" (${preDetectedType.reason}). Use this exact value.`;
+        console.log(`[ParseService] Skipping LLM type inference, using pre-detected: ${preDetectedType.cvType}`);
+      } else {
+        // Low confidence: let LLM determine the type
+        cvTypeValue = "student, fresh_grad, researcher, or professional";
+      }
+      
+      const userPrompt = `Extract structured data from this CV/resume. Return ONLY valid JSON with this exact structure:${preDetectionNote}
 {
   "name": "Full name",
   "title": "Professional title or current role",
@@ -177,7 +199,7 @@ export class ParseService {
   "linkedin": "LinkedIn URL if any",
   "github": "GitHub URL if any",
   "summary": "Professional summary or objective",
-  "cvType": "One of: student, fresh_grad, researcher, or professional",
+  "cvType": "${cvTypeValue}",
   "experience": [
     {
       "company": "Company name",
@@ -207,12 +229,12 @@ export class ParseService {
 IMPORTANT: 
 - Extract ALL work experiences, not just the first one
 - Include the full job description with all bullet points
-- If a field is not found, use empty string "" or empty array []
+- If a field is not found, use empty string "" or empty array []${preDetectedType ? '' : `
 - For cvType, determine based on these criteria:
   * "student": Currently enrolled in education, no or only internship/part-time work experience
   * "fresh_grad": Graduated within last 2 years, limited professional experience (0-2 years)
   * "researcher": PhD candidate, postdoc, research fellow, or academic role with publications/research focus
-  * "professional": 3+ years of professional work experience in industry
+  * "professional": 3+ years of professional work experience in industry`}
 
 CV TEXT:
 ${text}`;
@@ -249,11 +271,20 @@ ${text}`;
         location: exp.location || "",
       }));
       
-      // Use AI-detected cvType, or fall back to heuristic detection if AI omitted it
-      let cvType = this.normalizeCVType(parsed.cvType);
-      if (!parsed.cvType || parsed.cvType === "") {
-        cvType = this.detectCVType(text, experiences);
-        console.log(`[ParseService] AI omitted cvType, using heuristic detection: ${cvType}`);
+      // Use pre-detected type if we had high confidence, otherwise use AI response or fallback
+      let cvType: "student" | "fresh_grad" | "researcher" | "professional";
+      if (preDetectedType) {
+        // We provided the type to AI, use it
+        cvType = preDetectedType.cvType;
+        console.log(`[ParseService] Using pre-detected cvType: ${cvType} (${preDetectedType.confidence}% confidence)`);
+      } else if (parsed.cvType && parsed.cvType !== "") {
+        // AI determined the type
+        cvType = this.normalizeCVType(parsed.cvType);
+        console.log(`[ParseService] Using AI-detected cvType: ${cvType}`);
+      } else {
+        // Fallback to old heuristic (shouldn't happen often)
+        cvType = this.detectCVTypeLegacy(text, experiences);
+        console.log(`[ParseService] AI omitted cvType, using legacy heuristic: ${cvType}`);
       }
       console.log(`[ParseService] AI extraction successful - found ${experiences.length} experiences, cvType: ${cvType}`);
 
@@ -375,10 +406,11 @@ ${text}`;
   }
 
   /**
-   * Detect CV type using regex-based heuristics
-   * Used as fallback when AI parsing is unavailable
+   * Legacy CV type detection using regex-based heuristics
+   * Used as fallback when AI parsing is unavailable and new module fails
+   * @deprecated Use detectCVType from cv-type-detection.ts instead
    */
-  private detectCVType(text: string, experience: { duration: string }[]): "student" | "fresh_grad" | "researcher" | "professional" {
+  private detectCVTypeLegacy(text: string, experience: { duration: string }[]): "student" | "fresh_grad" | "researcher" | "professional" {
     const lowerText = text.toLowerCase();
     
     // Check for researcher indicators (check first as researchers may also have student indicators)
