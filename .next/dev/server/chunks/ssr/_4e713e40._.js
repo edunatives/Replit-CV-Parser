@@ -2172,6 +2172,24 @@ const templateRegistry = {
         showMetaIcons: false,
         companyColor: "#14b8a6",
         summaryBoxed: false
+    },
+    "phd-research": {
+        id: "phd-research",
+        name: "PhD Research",
+        description: "Academic template for PhD candidates and researchers with skills-first layout, publications, and honors sections",
+        category: "student",
+        headerBg: "#1e3a5f",
+        accent: "#3b82f6",
+        headerText: "#ffffff",
+        bodyBg: "#ffffff",
+        bodyText: "#1a1a1a",
+        bodyTextSecondary: "#4a4a4a",
+        borderBottom: "none",
+        headerCentered: false,
+        sectionHeaderVariant: "underline",
+        showMetaIcons: false,
+        companyColor: "#3b82f6",
+        summaryBoxed: false
     }
 };
 function getTemplateStyle(template) {
@@ -2207,6 +2225,8 @@ __turbopack_context__.s([
     ()=>COLOR_SCHEME_PRESETS,
     "DEFAULT_SECTION_ORDER",
     ()=>DEFAULT_SECTION_ORDER,
+    "PHD_RESEARCH_SECTION_ORDER",
+    ()=>PHD_RESEARCH_SECTION_ORDER,
     "STUDENT_SECTION_ORDER",
     ()=>STUDENT_SECTION_ORDER
 ]);
@@ -2277,6 +2297,15 @@ const STUDENT_SECTION_ORDER = [
     "skills",
     "certifications",
     "strengths"
+];
+const PHD_RESEARCH_SECTION_ORDER = [
+    "summary",
+    "skills",
+    "experience",
+    "training",
+    "education",
+    "publications",
+    "honors"
 ];
 }),
 "[project]/app/page.tsx [app-ssr] (ecmascript)", ((__turbopack_context__) => {

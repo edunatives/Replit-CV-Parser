@@ -231,6 +231,24 @@ export const templateRegistry: Record<TemplateType, TemplateStyle> = {
     companyColor: "#14b8a6",
     summaryBoxed: false,
   },
+  "phd-research": {
+    id: "phd-research",
+    name: "PhD Research",
+    description: "Academic template for PhD candidates and researchers with skills-first layout, publications, and honors sections",
+    category: "student",
+    headerBg: "#1e3a5f",
+    accent: "#3b82f6",
+    headerText: "#ffffff",
+    bodyBg: "#ffffff",
+    bodyText: "#1a1a1a",
+    bodyTextSecondary: "#4a4a4a",
+    borderBottom: "none",
+    headerCentered: false,
+    sectionHeaderVariant: "underline",
+    showMetaIcons: false,
+    companyColor: "#3b82f6",
+    summaryBoxed: false,
+  },
 };
 
 /**

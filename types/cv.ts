@@ -45,11 +45,13 @@ export const COLOR_SCHEME_PRESETS: ColorScheme[] = [
   { id: "black-purple", name: "Black & Purple", primary: "#1a1a1a", secondary: "#8b5cf6" },
 ];
 
-export type CVSection = "summary" | "experience" | "education" | "skills" | "certifications" | "strengths" | "projects";
+export type CVSection = "summary" | "experience" | "education" | "skills" | "certifications" | "strengths" | "projects" | "publications" | "training" | "honors";
 
 export const DEFAULT_SECTION_ORDER: CVSection[] = ["summary", "experience", "education", "skills", "certifications", "strengths", "projects"];
 
 export const STUDENT_SECTION_ORDER: CVSection[] = ["summary", "education", "projects", "experience", "skills", "certifications", "strengths"];
+
+export const PHD_RESEARCH_SECTION_ORDER: CVSection[] = ["summary", "skills", "experience", "training", "education", "publications", "honors"];
 
 export type CVType = "student" | "fresh_grad" | "researcher" | "professional";
 
@@ -70,6 +72,9 @@ export interface ParsedCV {
   skills: string[];
   strengths?: string[];
   projects?: Project[];
+  publications?: Publication[];
+  training?: Training[];
+  honors?: Honor[];
   sectionOrder?: CVSection[];
   colorScheme?: ColorScheme;
   cvType?: CVType;
@@ -90,7 +95,7 @@ export interface CVFile {
   error?: string;
 }
 
-export type TemplateType = "modern-dark" | "classic-light" | "executive" | "minimal" | "creative" | "professional" | "corporate" | "business" | "classic-underline" | "typical" | "student-modern";
+export type TemplateType = "modern-dark" | "classic-light" | "executive" | "minimal" | "creative" | "professional" | "corporate" | "business" | "classic-underline" | "typical" | "student-modern" | "phd-research";
 
 export interface Project {
   id: string;
@@ -99,6 +104,25 @@ export interface Project {
   description: string;
   technologies: string[];
   impact?: string[];
+}
+
+export interface Publication {
+  id: string;
+  citation: string;
+  status?: "published" | "submitted" | "in_preparation";
+}
+
+export interface Training {
+  id: string;
+  title: string;
+  description: string;
+}
+
+export interface Honor {
+  id: string;
+  title: string;
+  year?: string;
+  description?: string;
 }
 
 // ============================================================================
