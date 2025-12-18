@@ -119,6 +119,7 @@ export function Dashboard({ cvs, onUploadNew, onSelectCV, onDeleteCV, onDuplicat
                   sx={{ 
                     height: "100%",
                     display: "flex",
+                    flexDirection: "column",
                     transition: "box-shadow 0.2s ease",
                     "&:hover": {
                       boxShadow: 4,
@@ -126,27 +127,6 @@ export function Dashboard({ cvs, onUploadNew, onSelectCV, onDeleteCV, onDuplicat
                   }}
                   data-testid={`card-cv-${cv.id}`}
                 >
-                  <Box 
-                    sx={{ 
-                      width: 140, 
-                      minHeight: 180,
-                      bgcolor: "grey.100",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                      borderRight: "1px solid",
-                      borderColor: "divider",
-                    }}
-                  >
-                    <Box sx={{ textAlign: "center", color: "text.secondary" }}>
-                      <DescriptionIcon sx={{ fontSize: 40, opacity: 0.5 }} />
-                      <Typography variant="caption" display="block">
-                        Preview
-                      </Typography>
-                    </Box>
-                  </Box>
-                  
                   <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
                     <CardContent sx={{ flex: 1, pb: 1 }}>
                       <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>

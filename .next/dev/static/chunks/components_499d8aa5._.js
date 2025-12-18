@@ -708,13 +708,11 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$ico
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$ContentCopy$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mui/icons-material/esm/ContentCopy.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$FileDownload$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mui/icons-material/esm/FileDownload.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$DeleteOutline$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mui/icons-material/esm/DeleteOutline.js [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$Description$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mui/icons-material/esm/Description.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$AccessTime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@mui/icons-material/esm/AccessTime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$export$2f$exportCV$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/export/exportCV.ts [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
-;
 ;
 ;
 ;
@@ -943,278 +941,229 @@ function Dashboard({ cvs, onUploadNew, onSelectCV, onDeleteCV, onDuplicateCV }) 
                                     sx: {
                                         height: "100%",
                                         display: "flex",
+                                        flexDirection: "column",
                                         transition: "box-shadow 0.2s ease",
                                         "&:hover": {
                                             boxShadow: 4
                                         }
                                     },
                                     "data-testid": `card-cv-${cv.id}`,
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
-                                            sx: {
-                                                width: 140,
-                                                minHeight: 180,
-                                                bgcolor: "grey.100",
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                                flexShrink: 0,
-                                                borderRight: "1px solid",
-                                                borderColor: "divider"
-                                            },
-                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
+                                        sx: {
+                                            flex: 1,
+                                            display: "flex",
+                                            flexDirection: "column"
+                                        },
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$CardContent$2f$CardContent$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CardContent$3e$__["CardContent"], {
                                                 sx: {
-                                                    textAlign: "center",
-                                                    color: "text.secondary"
+                                                    flex: 1,
+                                                    pb: 1
                                                 },
                                                 children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$Description$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
+                                                        variant: "subtitle1",
                                                         sx: {
-                                                            fontSize: 40,
-                                                            opacity: 0.5
+                                                            fontWeight: 600,
+                                                            mb: 0.5
+                                                        },
+                                                        children: cv.name || "Untitled Resume"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/components/Dashboard.tsx",
+                                                        lineNumber: 132,
+                                                        columnNumber: 23
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
+                                                        sx: {
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            gap: 0.5,
+                                                            mb: 1
+                                                        },
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$AccessTime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                                sx: {
+                                                                    fontSize: 14,
+                                                                    color: "text.secondary"
+                                                                }
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/Dashboard.tsx",
+                                                                lineNumber: 136,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
+                                                                variant: "caption",
+                                                                color: "text.secondary",
+                                                                children: [
+                                                                    "Modified: ",
+                                                                    formatDate(cv.uploadedAt)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/components/Dashboard.tsx",
+                                                                lineNumber: 137,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/components/Dashboard.tsx",
+                                                        lineNumber: 135,
+                                                        columnNumber: 23
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Chip$2f$Chip$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Chip$3e$__["Chip"], {
+                                                        label: "Resume",
+                                                        size: "small",
+                                                        sx: {
+                                                            bgcolor: "primary.main",
+                                                            color: "white",
+                                                            fontWeight: 500,
+                                                            fontSize: "0.7rem"
                                                         }
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/Dashboard.tsx",
-                                                        lineNumber: 143,
-                                                        columnNumber: 23
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
-                                                        variant: "caption",
-                                                        display: "block",
-                                                        children: "Preview"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/components/Dashboard.tsx",
-                                                        lineNumber: 144,
+                                                        lineNumber: 141,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/Dashboard.tsx",
-                                                lineNumber: 142,
+                                                lineNumber: 131,
+                                                columnNumber: 21
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$CardActions$2f$CardActions$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CardActions$3e$__["CardActions"], {
+                                                sx: {
+                                                    pt: 0,
+                                                    flexDirection: "column",
+                                                    alignItems: "flex-start",
+                                                    gap: 0.5,
+                                                    px: 2,
+                                                    pb: 2
+                                                },
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Button$2f$Button$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
+                                                        size: "small",
+                                                        onClick: ()=>onSelectCV(cv),
+                                                        sx: {
+                                                            color: "text.primary",
+                                                            justifyContent: "flex-start",
+                                                            p: 0,
+                                                            minWidth: "auto"
+                                                        },
+                                                        "data-testid": `button-edit-cv-${cv.id}`,
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$Edit$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                                sx: {
+                                                                    fontSize: 16,
+                                                                    mr: 0.5
+                                                                }
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/Dashboard.tsx",
+                                                                lineNumber: 160,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            " Edit"
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/components/Dashboard.tsx",
+                                                        lineNumber: 154,
+                                                        columnNumber: 23
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Button$2f$Button$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
+                                                        size: "small",
+                                                        onClick: ()=>onDuplicateCV(cv),
+                                                        sx: {
+                                                            color: "text.primary",
+                                                            justifyContent: "flex-start",
+                                                            p: 0,
+                                                            minWidth: "auto"
+                                                        },
+                                                        "data-testid": `button-copy-cv-${cv.id}`,
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$ContentCopy$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                                sx: {
+                                                                    fontSize: 16,
+                                                                    mr: 0.5
+                                                                }
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/Dashboard.tsx",
+                                                                lineNumber: 168,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            " Make a copy"
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/components/Dashboard.tsx",
+                                                        lineNumber: 162,
+                                                        columnNumber: 23
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Button$2f$Button$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
+                                                        size: "small",
+                                                        onClick: ()=>handleDownload(cv),
+                                                        sx: {
+                                                            color: "text.primary",
+                                                            justifyContent: "flex-start",
+                                                            p: 0,
+                                                            minWidth: "auto"
+                                                        },
+                                                        "data-testid": `button-download-cv-${cv.id}`,
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$FileDownload$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                                sx: {
+                                                                    fontSize: 16,
+                                                                    mr: 0.5
+                                                                }
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/Dashboard.tsx",
+                                                                lineNumber: 176,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            " Download"
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/components/Dashboard.tsx",
+                                                        lineNumber: 170,
+                                                        columnNumber: 23
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Button$2f$Button$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
+                                                        size: "small",
+                                                        onClick: ()=>onDeleteCV(cv.id),
+                                                        sx: {
+                                                            color: "error.main",
+                                                            justifyContent: "flex-start",
+                                                            p: 0,
+                                                            minWidth: "auto"
+                                                        },
+                                                        "data-testid": `button-delete-cv-${cv.id}`,
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$DeleteOutline$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                                sx: {
+                                                                    fontSize: 16,
+                                                                    mr: 0.5
+                                                                }
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/components/Dashboard.tsx",
+                                                                lineNumber: 184,
+                                                                columnNumber: 25
+                                                            }, this),
+                                                            " Delete"
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/components/Dashboard.tsx",
+                                                        lineNumber: 178,
+                                                        columnNumber: 23
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/components/Dashboard.tsx",
+                                                lineNumber: 153,
                                                 columnNumber: 21
                                             }, this)
-                                        }, void 0, false, {
-                                            fileName: "[project]/components/Dashboard.tsx",
-                                            lineNumber: 129,
-                                            columnNumber: 19
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
-                                            sx: {
-                                                flex: 1,
-                                                display: "flex",
-                                                flexDirection: "column"
-                                            },
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$CardContent$2f$CardContent$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CardContent$3e$__["CardContent"], {
-                                                    sx: {
-                                                        flex: 1,
-                                                        pb: 1
-                                                    },
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
-                                                            variant: "subtitle1",
-                                                            sx: {
-                                                                fontWeight: 600,
-                                                                mb: 0.5
-                                                            },
-                                                            children: cv.name || "Untitled Resume"
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/Dashboard.tsx",
-                                                            lineNumber: 152,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
-                                                            sx: {
-                                                                display: "flex",
-                                                                alignItems: "center",
-                                                                gap: 0.5,
-                                                                mb: 1
-                                                            },
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$AccessTime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                                                    sx: {
-                                                                        fontSize: 14,
-                                                                        color: "text.secondary"
-                                                                    }
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/components/Dashboard.tsx",
-                                                                    lineNumber: 156,
-                                                                    columnNumber: 25
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
-                                                                    variant: "caption",
-                                                                    color: "text.secondary",
-                                                                    children: [
-                                                                        "Modified: ",
-                                                                        formatDate(cv.uploadedAt)
-                                                                    ]
-                                                                }, void 0, true, {
-                                                                    fileName: "[project]/components/Dashboard.tsx",
-                                                                    lineNumber: 157,
-                                                                    columnNumber: 25
-                                                                }, this)
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/components/Dashboard.tsx",
-                                                            lineNumber: 155,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Chip$2f$Chip$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Chip$3e$__["Chip"], {
-                                                            label: "Resume",
-                                                            size: "small",
-                                                            sx: {
-                                                                bgcolor: "primary.main",
-                                                                color: "white",
-                                                                fontWeight: 500,
-                                                                fontSize: "0.7rem"
-                                                            }
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/components/Dashboard.tsx",
-                                                            lineNumber: 161,
-                                                            columnNumber: 23
-                                                        }, this)
-                                                    ]
-                                                }, void 0, true, {
-                                                    fileName: "[project]/components/Dashboard.tsx",
-                                                    lineNumber: 151,
-                                                    columnNumber: 21
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$CardActions$2f$CardActions$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__CardActions$3e$__["CardActions"], {
-                                                    sx: {
-                                                        pt: 0,
-                                                        flexDirection: "column",
-                                                        alignItems: "flex-start",
-                                                        gap: 0.5,
-                                                        px: 2,
-                                                        pb: 2
-                                                    },
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Button$2f$Button$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
-                                                            size: "small",
-                                                            onClick: ()=>onSelectCV(cv),
-                                                            sx: {
-                                                                color: "text.primary",
-                                                                justifyContent: "flex-start",
-                                                                p: 0,
-                                                                minWidth: "auto"
-                                                            },
-                                                            "data-testid": `button-edit-cv-${cv.id}`,
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$Edit$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                                                    sx: {
-                                                                        fontSize: 16,
-                                                                        mr: 0.5
-                                                                    }
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/components/Dashboard.tsx",
-                                                                    lineNumber: 180,
-                                                                    columnNumber: 25
-                                                                }, this),
-                                                                " Edit"
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/components/Dashboard.tsx",
-                                                            lineNumber: 174,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Button$2f$Button$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
-                                                            size: "small",
-                                                            onClick: ()=>onDuplicateCV(cv),
-                                                            sx: {
-                                                                color: "text.primary",
-                                                                justifyContent: "flex-start",
-                                                                p: 0,
-                                                                minWidth: "auto"
-                                                            },
-                                                            "data-testid": `button-copy-cv-${cv.id}`,
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$ContentCopy$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                                                    sx: {
-                                                                        fontSize: 16,
-                                                                        mr: 0.5
-                                                                    }
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/components/Dashboard.tsx",
-                                                                    lineNumber: 188,
-                                                                    columnNumber: 25
-                                                                }, this),
-                                                                " Make a copy"
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/components/Dashboard.tsx",
-                                                            lineNumber: 182,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Button$2f$Button$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
-                                                            size: "small",
-                                                            onClick: ()=>handleDownload(cv),
-                                                            sx: {
-                                                                color: "text.primary",
-                                                                justifyContent: "flex-start",
-                                                                p: 0,
-                                                                minWidth: "auto"
-                                                            },
-                                                            "data-testid": `button-download-cv-${cv.id}`,
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$FileDownload$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                                                    sx: {
-                                                                        fontSize: 16,
-                                                                        mr: 0.5
-                                                                    }
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/components/Dashboard.tsx",
-                                                                    lineNumber: 196,
-                                                                    columnNumber: 25
-                                                                }, this),
-                                                                " Download"
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/components/Dashboard.tsx",
-                                                            lineNumber: 190,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Button$2f$Button$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
-                                                            size: "small",
-                                                            onClick: ()=>onDeleteCV(cv.id),
-                                                            sx: {
-                                                                color: "error.main",
-                                                                justifyContent: "flex-start",
-                                                                p: 0,
-                                                                minWidth: "auto"
-                                                            },
-                                                            "data-testid": `button-delete-cv-${cv.id}`,
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$DeleteOutline$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                                                    sx: {
-                                                                        fontSize: 16,
-                                                                        mr: 0.5
-                                                                    }
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/components/Dashboard.tsx",
-                                                                    lineNumber: 204,
-                                                                    columnNumber: 25
-                                                                }, this),
-                                                                " Delete"
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/components/Dashboard.tsx",
-                                                            lineNumber: 198,
-                                                            columnNumber: 23
-                                                        }, this)
-                                                    ]
-                                                }, void 0, true, {
-                                                    fileName: "[project]/components/Dashboard.tsx",
-                                                    lineNumber: 173,
-                                                    columnNumber: 21
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/components/Dashboard.tsx",
-                                            lineNumber: 150,
-                                            columnNumber: 19
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/components/Dashboard.tsx",
+                                        lineNumber: 130,
+                                        columnNumber: 19
+                                    }, this)
+                                }, void 0, false, {
                                     fileName: "[project]/components/Dashboard.tsx",
                                     lineNumber: 118,
                                     columnNumber: 17
