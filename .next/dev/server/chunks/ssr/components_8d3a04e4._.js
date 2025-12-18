@@ -747,107 +747,27 @@ function Dashboard({ cvs, onUploadNew, onSelectCV, onDeleteCV, onDuplicateCV }) 
                 lineNumber: 51,
                 columnNumber: 7
             }, this),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
-                variant: "subtitle1",
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Button$2f$Button$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
+                variant: "contained",
+                size: "large",
+                startIcon: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$Add$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
+                    fileName: "[project]/components/Dashboard.tsx",
+                    lineNumber: 58,
+                    columnNumber: 20
+                }, void 0),
+                onClick: onUploadNew,
+                "data-testid": "card-upload-new",
                 sx: {
-                    mb: 1.5,
-                    fontWeight: 500
+                    mb: 4,
+                    py: 1.5,
+                    px: 3,
+                    textTransform: "none",
+                    fontWeight: 600
                 },
-                children: "Upload your resume"
+                children: "Upload new resume"
             }, void 0, false, {
                 fileName: "[project]/components/Dashboard.tsx",
                 lineNumber: 55,
-                columnNumber: 7
-            }, this),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Card$2f$Card$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Card$3e$__["Card"], {
-                sx: {
-                    mb: 4,
-                    maxWidth: "50%",
-                    border: "2px dashed",
-                    borderColor: "primary.light",
-                    bgcolor: "rgba(47, 84, 235, 0.04)",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    "&:hover": {
-                        borderColor: "primary.main",
-                        bgcolor: "rgba(47, 84, 235, 0.08)"
-                    }
-                },
-                onClick: onUploadNew,
-                "data-testid": "card-upload-new",
-                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$CardContent$2f$CardContent$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__CardContent$3e$__["CardContent"], {
-                    sx: {
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 3,
-                        py: 4
-                    },
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
-                            sx: {
-                                width: 140,
-                                height: 180,
-                                border: "2px dashed",
-                                borderColor: "primary.light",
-                                borderRadius: 2,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                bgcolor: "rgba(47, 84, 235, 0.06)"
-                            },
-                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$Add$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
-                                sx: {
-                                    fontSize: 48,
-                                    color: "primary.main"
-                                }
-                            }, void 0, false, {
-                                fileName: "[project]/components/Dashboard.tsx",
-                                lineNumber: 90,
-                                columnNumber: 13
-                            }, this)
-                        }, void 0, false, {
-                            fileName: "[project]/components/Dashboard.tsx",
-                            lineNumber: 77,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
-                                    variant: "h6",
-                                    sx: {
-                                        fontWeight: 600,
-                                        mb: 1
-                                    },
-                                    children: "Upload your resume"
-                                }, void 0, false, {
-                                    fileName: "[project]/components/Dashboard.tsx",
-                                    lineNumber: 93,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
-                                    variant: "body2",
-                                    color: "text.secondary",
-                                    children: "Create a customized resume for each job application to increase your chances of success."
-                                }, void 0, false, {
-                                    fileName: "[project]/components/Dashboard.tsx",
-                                    lineNumber: 96,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/components/Dashboard.tsx",
-                            lineNumber: 92,
-                            columnNumber: 11
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/components/Dashboard.tsx",
-                    lineNumber: 76,
-                    columnNumber: 9
-                }, this)
-            }, void 0, false, {
-                fileName: "[project]/components/Dashboard.tsx",
-                lineNumber: 59,
                 columnNumber: 7
             }, this),
             cvs.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -868,7 +788,7 @@ function Dashboard({ cvs, onUploadNew, onSelectCV, onDeleteCV, onDuplicateCV }) 
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/components/Dashboard.tsx",
-                                lineNumber: 106,
+                                lineNumber: 75,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -877,7 +797,7 @@ function Dashboard({ cvs, onUploadNew, onSelectCV, onDeleteCV, onDuplicateCV }) 
                                 children: "OR"
                             }, void 0, false, {
                                 fileName: "[project]/components/Dashboard.tsx",
-                                lineNumber: 107,
+                                lineNumber: 76,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -888,13 +808,13 @@ function Dashboard({ cvs, onUploadNew, onSelectCV, onDeleteCV, onDuplicateCV }) 
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/components/Dashboard.tsx",
-                                lineNumber: 108,
+                                lineNumber: 77,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/Dashboard.tsx",
-                        lineNumber: 105,
+                        lineNumber: 74,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -906,7 +826,7 @@ function Dashboard({ cvs, onUploadNew, onSelectCV, onDeleteCV, onDuplicateCV }) 
                         children: "Use existing resume"
                     }, void 0, false, {
                         fileName: "[project]/components/Dashboard.tsx",
-                        lineNumber: 111,
+                        lineNumber: 80,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Grid$2f$Grid$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -951,7 +871,7 @@ function Dashboard({ cvs, onUploadNew, onSelectCV, onDeleteCV, onDuplicateCV }) 
                                                         children: cv.name || "Untitled Resume"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/Dashboard.tsx",
-                                                        lineNumber: 132,
+                                                        lineNumber: 101,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -969,7 +889,7 @@ function Dashboard({ cvs, onUploadNew, onSelectCV, onDeleteCV, onDuplicateCV }) 
                                                                 }
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/Dashboard.tsx",
-                                                                lineNumber: 136,
+                                                                lineNumber: 105,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -981,13 +901,13 @@ function Dashboard({ cvs, onUploadNew, onSelectCV, onDeleteCV, onDuplicateCV }) 
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/components/Dashboard.tsx",
-                                                                lineNumber: 137,
+                                                                lineNumber: 106,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/Dashboard.tsx",
-                                                        lineNumber: 135,
+                                                        lineNumber: 104,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Chip$2f$Chip$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Chip$3e$__["Chip"], {
@@ -1001,13 +921,13 @@ function Dashboard({ cvs, onUploadNew, onSelectCV, onDeleteCV, onDuplicateCV }) 
                                                         }
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/Dashboard.tsx",
-                                                        lineNumber: 141,
+                                                        lineNumber: 110,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/Dashboard.tsx",
-                                                lineNumber: 131,
+                                                lineNumber: 100,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$CardActions$2f$CardActions$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__CardActions$3e$__["CardActions"], {
@@ -1038,14 +958,14 @@ function Dashboard({ cvs, onUploadNew, onSelectCV, onDeleteCV, onDuplicateCV }) 
                                                                 }
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/Dashboard.tsx",
-                                                                lineNumber: 160,
+                                                                lineNumber: 129,
                                                                 columnNumber: 25
                                                             }, this),
                                                             " Edit"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/Dashboard.tsx",
-                                                        lineNumber: 154,
+                                                        lineNumber: 123,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Button$2f$Button$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
@@ -1066,14 +986,14 @@ function Dashboard({ cvs, onUploadNew, onSelectCV, onDeleteCV, onDuplicateCV }) 
                                                                 }
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/Dashboard.tsx",
-                                                                lineNumber: 168,
+                                                                lineNumber: 137,
                                                                 columnNumber: 25
                                                             }, this),
                                                             " Make a copy"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/Dashboard.tsx",
-                                                        lineNumber: 162,
+                                                        lineNumber: 131,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Button$2f$Button$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
@@ -1094,14 +1014,14 @@ function Dashboard({ cvs, onUploadNew, onSelectCV, onDeleteCV, onDuplicateCV }) 
                                                                 }
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/Dashboard.tsx",
-                                                                lineNumber: 176,
+                                                                lineNumber: 145,
                                                                 columnNumber: 25
                                                             }, this),
                                                             " Download"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/Dashboard.tsx",
-                                                        lineNumber: 170,
+                                                        lineNumber: 139,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Button$2f$Button$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
@@ -1122,41 +1042,41 @@ function Dashboard({ cvs, onUploadNew, onSelectCV, onDeleteCV, onDuplicateCV }) 
                                                                 }
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/Dashboard.tsx",
-                                                                lineNumber: 184,
+                                                                lineNumber: 153,
                                                                 columnNumber: 25
                                                             }, this),
                                                             " Delete"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/Dashboard.tsx",
-                                                        lineNumber: 178,
+                                                        lineNumber: 147,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/Dashboard.tsx",
-                                                lineNumber: 153,
+                                                lineNumber: 122,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/Dashboard.tsx",
-                                        lineNumber: 130,
+                                        lineNumber: 99,
                                         columnNumber: 19
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/Dashboard.tsx",
-                                    lineNumber: 118,
+                                    lineNumber: 87,
                                     columnNumber: 17
                                 }, this)
                             }, cv.id, false, {
                                 fileName: "[project]/components/Dashboard.tsx",
-                                lineNumber: 117,
+                                lineNumber: 86,
                                 columnNumber: 15
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/components/Dashboard.tsx",
-                        lineNumber: 115,
+                        lineNumber: 84,
                         columnNumber: 11
                     }, this)
                 ]

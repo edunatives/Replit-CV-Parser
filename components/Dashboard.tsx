@@ -52,53 +52,22 @@ export function Dashboard({ cvs, onUploadNew, onSelectCV, onDeleteCV, onDuplicat
         My Resumes
       </Typography>
 
-      <Typography variant="subtitle1" sx={{ mb: 1.5, fontWeight: 500 }}>
-        Upload your resume
-      </Typography>
-      
-      <Card 
-        sx={{ 
-          mb: 4, 
-          maxWidth: "50%",
-          border: "2px dashed",
-          borderColor: "primary.light",
-          bgcolor: "rgba(47, 84, 235, 0.04)",
-          cursor: "pointer",
-          transition: "all 0.2s ease",
-          "&:hover": {
-            borderColor: "primary.main",
-            bgcolor: "rgba(47, 84, 235, 0.08)",
-          }
-        }}
+      <Button
+        variant="contained"
+        size="large"
+        startIcon={<AddIcon />}
         onClick={onUploadNew}
         data-testid="card-upload-new"
+        sx={{ 
+          mb: 4,
+          py: 1.5,
+          px: 3,
+          textTransform: "none",
+          fontWeight: 600,
+        }}
       >
-        <CardContent sx={{ display: "flex", alignItems: "center", gap: 3, py: 4 }}>
-          <Box 
-            sx={{ 
-              width: 140, 
-              height: 180, 
-              border: "2px dashed",
-              borderColor: "primary.light",
-              borderRadius: 2,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              bgcolor: "rgba(47, 84, 235, 0.06)",
-            }}
-          >
-            <AddIcon sx={{ fontSize: 48, color: "primary.main" }} />
-          </Box>
-          <Box>
-            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-              Upload your resume
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Create a customized resume for each job application to increase your chances of success.
-            </Typography>
-          </Box>
-        </CardContent>
-      </Card>
+        Upload new resume
+      </Button>
 
       {cvs.length > 0 && (
         <>
