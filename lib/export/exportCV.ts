@@ -50,6 +50,7 @@ const templateStyles: Record<TemplateType, TemplateStyle> = {
   "classic-underline": { headerBg: "#ffffff", accent: "#1b4f72", headerText: "#1b4f72", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a" },
   "typical": { headerBg: "#ffffff", accent: "#22c55e", headerText: "#1a1a1a", bodyBg: "#ffffff", bodyText: "#1a1a1a", bodyTextSecondary: "#4a4a4a" },
   "student-modern": { headerBg: "#f8fafc", accent: "#3b82f6", headerText: "#1e293b", bodyBg: "#ffffff", bodyText: "#1e293b", bodyTextSecondary: "#64748b" },
+  "phd-research": { headerBg: "#1e3a5f", accent: "#10b981", headerText: "#ffffff", bodyBg: "#f8fafc", bodyText: "#1e293b", bodyTextSecondary: "#64748b" },
 };
 
 /**

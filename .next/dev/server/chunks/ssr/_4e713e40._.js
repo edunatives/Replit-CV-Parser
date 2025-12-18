@@ -119,6 +119,14 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$file$2d$save
         bodyBg: "#ffffff",
         bodyText: "#1e293b",
         bodyTextSecondary: "#64748b"
+    },
+    "phd-research": {
+        headerBg: "#1e3a5f",
+        accent: "#10b981",
+        headerText: "#ffffff",
+        bodyBg: "#f8fafc",
+        bodyText: "#1e293b",
+        bodyTextSecondary: "#64748b"
     }
 };
 /**
