@@ -54,6 +54,25 @@ export type { ProviderType };
 export { getAvailableProviders };
 
 // ============================================================================
+// AUDIENCE HELPERS
+// ============================================================================
+
+/** Check if audience is HR (recruiter perspective) */
+function isHRAudience(audience: AudienceType): boolean {
+  return audience === "HR";
+}
+
+/** Check if audience is a user type (starts with USER/) - student, professional, etc. */
+function isUserAudience(audience: AudienceType): boolean {
+  return audience.startsWith("USER/");
+}
+
+/** Check if audience is student-like (student or fresh graduate) - needs encouragement-focused output */
+function isStudentAudience(audience: AudienceType): boolean {
+  return audience === "USER/STUDENT" || audience === "USER/FRESH_GRADUATE";
+}
+
+// ============================================================================
 // UTILITIES
 // ============================================================================
 
@@ -269,7 +288,7 @@ function transformToStandard(raw: unknown, audience: AudienceType): StandardOutp
     verdict: lite.verdict,
   };
   
-  if (audience === "STUDENT") {
+  if (isStudentAudience(audience)) {
     output.alternativeRoles = safeArr(getPath(data, "alternativeRoles", "alternative_roles")).map((r: unknown) => {
       const role = r as Record<string, unknown>;
       return {
@@ -543,7 +562,7 @@ function transformToFull(raw: unknown, audience: AudienceType): FullOutput {
   let studentAnalysis: FullOutput["studentAnalysis"] = undefined;
   let hrAnalysis: FullOutput["hrAnalysis"] = undefined;
   
-  if (audience === "STUDENT") {
+  if (isStudentAudience(audience)) {
     const improvementsRaw = (studentAnalysisRaw.improvements || {}) as Record<string, unknown>;
     const alternativesRaw = (studentAnalysisRaw.alternatives || {}) as Record<string, unknown>;
     const nextStepsRaw = (studentAnalysisRaw.nextSteps || studentAnalysisRaw.next_steps || {}) as Record<string, unknown>;
@@ -710,7 +729,7 @@ ${jd}
   "topIssues": [{"code": "<A1-H9>", "issue": "<description>", "severity": "<critical|high|medium|low>", "count": <N>, "fix": "<how to fix>"}],
   "topStrengths": [{"code": "<D1-D8>", "strength": "<description>"}],
   "bestFitRole": "<Role Name (XX%)>" or null,
-  "nextAction": "<Most important single action>"${audience === "HR" ? ',\n  "hireRecommendation": "<STRONG_HIRE|HIRE|CONDITIONAL_HIRE|NO_HIRE>"' : ""}
+  "nextAction": "<Most important single action>"${isHRAudience(audience) ? ',\n  "hireRecommendation": "<STRONG_HIRE|HIRE|CONDITIONAL_HIRE|NO_HIRE>"' : ""}
 }`;
   } else if (mode === "STANDARD") {
     prompt += `Return ~2500 tokens JSON with all of:
@@ -725,7 +744,7 @@ ${jd ? "- experienceMatch: {totalYearsMatch, domainYearsMatch, domainGap, scopeM
 - improvements: {critical[], high[], medium[]} where each item is {code, priority, action, impact, effort}
 - improvements.scorePotential: {current, afterCritical, afterAll, ceiling}
 - verdict: "<assessment summary>"
-${audience === "STUDENT" ? "- alternativeRoles: [{role, fitScore, reason}]\n- nextSteps: {immediate[], thisWeek[], beforeApplication[]}\n- encouragement" : "- riskLevel, hireRecommendation\n- verificationItems: [{item, priority, reason}]\n- interviewQuestions: [{question, probing, redFlag}]"}`;
+${isStudentAudience(audience) ? "- alternativeRoles: [{role, fitScore, reason}]\n- nextSteps: {immediate[], thisWeek[], beforeApplication[]}\n- encouragement" : "- riskLevel, hireRecommendation\n- verificationItems: [{item, priority, reason}]\n- interviewQuestions: [{question, probing, redFlag}]"}`;
   } else {
     prompt += `Return ~5000 tokens comprehensive JSON with:
 - cvAnalysis: {
@@ -762,7 +781,7 @@ ${audience === "STUDENT" ? "- alternativeRoles: [{role, fitScore, reason}]\n- ne
     strengthsDetected: [{code, strength}]
   }
 ${jd ? "- jdAnalysis: {metadata, requirements{tier1/2/3Skills[], minimumYears, education, certifications[]}, hardGates[], jdNature}" : ""}
-${audience === "STUDENT" ? `- studentAnalysis: {
+${isStudentAudience(audience) ? `- studentAnalysis: {
   overallCvQuality: {score: <0-100>, grade: "<A|A-|B+|B|B-|C+|C|D|F>", label: "<e.g. Strong Candidate>", summary: "<brief assessment>"},
   honestAssessment: {rawCompatibility: {score, analysis}, transformationEffort: {level: 1-5, timeline, description}, candidateRisk: {score, factors[]}, successProbability: "<assessment>"},
   improvements: {critical[], high[], medium[], scorePotential: {current, afterCritical, afterAll, ceiling}} where each item in critical/high/medium is {code, priority, action, impact, effort},
@@ -825,7 +844,7 @@ export class CvIntelligenceChain {
   }): Promise<AnalysisResponse> {
     const startTime = Date.now();
     const timings: Record<string, number> = {};
-    const { cvContent, jdContent, outputMode = "STANDARD", audience = "STUDENT" } = request;
+    const { cvContent, jdContent, outputMode = "STANDARD", audience = "USER/PROFESSIONAL" } = request;
     
     console.log(`[TIMING] Assessment starting - mode: ${outputMode}, audience: ${audience}, cvLength: ${cvContent.length} chars`);
     
@@ -911,16 +930,16 @@ export class CvIntelligenceChain {
   }
   
   async quickCheck(cvContent: string): Promise<LiteOutput> {
-    const response = await this.analyze({ cvContent, outputMode: "LITE", audience: "STUDENT" });
+    const response = await this.analyze({ cvContent, outputMode: "LITE", audience: "USER/PROFESSIONAL" });
     return response.data as LiteOutput;
   }
   
   async assessCV(cvContent: string, outputMode: OutputMode = "STANDARD"): Promise<AnalysisResponse> {
-    return this.analyze({ cvContent, outputMode, audience: "STUDENT" });
+    return this.analyze({ cvContent, outputMode, audience: "USER/PROFESSIONAL" });
   }
   
   async matchForStudent(cvContent: string, jdContent: string, outputMode: OutputMode = "STANDARD"): Promise<AnalysisResponse> {
-    return this.analyze({ cvContent, jdContent, outputMode, audience: "STUDENT" });
+    return this.analyze({ cvContent, jdContent, outputMode, audience: "USER/STUDENT" });
   }
   
   async matchForHR(cvContent: string, jdContent: string, outputMode: OutputMode = "STANDARD"): Promise<AnalysisResponse> {
@@ -973,7 +992,7 @@ export async function analyzeCV(
     cvContent,
     jdContent: options?.jdContent,
     outputMode: options?.outputMode || "STANDARD",
-    audience: options?.audience || "STUDENT",
+    audience: options?.audience || "USER/PROFESSIONAL",
   });
 }
 
