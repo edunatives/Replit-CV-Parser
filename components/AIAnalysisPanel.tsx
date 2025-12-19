@@ -26,6 +26,8 @@ function mapCvTypeToAudience(cvType?: CVType): AudienceType {
     case "fresh_grad": return "USER/FRESH_GRADUATE";
     case "researcher": return "USER/RESEARCHER";
     case "professional": return "USER/PROFESSIONAL";
+    case "expert": return "USER/EXPERT";
+    case "executive": return "USER/EXECUTIVE";
     default: return "USER/PROFESSIONAL";
   }
 }

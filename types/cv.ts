@@ -53,7 +53,7 @@ export const STUDENT_SECTION_ORDER: CVSection[] = ["summary", "education", "proj
 
 export const PHD_RESEARCH_SECTION_ORDER: CVSection[] = ["summary", "skills", "experience", "training", "education", "publications", "honors"];
 
-export type CVType = "student" | "fresh_grad" | "researcher" | "professional";
+export type CVType = "student" | "fresh_grad" | "researcher" | "professional" | "expert" | "executive";
 
 export interface ParsedCV {
   id: string;

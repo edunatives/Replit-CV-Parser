@@ -272,7 +272,7 @@ ${text}`;
       }));
       
       // Use pre-detected type if we had high confidence, otherwise use AI response or fallback
-      let cvType: "student" | "fresh_grad" | "researcher" | "professional";
+      let cvType: "student" | "fresh_grad" | "researcher" | "professional" | "expert" | "executive";
       if (preDetectedType) {
         // We provided the type to AI, use it
         cvType = preDetectedType.cvType;
@@ -396,12 +396,14 @@ ${text}`;
   /**
    * Normalize CV type string from AI response to valid CVType
    */
-  private normalizeCVType(cvType: string | undefined): "student" | "fresh_grad" | "researcher" | "professional" {
+  private normalizeCVType(cvType: string | undefined): "student" | "fresh_grad" | "researcher" | "professional" | "expert" | "executive" {
     if (!cvType) return "professional";
     const normalized = cvType.toLowerCase().trim();
     if (normalized === "student" || normalized.includes("student")) return "student";
     if (normalized === "fresh_grad" || normalized.includes("fresh") || normalized.includes("graduate")) return "fresh_grad";
     if (normalized === "researcher" || normalized.includes("research") || normalized.includes("phd") || normalized.includes("postdoc")) return "researcher";
+    if (normalized === "expert" || normalized.includes("principal") || normalized.includes("staff") || normalized.includes("architect")) return "expert";
+    if (normalized === "executive" || normalized.includes("executive") || normalized.includes("director") || normalized.includes("vp") || normalized.includes("c-level")) return "executive";
     return "professional";
   }
 
@@ -410,7 +412,7 @@ ${text}`;
    * Used as fallback when AI parsing is unavailable and new module fails
    * @deprecated Use detectCVType from cv-type-detection.ts instead
    */
-  private detectCVTypeLegacy(text: string, experience: { duration: string }[]): "student" | "fresh_grad" | "researcher" | "professional" {
+  private detectCVTypeLegacy(text: string, experience: { duration: string }[]): "student" | "fresh_grad" | "researcher" | "professional" | "expert" | "executive" {
     const lowerText = text.toLowerCase();
     
     // Check for researcher indicators (check first as researchers may also have student indicators)

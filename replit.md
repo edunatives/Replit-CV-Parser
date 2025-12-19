@@ -45,9 +45,15 @@ Preferred communication style: Simple, everyday language.
     - Heuristic detection runs first with 70% confidence threshold
     - High confidence (>=70%): Pre-detected type passed to AI, skipping LLM type inference (~200-500 tokens saved)
     - Low confidence (<70%): AI determines type with full inference instructions
-    - Scoring system: Student max 165, Fresh_grad 110, Researcher 305, Professional 150 points
+    - Scoring system with 6 categories
     - Expected ~85% of CVs skip LLM type detection
-    - CVType values: `student` (enrolled), `fresh_grad` (0-2 years), `researcher` (PhD/postdoc/academic), `professional` (3+ years industry)
+    - CVType values (6 categories):
+      - `student` (currently enrolled)
+      - `fresh_grad` (0-2 years experience)
+      - `researcher` (PhD/postdoc/academic)
+      - `professional` (3-7 years industry)
+      - `expert` (8+ years senior IC/specialist)
+      - `executive` (C-level, VP, Director, management)
 - **Template Selector Logic**: Based on detected cvType, template dropdowns are conditionally enabled:
     - Student/Fresh Grad CVs: Students Templates enabled, Professional Templates disabled
     - Researcher/Professional CVs: Professional Templates enabled, Students Templates disabled

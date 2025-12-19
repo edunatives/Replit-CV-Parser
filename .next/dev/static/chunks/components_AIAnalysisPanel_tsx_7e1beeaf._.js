@@ -70,6 +70,10 @@ function mapCvTypeToAudience(cvType) {
             return "USER/RESEARCHER";
         case "professional":
             return "USER/PROFESSIONAL";
+        case "expert":
+            return "USER/EXPERT";
+        case "executive":
+            return "USER/EXECUTIVE";
         default:
             return "USER/PROFESSIONAL";
     }
@@ -514,7 +518,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                 children: "Depth:"
                             }, void 0, false, {
                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                lineNumber: 601,
+                                lineNumber: 603,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$ToggleButtonGroup$2f$ToggleButtonGroup$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ToggleButtonGroup$3e$__["ToggleButtonGroup"], {
@@ -538,14 +542,14 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                 }
                                             }, void 0, false, {
                                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                lineNumber: 610,
+                                                lineNumber: 612,
                                                 columnNumber: 17
                                             }, this),
                                             "Lite"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                        lineNumber: 609,
+                                        lineNumber: 611,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$ToggleButton$2f$ToggleButton$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ToggleButton$3e$__["ToggleButton"], {
@@ -562,14 +566,14 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                 }
                                             }, void 0, false, {
                                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                lineNumber: 614,
+                                                lineNumber: 616,
                                                 columnNumber: 17
                                             }, this),
                                             "Standard"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                        lineNumber: 613,
+                                        lineNumber: 615,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$ToggleButton$2f$ToggleButton$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ToggleButton$3e$__["ToggleButton"], {
@@ -586,26 +590,26 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                 }
                                             }, void 0, false, {
                                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                lineNumber: 618,
+                                                lineNumber: 620,
                                                 columnNumber: 17
                                             }, this),
                                             "Full"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                        lineNumber: 617,
+                                        lineNumber: 619,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                lineNumber: 602,
+                                lineNumber: 604,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                        lineNumber: 600,
+                        lineNumber: 602,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -621,7 +625,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                 children: "Audience:"
                             }, void 0, false, {
                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                lineNumber: 624,
+                                lineNumber: 626,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$FormControl$2f$FormControl$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__FormControl$3e$__["FormControl"], {
@@ -645,23 +649,23 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                             children: opt.label
                                         }, opt.value, false, {
                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                            lineNumber: 633,
+                                            lineNumber: 635,
                                             columnNumber: 19
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 626,
+                                    lineNumber: 628,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                lineNumber: 625,
+                                lineNumber: 627,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                        lineNumber: 623,
+                        lineNumber: 625,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Button$2f$Button$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
@@ -669,7 +673,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                         size: "small",
                         startIcon: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$AutoAwesome$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 643,
+                            lineNumber: 645,
                             columnNumber: 24
                         }, void 0),
                         onClick: ()=>runAssessment(),
@@ -682,13 +686,13 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                        lineNumber: 640,
+                        lineNumber: 642,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                lineNumber: 599,
+                lineNumber: 601,
                 columnNumber: 9
             }, this) : undefined;
             return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -707,12 +711,12 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                     rerunControls: rerunControls
                 }, void 0, false, {
                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                    lineNumber: 655,
+                    lineNumber: 657,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                lineNumber: 654,
+                lineNumber: 656,
                 columnNumber: 9
             }, this);
         }
@@ -738,7 +742,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                             }
                         }, void 0, false, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 671,
+                            lineNumber: 673,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -749,13 +753,13 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                             children: "AI Resume Analysis"
                         }, void 0, false, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 672,
+                            lineNumber: 674,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                    lineNumber: 670,
+                    lineNumber: 672,
                     columnNumber: 9
                 }, this),
                 error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Alert$2f$Alert$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Alert$3e$__["Alert"], {
@@ -767,7 +771,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                     children: error
                 }, void 0, false, {
                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                    lineNumber: 678,
+                    lineNumber: 680,
                     columnNumber: 11
                 }, this),
                 assessment ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -802,7 +806,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                         children: "Overall Score"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                        lineNumber: 689,
+                                                        lineNumber: 691,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -820,7 +824,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                                 children: assessment.overallScore
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                                lineNumber: 693,
+                                                                lineNumber: 695,
                                                                 columnNumber: 23
                                                             }, this),
                                                             assessment.level && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Chip$2f$Chip$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Chip$3e$__["Chip"], {
@@ -833,19 +837,19 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                                 }
                                                             }, void 0, false, {
                                                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                                lineNumber: 697,
+                                                                lineNumber: 699,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                        lineNumber: 692,
+                                                        lineNumber: 694,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                lineNumber: 688,
+                                                lineNumber: 690,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -863,7 +867,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                            lineNumber: 707,
+                                                            lineNumber: 709,
                                                             columnNumber: 29
                                                         }, void 0),
                                                         label: `${assessment.tokenUsage.totalTokens} tokens`,
@@ -874,7 +878,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                         }
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                        lineNumber: 706,
+                                                        lineNumber: 708,
                                                         columnNumber: 21
                                                     }, this),
                                                     assessment.inflation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Chip$2f$Chip$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Chip$3e$__["Chip"], {
@@ -884,7 +888,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                            lineNumber: 714,
+                                                            lineNumber: 716,
                                                             columnNumber: 31
                                                         }, void 0),
                                                         label: "Inflation Detected",
@@ -895,19 +899,19 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                         }
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                        lineNumber: 713,
+                                                        lineNumber: 715,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                lineNumber: 705,
+                                                lineNumber: 707,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                        lineNumber: 687,
+                                        lineNumber: 689,
                                         columnNumber: 17
                                     }, this),
                                     assessment.verdict && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -920,18 +924,18 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                         children: assessment.verdict
                                     }, void 0, false, {
                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                        lineNumber: 723,
+                                        lineNumber: 725,
                                         columnNumber: 19
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                lineNumber: 686,
+                                lineNumber: 688,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 685,
+                            lineNumber: 687,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -944,7 +948,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                             children: "Section Scores"
                         }, void 0, false, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 730,
+                            lineNumber: 732,
                             columnNumber: 13
                         }, this),
                         assessment.sections.map((section, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Card$2f$Card$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Card$3e$__["Card"], {
@@ -978,7 +982,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                            lineNumber: 740,
+                                                            lineNumber: 742,
                                                             columnNumber: 25
                                                         }, this) : section.score >= 50 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$Warning$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                                             sx: {
@@ -987,7 +991,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                            lineNumber: 742,
+                                                            lineNumber: 744,
                                                             columnNumber: 25
                                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$Error$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                                             sx: {
@@ -996,7 +1000,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                            lineNumber: 744,
+                                                            lineNumber: 746,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1007,13 +1011,13 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                             children: section.name
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                            lineNumber: 746,
+                                                            lineNumber: 748,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                    lineNumber: 738,
+                                                    lineNumber: 740,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1028,13 +1032,13 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                    lineNumber: 750,
+                                                    lineNumber: 752,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                            lineNumber: 737,
+                                            lineNumber: 739,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$LinearProgress$2f$LinearProgress$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__LinearProgress$3e$__["LinearProgress"], {
@@ -1048,7 +1052,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                             }
                                         }, void 0, false, {
                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                            lineNumber: 754,
+                                            lineNumber: 756,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1057,18 +1061,18 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                             children: section.feedback
                                         }, void 0, false, {
                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                            lineNumber: 759,
+                                            lineNumber: 761,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 736,
+                                    lineNumber: 738,
                                     columnNumber: 17
                                 }, this)
                             }, index, false, {
                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                lineNumber: 735,
+                                lineNumber: 737,
                                 columnNumber: 15
                             }, this)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1082,7 +1086,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                             children: "Strengths"
                         }, void 0, false, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 766,
+                            lineNumber: 768,
                             columnNumber: 13
                         }, this),
                         assessment.strengths.map((strength, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1101,7 +1105,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                         }
                                     }, void 0, false, {
                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                        lineNumber: 771,
+                                        lineNumber: 773,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1109,13 +1113,13 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                         children: strength
                                     }, void 0, false, {
                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                        lineNumber: 772,
+                                        lineNumber: 774,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, index, true, {
                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                lineNumber: 770,
+                                lineNumber: 772,
                                 columnNumber: 15
                             }, this)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1129,7 +1133,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                             children: "Areas for Improvement"
                         }, void 0, false, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 776,
+                            lineNumber: 778,
                             columnNumber: 13
                         }, this),
                         assessment.weaknesses.map((weakness, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1148,7 +1152,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                         }
                                     }, void 0, false, {
                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                        lineNumber: 781,
+                                        lineNumber: 783,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1156,13 +1160,13 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                         children: weakness
                                     }, void 0, false, {
                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                        lineNumber: 782,
+                                        lineNumber: 784,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, index, true, {
                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                lineNumber: 780,
+                                lineNumber: 782,
                                 columnNumber: 15
                             }, this)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1176,7 +1180,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                             children: "Recommendations"
                         }, void 0, false, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 786,
+                            lineNumber: 788,
                             columnNumber: 13
                         }, this),
                         assessment.recommendations.map((rec, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1195,7 +1199,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                         }
                                     }, void 0, false, {
                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                        lineNumber: 791,
+                                        lineNumber: 793,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1203,13 +1207,13 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                         children: rec
                                     }, void 0, false, {
                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                        lineNumber: 792,
+                                        lineNumber: 794,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, index, true, {
                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                lineNumber: 790,
+                                lineNumber: 792,
                                 columnNumber: 15
                             }, this)),
                         assessment.highlights && assessment.highlights.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -1225,7 +1229,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     children: "CV Highlights"
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 798,
+                                    lineNumber: 800,
                                     columnNumber: 17
                                 }, this),
                                 assessment.highlights.map((highlight, index)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Card$2f$Card$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Card$3e$__["Card"], {
@@ -1254,7 +1258,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                    lineNumber: 811,
+                                                    lineNumber: 813,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1263,18 +1267,18 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                     children: highlight.comment
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                    lineNumber: 821,
+                                                    lineNumber: 823,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                            lineNumber: 810,
+                                            lineNumber: 812,
                                             columnNumber: 21
                                         }, this)
                                     }, index, false, {
                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                        lineNumber: 802,
+                                        lineNumber: 804,
                                         columnNumber: 19
                                     }, this))
                             ]
@@ -1284,7 +1288,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                             fullWidth: true,
                             startIcon: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$AutoAwesome$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                lineNumber: 833,
+                                lineNumber: 835,
                                 columnNumber: 26
                             }, void 0),
                             onClick: ()=>runAssessment(),
@@ -1295,7 +1299,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                             children: "Re-run Analysis (v2.3)"
                         }, void 0, false, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 830,
+                            lineNumber: 832,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Divider$2f$Divider$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Divider$3e$__["Divider"], {
@@ -1304,7 +1308,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                             }
                         }, void 0, false, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 841,
+                            lineNumber: 843,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Button$2f$Button$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
@@ -1320,7 +1324,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                             children: comparingPrompts ? "Comparing..." : "Compare Old vs New Prompt"
                         }, void 0, false, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 843,
+                            lineNumber: 845,
                             columnNumber: 13
                         }, this),
                         promptComparison && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1340,7 +1344,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     children: "Prompt Comparison Results"
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 857,
+                                    lineNumber: 859,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1366,7 +1370,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                         children: "OLD Prompt"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                        lineNumber: 864,
+                                                        lineNumber: 866,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1377,18 +1381,18 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                         children: promptComparison.scoreDifference.oldScore
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                        lineNumber: 865,
+                                                        lineNumber: 867,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                lineNumber: 863,
+                                                lineNumber: 865,
                                                 columnNumber: 21
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                            lineNumber: 862,
+                                            lineNumber: 864,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Card$2f$Card$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Card$3e$__["Card"], {
@@ -1410,7 +1414,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                         children: "NEW Prompt"
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                        lineNumber: 872,
+                                                        lineNumber: 874,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1421,24 +1425,24 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                         children: promptComparison.scoreDifference.newScore
                                                     }, void 0, false, {
                                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                        lineNumber: 873,
+                                                        lineNumber: 875,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                lineNumber: 871,
+                                                lineNumber: 873,
                                                 columnNumber: 21
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                            lineNumber: 870,
+                                            lineNumber: 872,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 861,
+                                    lineNumber: 863,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1455,7 +1459,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 880,
+                                    lineNumber: 882,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1468,7 +1472,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     children: "OLD Prompt Feedback:"
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 884,
+                                    lineNumber: 886,
                                     columnNumber: 17
                                 }, this),
                                 promptComparison.oldPrompt.assessment.sections?.map((s, i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1488,7 +1492,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                lineNumber: 889,
+                                                lineNumber: 891,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1500,13 +1504,13 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                 children: s.feedback
                                             }, void 0, false, {
                                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                lineNumber: 890,
+                                                lineNumber: 892,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, `old-${i}`, true, {
                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                        lineNumber: 888,
+                                        lineNumber: 890,
                                         columnNumber: 19
                                     }, this)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Divider$2f$Divider$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Divider$3e$__["Divider"], {
@@ -1515,7 +1519,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 894,
+                                    lineNumber: 896,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1527,7 +1531,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     children: "NEW Prompt Feedback:"
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 896,
+                                    lineNumber: 898,
                                     columnNumber: 17
                                 }, this),
                                 promptComparison.newPrompt.assessment.sections?.map((s, i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1547,7 +1551,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                lineNumber: 901,
+                                                lineNumber: 903,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1559,19 +1563,19 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                 children: s.feedback
                                             }, void 0, false, {
                                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                lineNumber: 902,
+                                                lineNumber: 904,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, `new-${i}`, true, {
                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                        lineNumber: 900,
+                                        lineNumber: 902,
                                         columnNumber: 19
                                     }, this))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 856,
+                            lineNumber: 858,
                             columnNumber: 15
                         }, this)
                     ]
@@ -1596,7 +1600,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                         }
                                     }, void 0, false, {
                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                        lineNumber: 912,
+                                        lineNumber: 914,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1607,7 +1611,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                         children: "Ready to Analyze"
                                     }, void 0, false, {
                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                        lineNumber: 913,
+                                        lineNumber: 915,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1616,18 +1620,18 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                         children: "Get AI-powered insights about your resume's strengths, weaknesses, and areas for improvement."
                                     }, void 0, false, {
                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                        lineNumber: 916,
+                                        lineNumber: 918,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                lineNumber: 911,
+                                lineNumber: 913,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 910,
+                            lineNumber: 912,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1640,7 +1644,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                             children: "Quick Preview"
                         }, void 0, false, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 922,
+                            lineNumber: 924,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1658,7 +1662,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 927,
+                                    lineNumber: 929,
                                     columnNumber: 27
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$Error$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                     sx: {
@@ -1667,7 +1671,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 927,
+                                    lineNumber: 929,
                                     columnNumber: 94
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1675,13 +1679,13 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     children: "Contact Information"
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 928,
+                                    lineNumber: 930,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 926,
+                            lineNumber: 928,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1699,7 +1703,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 931,
+                                    lineNumber: 933,
                                     columnNumber: 29
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$Warning$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                     sx: {
@@ -1708,7 +1712,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 931,
+                                    lineNumber: 933,
                                     columnNumber: 96
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1716,13 +1720,13 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     children: "Professional Summary"
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 932,
+                                    lineNumber: 934,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 930,
+                            lineNumber: 932,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1740,7 +1744,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 935,
+                                    lineNumber: 937,
                                     columnNumber: 40
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$Error$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                     sx: {
@@ -1749,7 +1753,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 935,
+                                    lineNumber: 937,
                                     columnNumber: 107
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1761,13 +1765,13 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 936,
+                                    lineNumber: 938,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 934,
+                            lineNumber: 936,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1785,7 +1789,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 939,
+                                    lineNumber: 941,
                                     columnNumber: 41
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$Warning$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                     sx: {
@@ -1794,7 +1798,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 939,
+                                    lineNumber: 941,
                                     columnNumber: 108
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1806,13 +1810,13 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 940,
+                                    lineNumber: 942,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 938,
+                            lineNumber: 940,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -1831,7 +1835,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     children: "Analysis Depth"
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 944,
+                                    lineNumber: 946,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$ToggleButtonGroup$2f$ToggleButtonGroup$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ToggleButtonGroup$3e$__["ToggleButtonGroup"], {
@@ -1860,30 +1864,30 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                            lineNumber: 958,
+                                                            lineNumber: 960,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             children: "Lite"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                            lineNumber: 959,
+                                                            lineNumber: 961,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                    lineNumber: 957,
+                                                    lineNumber: 959,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                lineNumber: 956,
+                                                lineNumber: 958,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                            lineNumber: 955,
+                                            lineNumber: 957,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$ToggleButton$2f$ToggleButton$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ToggleButton$3e$__["ToggleButton"], {
@@ -1904,30 +1908,30 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                            lineNumber: 966,
+                                                            lineNumber: 968,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             children: "Standard"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                            lineNumber: 967,
+                                                            lineNumber: 969,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                    lineNumber: 965,
+                                                    lineNumber: 967,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                lineNumber: 964,
+                                                lineNumber: 966,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                            lineNumber: 963,
+                                            lineNumber: 965,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$ToggleButton$2f$ToggleButton$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ToggleButton$3e$__["ToggleButton"], {
@@ -1948,36 +1952,36 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                             }
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                            lineNumber: 974,
+                                                            lineNumber: 976,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             children: "Full"
                                                         }, void 0, false, {
                                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                            lineNumber: 975,
+                                                            lineNumber: 977,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                    lineNumber: 973,
+                                                    lineNumber: 975,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                lineNumber: 972,
+                                                lineNumber: 974,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                            lineNumber: 971,
+                                            lineNumber: 973,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 947,
+                                    lineNumber: 949,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -1994,13 +1998,13 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 980,
+                                    lineNumber: 982,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 943,
+                            lineNumber: 945,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Button$2f$Button$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
@@ -2011,11 +2015,11 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                 color: "inherit"
                             }, void 0, false, {
                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                lineNumber: 990,
+                                lineNumber: 992,
                                 columnNumber: 36
                             }, void 0) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$AutoAwesome$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                lineNumber: 990,
+                                lineNumber: 992,
                                 columnNumber: 85
                             }, void 0),
                             onClick: ()=>runAssessment(),
@@ -2024,7 +2028,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                             children: loading ? "Analyzing..." : `Run ${outputMode} Analysis (v2.3)`
                         }, void 0, false, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 987,
+                            lineNumber: 989,
                             columnNumber: 13
                         }, this)
                     ]
@@ -2032,7 +2036,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
             ]
         }, void 0, true, {
             fileName: "[project]/components/AIAnalysisPanel.tsx",
-            lineNumber: 669,
+            lineNumber: 671,
             columnNumber: 7
         }, this);
     }
@@ -2065,7 +2069,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 1008,
+                                    lineNumber: 1010,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -2076,13 +2080,13 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     children: "AI Career Advisor"
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 1009,
+                                    lineNumber: 1011,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 1007,
+                            lineNumber: 1009,
                             columnNumber: 11
                         }, this),
                         error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Alert$2f$Alert$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Alert$3e$__["Alert"], {
@@ -2094,7 +2098,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                             children: error
                         }, void 0, false, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 1015,
+                            lineNumber: 1017,
                             columnNumber: 13
                         }, this),
                         chatHistory.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -2116,7 +2120,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                 children: "Get personalized advice"
                                             }, void 0, false, {
                                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                lineNumber: 1024,
+                                                lineNumber: 1026,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -2127,18 +2131,18 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                 children: "Ask questions about your resume, get suggestions for improvements, or learn how to tailor your CV for specific roles."
                                             }, void 0, false, {
                                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                lineNumber: 1027,
+                                                lineNumber: 1029,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                        lineNumber: 1023,
+                                        lineNumber: 1025,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 1022,
+                                    lineNumber: 1024,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -2151,7 +2155,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     children: "Suggested prompts"
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 1034,
+                                    lineNumber: 1036,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2180,12 +2184,12 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                             children: prompt
                                         }, index, false, {
                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                            lineNumber: 1045,
+                                            lineNumber: 1047,
                                             columnNumber: 19
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 1038,
+                                    lineNumber: 1040,
                                     columnNumber: 15
                                 }, this)
                             ]
@@ -2222,22 +2226,22 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                     children: msg.content
                                                 }, void 0, false, {
                                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                    lineNumber: 1075,
+                                                    lineNumber: 1077,
                                                     columnNumber: 23
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                lineNumber: 1074,
+                                                lineNumber: 1076,
                                                 columnNumber: 21
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                            lineNumber: 1070,
+                                            lineNumber: 1072,
                                             columnNumber: 19
                                         }, this)
                                     }, index, false, {
                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                        lineNumber: 1063,
+                                        lineNumber: 1065,
                                         columnNumber: 17
                                     }, this)),
                                 loading && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2260,46 +2264,46 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                                 size: 16
                                             }, void 0, false, {
                                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                                lineNumber: 1086,
+                                                lineNumber: 1088,
                                                 columnNumber: 23
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                            lineNumber: 1085,
+                                            lineNumber: 1087,
                                             columnNumber: 21
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                        lineNumber: 1084,
+                                        lineNumber: 1086,
                                         columnNumber: 19
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 1083,
+                                    lineNumber: 1085,
                                     columnNumber: 17
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     ref: chatEndRef
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 1091,
+                                    lineNumber: 1093,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 1061,
+                            lineNumber: 1063,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                    lineNumber: 1006,
+                    lineNumber: 1008,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Divider$2f$Divider$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Divider$3e$__["Divider"], {}, void 0, false, {
                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                    lineNumber: 1096,
+                    lineNumber: 1098,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2329,7 +2333,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                 "data-testid": "input-chat-message"
                             }, void 0, false, {
                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                lineNumber: 1100,
+                                lineNumber: 1102,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$IconButton$2f$IconButton$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconButton$3e$__["IconButton"], {
@@ -2339,29 +2343,29 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                 "data-testid": "button-send-message",
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$Send$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 1121,
+                                    lineNumber: 1123,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                lineNumber: 1115,
+                                lineNumber: 1117,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                        lineNumber: 1099,
+                        lineNumber: 1101,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                    lineNumber: 1098,
+                    lineNumber: 1100,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/AIAnalysisPanel.tsx",
-            lineNumber: 1005,
+            lineNumber: 1007,
             columnNumber: 7
         }, this);
     }
@@ -2387,7 +2391,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                             }
                         }, void 0, false, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 1133,
+                            lineNumber: 1135,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -2398,13 +2402,13 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                             children: "Job Description Match"
                         }, void 0, false, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 1134,
+                            lineNumber: 1136,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                    lineNumber: 1132,
+                    lineNumber: 1134,
                     columnNumber: 9
                 }, this),
                 error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Alert$2f$Alert$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Alert$3e$__["Alert"], {
@@ -2416,7 +2420,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                     children: error
                 }, void 0, false, {
                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                    lineNumber: 1140,
+                    lineNumber: 1142,
                     columnNumber: 11
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Card$2f$Card$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Card$3e$__["Card"], {
@@ -2441,7 +2445,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                         children: "Paste Job Description"
                                     }, void 0, false, {
                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                        lineNumber: 1148,
+                                        lineNumber: 1150,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$IconButton$2f$IconButton$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__IconButton$3e$__["IconButton"], {
@@ -2464,18 +2468,18 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                             fontSize: "small"
                                         }, void 0, false, {
                                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                            lineNumber: 1166,
+                                            lineNumber: 1168,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                        lineNumber: 1151,
+                                        lineNumber: 1153,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                lineNumber: 1147,
+                                lineNumber: 1149,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$TextField$2f$TextField$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__TextField$3e$__["TextField"], {
@@ -2490,7 +2494,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                 "data-testid": "input-job-description"
                             }, void 0, false, {
                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                lineNumber: 1169,
+                                lineNumber: 1171,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Button$2f$Button$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Button$3e$__["Button"], {
@@ -2506,29 +2510,29 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                                     color: "inherit"
                                 }, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 1186,
+                                    lineNumber: 1188,
                                     columnNumber: 36
                                 }, void 0) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$icons$2d$material$2f$esm$2f$Work$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                    lineNumber: 1186,
+                                    lineNumber: 1188,
                                     columnNumber: 85
                                 }, void 0),
                                 "data-testid": "button-analyze-match",
                                 children: loading ? "Analyzing..." : "Analyze Match"
                             }, void 0, false, {
                                 fileName: "[project]/components/AIAnalysisPanel.tsx",
-                                lineNumber: 1180,
+                                lineNumber: 1182,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/AIAnalysisPanel.tsx",
-                        lineNumber: 1146,
+                        lineNumber: 1148,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                    lineNumber: 1145,
+                    lineNumber: 1147,
                     columnNumber: 9
                 }, this),
                 !jdMatch && !jdText && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Box$2f$Box$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Box$3e$__["Box"], {
@@ -2545,7 +2549,7 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                             }
                         }, void 0, false, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 1196,
+                            lineNumber: 1198,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$mui$2f$material$2f$esm$2f$Typography$2f$Typography$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Typography$3e$__["Typography"], {
@@ -2554,13 +2558,13 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                             children: "Paste a job description above to see your match rate and get optimization tips"
                         }, void 0, false, {
                             fileName: "[project]/components/AIAnalysisPanel.tsx",
-                            lineNumber: 1197,
+                            lineNumber: 1199,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                    lineNumber: 1195,
+                    lineNumber: 1197,
                     columnNumber: 11
                 }, this),
                 jdMatch && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$JDMatchPanel$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["JDMatchPanel"], {
@@ -2579,13 +2583,13 @@ function AIAnalysisPanel({ cv, activeTrack }) {
                     candidateName: cv.name
                 }, void 0, false, {
                     fileName: "[project]/components/AIAnalysisPanel.tsx",
-                    lineNumber: 1204,
+                    lineNumber: 1206,
                     columnNumber: 11
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/AIAnalysisPanel.tsx",
-            lineNumber: 1131,
+            lineNumber: 1133,
             columnNumber: 7
         }, this);
     }
