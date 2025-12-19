@@ -32,7 +32,7 @@ function mapCvTypeToAudience(cvType?: CVType): AudienceType {
   }
 }
 
-const AUDIENCE_OPTIONS: { value: AudienceType; label: string }[] = [
+const _AUDIENCE_OPTIONS: { value: AudienceType; label: string }[] = [
   { value: "HR", label: "HR/Recruiter" },
   { value: "USER/STUDENT", label: "Student" },
   { value: "USER/FRESH_GRADUATE", label: "Fresh Graduate" },
@@ -621,23 +621,6 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
                 Full
               </ToggleButton>
             </ToggleButtonGroup>
-          </Box>
-          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-            <Typography variant="caption" color="text.secondary">Audience:</Typography>
-            <FormControl size="small" sx={{ minWidth: 140 }}>
-              <Select
-                value={audience}
-                onChange={(e) => setAudience(e.target.value as AudienceType)}
-                sx={{ fontSize: "0.75rem", height: 28 }}
-                data-testid="select-audience"
-              >
-                {AUDIENCE_OPTIONS.map((opt) => (
-                  <MenuItem key={opt.value} value={opt.value} sx={{ fontSize: "0.75rem" }}>
-                    {opt.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
           </Box>
           <Button 
             variant="outlined" 
