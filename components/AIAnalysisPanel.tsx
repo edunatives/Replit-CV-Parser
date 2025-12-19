@@ -446,6 +446,11 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
     }, 0);
   };
 
+  // Keep audience in sync with CV type when it changes
+  useEffect(() => {
+    setAudience(mapCvTypeToAudience(cv.cvType));
+  }, [cv.cvType]);
+
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatHistory]);
