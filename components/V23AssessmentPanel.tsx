@@ -1295,9 +1295,14 @@ function BulletsTab({ data }: { data: StandardOutput | FullOutput }) {
       {/* FULL MODE: Show each bullet with detailed LLM feedback */}
       {isFullOutput(data) && allBullets.length > 0 && (
         <Box sx={{ mt: 3 }}>
-          <Typography variant="subtitle2" sx={{ mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
+          <Typography variant="subtitle2" sx={{ mb: 1, display: "flex", alignItems: "center", gap: 1 }}>
             Detailed Bullet Feedback ({allBullets.length} bullets)
           </Typography>
+          {allBullets.length < bulletHealth.totalBullets && (
+            <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 2 }}>
+              Showing detailed analysis for {allBullets.length} of {bulletHealth.totalBullets} bullets
+            </Typography>
+          )}
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             {allBullets.map((bullet, idx) => (
               <Card key={idx} elevation={0} sx={{ bgcolor: "#f8fafc", border: "1px solid #e2e8f0" }} data-testid={`bullet-feedback-${idx}`}>
@@ -1385,24 +1390,32 @@ function BulletsTab({ data }: { data: StandardOutput | FullOutput }) {
         <Box sx={{ mt: 3 }}>
           <Typography variant="subtitle2" sx={{ mb: 2 }}>Priority Rewrites ({rewritePriorities.length})</Typography>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {rewritePriorities.slice(0, 5).map((item, idx) => (
+            {rewritePriorities.slice(0, 5).map((item, idx) => {
+              const currentScore = typeof item.currentScore === "number" ? item.currentScore : 50;
+              const projectedScore = typeof item.projectedScore === "number" ? item.projectedScore : currentScore + 15;
+              return (
               <Card key={idx} elevation={0} sx={{ bgcolor: "#f8fafc" }}>
                 <CardContent sx={{ py: 1.5 }}>
                   <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
-                    <Chip label={`Score: ${item.currentScore}`} size="small" sx={{ bgcolor: getScoreColor(item.currentScore), color: "white" }} />
+                    <Chip label={`Score: ${currentScore}`} size="small" sx={{ bgcolor: getScoreColor(currentScore), color: "white" }} />
                     <Typography variant="caption" color="success.main" fontWeight={600}>
-                      {"→"} {item.projectedScore}
+                      {"→"} {projectedScore}
                     </Typography>
                   </Box>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1, textDecoration: "line-through" }}>
-                    {item.currentText}
-                  </Typography>
-                  <Typography variant="body2" fontWeight={500}>
-                    {item.suggestedRewrite}
-                  </Typography>
+                  {item.currentText && (
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1, textDecoration: "line-through" }}>
+                      {item.currentText}
+                    </Typography>
+                  )}
+                  {item.suggestedRewrite && (
+                    <Typography variant="body2" fontWeight={500}>
+                      {item.suggestedRewrite}
+                    </Typography>
+                  )}
                 </CardContent>
               </Card>
-            ))}
+              );
+            })}
           </Box>
         </Box>
       )}
