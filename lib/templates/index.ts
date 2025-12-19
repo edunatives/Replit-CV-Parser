@@ -304,3 +304,75 @@ export function getStudentTemplateOptions(): { value: TemplateType; label: strin
       label: t.name,
     }));
 }
+
+/**
+ * Get category display label for templates
+ */
+function getCategoryLabel(category: TemplateCategory, templateId: TemplateType): string {
+  if (templateId === "phd-research") return "Researcher";
+  if (category === "student") return "Student";
+  return "Professional";
+}
+
+/**
+ * Get all template options with category labels for unified selector
+ * Groups templates by category with clear labels
+ * @returns Array of template options with category-prefixed labels
+ */
+export function getAllTemplateOptionsWithLabels(): { value: TemplateType; label: string; category: TemplateCategory; categoryLabel: string }[] {
+  const templates = getAllTemplates();
+  
+  // Sort: professional first, then student/researcher
+  const sorted = templates.sort((a, b) => {
+    if (a.category === "professional" && b.category !== "professional") return -1;
+    if (a.category !== "professional" && b.category === "professional") return 1;
+    return a.name.localeCompare(b.name);
+  });
+  
+  return sorted.map((t) => {
+    const categoryLabel = getCategoryLabel(t.category, t.id);
+    return {
+      value: t.id,
+      label: `[${categoryLabel}] ${t.name}`,
+      category: t.category,
+      categoryLabel,
+    };
+  });
+}
+
+/**
+ * Check if a template is recommended for a given CV type
+ * @param templateId - The template to check
+ * @param cvType - The detected CV type
+ * @returns Object with isRecommended boolean and warning message if not recommended
+ */
+export function getTemplateRecommendation(templateId: TemplateType, cvType: string): { isRecommended: boolean; warning?: string } {
+  const template = templateRegistry[templateId];
+  if (!template) return { isRecommended: true };
+  
+  const isStudentCV = cvType === "student" || cvType === "fresh_grad";
+  const isResearcherCV = cvType === "researcher";
+  const isProfessionalCV = cvType === "professional" || cvType === "expert" || cvType === "executive";
+  
+  // PhD Research template
+  if (templateId === "phd-research") {
+    if (isResearcherCV) return { isRecommended: true };
+    if (isStudentCV) return { isRecommended: false, warning: "This template is designed for researchers/PhD candidates. Your CV appears to be student-focused." };
+    return { isRecommended: false, warning: "This template is designed for researchers/PhD candidates. Your CV appears to be professional-focused." };
+  }
+  
+  // Student Modern template
+  if (templateId === "student-modern") {
+    if (isStudentCV) return { isRecommended: true };
+    if (isResearcherCV) return { isRecommended: false, warning: "This template is designed for students. Consider using the PhD Research template for your researcher CV." };
+    return { isRecommended: false, warning: "This template is designed for students/fresh graduates. Your CV appears to have significant professional experience." };
+  }
+  
+  // Professional templates
+  if (template.category === "professional") {
+    if (isProfessionalCV || isResearcherCV) return { isRecommended: true };
+    return { isRecommended: false, warning: "This template is designed for experienced professionals. Consider using a student template to better highlight your education and projects." };
+  }
+  
+  return { isRecommended: true };
+}

@@ -1976,6 +1976,8 @@ function validateCVDocument(text) {
  * - Template registry with all available templates
  * - Helper functions to get template styles
  */ __turbopack_context__.s([
+    "getAllTemplateOptionsWithLabels",
+    ()=>getAllTemplateOptionsWithLabels,
     "getAllTemplates",
     ()=>getAllTemplates,
     "getProfessionalTemplateOptions",
@@ -1984,6 +1986,8 @@ function validateCVDocument(text) {
     ()=>getStudentTemplateOptions,
     "getTemplateOptions",
     ()=>getTemplateOptions,
+    "getTemplateRecommendation",
+    ()=>getTemplateRecommendation,
     "getTemplateStyle",
     ()=>getTemplateStyle,
     "templateRegistry",
@@ -2223,6 +2227,81 @@ function getStudentTemplateOptions() {
             value: t.id,
             label: t.name
         }));
+}
+/**
+ * Get category display label for templates
+ */ function getCategoryLabel(category, templateId) {
+    if (templateId === "phd-research") return "Researcher";
+    if (category === "student") return "Student";
+    return "Professional";
+}
+function getAllTemplateOptionsWithLabels() {
+    const templates = getAllTemplates();
+    // Sort: professional first, then student/researcher
+    const sorted = templates.sort((a, b)=>{
+        if (a.category === "professional" && b.category !== "professional") return -1;
+        if (a.category !== "professional" && b.category === "professional") return 1;
+        return a.name.localeCompare(b.name);
+    });
+    return sorted.map((t)=>{
+        const categoryLabel = getCategoryLabel(t.category, t.id);
+        return {
+            value: t.id,
+            label: `[${categoryLabel}] ${t.name}`,
+            category: t.category,
+            categoryLabel
+        };
+    });
+}
+function getTemplateRecommendation(templateId, cvType) {
+    const template = templateRegistry[templateId];
+    if (!template) return {
+        isRecommended: true
+    };
+    const isStudentCV = cvType === "student" || cvType === "fresh_grad";
+    const isResearcherCV = cvType === "researcher";
+    const isProfessionalCV = cvType === "professional" || cvType === "expert" || cvType === "executive";
+    // PhD Research template
+    if (templateId === "phd-research") {
+        if (isResearcherCV) return {
+            isRecommended: true
+        };
+        if (isStudentCV) return {
+            isRecommended: false,
+            warning: "This template is designed for researchers/PhD candidates. Your CV appears to be student-focused."
+        };
+        return {
+            isRecommended: false,
+            warning: "This template is designed for researchers/PhD candidates. Your CV appears to be professional-focused."
+        };
+    }
+    // Student Modern template
+    if (templateId === "student-modern") {
+        if (isStudentCV) return {
+            isRecommended: true
+        };
+        if (isResearcherCV) return {
+            isRecommended: false,
+            warning: "This template is designed for students. Consider using the PhD Research template for your researcher CV."
+        };
+        return {
+            isRecommended: false,
+            warning: "This template is designed for students/fresh graduates. Your CV appears to have significant professional experience."
+        };
+    }
+    // Professional templates
+    if (template.category === "professional") {
+        if (isProfessionalCV || isResearcherCV) return {
+            isRecommended: true
+        };
+        return {
+            isRecommended: false,
+            warning: "This template is designed for experienced professionals. Consider using a student template to better highlight your education and projects."
+        };
+    }
+    return {
+        isRecommended: true
+    };
 }
 }),
 "[project]/types/cv.ts [app-ssr] (ecmascript)", ((__turbopack_context__) => {
