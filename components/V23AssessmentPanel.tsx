@@ -341,7 +341,7 @@ function HeaderSection({ data, meta, candidateName, candidateTitle }: {
           </Box>
           <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
             <Chip 
-              label={grade} 
+              label={`Grade: ${grade}`} 
               size="small"
               sx={{ bgcolor: getGradeColor(grade), color: "white", fontWeight: 600 }}
               data-testid="chip-grade"
