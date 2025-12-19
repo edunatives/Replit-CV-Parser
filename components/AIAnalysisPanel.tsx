@@ -573,6 +573,44 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
   if (activeTrack === "assessment") {
     // v2.3 CV Intelligence Engine UI
     if (useV23 && (v23Analysis || loading || error)) {
+      const rerunControls = v23Analysis ? (
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center", flexWrap: "wrap" }}>
+          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+            <Typography variant="caption" color="text.secondary">Depth:</Typography>
+            <ToggleButtonGroup
+              value={outputMode}
+              exclusive
+              onChange={(_, value) => value && setOutputMode(value as OutputMode)}
+              size="small"
+              data-testid="toggle-output-mode-rerun"
+            >
+              <ToggleButton value="LITE" sx={{ py: 0.25, px: 1 }}>
+                <FlashOnIcon sx={{ fontSize: 14, mr: 0.5 }} />
+                Lite
+              </ToggleButton>
+              <ToggleButton value="STANDARD" sx={{ py: 0.25, px: 1 }}>
+                <BalanceIcon sx={{ fontSize: 14, mr: 0.5 }} />
+                Standard
+              </ToggleButton>
+              <ToggleButton value="FULL" sx={{ py: 0.25, px: 1 }}>
+                <AllInclusiveIcon sx={{ fontSize: 14, mr: 0.5 }} />
+                Full
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
+          <Button 
+            variant="outlined" 
+            size="small"
+            startIcon={<AutoAwesomeIcon />}
+            onClick={() => runAssessment()}
+            disabled={loading}
+            data-testid="button-rerun-assessment"
+          >
+            Re-run {outputMode} Analysis
+          </Button>
+        </Box>
+      ) : undefined;
+      
       return (
         <Box sx={{ height: "100%", display: "flex", flexDirection: "column", overflow: "auto" }}>
           <V23AssessmentPanel
@@ -581,44 +619,8 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
             error={error}
             candidateName={cv.name}
             candidateTitle={cv.title}
+            rerunControls={rerunControls}
           />
-          {v23Analysis && (
-            <Box sx={{ p: 2, mt: 2 }}>
-              <Box sx={{ display: "flex", gap: 1, mb: 1.5, alignItems: "center", flexWrap: "wrap" }}>
-                <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>Depth:</Typography>
-                <ToggleButtonGroup
-                  value={outputMode}
-                  exclusive
-                  onChange={(_, value) => value && setOutputMode(value as OutputMode)}
-                  size="small"
-                  data-testid="toggle-output-mode-rerun"
-                >
-                  <ToggleButton value="LITE" sx={{ py: 0.5, px: 1.5 }}>
-                    <FlashOnIcon sx={{ fontSize: 14, mr: 0.5 }} />
-                    Lite
-                  </ToggleButton>
-                  <ToggleButton value="STANDARD" sx={{ py: 0.5, px: 1.5 }}>
-                    <BalanceIcon sx={{ fontSize: 14, mr: 0.5 }} />
-                    Standard
-                  </ToggleButton>
-                  <ToggleButton value="FULL" sx={{ py: 0.5, px: 1.5 }}>
-                    <AllInclusiveIcon sx={{ fontSize: 14, mr: 0.5 }} />
-                    Full
-                  </ToggleButton>
-                </ToggleButtonGroup>
-              </Box>
-              <Button 
-                variant="outlined" 
-                fullWidth 
-                startIcon={<AutoAwesomeIcon />}
-                onClick={() => runAssessment()}
-                disabled={loading}
-                data-testid="button-rerun-assessment"
-              >
-                Re-run {outputMode} Analysis (v2.3)
-              </Button>
-            </Box>
-          )}
         </Box>
       );
     }

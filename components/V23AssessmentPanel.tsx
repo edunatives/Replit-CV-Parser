@@ -31,6 +31,7 @@ interface V23AssessmentPanelProps {
   error: string | null;
   candidateName?: string;
   candidateTitle?: string;
+  rerunControls?: React.ReactNode;
 }
 
 const ANALYSIS_STEPS = [
@@ -111,7 +112,8 @@ export function V23AssessmentPanel({
   loading, 
   error, 
   candidateName,
-  candidateTitle
+  candidateTitle,
+  rerunControls
 }: V23AssessmentPanelProps) {
   const [activeTab, setActiveTab] = useState<TabValue>("overview");
   const [analysisStep, setAnalysisStep] = useState(0);
@@ -232,6 +234,12 @@ export function V23AssessmentPanel({
   return (
     <Box sx={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, overflow: "hidden" }} data-testid="v23-assessment-panel">
       <HeaderSection data={data} meta={meta} candidateName={candidateName} candidateTitle={candidateTitle} />
+      
+      {rerunControls && (
+        <Box sx={{ px: 2, py: 1.5, borderBottom: 1, borderColor: "divider", bgcolor: "background.paper" }}>
+          {rerunControls}
+        </Box>
+      )}
       
       <Tabs 
         value={activeTab} 
