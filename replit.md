@@ -52,6 +52,15 @@ Preferred communication style: Simple, everyday language.
     - Student/Fresh Grad CVs: Students Templates enabled, Professional Templates disabled
     - Researcher/Professional CVs: Professional Templates enabled, Students Templates disabled
 - **AI-Powered Features**: All AI operations use a multi-provider LLM abstraction layer supporting Gemini and OpenAI. The v2.3 CV Intelligence Engine provides consistent, type-safe structured output via Zod schemas.
+- **Audience System**: 7-category audience targeting with automatic CV type mapping:
+    - HR (recruiter perspective)
+    - USER/STUDENT (auto-mapped from cvType="student")
+    - USER/FRESH_GRADUATE (auto-mapped from cvType="fresh_grad")
+    - USER/PROFESSIONAL (auto-mapped from cvType="professional", default)
+    - USER/RESEARCHER (auto-mapped from cvType="researcher")
+    - USER/EXPERT (senior professionals)
+    - USER/EXECUTIVE (C-level/leadership)
+    - Audience dropdown in rerun controls allows manual override
 - **Multi-Provider Support**: 
     - Gemini: GOOGLE_API_KEY (user's direct key) or AI_INTEGRATIONS_GEMINI_API_KEY (Replit integration)
     - OpenAI: AI_INTEGRATIONS_OPENAI_API_KEY (Replit integration) - uses gpt-4o by default

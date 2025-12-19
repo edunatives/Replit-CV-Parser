@@ -13,7 +13,15 @@ import { z } from "zod";
 // ============================================================================
 
 export const OutputModeEnum = z.enum(["LITE", "STANDARD", "FULL"]);
-export const AudienceTypeEnum = z.enum(["STUDENT", "HR"]);
+export const AudienceTypeEnum = z.enum([
+  "HR",
+  "USER/STUDENT",
+  "USER/FRESH_GRADUATE",
+  "USER/PROFESSIONAL",
+  "USER/RESEARCHER",
+  "USER/EXPERT",
+  "USER/EXECUTIVE"
+]);
 export const SeverityLevelEnum = z.enum(["info", "low", "medium", "high", "critical"]);
 export const GradeEnum = z.enum(["A", "A-", "B+", "B", "B-", "C+", "C", "D", "F"]);
 export const RiskLevelEnum = z.enum(["LOW", "MODERATE", "HIGH", "CRITICAL"]);

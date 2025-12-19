@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Box, Typography, Card, CardContent, Chip, LinearProgress, TextField, Button, IconButton, Divider, CircularProgress, Alert, ToggleButtonGroup, ToggleButton, Tooltip } from "@mui/material";
+import { Box, Typography, Card, CardContent, Chip, LinearProgress, TextField, Button, IconButton, Divider, CircularProgress, Alert, ToggleButtonGroup, ToggleButton, Tooltip, Select, MenuItem, FormControl } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 import WarningIcon from "@mui/icons-material/Warning";
@@ -14,10 +14,31 @@ import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import FlashOnIcon from "@mui/icons-material/FlashOn";
 import BalanceIcon from "@mui/icons-material/Balance";
 import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
-import type { ParsedCV } from "@/types/cv";
+import type { ParsedCV, CVType } from "@/types/cv";
 import { V23AssessmentPanel } from "./V23AssessmentPanel";
 import { JDMatchPanel } from "./JDMatchPanel";
-import type { AnalysisResponse, OutputMode } from "@/lib/langchain/v23-cv-intelligence-schemas";
+import type { AnalysisResponse, OutputMode, AudienceType } from "@/lib/langchain/v23-cv-intelligence-schemas";
+
+// Map CV type detection to audience categories
+function mapCvTypeToAudience(cvType?: CVType): AudienceType {
+  switch (cvType) {
+    case "student": return "USER/STUDENT";
+    case "fresh_grad": return "USER/FRESH_GRADUATE";
+    case "researcher": return "USER/RESEARCHER";
+    case "professional": return "USER/PROFESSIONAL";
+    default: return "USER/PROFESSIONAL";
+  }
+}
+
+const AUDIENCE_OPTIONS: { value: AudienceType; label: string }[] = [
+  { value: "HR", label: "HR/Recruiter" },
+  { value: "USER/STUDENT", label: "Student" },
+  { value: "USER/FRESH_GRADUATE", label: "Fresh Graduate" },
+  { value: "USER/PROFESSIONAL", label: "Professional" },
+  { value: "USER/RESEARCHER", label: "Researcher/Academia" },
+  { value: "USER/EXPERT", label: "Expert Professional" },
+  { value: "USER/EXECUTIVE", label: "Executive" },
+];
 
 interface AIAnalysisPanelProps {
   cv: ParsedCV;
@@ -392,6 +413,7 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
   const [v23Analysis, setV23Analysis] = useState<AnalysisResponse | null>(null);
   const [useV23, setUseV23] = useState(true);
   const [outputMode, setOutputMode] = useState<OutputMode>("FULL");
+  const [audience, setAudience] = useState<AudienceType>(() => mapCvTypeToAudience(cv.cvType));
   const [jdMatch, setJdMatch] = useState<JDMatchResult | null>(null);
   const [v23JdMatch, setV23JdMatch] = useState<AnalysisResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -436,7 +458,7 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
         body: JSON.stringify({ 
           cv, 
           outputMode, 
-          audience: "STUDENT",
+          audience,
           version: outputMode === "FULL" ? "2.4" : "2.3",
           includeFullRewrite: outputMode === "FULL"
         }),
@@ -543,7 +565,7 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
       const response = await fetch("/api/assess/jd-match", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cv, jd: jdText, outputMode, audience: "STUDENT" }),
+        body: JSON.stringify({ cv, jd: jdText, outputMode, audience }),
       });
       
       const contentType = response.headers.get("content-type");
@@ -597,6 +619,23 @@ export function AIAnalysisPanel({ cv, activeTrack }: AIAnalysisPanelProps) {
                 Full
               </ToggleButton>
             </ToggleButtonGroup>
+          </Box>
+          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+            <Typography variant="caption" color="text.secondary">Audience:</Typography>
+            <FormControl size="small" sx={{ minWidth: 140 }}>
+              <Select
+                value={audience}
+                onChange={(e) => setAudience(e.target.value as AudienceType)}
+                sx={{ fontSize: "0.75rem", height: 28 }}
+                data-testid="select-audience"
+              >
+                {AUDIENCE_OPTIONS.map((opt) => (
+                  <MenuItem key={opt.value} value={opt.value} sx={{ fontSize: "0.75rem" }}>
+                    {opt.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Box>
           <Button 
             variant="outlined" 
